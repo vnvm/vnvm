@@ -1,0 +1,6 @@
+/*
+Translation File
+*/
+class COD
+{
+}

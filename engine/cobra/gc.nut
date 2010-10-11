@@ -1,0 +1,6 @@
+/*
+Graphic Cell
+*/
+class GC
+{
+}

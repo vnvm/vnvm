@@ -1,0 +1,3 @@
+VNVM engine made by soywiz.
+Port of the engine made by soywiz for Tales Translations. http://www.tales-tra.com/
+Translation into spanish made by Tales Translation group (soywiz and memnoch).

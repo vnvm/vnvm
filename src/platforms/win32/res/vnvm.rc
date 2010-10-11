@@ -1,0 +1,32 @@
+101 ICON FIXED PRELOAD "icon.ico"
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION 0,0,1,0
+PRODUCTVERSION 0,0,1,0
+FILEFLAGSMASK 0x17L
+FILEFLAGS 0x1L
+FILEOS 0x4L
+FILETYPE 0x1L
+FILESUBTYPE 0x0L
+BEGIN
+	BLOCK "StringFileInfo"
+	BEGIN
+		BLOCK "0c0a04b0"
+		BEGIN
+			VALUE "Comments",          "VisualNovel VirtualMachine"
+			VALUE "CompanyName",       "soywiz"
+			VALUE "FileDescription",   "VisualNovel VirtualMachine"
+            VALUE "FileVersion",       "0.1"
+			VALUE "InternalName",      "vnvm"
+			VALUE "LegalCopyright",    "soywiz 2008-2011"
+			VALUE "LegalTrademarks",   "soywiz 2008-2011"
+			VALUE "OriginalFilename",  "vnvm.exe"
+			VALUE "ProductName",       "vnvm"
+            VALUE "ProductVersion",    "0.1"
+		END
+	END
+	BLOCK "VarFileInfo"
+	BEGIN
+		VALUE "Translation", 0xc0a, 1200
+	END
+END

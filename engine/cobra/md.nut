@@ -1,0 +1,6 @@
+/*
+MAP DATA
+*/
+class MD
+{
+}
