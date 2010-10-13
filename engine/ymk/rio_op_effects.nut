@@ -63,32 +63,45 @@ class RIO_OP_EFFECTS_base
 					case 0:
 						effect = Effect("normal");
 						effect.image = sceneLayerDraw;
-						printf("Effect::normal\n");
+						//printf("Effect::normal\n");
 					break;
 					case 1:
 						effect = Effect("invert");
 						effect.image = sceneLayerDraw;
-						printf("Effect::invert\n");
+						//printf("Effect::invert\n");
 					break;
 				}
 			break;
-			case 42: // TRANSITION MASK
+			case 13: // TRANSITION MASK (show)
 				effect = Effect("transition");
 				effect.image = sceneLayerDraw;
 				effect.mask = this.maskWip.images[0];
+				effect.blend = 0;
 				effect.reverse = 0;
-				printf("Effect::transition\n");
+				//printf("Effect::transition_show\n");
+			break;
+			case 42: // TRANSITION MASK (blend)
+				effect = Effect("transition");
+				effect.image = sceneLayerDraw;
+				effect.mask = this.maskWip.images[0];
+				effect.blend = 1;
+				effect.reverse = 0;
+				//printf("Effect::transition_blend\n");
 			break;
 			default: // UNKNOWN EFFECT
 				this.TODO();
 			break;
+		}
+		
+		if (this.skipping()) {
+			nsteps /= 5;
 		}
 
 		while (step <= nsteps) {
 			this.input_update();
 			
 			//if (mouse.click_left) step = nsteps;
-			if (this.skipping()) step = nsteps;
+			//if (this.skipping()) step = nsteps;
 
 			local fstep = step / nsteps;
 			
@@ -118,7 +131,8 @@ class RIO_OP_EFFECTS_base
 		}
 
 		sceneLayerShow.clear([0, 0, 0, 1]);
-		sceneLayerShow.drawBitmap(sceneLayerMixed, 0, 0, 1.0);
+		sceneLayerShow.drawBitmap(sceneLayerDraw, 0, 0, 1.0);
+		//sceneLayerShow.drawBitmap(sceneLayerMixed, 0, 0, 1.0);
 	}
 	
 	</ id=0x4B, format="1222221", description="" />
@@ -150,6 +164,7 @@ class RIO_OP_EFFECTS_base
 			if (!("animation" in object)) continue;
 			local anim = object.animation;
 			if (!anim) continue;
+			anim.timer.length /= 5;
 			anim.start();
 		}
 		do {

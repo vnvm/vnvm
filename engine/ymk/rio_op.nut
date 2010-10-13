@@ -21,6 +21,12 @@ class RIO_OP_base
 		this.TODO();
 	}
 
+	</ id=0x30, format="22", description="" />
+	static function UNK_30(param1, param2)
+	{
+		this.TODO();
+	}
+
 	</ id=0x55, format="1", description="" />
 	static function UNK_55(unk)
 	{
@@ -45,7 +51,13 @@ class RIO_OP_base
 		}
 		movie.stop();
 	}
-	
+
+	</ id=0x62, format="1", description="" />
+	static function UNK_62(param)
+	{
+		this.TODO();
+	}
+
 	</ id=0x64, format="4", description="" />
 	static function UNK_64(unk1)
 	{

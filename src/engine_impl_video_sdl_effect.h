@@ -255,6 +255,7 @@ class Effect : public ShaderProgram
 			uniform sampler2D mask; \
 			uniform float     step; \
 			uniform bool      reverse; \
+			uniform bool      blend; \
 			\
 			void main() { \
 				float a; \
@@ -262,6 +263,7 @@ class Effect : public ShaderProgram
 				if (!reverse) a = 1.0 - a; \
 				a = a - 1.0 + step * 2.0; \
 				gl_FragColor.rgb = texture2D(image, gl_TexCoord[0].xy).rgb; \
+				if (!blend && (a >= 0.0)) a = 1.0; \
 				gl_FragColor.a   = clamp(a, 0.0, 1.0); \
 			} \
 		");
@@ -315,7 +317,8 @@ class Effect : public ShaderProgram
 			if (strcmp(effectName, "normal") == 0) return setEffectNormal();
 			if (strcmp(effectName, "tint") == 0) return setEffectTint();
 			if (strcmp(effectName, "invert") == 0) return setEffectInvert();
+			if (strcmp(effectName, "transition") == 0) return setEffectTransition();
 		}
-		return setEffectTransition();
+		return setEffectNormal();
 	}
 };

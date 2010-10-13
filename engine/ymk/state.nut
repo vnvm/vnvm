@@ -22,6 +22,7 @@ class State
 	static MAX_FLAGS = 3000;
 	sprites_l1 = null;
 	sprites_l2 = null;
+	sprites_object = null;
 	timer = 0;
 	timer_max = 0;
 	script_stack = null;
@@ -35,6 +36,7 @@ class State
 	{
 		sprites_l1 = [null, null, null];
 		sprites_l2 = [null, null, null];
+		sprites_object = null;
 		script_stack = [];
 		background = "";
 		background_color = null;
@@ -44,6 +46,11 @@ class State
 	function flags_set_range(start, end, value = 0)
 	{
 		for (local n = start; n <= end; n++) flags[n] = value;
+	}
+
+	function flags_set_range_count(start, count, value = 0)
+	{
+		for (local n = start; n < start + count; n++) flags[n] = value;
 	}
 
 	function script_push(script_reference)

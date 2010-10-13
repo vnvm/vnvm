@@ -125,7 +125,7 @@ class RIO_OP_TEXT
 	}
 
 	</ id=0x08, format="2", description="Sets the size of the text (00=small, 01=big)" />
-	static function TEXT_SIZE()
+	static function TEXT_SIZE(size)
 	{
 		this.TODO();
 	}

@@ -63,7 +63,7 @@ class RIO_OP_ANIM
 			
 			if (this.table.using_mouse) {
 				mask_kind = this.table.mask.images[0].getpixel(mouse.x, mouse.y);
-				if (!this.state.flags[this.table.enable_flags[mask_kind]]) {
+				if (!this.table.tbl_enable(mask_kind)) {
 					mask_kind = 0;
 				} else {
 					this.table.keymap_goto_kind(mask_kind);

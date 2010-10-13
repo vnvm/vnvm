@@ -14,6 +14,7 @@ class TBL
 	msk_name = 0;
 	enable_flags = null;
 	keymap   = null;
+	state    = null;
 
 	// Object info.
 	mask     = null;
@@ -56,7 +57,8 @@ class TBL
 	{
 		if (kind < 0) return 0;
 		if (kind >= this.enable_flags.len()) return 0;
-		return this.enable_flags[kind];
+		//printf("tbl_enable(kind:%d, flag:%d)\n", kind, this.enable_flags[kind]);
+		return this.state.flags[this.enable_flags[kind]];
 	}
 	
 	function keymap_move(mx = 0, my = 0)

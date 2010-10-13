@@ -86,11 +86,19 @@ switch (engine_version) {
 }
 
 //RIO().load("CG_WAIT").save("CG_WAIT.BIN");
-//RIO().load("pw0001").save("pw0001.BIN");
+//RIO().load("pw0002_1").save("pw0002_1.BIN");
+//RIO().load("pw0002_1").save("pw0002_1.BIN");
+//pw0001
 
 rio <- RIO();
+rio.load("START");
 
 switch (engine_version) {
+	case "pw":
+		rio.state.flags_set_range_count(1050, 30, 1); // ENABLE BGM
+		
+		rio.state.flags_set_range(1000, 2999, 1); // ENABLE ALL
+	break;
 	default: /*case "ymk":*/
 		rio.state.flags_set_range(1051, 1067, 1); // ENABLE BGM
 
@@ -115,7 +123,8 @@ switch (engine_version) {
 	break;
 }
 
-rio.load("START");
+//rio.load("pw0002_1", 1, 0xB249);
+//rio.load("START");
 //rio.load("MAINMENU")
 //rio.load("t001_01", 1, 0x0000161F)
 //rio.load("t001_01", 1, 0x48E1)

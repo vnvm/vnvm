@@ -7,7 +7,7 @@ class RIO
 	maskWip = null;
 	table = null;
 	anim = null;
-	fps = 25;
+	fps = 40;
 	music = null;
 	music_stream = null;
 	sound = null;
@@ -24,7 +24,7 @@ class RIO
 	constructor()
 	{
 		this.state = State();
-		this.table = TBL();
+		this.table = TBL(); this.table.state = this.state;
 		this.anim  = ANM();
 		this.running = true;
 		this.wip_clkwait = resman.get_image("CLKWAIT", 0);
@@ -63,7 +63,7 @@ class RIO
 		}
 
 		// Draw sprites
-		foreach (sprite in this.state.sprites_l1) {
+		foreach (sprite in [this.state.sprites_l1[0], this.state.sprites_l1[1], this.state.sprites_l1[2], this.state.sprites_object]) {
 			if (sprite == null) continue;
 			resman.get_image(sprite.name).drawTo(sceneLayerDraw, 0, sprite.x, sprite.y);
 		}
@@ -326,7 +326,7 @@ class RIO
 				printf("Unprocessed OP(0x%02X) : %s\n", op, name);
 			}
 		} catch (e) {
-			printf("Error with OP(0x%02X):'%s':'%s':'%s' : '%s'\n", op, name, params_format, ::object_to_string(vparams), e);
+			printf("%s@%04X: Error with OP(0x%02X):'%s':'%s':'%s' : '%s'\n", this.name, start_pos, op, name, params_format, ::object_to_string(vparams), e);
 			throw(e);
 		}
 	}
