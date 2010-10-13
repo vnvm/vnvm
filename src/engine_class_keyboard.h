@@ -48,7 +48,7 @@ int pressed_pressing(int get_pressing)
 	char *c = (char *)s.data;
 	int l = strlen(c);
 	int key = -1;
-	int modkey = -1;
+	int modkey = 0;
 	
 	switch (l) {
 		// Single letter
@@ -95,7 +95,7 @@ int pressed_pressing(int get_pressing)
 	if (key >= 0) {
 		RETURN_INT(get_pressing ? self->pressing(key) : self->pressed(key));
 	} else if (modkey >= 0) {
-		RETURN_INT(get_pressing ? self->mod_pressing(key) : self->mod_pressed(key));
+		RETURN_INT(get_pressing ? self->mod_pressing(modkey) : self->mod_pressed(modkey));
 	} else {
 		RETURN_VOID;
 	}

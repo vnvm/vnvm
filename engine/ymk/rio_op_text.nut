@@ -38,10 +38,21 @@ class RIO_OP_TEXT
 		local draw_text_scene = function(title, text, number_of_letters, fstep, screen, draw_interface) {
 			this.frame_draw();
 			if (draw_interface) this.frame_draw_interface(title.len());
+			
+			local title_pos = { x = 60, y = screen.h - 152, w = 0, h = 0};
+			local text_pos  = { x = 80, y = 512           , w = 0, h = 0};
+			
+			switch (engine_version) {
+				case "pw":
+					title_pos.y = screen.h - 166;
+					title_pos.x = 90;
+					text_pos.y = 512 - 40;
+				break;
+			}
 
-			print_text(title, 60, screen.h - 152);
+			print_text(title, title_pos.x, title_pos.y);
 			font.setSlice(0, number_of_letters * fstep);
-			print_text(text, 80, 512);
+			print_text(text, text_pos.x, text_pos.y);
 			font.setSlice(-1, -1);
 		};
 		

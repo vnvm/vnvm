@@ -31,5 +31,6 @@ if (exists_in_game_path_any(["chip.arc"])) {
 	// True love
 	include("shuffle/main.nut");
 } else {
-	printf("Not detected any compatible Visual Novel\n");
+	include("game_selector/main.nut");
+	//printf("Not detected any compatible Visual Novel\n");
 }

@@ -28,7 +28,19 @@ class RIO
 		this.anim  = ANM();
 		this.running = true;
 		this.wip_clkwait = resman.get_image("CLKWAIT", 0);
-		this.wip_clkwait_frames = wip_clkwait.images[0].split(wip_clkwait.images[0].h, wip_clkwait.images[0].h);
+		//this.wip_clkwait_frames = wip_clkwait.images[0].split(wip_clkwait.images[0].h, wip_clkwait.images[0].h);
+		//wip_clkwait.images[0].save("CLKWAIT.bmp");
+		
+		local iwait = wip_clkwait.images[0];
+		
+		switch (engine_version) {
+			case "pw":
+				this.wip_clkwait_frames = iwait.slice(1, 0, iwait.w, iwait.h).split(55, iwait.h);
+			break;
+			default:
+				this.wip_clkwait_frames = iwait.split(iwait.h, iwait.h);
+			break;
+		}
 		this.font = Font("lucon.ttf", 19);
 	}
 
@@ -145,12 +157,26 @@ class RIO
 	
 	function frame_draw_interface(show_header_text = 0)
 	{
-		local y = 600 - resman.get_image("WINBASE0", 0).infos[0].h;
-		for (local n = 0; n < 8; n++) {
-			resman.get_image("WINBASE0", 0).drawTo(screen, n, 0, y);
+		local wip = resman.get_image("WINBASE0", 0);
+		local x = 800 / 2 - wip.infos[0].w / 2;
+		local y = 600 - wip.infos[0].h;
+		
+		local num_buttons;
+		
+		switch (engine_version) {
+			case "pw":
+				num_buttons = 10;
+			break;
+			default:
+				num_buttons = 8;
+			break;
 		}
 		
-		if (show_header_text) resman.get_image("WINBASE0", 0).drawTo(screen, 25, 0, y);
+		for (local n = 0; n < num_buttons; n++) {
+			wip.drawTo(screen, n, x, y);
+		}
+		
+		if (show_header_text) wip.drawTo(screen, num_buttons * 3 + 1, x, y);
 	}
 	
 	function skipping()
