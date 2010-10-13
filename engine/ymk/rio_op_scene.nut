@@ -4,7 +4,8 @@ class RIO_OP_SCENE
 	static function BACKGROUND(x, y, unk1, unk2, index, name)
 	{
 		this.state.background_color = null;
-		this.state.background = {x=x, y=y, index=index, name=name};
+		this.state.background = {x=x, y=y, index=index, name=name, animation=null};
+		//this.state.background = {x=0, y=0, index=index, name=name};
 		this.updateSceneLayer();
 	}
 	
@@ -32,6 +33,7 @@ class RIO_OP_SCENE
 			x = x,
 			y = y,
 			name = name,
+			animation = null,
 		};
 		this.state.sprites_l1[index] = sprite;
 		this.updateSceneLayer();

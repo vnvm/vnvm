@@ -30,7 +30,7 @@ class Movie { public:
 		unload();
 		mpeg = SMPEG_new(file_name, &mpeg_info, 0);
 
-		if (1) {
+		if (0) {
 			printf("\n");
 			printf("MOVIE('%s') {\n", file_name);
 			printf(" mpeg : %08X\n", mpeg);
@@ -46,7 +46,9 @@ class Movie { public:
 		
 		surface = SDL_CreateRGBSurface(SDL_SWSURFACE, mpeg_info.width, mpeg_info.height, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
 		
-		printf("Ok\n");
+		if (0) {
+			printf("Ok\n");
+		}
 		rect.y = rect.x = 0;
 		rect.w = width();
 		rect.h = height();
@@ -60,7 +62,9 @@ class Movie { public:
 		rect.y = y1;
 		rect.w = x2 - x1;
 		rect.h = y2 - y1;
-		printf("Movie.viewport(%d, %d, %d, %d)\n", rect.x, rect.y, rect.w, rect.h);
+		if (0) {
+			printf("Movie.viewport(%d, %d, %d, %d)\n", rect.x, rect.y, rect.w, rect.h);
+		}
 	}
 	
 	void unload() {
@@ -145,10 +149,14 @@ class Movie { public:
 		SMPEG_scaleXY(mpeg, rect.w, rect.h);
 		SMPEG_filter(mpeg, SMPEGfilter_bilinear());
 
-		printf("Play...");
+		if (0) {
+			printf("Play...");
+		}
 		SMPEG_play(mpeg);
 
-		printf("MOVIE_PLAY:END\n");
+		if (0) {
+			printf("MOVIE_PLAY:END\n");
+		}
 	}
 };
 

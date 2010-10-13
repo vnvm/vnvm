@@ -1,3 +1,5 @@
+include("math.nut");
+
 info.game_data_path <- info.engine_path + "/../game_data";
 
 printf("Information:\n");
@@ -5,7 +7,6 @@ printf("  Platform: %s\n", info.platform);
 printf("  Native resolution: %dx%d\n", info.native_width, info.native_height);
 printf("  Engine path: %s\n", info.engine_path);
 printf("  Game data path: %s\n", info.game_data_path);
-
 
 mouse    <- Mouse();
 keyboard <- Keyboard();
@@ -45,10 +46,12 @@ translation <- Translation();
 
 class Timer
 {
-	start = 0;
+	start  = 0;
+	length = 0;
 	
-	constructor()
+	constructor(length = 0)
 	{
+		this.length = length;
 		this.reset();
 	}
 	
@@ -59,13 +62,19 @@ class Timer
 	
 	function reset()
 	{
-		start = ::time_ms();
+		start  = ::time_ms();
+	}
+	
+	function ended()
+	{
+		return this.elapsed >= this.length;
 	}
 	
 	function _get(name)
 	{
 		switch (name) {
 			case "elapsed": return ::time_ms() - this.start;
+			case "elapsedf": return (::time_ms() - this.start).tofloat() / this.length.tofloat();
 		}
 	}
 }
@@ -82,11 +91,6 @@ array_join <- function(array, separator) {
 function loop_forever(fps = 40)
 {
 	while (1) { Screen.flip(); Screen.frame(40); }
-}
-
-function between(v, m, M)
-{
-	return (v >= m) && (v < M);
 }
 
 function object_to_string(v)

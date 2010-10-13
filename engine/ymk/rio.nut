@@ -53,7 +53,7 @@ class RIO
 	{
 		if (this.state.background != "") {
 			// Background
-			resman.get_image(this.state.background.name).drawTo(sceneLayerDraw, 0, this.state.background.x, this.state.background.y);
+			resman.get_image(this.state.background.name).drawTo(sceneLayerDraw, 0, -this.state.background.x, -this.state.background.y);
 		} else if (this.state.background_color != null) {
 			// Background color
 			sceneLayerDraw.clear(this.state.background_color);
@@ -77,7 +77,11 @@ class RIO
 	function load(name, call = 1, position = 0)
 	{
 		translation.reset();
-		include("../game_data/ymk/translation/" + name.toupper() + ".nut");
+		local translation_script = "../game_data/ymk/translation/" + name.toupper() + ".nut";
+		if (file_exists(translation_script)) {
+			printf("Loaded translation: '%s'\n", translation_script);
+			include(translation_script);
+		}
 
 		//printf("-----------------------------------------------\n");
 		printf("@@@ RIO.load('%s', %d, %d)\n", name, call, position);

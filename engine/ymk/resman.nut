@@ -58,7 +58,7 @@ class RESMAN
 		if (!(index_name in resources)) {
 			local data = callback(name);
 			local size = data.memory_size;
-			printf("SIZE: %d\n", size);
+			// printf("SIZE: %d\n", size);
 			resources[index_name] <- {
 				name        = name,
 				type        = type,

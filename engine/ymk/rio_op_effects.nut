@@ -1,3 +1,45 @@
+class Animation
+{
+	from = {};
+	to = {};
+	updateObject = null;
+	timer = null;
+
+	constructor(updateObject = null, totalTime = 0)
+	{
+		this.from = {};
+		this.to = {};
+		this.timer = Timer(totalTime);
+		this.updateObject = updateObject;
+	}
+	
+	function increment(key, inc = 0)
+	{
+		this.from[key] <- this.updateObject[key];
+		this.to[key] <- this.from[key] + inc;
+	}
+	
+	function ended()
+	{
+		return this.timer.ended();
+	}
+	
+	function start()
+	{
+		this.timer.reset();
+	}
+	
+	function update()
+	{
+		foreach (k, v in from) {
+			local f = from[k], t = to[k];
+			local v = interpolate(f, t, this.timer.elapsedf);
+			updateObject[k] = v;
+			//print("Animation::update::" + k + " = " + v + "\n");
+		}
+	}
+}
+
 class RIO_OP_EFFECTS_base
 {
 	</ id=0x4A, format="12.", description="" />
@@ -80,14 +122,60 @@ class RIO_OP_EFFECTS_base
 	}
 	
 	</ id=0x4B, format="1222221", description="" />
-	static function ANIMATE_ADD(a, b, c, d, e, f, g)
+	static function ANIMATE_ADD(object_id, inc_x, inc_y, time, unk0, unk1, unk2)
 	{
+		local object;
+		
+		switch (object_id) {
+			case 0: object = this.state.background; break;
+			case 1: object = this.state.sprites_l1[0]; break;
+			case 2: object = this.state.sprites_l1[1]; break;
+			case 3: object = this.state.sprites_l1[2]; break;
+		}
+		
+		local anim = Animation(object, time);
+		anim.increment("x", inc_x);
+		anim.increment("y", inc_y);
+		object.animation <- anim;
+
 		this.TODO();
 	}
 	
 	</ id=0x4C, format="1", description="" />
-	static function ANIMATE_PLAY(a)
+	static function ANIMATE_PLAY(can_skip)
 	{
+		local objects = [this.state.background, this.state.sprites_l1[0], this.state.sprites_l1[1], this.state.sprites_l1[2]];
+		local ended;
+		foreach (object in objects) {
+			if (!("animation" in object)) continue;
+			local anim = object.animation;
+			if (!anim) continue;
+			anim.start();
+		}
+		do {
+			ended = true;
+			foreach (object in objects) {
+				if (!("animation" in object)) continue;
+				local anim = object.animation;
+				if (!anim) continue;
+				if (!anim.ended()) ended = false;
+				anim.update();
+			}
+			updateSceneLayer();
+			screen.clear([0, 0, 0, 1]);
+			screen.drawBitmap(sceneLayerDraw);
+			if (draw_interface) frame_draw_interface();
+			this.frame_tick();
+		} while (!ended);
+		
+		sceneLayerShow.clear([0, 0, 0, 1]);
+		sceneLayerShow.drawBitmap(sceneLayerDraw, 0, 0, 1.0);
+
+		foreach (object in objects) {
+			if (!("animation" in object)) continue;
+			object.animation = null;
+		}
+
 		this.TODO();
 	}
 
@@ -131,10 +219,10 @@ switch (engine_version) {
 	case "pw": // For Pricess Waltz.
 		class RIO_OP_EFFECTS extends RIO_OP_EFFECTS_base
 		{
-			</ id=0x4C, format="2", description="" />
-			static function ANIMATE_PLAY(a)
+			</ id=0x4C, format="1.", description="" />
+			static function ANIMATE_PLAY(can_skip)
 			{
-				this.TODO();
+				RIO_OP_EFFECTS_base.ANIMATE_PLAY(can_skip);
 			}
 		}
 	break;

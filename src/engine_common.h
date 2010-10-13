@@ -189,7 +189,8 @@ class RefcountObject { public:
 	RefcountObject() {
 		refcount = 0;
 		//sqvm = NULL;
-		printf("RefcountObject(%08X) : %d\n", this, refcount);
+		
+		//printf("RefcountObject(%08X) : %d\n", this, refcount);
 	}
 
 	void capture() {
@@ -199,15 +200,15 @@ class RefcountObject { public:
 			//printf("-----------------\n");
 		}*/
 		refcount++;
-		printf("RefcountObject::capture(%08X) : %d -> %d\n", this, refcount - 1, refcount);
+		//printf("RefcountObject::capture(%08X) : %d -> %d\n", this, refcount - 1, refcount);
 	}
 
 	void release() {
 		//if (sqvm != NULL) sq_release(sqvm, &sqobject);
 		refcount--;
-		printf("RefcountObject::release(%08X) : %d -> %d\n", this, refcount + 1, refcount); fflush(stdout);
+		//printf("RefcountObject::release(%08X) : %d -> %d\n", this, refcount + 1, refcount); fflush(stdout);
 		if (refcount <= 0) {
-			printf(" :: DELETED\n"); fflush(stdout);
+			//printf(" :: DELETED\n"); fflush(stdout);
 			delete this;
 		}
 	}
