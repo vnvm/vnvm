@@ -187,8 +187,12 @@ class RIO
 	
 	function save(name)
 	{
+		printf("Saving '%s' (%d)...\n", name, this.data.len());
+		this.data.seek(0);
 		local file = ::file(name, "wb");
-		file.writestream(this.data);
+		file.writeblob(this.data.readblob(this.data.len()));
+		//file.close();
+		this.data.seek(0);
 	}
 	
 	function process_text(text)
@@ -274,6 +278,8 @@ class RIO
 			if (name.len() == 0) name = ::format("OP_%02X", op);
 			
 			this.state.script_set_pc(data.tell());
+			
+			//printf("OP:%02X\n", op);
 			
 			if (name in cop.__class) {
 				vparams.insert(0, this);

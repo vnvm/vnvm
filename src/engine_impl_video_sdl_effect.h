@@ -1,109 +1,102 @@
-class ShaderProgram { public:
-	GLuint program;
-	GLuint framentShader;
-	//static vector<ShaderProgram*> effects;
+#ifdef USE_OPENGL
+	class ShaderProgram { public:
+		GLuint program;
+		GLuint framentShader;
 
-	ShaderProgram() {
-		framentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		program = glCreateProgram();
-		glAttachShader(program, framentShader);
-	}
-
-	~ShaderProgram() {
-		glDeleteProgram(program);
-		glDeleteShader(framentShader);
-	}
-	
-	/*void push() {
-		effects.push_back(this);
-		effects.back()->use();
-	}
-	
-	void pop() {
-		if (!effects->empty()) effects.pop_back();
-		if (effects->empty()) {
-			ShaderProgram::unuse();
-		} else {
-			effects.back()->use();
+		ShaderProgram() {
+			framentShader = glCreateShader(GL_FRAGMENT_SHADER);
+			program = glCreateProgram();
+			glAttachShader(program, framentShader);
 		}
-	}*/
-	
-	void showErrors(GLuint shader) {
-		int infologLength = 0;
-	    int charsWritten  = 0;
-	    char *infoLog;
 
-		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infologLength);
-	    if (infologLength > 0) {
-	        infoLog = (char *)malloc(infologLength);
-	        glGetShaderInfoLog(shader, infologLength, &charsWritten, infoLog);
-			if (strlen(infoLog)) {
-				fprintf(stderr, "ShaderProgram::showErrors('%s')\n", infoLog);
-				exit(-1);
+		~ShaderProgram() {
+			glDeleteProgram(program);
+			glDeleteShader(framentShader);
+		}
+		
+		void showErrors(GLuint shader) {
+			int infologLength = 0;
+			int charsWritten  = 0;
+			char *infoLog;
+
+			glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infologLength);
+			if (infologLength > 0) {
+				infoLog = (char *)malloc(infologLength);
+				glGetShaderInfoLog(shader, infologLength, &charsWritten, infoLog);
+				if (strlen(infoLog)) {
+					fprintf(stderr, "ShaderProgram::showErrors('%s')\n", infoLog);
+					exit(-1);
+				}
+				free(infoLog);
 			}
-	        free(infoLog);
-	    }
-	}
-	
-	void setFragmentShader(char *string) {
-		//printf("-- SHADER ---------------------------------------------------\n");
-		//printf("%s\n", string);
-		//printf("-------------------------------------------------------------\n");
-		glShaderSource(framentShader, 1, (const GLchar **)&string, NULL);
-		glCompileShader(framentShader);
-		showErrors(framentShader);
-	}
-	
-	void link() {
-		glLinkProgram(program);
-	}
-
-	void setFragmentShaderAndLink(char *string) {
-		setFragmentShader(string);
-		link();
-	}
-	
-	void use() {
-		glUseProgram(program);
-	}
-	
-	static void unuse() {
-		glUseProgram(0);
-	}
-	
-	GLint getUniformLocation(const char *name, bool warning = true) {
-		GLint location = glGetUniformLocation(program, name);
-		if (location == -1) {
-			fprintf(stderr, "ShaderProgram::getUniformLocation('%s') -> Location doesn't not exists.\n", name);
 		}
-		//printf("POSITION(%d:%d)\n", getUniformLocation("image"), getUniformLocation("step"));
-		return location;
-	}
-	
-	void uniform_i(char *name, int v) {
-		GLint location = getUniformLocation(name);
-		printf("LOCATION::%d\n", location); fflush(stdout);
-		glUniform1iv(location, 1, &v);
-	}
+		
+		void setFragmentShader(char *string) {
+			//printf("-- SHADER ---------------------------------------------------\n");
+			//printf("%s\n", string);
+			//printf("-------------------------------------------------------------\n");
+			glShaderSource(framentShader, 1, (const GLchar **)&string, NULL);
+			glCompileShader(framentShader);
+			showErrors(framentShader);
+		}
+		
+		void link() {
+			glLinkProgram(program);
+		}
 
-	void uniform_f(char *name, float v) {
-		GLint location = getUniformLocation(name);
-		glUniform1fv(location, 1, &v);
-	}
-	
-	void uniform_t(char *name, float gltex, int index = 1) {
-		glActiveTexture(GL_TEXTURE0 + index);
-		glBindTexture(GL_TEXTURE_2D, gltex);
-		GLint location = getUniformLocation(name);
-		glUniform1iv(location, 1, &index);
-	}
-};
+		void setFragmentShaderAndLink(char *string) {
+			setFragmentShader(string);
+			link();
+		}
+		
+		void use() {
+			glUseProgram(program);
+		}
+		
+		static void unuse() {
+			glUseProgram(0);
+		}
+		
+		GLint getUniformLocation(const char *name, bool warning = true) {
+			GLint location = glGetUniformLocation(program, name);
+			if (location == -1) {
+				fprintf(stderr, "ShaderProgram::getUniformLocation('%s') -> Location doesn't not exists.\n", name);
+			}
+			//printf("POSITION(%d:%d)\n", getUniformLocation("image"), getUniformLocation("step"));
+			return location;
+		}
+	};
+#else
+	class ShaderProgram { public:
+		ShaderProgram() {
+		}
+
+		~ShaderProgram() {
+		}
+
+		void setFragmentShader(char *string) {
+		}
+		
+		void link() {
+		}
+
+		void setFragmentShaderAndLink(char *string) {
+		}
+		
+		void use() {
+		}
+		
+		static void unuse() {
+		}
+	};
+#endif
 
 typedef enum { EVT_VOID, EVT_FLOAT, EVT_INT, EVT_BITMAP } EffectValuesType;
 class EffectValues
 { public:
 	char name[64];
-	GLuint location;
+	unsigned int location;
+	ShaderProgram *shader;
 	EffectValuesType type;
 	int count;
 	union {
@@ -112,12 +105,13 @@ class EffectValues
 		Bitmap *bitmaps[4];
 	};
 
-	EffectValues()
+	EffectValues(ShaderProgram *shader)
 	{
-		type     = EVT_VOID;
-		count    = 0;
-		sprintf(name, "");
-		location = -1;
+		this->type     = EVT_VOID;
+		this->count    = 0;
+		this->shader   = shader;
+		sprintf(this->name, "");
+		this->location = -1;
 	}
 	
 	~EffectValues()
@@ -128,11 +122,13 @@ class EffectValues
 	{
 	}
 	
-	void set_location(char *name, GLuint location)
+	void set_name(char *name)
 	{
 		//scnprintf(this->name, sizeof(this->name), "%s", name); // SECURE!
 		sprintf(this->name, "%s", name); // @TODO: INSECURE!
-		this->location = location;
+		#ifdef USE_OPENGL
+			this->location = this->shader->getUniformLocation(name);
+		#endif
 	}
 	
 	void set_vars(EffectValuesType type, int count, void *values) {
@@ -154,6 +150,7 @@ class EffectValues
 	void set_floats(int count, float *values) { set_vars(EVT_FLOAT, count, values); }
 	void set_bitmaps(int count, Bitmap **values) { set_vars(EVT_BITMAP, count, values); }
 
+	#ifdef USE_OPENGL
 	void send(int& index, bool showDebugParams = false)
 	{
 		switch (this->type)
@@ -196,12 +193,13 @@ class EffectValues
 			break;
 		}
 	}
+	#endif
 };
 
 class Effect : public ShaderProgram
 { public:
 	char effectName[64];
-	map<GLuint, EffectValues*> uniform_values;
+	map<string, EffectValues*> uniform_values;
 	
 	Effect(char *effect = "")
 	{
@@ -212,14 +210,11 @@ class Effect : public ShaderProgram
 	
 	void set_vars(EffectValuesType type, char *name, int count, void *values)
 	{
-		GLint location = getUniformLocation(name);
-		if (location >= 0) {
-			EffectValues *ev = new EffectValues();
-			ev->set_location(name, location);
-			ev->set_vars(type, count, values);
-			uniform_values.erase(location);
-			uniform_values[location] = ev;
-		}
+		EffectValues *ev = new EffectValues(this);
+		ev->set_name(name);
+		ev->set_vars(type, count, values);
+		uniform_values.erase(ev->name);
+		uniform_values[ev->name] = ev;
 	}
 	
 	void set_i(char *name, int value) { set_vars(EVT_INT, name, 1, &value); }
@@ -232,19 +227,25 @@ class Effect : public ShaderProgram
 		//bool showDebugParams = true;
 		int index = 0;
 		bool first = true;
-		for (map<GLuint, EffectValues*>::iterator i = uniform_values.begin(); i != uniform_values.end(); i++) {
+		for (map<string, EffectValues*>::iterator i = uniform_values.begin(); i != uniform_values.end(); i++) {
 			if (showDebugParams && first) printf("---  '%s' --------------------------\n", effectName);
 			//i->second->set_location(i->second->name, getUniformLocation(i->second->name));
-			i->second->send(index, showDebugParams);
+			#ifdef USE_OPENGL
+				i->second->send(index, showDebugParams);
+			#endif
 			if (first) first = !first;
 		}
-		glActiveTexture(GL_TEXTURE0);
+		#ifdef USE_OPENGL
+			glActiveTexture(GL_TEXTURE0);
+		#endif
 	}
 	
 	static void unuse()
 	{
 		ShaderProgram::unuse();
-		glActiveTexture(GL_TEXTURE0);
+		#ifdef USE_OPENGL
+			glActiveTexture(GL_TEXTURE0);
+		#endif
 	}
 	
 	void setEffectTransition()
@@ -258,7 +259,7 @@ class Effect : public ShaderProgram
 			void main() { \
 				float a; \
 				a = texture2D(mask, gl_TexCoord[0].xy).r; \
-				if (reverse) a = 1.0 - a; \
+				if (!reverse) a = 1.0 - a; \
 				a = a - 1.0 + step * 2.0; \
 				gl_FragColor.rgb = texture2D(image, gl_TexCoord[0].xy).rgb; \
 				gl_FragColor.a   = clamp(a, 0.0, 1.0); \

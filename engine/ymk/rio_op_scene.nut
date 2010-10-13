@@ -45,7 +45,7 @@ class RIO_OP_SCENE
 	}
 
 	</ id=0x73, format="22221s", description="" />
-	static function OBJ_PUT()
+	static function OBJ_PUT(a, b, c, d, e, name)
 	{
 		this.TODO();
 	}

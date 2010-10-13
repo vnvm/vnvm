@@ -14,23 +14,6 @@
 
 #undef main
 
-/*
-struct SQStream {
-	virtual SQInteger Read(void *buffer, SQInteger size) = 0;
-	virtual SQInteger Write(void *buffer, SQInteger size) = 0;
-	virtual SQInteger Flush() = 0;
-	virtual SQInteger Tell() = 0;
-	virtual SQInteger Len() = 0;
-	virtual SQInteger Seek(SQInteger offset, SQInteger origin) = 0;
-	virtual bool IsValid() = 0;
-	virtual bool EOS() = 0;
-};
-
-#define SEEK_SET	0
-#define SEEK_CUR	1
-#define SEEK_END	2
-*/
-
 #define sdl_long int
 #define sdl_size_t int
 //#define sdl_size_t size_t

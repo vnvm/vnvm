@@ -5,83 +5,87 @@
 #include <map>
 #include <vector>
 #include <utility>
+#include <string>
+#include <algorithm>
 
 using namespace std;
 
-#define GL_BIND_EXT(func) *((void **)&func##EXT) = wglGetProcAddress(#func "EXT"); if (!func##EXT) { fprintf( stderr, "OpenGL: Can't find function '%s'\n", #func ); exit(-1); }
-#define GL_BIND_NOR(func) *((void **)&func     ) = wglGetProcAddress(#func      ); if (!func     ) { fprintf( stderr, "OpenGL: Can't find function '%s'\n", #func ); exit(-1); }
-#define GL_BIND(func)     *((void **)&func     ) = wglGetProcAddress(#func "EXT"); if (!func     ) { fprintf( stderr, "OpenGL: Can't find function '%s'\n", #func ); exit(-1); }
-#define GL_DEF(type, name) type name = NULL;
-#define GL_DEF_PROC(type, name) PFN##type##PROC name = NULL;
+#ifdef USE_OPENGL
+	#define GL_BIND_EXT(func) *((void **)&func##EXT) = wglGetProcAddress(#func "EXT"); if (!func##EXT) { fprintf( stderr, "OpenGL: Can't find function '%s'\n", #func ); exit(-1); }
+	#define GL_BIND_NOR(func) *((void **)&func     ) = wglGetProcAddress(#func      ); if (!func     ) { fprintf( stderr, "OpenGL: Can't find function '%s'\n", #func ); exit(-1); }
+	#define GL_BIND(func)     *((void **)&func     ) = wglGetProcAddress(#func "EXT"); if (!func     ) { fprintf( stderr, "OpenGL: Can't find function '%s'\n", #func ); exit(-1); }
+	#define GL_DEF(type, name) type name = NULL;
+	#define GL_DEF_PROC(type, name) PFN##type##PROC name = NULL;
 
-GL_DEF(PFNGLRENDERBUFFERSTORAGEEXTPROC,   glRenderbufferStorage);
-GL_DEF(PFNGLBINDFRAMEBUFFEREXTPROC,       glBindFramebuffer);
-GL_DEF(PFNGLGENFRAMEBUFFERSEXTPROC,       glGenFramebuffers);
-GL_DEF(PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC,glCheckFramebufferStatus);
-GL_DEF(PFNGLFRAMEBUFFERTEXTURE2DEXTPROC,  glFramebufferTexture2D);
-GL_DEF(PFNGLBLENDFUNCSEPARATEPROC,        glBlendFuncSeparate);
+	GL_DEF(PFNGLRENDERBUFFERSTORAGEEXTPROC,   glRenderbufferStorage);
+	GL_DEF(PFNGLBINDFRAMEBUFFEREXTPROC,       glBindFramebuffer);
+	GL_DEF(PFNGLGENFRAMEBUFFERSEXTPROC,       glGenFramebuffers);
+	GL_DEF(PFNGLCHECKFRAMEBUFFERSTATUSEXTPROC,glCheckFramebufferStatus);
+	GL_DEF(PFNGLFRAMEBUFFERTEXTURE2DEXTPROC,  glFramebufferTexture2D);
+	GL_DEF(PFNGLBLENDFUNCSEPARATEPROC,        glBlendFuncSeparate);
 
-//GL_DEF(PFN PROC, glCreateProgram);
+	//GL_DEF(PFN PROC, glCreateProgram);
 
-GL_DEF(PFNGLCREATESHADERPROC    , glCreateShader);
-GL_DEF(PFNGLCREATEPROGRAMPROC   , glCreateProgram);
-GL_DEF(PFNGLDELETEPROGRAMPROC   , glDeleteProgram);
-GL_DEF(PFNGLDELETESHADERPROC    , glDeleteShader);
-GL_DEF(PFNGLGETSHADERIVPROC     , glGetShaderiv);
-GL_DEF(PFNGLGETSHADERINFOLOGPROC, glGetShaderInfoLog);
-GL_DEF(PFNGLSHADERSOURCEPROC    , glShaderSource);
-GL_DEF(PFNGLCOMPILESHADERPROC   , glCompileShader);
-GL_DEF(PFNGLATTACHSHADERPROC    , glAttachShader);
-GL_DEF(PFNGLLINKPROGRAMPROC     , glLinkProgram);
-GL_DEF(PFNGLUSEPROGRAMPROC      , glUseProgram);
-GL_DEF(PFNGLGETUNIFORMLOCATIONPROC, glGetUniformLocation);
-GL_DEF(PFNGLUNIFORM1IVPROC      , glUniform1iv);
-GL_DEF(PFNGLUNIFORM1FVPROC      , glUniform1fv);
-GL_DEF(PFNGLUNIFORM2IVPROC      , glUniform2iv);
-GL_DEF(PFNGLUNIFORM2FVPROC      , glUniform2fv);
-GL_DEF(PFNGLUNIFORM3IVPROC      , glUniform3iv);
-GL_DEF(PFNGLUNIFORM3FVPROC      , glUniform3fv);
-GL_DEF(PFNGLUNIFORM4IVPROC      , glUniform4iv);
-GL_DEF(PFNGLUNIFORM4FVPROC      , glUniform4fv);
-GL_DEF(PFNGLACTIVETEXTUREPROC   , glActiveTexture);
+	GL_DEF(PFNGLCREATESHADERPROC    , glCreateShader);
+	GL_DEF(PFNGLCREATEPROGRAMPROC   , glCreateProgram);
+	GL_DEF(PFNGLDELETEPROGRAMPROC   , glDeleteProgram);
+	GL_DEF(PFNGLDELETESHADERPROC    , glDeleteShader);
+	GL_DEF(PFNGLGETSHADERIVPROC     , glGetShaderiv);
+	GL_DEF(PFNGLGETSHADERINFOLOGPROC, glGetShaderInfoLog);
+	GL_DEF(PFNGLSHADERSOURCEPROC    , glShaderSource);
+	GL_DEF(PFNGLCOMPILESHADERPROC   , glCompileShader);
+	GL_DEF(PFNGLATTACHSHADERPROC    , glAttachShader);
+	GL_DEF(PFNGLLINKPROGRAMPROC     , glLinkProgram);
+	GL_DEF(PFNGLUSEPROGRAMPROC      , glUseProgram);
+	GL_DEF(PFNGLGETUNIFORMLOCATIONPROC, glGetUniformLocation);
+	GL_DEF(PFNGLUNIFORM1IVPROC      , glUniform1iv);
+	GL_DEF(PFNGLUNIFORM1FVPROC      , glUniform1fv);
+	GL_DEF(PFNGLUNIFORM2IVPROC      , glUniform2iv);
+	GL_DEF(PFNGLUNIFORM2FVPROC      , glUniform2fv);
+	GL_DEF(PFNGLUNIFORM3IVPROC      , glUniform3iv);
+	GL_DEF(PFNGLUNIFORM3FVPROC      , glUniform3fv);
+	GL_DEF(PFNGLUNIFORM4IVPROC      , glUniform4iv);
+	GL_DEF(PFNGLUNIFORM4FVPROC      , glUniform4fv);
+	GL_DEF(PFNGLACTIVETEXTUREPROC   , glActiveTexture);
 
-//glBlendFuncSeparate
+	//glBlendFuncSeparate
 
-void gl_ext_prepare()
-{
-	static int initialized = 0; if (initialized) return;
+	void gl_ext_prepare()
+	{
+		static int initialized = 0; if (initialized) return;
 
-	GL_BIND(glBlendFuncSeparate);
-	GL_BIND(glRenderbufferStorage);
-	GL_BIND(glBindFramebuffer);
-	GL_BIND(glGenFramebuffers);
-	GL_BIND(glCheckFramebufferStatus);
-	GL_BIND(glFramebufferTexture2D);
+		GL_BIND(glBlendFuncSeparate);
+		GL_BIND(glRenderbufferStorage);
+		GL_BIND(glBindFramebuffer);
+		GL_BIND(glGenFramebuffers);
+		GL_BIND(glCheckFramebufferStatus);
+		GL_BIND(glFramebufferTexture2D);
 
-	GL_BIND_NOR(glCreateShader);
-	GL_BIND_NOR(glCreateProgram);
-	GL_BIND_NOR(glDeleteProgram);
-	GL_BIND_NOR(glDeleteShader);
-	GL_BIND_NOR(glGetShaderiv);
-	GL_BIND_NOR(glGetShaderInfoLog);
-	GL_BIND_NOR(glShaderSource);
-	GL_BIND_NOR(glCompileShader);
-	GL_BIND_NOR(glAttachShader);
-	GL_BIND_NOR(glLinkProgram);
-	GL_BIND_NOR(glUseProgram);
-	GL_BIND_NOR(glGetUniformLocation);
-	GL_BIND_NOR(glUniform1iv);
-	GL_BIND_NOR(glUniform1fv);
-	GL_BIND_NOR(glUniform2iv);
-	GL_BIND_NOR(glUniform2fv);
-	GL_BIND_NOR(glUniform3iv);
-	GL_BIND_NOR(glUniform3fv);
-	GL_BIND_NOR(glUniform4iv);
-	GL_BIND_NOR(glUniform4fv);
-	GL_BIND_NOR(glActiveTexture);
+		GL_BIND_NOR(glCreateShader);
+		GL_BIND_NOR(glCreateProgram);
+		GL_BIND_NOR(glDeleteProgram);
+		GL_BIND_NOR(glDeleteShader);
+		GL_BIND_NOR(glGetShaderiv);
+		GL_BIND_NOR(glGetShaderInfoLog);
+		GL_BIND_NOR(glShaderSource);
+		GL_BIND_NOR(glCompileShader);
+		GL_BIND_NOR(glAttachShader);
+		GL_BIND_NOR(glLinkProgram);
+		GL_BIND_NOR(glUseProgram);
+		GL_BIND_NOR(glGetUniformLocation);
+		GL_BIND_NOR(glUniform1iv);
+		GL_BIND_NOR(glUniform1fv);
+		GL_BIND_NOR(glUniform2iv);
+		GL_BIND_NOR(glUniform2fv);
+		GL_BIND_NOR(glUniform3iv);
+		GL_BIND_NOR(glUniform3fv);
+		GL_BIND_NOR(glUniform4iv);
+		GL_BIND_NOR(glUniform4fv);
+		GL_BIND_NOR(glActiveTexture);
 
-	initialized = 1;
-}
+		initialized = 1;
+	}
+#endif
 
 SDL_Surface *Video_screen = NULL;
 
@@ -207,6 +211,12 @@ SDL_Surface *IMG_Convert_TO_32(SDL_Surface *src, bool free_src = true) {
 	return new_surface;
 }
 
+struct BitmapSlice {
+	int x, y;
+	int tx, ty;
+	int w, h;
+};
+
 class Bitmap {
 public:
 	SDL_Surface *surface;
@@ -274,23 +284,33 @@ public:
 			if (strcmp(name, "alpha") == 0) return GL_ALPHA;
 			return GL_RED;
 		}
+		
+		static Bitmap *lastBitmapBind;
 
 		static void gl_unbind()
 		{
-			glDisable(GL_BLEND);
-			glDisable(GL_TEXTURE_2D);
-			glBindTexture(GL_TEXTURE_2D, 0);
-			glMatrixMode(GL_TEXTURE); glLoadIdentity();
+			//if (lastBitmapBind != NULL)
+			{
+				lastBitmapBind = NULL;
+				glDisable(GL_BLEND);
+				glDisable(GL_TEXTURE_2D);
+				glBindTexture(GL_TEXTURE_2D, 0);
+				glMatrixMode(GL_TEXTURE); glLoadIdentity();
+			}
 		}
 		
 		void gl_bind()
 		{
-			glEnable(GL_BLEND);
-			//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-			glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-			glEnable(GL_TEXTURE_2D);
-			glBindTexture(GL_TEXTURE_2D, gltex);
-			glMatrixMode(GL_TEXTURE); glLoadIdentity(); glScalef(1.0 / surface->w, 1.0 / surface->h, 1.0);
+			//if (lastBitmapBind != this)
+			{
+				lastBitmapBind = this;
+				glEnable(GL_BLEND);
+				//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+				glEnable(GL_TEXTURE_2D);
+				glBindTexture(GL_TEXTURE_2D, gltex);
+				glMatrixMode(GL_TEXTURE); glLoadIdentity(); glScalef(1.0 / surface->w, 1.0 / surface->h, 1.0);
+			}
 		}
 		
 		static void gl_draw_slice(int x, int y, int tx, int ty, int w, int h) {
@@ -451,6 +471,23 @@ public:
 	static Bitmap *createFromStream(STRING data)
 	{
 		return Bitmap::createFromRW(SDL_RWFromConstMem(data.data, data.len));
+	}
+	
+	//void drawSlices(int count, BitmapSlice *slices)
+	void drawSlices(Bitmap *src, std::vector<BitmapSlice> slices)
+	{
+		Bitmap *dst = this;
+	
+		#ifdef USE_OPENGL
+			dst->gl_render_to();
+			src->gl_bind();
+		
+			for (std::vector<BitmapSlice>::iterator slice = slices.begin(); slice != slices.end(); slice++) {
+				Bitmap::gl_draw_slice(slice->x, slice->y, slice->tx, slice->ty, slice->w, slice->h);
+			}
+		#else
+			assert(0);
+		#endif
 	}
 
 	// Creates a slice bitmap of this bitmap.
@@ -725,7 +762,9 @@ public:
 			flags |= SDL_OPENGL;
 		#endif
 		Video_screen = SDL_SetVideoMode(w, h, 32, flags);
-		gl_ext_prepare();
+		#ifdef USE_OPENGL
+			gl_ext_prepare();
+		#endif
 		screen = Bitmap::create(Video_screen);
 		#ifdef USE_OPENGL
 			screen->gl_render_to();
@@ -768,6 +807,10 @@ public:
 		setEffect(effect_list.empty() ? NULL : effect_list.back());
 	}
 };
+
+#ifdef USE_OPENGL
+	Bitmap *Bitmap::lastBitmapBind = NULL;
+#endif
 
 vector<Effect *> Video::effect_list;
 

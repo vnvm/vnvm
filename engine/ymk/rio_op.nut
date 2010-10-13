@@ -2,12 +2,21 @@
 SPECIAL FLAGS:
 	993 - TEXT_SPEED
 	996 - DISABLE SAVE
+
+PRINCESS WALTZ:
+	sub_406F00
 */
 
-class RIO_OP
+class RIO_OP_base
 {
 	</ id=0x28, format="12", description="" />
 	static function UNK_28(param, text)
+	{
+		this.TODO();
+	}
+	
+	</ id=0x29, format="22", description="" />
+	static function UNK_29(param1, param2)
 	{
 		this.TODO();
 	}
@@ -78,4 +87,56 @@ class RIO_OP
 	{
 		this.TODO();
 	}
+
+	</ id=0xBD, format="2", description="" />
+	static function UNK_BD(param)
+	{
+		this.TODO();
+	}
+
+	</ id=0xBE, format="1", description="" />
+	static function UNK_BE(param)
+	{
+		this.TODO();
+	}
+
+	</ id=0xBC, format="22", description="" />
+	static function UNK_BC(param1, param2)
+	{
+		this.TODO();
+	}
+
+	/*
+	</ id=0xE6, format="...", description="" />
+	static function UNK_E6()
+	{
+		this.TODO();
+	}
+	*/
+}
+
+switch (engine_version) {
+	case "pw": // For Pricess Waltz.
+		class RIO_OP extends RIO_OP_base
+		{
+			</ id=0x28, format=".....", description="" />
+			static function UNK_28()
+			{
+				this.TODO();
+			}
+
+			</ id=0x64, format="4..", description="" />
+			static function UNK_64(unk1)
+			{
+				this.TODO();
+			}
+		}
+	break;
+	// For YMK and others.
+	default:
+	//case "ymk": 
+		class RIO_OP extends RIO_OP_base
+		{
+		}
+	break;
 }

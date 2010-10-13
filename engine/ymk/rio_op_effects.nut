@@ -1,4 +1,4 @@
-class RIO_OP_EFFECTS
+class RIO_OP_EFFECTS_base
 {
 	</ id=0x4A, format="12.", description="" />
 	static function TRANSITION(kind, time)
@@ -80,13 +80,13 @@ class RIO_OP_EFFECTS
 	}
 	
 	</ id=0x4B, format="1222221", description="" />
-	static function ANIMATE_ADD()
+	static function ANIMATE_ADD(a, b, c, d, e, f, g)
 	{
 		this.TODO();
 	}
 	
 	</ id=0x4C, format="1", description="" />
-	static function ANIMATE_PLAY()
+	static function ANIMATE_PLAY(a)
 	{
 		this.TODO();
 	}
@@ -125,4 +125,24 @@ class RIO_OP_EFFECTS
 		this.state.mask = name;
 		this.maskWip = ::resman.get_mask(name);
 	}
+}
+
+switch (engine_version) {
+	case "pw": // For Pricess Waltz.
+		class RIO_OP_EFFECTS extends RIO_OP_EFFECTS_base
+		{
+			</ id=0x4C, format="2", description="" />
+			static function ANIMATE_PLAY(a)
+			{
+				this.TODO();
+			}
+		}
+	break;
+	// For YMK and others.
+	default:
+	//case "ymk": 
+		class RIO_OP_EFFECTS extends RIO_OP_EFFECTS_base
+		{
+		}
+	break;
 }

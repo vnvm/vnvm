@@ -132,14 +132,14 @@ public:
 		SDL_UnlockSurface(surface);
 	}
 	
-	void renderGlyph(unsigned short ch, int x, int y) {
+	/*void renderGlyph(std::vector<BitmapSlice> slices, unsigned short ch, int x, int y) {
 		int tx = ch % characters_per_row;
 		int ty = ch / characters_per_row;
 		//printf("%d, %d, %d, %d, %d, %d\n", x, y, tx, ty, tw, th);
 		Bitmap::gl_draw_slice(x, y, tx * tw, ty * th, tw, th);
-	}
+	}*/
 	
-	void print2(char *text, int x, int y)
+	void print2(Bitmap *dst_bmp, char *text, int x, int y)
 	{
 		int text_len = strlen(text);
 		
@@ -150,6 +150,9 @@ public:
 		//SDL_Rect rect = {x, y, 0, 0};
 		int sy = y;
 		int sx = x;
+		
+		std::vector<BitmapSlice> slices;
+		
 		for (int n = 0; n < text_len; n++) {
 			bool showGlyph = (from == -1 && to == -1) || (n >= from && n < to);
 			//text[n]
@@ -159,25 +162,21 @@ public:
 				y += th + 2;
 				x = sx;
 			} else {
-				/*
-				FontGlyph *glpyh = get_glyph(ch);
-				if (glpyh != NULL) {
-					if ((from == -1 && to == -1) || (n >= from && n < to)) {
-						if (glpyh->surface != NULL) {
-							rect.y = y2 + TTF_FontAscent(ttf) - glpyh->maxy;
-							_tint_surface(glpyh->surface, (SDL_Color *)&color);
-							SDL_BlitSurface(glpyh->surface, NULL, dst_bmp->surface, &rect);
-						}
-					}
-					rect.x += glpyh->advance;
-				}
-				*/
 				if (showGlyph) {
-					renderGlyph(ch, x, y);
+					BitmapSlice slice = {
+						x, y,
+						(ch % characters_per_row) * tw,
+						(ch / characters_per_row) * th,
+						tw,
+						th
+					};
+					slices.push_back(slice);
 				}
 				x += characters_width[ch];
 			}
 		}
+		
+		dst_bmp->drawSlices(this->bitmap, slices);
 	}
 	
 	void print(Bitmap *dst_bmp, char *text, int x, int y)
@@ -185,13 +184,15 @@ public:
 		if ((dst_bmp == NULL) || (text == NULL)) return;
 		Video::pushEffect(effect);
 		{
-			glMatrixMode(GL_MODELVIEW); glLoadIdentity();
-			glTranslatef(x, y, 0);
-			float scale = ((float)local_size / (float)font_height) * 0.76;
-			glScalef(scale, scale, 1.0);
-			dst_bmp->gl_render_to();
-			bitmap->gl_bind();
-			print2(text, 0, 0);
+			#ifdef USE_OPENGL
+				glMatrixMode(GL_MODELVIEW); glLoadIdentity();
+				glTranslatef(x, y, 0);
+				float scale = ((float)local_size / (float)font_height) * 0.76;
+				glScalef(scale, scale, 1.0);
+				print2(dst_bmp, text, 0, 0);
+			#else
+				assert(0);
+			#endif
 		}
 		Video::popEffect();
 	}

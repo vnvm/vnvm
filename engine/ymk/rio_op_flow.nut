@@ -2,12 +2,15 @@ class RIO_OP_FLOW
 {
 	function binary_operation(op, a, b, flags = null) {
 		switch (op) {
+			// JUMP_IF
 			case ">="  : return a >= b;
 			case "<="  : return a <= b;
 			case "=="  : return a == b;
 			case "!="  : return a != b;
 			case ">"   : return a >  b;
 			case "<"   : return a <  b;
+			
+			// SET
 			case "+"   : return a + b;
 			case "-"   : return a - b;
 			case "%"   : return a % b;
@@ -62,7 +65,7 @@ class RIO_OP_FLOW
 			//printf("**SET_ALL_TEMPORAL_FLAGS_TO_ZERO()\n");
 		} else {
 			this.state.flags[left_flag % State.MAX_FLAGS] = RIO_OP_FLOW.binary_operation(RIO_OP_FLOW.ops_set[operation], left, right, this.state.flags);
-			printf("**SET %d=%d\n", left_flag, this.state.flags[left_flag % State.MAX_FLAGS]);
+			//printf("**SET %d=%d\n", left_flag, this.state.flags[left_flag % State.MAX_FLAGS]);
 		}
 		//this.TODO();
 	}
