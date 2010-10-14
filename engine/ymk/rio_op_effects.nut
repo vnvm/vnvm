@@ -15,13 +15,13 @@ class Animation
 	
 	function increment(key, inc = 0)
 	{
-		this.from[key] <- this.updateObject[key];
-		this.to[key] <- this.from[key] + inc;
+		try { this.from[key] <- this.updateObject[key]; } catch (e) { }
+		try { this.to[key] <- this.from[key] + inc; } catch (e) { }
 	}
 	
 	function ended()
 	{
-		return this.timer.ended();
+		return this.timer.ended;
 	}
 	
 	function start()
@@ -32,9 +32,12 @@ class Animation
 	function update()
 	{
 		foreach (k, v in from) {
-			local f = from[k], t = to[k];
-			local v = interpolate(f, t, this.timer.elapsedf);
-			updateObject[k] = v;
+			try { 
+				local f = from[k], t = to[k];
+				local v = interpolate(f, t, this.timer.elapsedf);
+				updateObject[k] = v;
+			} catch (e) {
+			}
 			//print("Animation::update::" + k + " = " + v + "\n");
 		}
 	}
@@ -142,7 +145,7 @@ class RIO_OP_EFFECTS_base
 	</ id=0x4B, format="1222221", description="" />
 	static function ANIMATE_ADD(object_id, inc_x, inc_y, time, unk0, unk1, unk2)
 	{
-		local object;
+		local object = null;
 		
 		switch (object_id) {
 			case 0: object = this.state.background; break;
@@ -151,10 +154,14 @@ class RIO_OP_EFFECTS_base
 			case 3: object = this.state.sprites_l1[2]; break;
 		}
 		
-		local anim = Animation(object, time);
-		anim.increment("x", inc_x);
-		anim.increment("y", inc_y);
-		object.animation <- anim;
+		if (object != null) {
+			local anim = Animation(object, time);
+			anim.increment("x", inc_x);
+			anim.increment("y", inc_y);
+			object.animation <- anim;
+		} else {
+			printf("WARNING!! invalid object: %d\n", object_id);
+		}
 
 		this.TODO();
 	}
@@ -178,6 +185,7 @@ class RIO_OP_EFFECTS_base
 				local anim = object.animation;
 				if (!anim) continue;
 				if (!anim.ended()) ended = false;
+				//printf("...%f: %d\n", anim.timer.elapsedf, anim.ended());
 				anim.update();
 			}
 			updateSceneLayer();

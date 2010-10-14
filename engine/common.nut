@@ -66,16 +66,12 @@ class Timer
 		start  = ::time_ms();
 	}
 	
-	function ended()
-	{
-		return this.elapsed >= this.length;
-	}
-	
 	function _get(name)
 	{
 		switch (name) {
-			case "elapsed": return ::time_ms() - this.start;
+			case "elapsed" : return ::time_ms() - this.start;
 			case "elapsedf": return (::time_ms() - this.start).tofloat() / this.length.tofloat();
+			case "ended"   : return (::time_ms() - this.start) >= this.length;
 		}
 	}
 }

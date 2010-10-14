@@ -10,6 +10,14 @@ function between(v, m, M)
 	return (v >= m) && (v < M);
 }
 
+function between2(point, rect)
+{
+	return (
+		between(point.x, rect.x, rect.x + rect.w) &&
+		between(point.y, rect.y, rect.y + rect.h)
+	);
+}
+
 function interpolate(from, to, stepf)
 {
 	stepf = clamp(stepf, 0.0, 1.0);

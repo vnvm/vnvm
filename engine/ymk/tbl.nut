@@ -61,7 +61,7 @@ class TBL
 		for (local y = 0; y < 0x12; y++) {
 			for (local x = 0; x < 0x10; x++) {
 				if (keymap[y][x] == kind) {
-					this.setPosition(x, y, kind);
+					this.setPosition(x, y);
 					//printf("keymap_goto_kind(%d) : {x=%d, y=%d}\n", kind, x, y);
 					return;
 				}

@@ -155,6 +155,7 @@ class RIO
 	
 	function frame_draw()
 	{
+		screen.clear([0, 0, 0, 1]);
 		screen.drawBitmap(sceneLayerShow);
 		//frame_draw_interface();
 	}
@@ -258,6 +259,7 @@ class RIO
 		for (local n = 0; n < sparams.len(); n++) {
 			local c = sparams[n];
 			switch (c) {
+				case '*': return [];
 				case '.': data.readn('b'); break;
 				case '1': l.push(data.readn('b')); break;
 				case '2': l.push(data.readn('s')); break;
@@ -318,12 +320,13 @@ class RIO
 			
 			this.state.script_set_pc(data.tell());
 			
-			//printf("OP:%02X\n", op);
-			
 			if (name in cop.__class) {
 				vparams.insert(0, this);
 				todo = 0;
 				//printf("---%s\n" name);
+				
+				//printf("%s@%04X: OP(0x%02X) : %s : %s\n", this.name, start_pos, op, name, ::object_to_string(vparams.slice(1)));
+				
 				local retval;
 				//printf("Variadic: %d\n", cop.variadic);
 				if (cop.variadic) {

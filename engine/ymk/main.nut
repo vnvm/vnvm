@@ -88,6 +88,9 @@ switch (engine_version) {
 //RIO().load("CG_WAIT").save("CG_WAIT.BIN");
 //RIO().load("pw0002_1").save("pw0002_1.BIN");
 //RIO().load("pw0002_1").save("pw0002_1.BIN");
+//RIO().load("SLG_SAVE").save("SLG_SAVE.BIN");
+//RIO().load("BATTLE").save("BATTLE.BIN");
+//RIO().load("CONTINUE").save("CONTINUE.BIN");
 //pw0001
 
 rio <- RIO();
@@ -123,6 +126,8 @@ switch (engine_version) {
 	break;
 }
 
+//rio.load("pw0015_1", 1, 0x17AED);
+//rio.load("pw0015_1", 1, 0x9E11);
 //rio.load("t001_02a", 1, 0x8B76);
 //rio.load("pw0002_1", 1, 0xB249);
 //rio.load("START");

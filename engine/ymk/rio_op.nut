@@ -40,10 +40,11 @@ class RIO_OP_base
 		movie.load(::path_to_files + "/" + name);
 		movie.viewport(0, 0, screen.w, screen.h);
 		movie.play();
+		local timer = Timer(2000);
 		while (movie.playing) {
 			input_update();
 
-			if (can_stop && pressedNext()) break;
+			if (can_stop && timer.ended && pressedNext()) break;
 
 			movie.update();
 			Screen.frame(30);
@@ -69,6 +70,12 @@ class RIO_OP_base
 		this.TODO();
 	}
 
+	</ id=0x84, format="1", description="" />
+	static function UNK_84(param)
+	{
+		this.TODO();
+	}
+
 	</ id=0x85, format="2", description="" />
 	static function UNK_85(param)
 	{
@@ -77,6 +84,12 @@ class RIO_OP_base
 
 	</ id=0x86, format="2", description="" />
 	static function UNK_86(unk1)
+	{
+		this.TODO();
+	}
+
+	</ id=0x88, format="111", description="" />
+	static function UNK_88(unk1, unk2, unk3)
 	{
 		this.TODO();
 	}
@@ -113,6 +126,12 @@ class RIO_OP_base
 
 	</ id=0xBC, format="22", description="" />
 	static function UNK_BC(param1, param2)
+	{
+		this.TODO();
+	}
+
+	</ id=0xE5, format="1", description="" />
+	static function UNK_E5(param)
 	{
 		this.TODO();
 	}
