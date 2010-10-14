@@ -1,3 +1,7 @@
+#ifdef WIN32
+	#include <windows.h>
+#endif
+
 #include "engine_utils.h"
 #include "engine_common.h"
 
@@ -11,6 +15,7 @@
 #include "engine_class_music.h"
 #include "engine_class_mouse.h"
 #include "engine_class_keyboard.h"
+#include "engine_class_joypad.h"
 #include "engine_class_movie.h"
 #include "engine_class_base.h"
 
@@ -48,6 +53,7 @@ extern "C" void game_main() {
 		engine_register_screen();
 		engine_register_mouse();
 		engine_register_keyboard();
+		engine_register_joypad();
 		engine_register_functions();
 		engine_register_movie();
 

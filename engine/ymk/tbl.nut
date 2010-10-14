@@ -10,6 +10,7 @@ struct TBL {
 class TBL
 {
 	// Struct data.
+	name     = null;
 	count    = 0;
 	msk_name = 0;
 	enable_flags = null;
@@ -20,10 +21,12 @@ class TBL
 	mask     = null;
 	position = null;
 	using_mouse = false;
+	
+	static memory = {};
 
 	constructor()
 	{
-		this.position = {x=-1, y=-1, kind=0};
+		//this.resetPosition();
 		this.enable_flags = array(0x100, 0);
 		this.keymap = [];
 		this.using_mouse = false;
@@ -32,8 +35,25 @@ class TBL
 	
 	function keymap_get(x, y)
 	{
-		if (x < 0 || y < 0 || x >= 0x10 || y >= 0x12) return 0;
+		if (x < 0 || y < 0 || x >= 0x10 || y >= 0x12) return -1;
 		return keymap[y][x];
+	}
+	
+	function setPosition(x = -1, y = -1)
+	{
+		local kind = keymap_get(x, y);
+		this.position = {x=x, y=y, kind=kind};
+		if (name != null) TBL.memory[name] <- this.position;
+	}
+	
+	function resetPosition()
+	{
+		if (name in TBL.memory) {
+			this.setPosition(TBL.memory[name].x, TBL.memory[name].y);
+		} else {
+			this.setPosition(-1, -1);
+			this.keymap_move(0, 1);
+		}
 	}
 	
 	function keymap_goto_kind(kind)
@@ -41,11 +61,7 @@ class TBL
 		for (local y = 0; y < 0x12; y++) {
 			for (local x = 0; x < 0x10; x++) {
 				if (keymap[y][x] == kind) {
-					this.position = {
-						x = x,
-						y = y,
-						kind = kind
-					};
+					this.setPosition(x, y, kind);
 					//printf("keymap_goto_kind(%d) : {x=%d, y=%d}\n", kind, x, y);
 					return;
 				}
@@ -86,17 +102,14 @@ class TBL
 		}
 
 		if (found) {
-			this.position = {
-				x = new_x,
-				y = new_y,
-				kind = keymap_get(new_x, new_y)
-			};
+			this.setPosition(new_x, new_y);
 		}
 	}
 	
 	function load(name)
 	{
 		//printf("Reading... '%s.TBL'\n", name);
+		this.name = name;
 		this.read(::arc[name + ".TBL"]);
 	}
 
@@ -119,7 +132,7 @@ class TBL
 		
 		// Local
 		this.mask = ::resman.get_mask(this.msk_name);
-		this.position = {x=-1, y=-1, kind=0};
+		this.resetPosition();
 	}
 
 	function print()

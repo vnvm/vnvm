@@ -93,6 +93,10 @@ class RIO_OP_EFFECTS_base
 			break;
 		}
 		
+		if (time <= 225) {
+			joypad.setVibration(0.2, 0.8, 40 * (300.0 / time.tofloat()), 0);
+		}
+		
 		if (this.skipping()) {
 			nsteps /= 5;
 		}
@@ -201,7 +205,10 @@ class RIO_OP_EFFECTS_base
 		
 		switch (kinds[kind]) {
 			case "quake":
+				printf("duration: %d\n", duration);
+				joypad.setVibration(1.0, 0.0, 50 * duration, 0);
 				duration *= 5;
+				//joypad.setVibration(quantity.tofloat() / 10.0, 0.0, duration, 0);
 				while (duration-- > 0) {
 					this.input_update();
 

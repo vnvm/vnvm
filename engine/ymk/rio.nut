@@ -183,15 +183,21 @@ class RIO
 		if (show_header_text) wip.drawTo(screen, num_buttons * 3 + 1, x, y);
 	}
 	
+	function pressedNext()
+	{
+		return ::mouse.clicked(0) || ::keyboard.pressed("enter") || ::joypad.pressed("accept");
+	}
+	
 	function skipping()
 	{
-		return ::keyboard.pressing("lctrl");
+		return ::keyboard.pressing("lctrl") || ::joypad.pressing("cancel");
 	}
 	
 	function input_update()
 	{
 		::mouse.update();
 		::keyboard.update();
+		::joypad.update();
 	}
 
 	/**
@@ -237,6 +243,8 @@ class RIO
 		local last_kind = 0;
 		local l = [];
 		local loop_to = 0;
+		local loop = 0;
+		local variadic = false;
 		/*
 			'l' processor dependent, 32bits on 32bits processors, 64bits on 64bits prcessors returns an integer 
 			'i' 32bits number returns an integer 
@@ -268,6 +276,7 @@ class RIO
 				break;
 				case '[':
 					loop_to = n;
+					variadic = true;
 				break;
 				case ']':
 					if (--loop > 0) n = loop_to;
@@ -299,7 +308,7 @@ class RIO
 	{
 		local start_pos = data.tell();
 		local op = data.readn('b');
-		local name = "?", params_format = "", vparams = [];
+		local name = "?", params_format = "", vparams = [], variadic = false;
 		try {
 			local cop = RIO.opcodes[op];
 			name = cop.name;
@@ -315,7 +324,13 @@ class RIO
 				vparams.insert(0, this);
 				todo = 0;
 				//printf("---%s\n" name);
-				local retval = cop.__class[name].acall(vparams);
+				local retval;
+				//printf("Variadic: %d\n", cop.variadic);
+				if (cop.variadic) {
+					retval = cop.__class[name].call(this, vparams);
+				} else {
+					retval = cop.__class[name].acall(vparams);
+				}
 				if (todo) {
 					printf("%s@%04X: OP(0x%02X) : %s : %s...", this.name, start_pos, op, name, ::object_to_string(vparams.slice(1)));
 					printf("  @TODO\n");
@@ -336,12 +351,13 @@ class RIO
 		RIO.opcodes <- {};
 	}
 
-	static function opcode_info(__class, id, name, params_format)
+	static function opcode_info(__class, id, name, params_format, variadic)
 	{
 		RIO.opcodes[id] <- {
 			__class = __class,
 			name = name,
-			params_format = params_format
+			params_format = params_format,
+			variadic = variadic,
 		};
 	}
 
@@ -352,7 +368,7 @@ class RIO
 			foreach (name, v in __class) {
 				local attr = __class.getattributes(name);
 				if ("id" in attr) {
-					RIO.opcode_info(__class, attr.id, name, attr.format);
+					RIO.opcode_info(__class, attr.id, name, attr.format, ("variadic" in attr) ? attr.variadic : 0);
 				}
 			}
 		}

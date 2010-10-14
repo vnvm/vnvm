@@ -48,12 +48,12 @@ class RIO_OP_ANIM
 		while (1) {
 			this.input_update();
 
-			if (keyboard.pressed("up"   )) { this.table.keymap_move( 0, -1); this.table.using_mouse = false; }
-			if (keyboard.pressed("down" )) { this.table.keymap_move( 0,  1); this.table.using_mouse = false; }
-			if (keyboard.pressed("left" )) { this.table.keymap_move(-1,  0); this.table.using_mouse = false; }
-			if (keyboard.pressed("right")) { this.table.keymap_move( 1,  0); this.table.using_mouse = false; }
-			if (keyboard.pressed("enter")) { click = 1; this.table.using_mouse = false; }
-			if (keyboard.pressed("escape")) { click = -1; this.table.using_mouse = false; }
+			if (joypad.pressed("up"    ) || keyboard.pressed("up"   )) { this.table.keymap_move( 0, -1); this.table.using_mouse = false; }
+			if (joypad.pressed("down"  ) || keyboard.pressed("down" )) { this.table.keymap_move( 0,  1); this.table.using_mouse = false; }
+			if (joypad.pressed("left"  ) || keyboard.pressed("left" )) { this.table.keymap_move(-1,  0); this.table.using_mouse = false; }
+			if (joypad.pressed("right" ) || keyboard.pressed("right")) { this.table.keymap_move( 1,  0); this.table.using_mouse = false; }
+			if (joypad.pressed("accept") || keyboard.pressed("enter")) { click = 1; this.table.using_mouse = false; }
+			if (joypad.pressed("cancel") || keyboard.pressed("escape")) { click = -1; this.table.using_mouse = false; }
 			
 			//printf("@@@@@@@@@POSITION: (%d, %d, %d)\n", this.table.position.x, this.table.position.y, this.table.position.kind);
 			// Mouse moved

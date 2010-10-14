@@ -89,7 +89,7 @@ class RIO_OP_TEXT
 			
 			if (skip_on_end && ended) break;
 
-			if (::mouse.clicked(0)) {
+			if (this.pressedNext()) {
 				if (ended) break;
 				if (can_skip) ended = true;
 			}
@@ -131,9 +131,37 @@ class RIO_OP_TEXT
 	}
 
 	//  02.? [0200], [7201], "Tell her", [01520307], @t001_02b@, [7301], "Don't tell her", [01530307], @t001_02c@
-	</ id=0x02, format="C[2t4s]", description="Show a list of options" />
-	static function OPTION_SELECT(options)
+	</ id=0x02, format="C[2t4s]", description="Show a list of options" variadic=1 />
+	static function OPTION_SELECT(params)
 	{
+		local selwnd0 = resman.get_image("SELWND0", 1);
+		local selwnd1 = resman.get_image("SELWND1", 1);
+		
+		local options = [];
+		local count = params[0];
+		for (local n = 0; n < count; n++) {
+			local unk1 = params[1 + n * 4 + 0];
+			local unk2 = params[1 + n * 4 + 1];
+			local unk3 = params[1 + n * 4 + 2];
+			local unk4 = params[1 + n * 4 + 3];
+			options.push([
+				unk1, unk2, unk3, unk4
+			]);
+		}
+		
+		while (1) {
+			this.input_update();
+			
+			this.frame_draw();
+			if (draw_interface) this.frame_draw_interface(title.len());
+
+			//for (local n = 0; n < )
+			selwnd0.drawTo(screen, 0, 100, 100);
+
+			this.frame_tick();
+			break;
+		}
+
 		this.TODO();
 	}
 }

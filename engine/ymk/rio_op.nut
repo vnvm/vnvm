@@ -41,11 +41,10 @@ class RIO_OP_base
 		movie.viewport(0, 0, screen.w, screen.h);
 		movie.play();
 		while (movie.playing) {
-			mouse.update();
-			keyboard.update();
-			if (can_stop) {
-				if (mouse.pressed(0)) break;
-			}
+			input_update();
+
+			if (can_stop && pressedNext()) break;
+
 			movie.update();
 			Screen.frame(30);
 		}
@@ -95,7 +94,7 @@ class RIO_OP_base
 	}
 
 	</ id=0x8E, format="1", description="" />
-	static function UNK_8E()
+	static function UNK_8E(param)
 	{
 		this.TODO();
 	}

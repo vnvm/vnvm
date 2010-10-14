@@ -28,6 +28,11 @@ class Engine
 			this.alphaStep = 0;
 			this.alphaFrom = this.alpha;
 			this.alphaTo = value ? 1.0 : 0.3;
+			if (value) {
+				//joypad.setVibration(1.0, 0.0, 60, 1);
+				//Screen.frame(5);
+				//joypad.setVibration(0.0, 0.0);
+			}
 		}
 	}
 	

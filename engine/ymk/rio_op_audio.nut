@@ -30,6 +30,7 @@ class RIO_OP_AUDIO_base
 	</ id=0x25, format="111122s", description="" />
 	static function SOUND_PLAY(channel, repeat, blocking, start_time, fade_in_ms, volume, sound_file)
 	{
+		printf("SOUND_PLAY!: '%s'\n", sound_file);
 		resman.get_sound(sound_file).play(channel, repeat + 1, fade_in_ms);
 		//this.TODO();
 	}

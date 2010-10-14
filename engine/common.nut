@@ -10,6 +10,7 @@ printf("  Game data path: %s\n", info.game_data_path);
 
 mouse    <- Mouse();
 keyboard <- Keyboard();
+joypad   <- Joypad();
 
 class Translation
 {
