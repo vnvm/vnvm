@@ -254,11 +254,9 @@ class SceneObject extends Component
 		if (color != null) {
 			destinationBitmap.clear(color);
 		} else {
-			if (type == "background") {
-				resman.get_image(name).drawTo(destinationBitmap, 0, -x, -y);
-			} else {
-				resman.get_image(name).drawTo(destinationBitmap, 0, x, y);
-			}
+			local rx = x, ry = y;
+			if (type == "background") { rx = -x; ry = -y; }
+			resman.get_image(name).drawTo(destinationBitmap, index, rx, ry);
 		}
 	}
 }

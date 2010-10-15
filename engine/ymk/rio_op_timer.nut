@@ -34,8 +34,8 @@ class RIO_OP_TIMER
 		this.TODO();
 	}
 
-	</ id=0x86, format="2", description="" />
-	static function UNK_86_DELAY(unk1)
+	</ id=0x86, format="11", description="" />
+	static function UNK_86_DELAY(unk1, unk2)
 	{
 		this.TODO();
 		Screen.delay(unk1);

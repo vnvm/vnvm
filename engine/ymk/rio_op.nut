@@ -59,6 +59,7 @@ class RIO_OP_base
 
 			if (can_stop && timer.ended && pressedNext()) break;
 
+			timer.update(this.ms_per_frame);
 			movie.update();
 			Screen.frame(30);
 		}
@@ -71,8 +72,8 @@ class RIO_OP_base
 		this.TODO();
 	}
 
-	</ id=0x64, format="4", description="" />
-	static function UNK_64(unk1)
+	</ id=0x64, format="1111", description="" />
+	static function CHARA_PUT_INFO(unk1, unk2, unk3, unk4)
 	{
 		this.TODO();
 	}
@@ -156,8 +157,8 @@ switch (engine_version) {
 				this.TODO();
 			}
 
-			</ id=0x64, format="4..", description="" />
-			static function UNK_64(unk1)
+			</ id=0x64, format="111111", description="" />
+			static function CHARA_PUT_INFO(index, unk2, unk3, unk4, unk5, unk6)
 			{
 				this.TODO();
 			}

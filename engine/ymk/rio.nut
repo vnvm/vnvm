@@ -4,7 +4,8 @@ class RIO extends Component
 	name    = null;
 	data    = null;
 	state   = null;
-	fps     = 40;
+	fps     = 25;
+	ms_per_frame = 0;
 	sound   = null;
 	todo    = 0;
 	running = true;
@@ -21,6 +22,7 @@ class RIO extends Component
 	constructor()
 	{
 		this.running = true;
+		this.ms_per_frame = (1000 / this.fps).tointeger();
 
 		this.state = State();
 		this.addChildComponent(this.scene     = Scene(this.state));
@@ -32,7 +34,7 @@ class RIO extends Component
 		local ended = false;
 		::input.update();
 		if (can_skip && skipping()) ended = ended || true;
-		this.update((1000 / this.fps).tointeger());
+		this.update(ms_per_frame);
 		ended = ended || this.ended();
 		if (updateCallback != null) updateCallback.call(this);
 		this.drawTo(screen);

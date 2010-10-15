@@ -129,6 +129,9 @@ switch (engine_version) {
 	break;
 }
 
+// SLOW: RESMAN.Loading 'X1_AA01S'...
+//rio.load("pw0001", 1, 0xBD21);
+
 //rio.load("pw0001", 1, 0x3EDB);
 //rio.load("pw0001", 1, 0x431A);
 //rio.load("pw0001", 1, 0x43E7);

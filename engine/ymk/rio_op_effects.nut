@@ -67,6 +67,9 @@ class RIO_OP_EFFECTS_base
 	</ id=0x4B, format="1222221", description="" />
 	static function ANIMATE_ADD(object_id, inc_x, inc_y, time, unk0, unk1, unk2)
 	{
+		if (this.skipping()) {
+			time /= 5;
+		}
 		local anim = this.scene.get(object_id).animation;
 		anim.reset(time);
 		anim.increment("x", inc_x);

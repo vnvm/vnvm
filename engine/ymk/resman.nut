@@ -2,7 +2,8 @@ class RESMAN
 {
 	resources = null;
 	//resources_neverdelete_test = null;
-	memory_size_max = 64 * 1024 * 1024;
+	memory_size_max = 16 * 1024 * 1024;
+	//memory_size_max = 64 * 1024 * 1024;
 	//memory_size_max = 8 * 1024 * 1024;
 	memory_size_cur = 0;
 	
@@ -71,7 +72,7 @@ class RESMAN
 			printf("RESMAN.Loading '%s'...", name);
 			local data = callback(name);
 			local size = data.memory_size;
-			printf("loaded\n");
+			printf("loaded (size:%d)\n", size);
 			// printf("SIZE: %d\n", size);
 			resources[index_name] <- {
 				name        = name,
