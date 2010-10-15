@@ -37,6 +37,15 @@ DSQ_METHOD(Font, setSlice)
 	return 0;
 }
 
+DSQ_METHOD(Font, setSize)
+{
+	EXTRACT_PARAM_START();
+	EXTRACT_PARAM_SELF(Font);
+	EXTRACT_PARAM_FLO(2, size, 0);
+	self->setSize(size);
+	return 0;
+}
+
 DSQ_METHOD(Font, print)
 {
 	EXTRACT_PARAM_START();
@@ -58,6 +67,7 @@ void engine_register_font()
 		NEWSLOT_METHOD(Font, print, 0, ".");
 		NEWSLOT_METHOD(Font, setSlice, 0, ".");
 		NEWSLOT_METHOD(Font, setColor, 0, ".");
+		NEWSLOT_METHOD(Font, setSize, 0, ".");
 	}
 	CLASS_END;
 }

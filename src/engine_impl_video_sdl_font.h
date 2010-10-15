@@ -23,6 +23,7 @@ public:
 	int characters_per_row;
 	int characters_per_column;
 	int font_height;
+	float size;
 	unsigned short characters_ch[4096];
 	unsigned short characters_width[4096];
 
@@ -63,6 +64,7 @@ public:
 		}
 		tw = bitmap->surface->w / characters_per_row;
 		th = bitmap->surface->h / characters_per_column;
+		size = 1.0;
 	}
 
 	~Font() {
@@ -132,6 +134,10 @@ public:
 		SDL_UnlockSurface(surface);
 	}
 	
+	void setSize(float size) {
+		this->size = size;
+	}
+	
 	/*void renderGlyph(std::vector<BitmapSlice> slices, unsigned short ch, int x, int y) {
 		int tx = ch % characters_per_row;
 		int ty = ch / characters_per_row;
@@ -187,7 +193,7 @@ public:
 			#ifdef USE_OPENGL
 				glMatrixMode(GL_MODELVIEW); glLoadIdentity();
 				glTranslatef(x, y, 0);
-				float scale = ((float)local_size / (float)font_height) * 0.76;
+				float scale = (((float)local_size / (float)font_height) * 0.76) * size;
 				glScalef(scale, scale, 1.0);
 				print2(dst_bmp, text, 0, 0);
 			#else

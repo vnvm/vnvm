@@ -53,7 +53,7 @@ class ANM
 		this.active[index] = set;
 	}
 	
-	function drawTo(buffer)
+	function drawTo(buffer, x = 0, y = 0)
 	{
 		if (this.wip == null) return;
 
@@ -61,7 +61,7 @@ class ANM
 		for (local n = 0; n < 100; n++) {
 			if (this.active[n]) {
 				try {
-					this.wip.drawTo(buffer, n + 1);
+					this.wip.drawTo(buffer, n + 1, x, y);
 				} catch (e) {
 				}
 			}

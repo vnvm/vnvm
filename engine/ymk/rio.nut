@@ -1,72 +1,53 @@
-class RIO
+class RIO extends Component
 {
 	static opcodes = {};
-	name = null;
-	data = null;
-	state = null;
-	maskWip = null;
-	table = null;
-	anim = null;
-	fps = 40;
-	music = null;
-	music_stream = null;
-	sound = null;
-	todo = 0;
+	name    = null;
+	data    = null;
+	state   = null;
+	fps     = 40;
+	sound   = null;
+	todo    = 0;
 	running = true;
-	wip_clkwait = null;
-	wip_clkwait_frames = null;
-	font = null;
+	music   = null;
+	music_stream = null;
 	voice_channel = 6;
 	draw_interface = 0;
 	last_title = "";
 	last_text = "";
+
+	scene   = null;
+	interface = null;
 	
 	constructor()
 	{
-		this.state = State();
-		this.table = TBL(); this.table.state = this.state;
-		this.anim  = ANM();
 		this.running = true;
-		this.wip_clkwait = resman.get_image("CLKWAIT", 0);
-		//this.wip_clkwait_frames = wip_clkwait.images[0].split(wip_clkwait.images[0].h, wip_clkwait.images[0].h);
-		//wip_clkwait.images[0].save("CLKWAIT.bmp");
-		
-		local iwait = wip_clkwait.images[0];
-		
-		switch (engine_version) {
-			case "pw":
-				this.wip_clkwait_frames = iwait.slice(1, 0, iwait.w, iwait.h).split(55, iwait.h);
-			break;
-			default:
-				this.wip_clkwait_frames = iwait.split(iwait.h, iwait.h);
-			break;
-		}
-		this.font = Font("lucon.ttf", 19);
+
+		this.state = State();
+		this.addChildComponent(this.scene     = Scene(this.state));
+		this.addChildComponent(this.interface = Interface());
 	}
-
-	/**
-	 * Draws the scene in 'sceneLayerDraw':
-	 *   - Background/UI
-	 *   - Sprites
-	 */
-	function updateSceneLayer()
+	
+	function gameStep(can_skip = false, updateCallback = null)
 	{
-		if (this.state.background != "") {
-			// Background
-			resman.get_image(this.state.background.name).drawTo(sceneLayerDraw, 0, -this.state.background.x, -this.state.background.y);
-		} else if (this.state.background_color != null) {
-			// Background color
-			sceneLayerDraw.clear(this.state.background_color);
-		} else {
-			// UI
-			anim.drawTo(sceneLayerDraw);
-		}
-
-		// Draw sprites
-		foreach (sprite in [this.state.sprites_l1[0], this.state.sprites_l1[1], this.state.sprites_l1[2], this.state.sprites_object]) {
-			if (sprite == null) continue;
-			resman.get_image(sprite.name).drawTo(sceneLayerDraw, 0, sprite.x, sprite.y);
-		}
+		local ended = false;
+		::input.update();
+		if (can_skip && skipping()) ended = ended || true;
+		this.update((1000 / this.fps).tointeger());
+		ended = ended || this.ended();
+		if (updateCallback != null) updateCallback.call(this);
+		this.drawTo(screen);
+		Screen.flip();
+		Screen.frame(this.fps);
+		return ended;
+	}
+	
+	function loopUntilAnimationEnds(can_skip = false, updateCallback = null)
+	{
+		local ended = false;
+		do {
+			ended = gameStep(can_skip, updateCallback);
+		} while (!ended);
+		this.scene.copyDrawLayerToShowLayer();
 	}
 
 	function exit()
@@ -117,8 +98,7 @@ class RIO
 	 */
 	function jump_relative(relative_position)
 	{
-		data.seek(data.tell() + relative_position);
-		this.state.script_set_pc(data.tell());
+		jump_absolute(data.tell() + relative_position);
 	}
 	
 	/**
@@ -132,80 +112,21 @@ class RIO
 		this.state.script_set_pc(data.tell());
 	}
 	
-	function print_text(text, x, y)
-	{
-		this.font.setColor([0x3C / 255.0, 0x5f / 255.0, 0xaf / 255.0, 1]);
-		// 3c5faf
-		for (local cy = -1; cy <= 1; cy++) {
-			for (local cx = -1; cx <= 1; cx++) {
-				if (cx != 0 && cy != 0) {
-					this.font.print(screen, text, x + cx, y + cy);
-				}
-			}
-		}
-		this.font.setColor([1, 1, 1, 1]);
-		this.font.print(screen, text, x, y);
-	}
-	
-	function frame_draw_tick()
-	{
-		this.frame_draw();
-		this.frame_tick();
-	}
-	
-	function frame_draw()
-	{
-		screen.clear([0, 0, 0, 1]);
-		screen.drawBitmap(sceneLayerShow);
-		//frame_draw_interface();
-	}
-	
-	function frame_draw_interface(show_header_text = 0)
-	{
-		local wip = resman.get_image("WINBASE0", 0);
-		local x = 800 / 2 - wip.infos[0].w / 2;
-		local y = 600 - wip.infos[0].h;
-		
-		local num_buttons;
-		
-		switch (engine_version) {
-			case "pw":
-				num_buttons = 10;
-			break;
-			default:
-				num_buttons = 8;
-			break;
-		}
-		
-		for (local n = 0; n < num_buttons; n++) {
-			wip.drawTo(screen, n, x, y);
-		}
-		
-		if (show_header_text) wip.drawTo(screen, num_buttons * 3 + 1, x, y);
-	}
-	
 	function pressedNext()
 	{
-		return ::mouse.clicked(0) || ::keyboard.pressed("enter") || ::joypad.pressed("accept");
+		return ::input.mouse.clicked(0) || ::input.pad_pressed("accept");
 	}
 	
 	function skipping()
 	{
-		return ::keyboard.pressing("lctrl") || ::joypad.pressing("cancel");
+		return ::input.pad_pressing("skip");
 	}
 	
-	function input_update()
-	{
-		::mouse.update();
-		::keyboard.update();
-		::joypad.update();
-	}
-
 	/**
 	 * Performs a frame tick.
 	 *   -------------- Updates timer.
 	 *   - Swaps the frame buffer. 
-	 *   - Waits 1000/25 ms (since last frame)
+	 *   - Waits 1000/fps ms (since last frame)
 	 */
 	function frame_tick()
 	{

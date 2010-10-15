@@ -73,6 +73,10 @@ int pressed_pressing(int get_pressing)
 			else if (strcmp(c, "down"     ) == 0) key = SDLK_DOWN;
 			else if (strcmp(c, "left"     ) == 0) key = SDLK_LEFT;
 			else if (strcmp(c, "right"    ) == 0) key = SDLK_RIGHT;
+			
+			// Special
+			else if (strcmp(c, "accept"   ) == 0) key = SDLK_RETURN;
+			else if (strcmp(c, "skip"     ) == 0) modkey = KMOD_LCTRL;
 
 			// Mod keys
 			else if (strcmp(c, "lshift" ) == 0) modkey = KMOD_LSHIFT;
@@ -119,6 +123,7 @@ void engine_register_keyboard()
 		NEWSLOT_METHOD(Keyboard, update, 0, "");
 		NEWSLOT_METHOD(Keyboard, pressed, 0, "");
 		NEWSLOT_METHOD(Keyboard, pressing, 0, "");
+		//NEWSLOT_METHOD(Keyboard, pressed_pressing, 0, "");
 		NEWSLOT_METHOD(Keyboard, _get, 0, "");
 	}
 	CLASS_END;

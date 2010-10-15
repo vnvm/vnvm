@@ -31,12 +31,13 @@ class RIO_OP_TIMER
 		if (!this.skipping()) {
 			Screen.delay(delay_ms);
 		}
+		this.TODO();
 	}
 
 	</ id=0x86, format="2", description="" />
-	static function UNK_86(unk1)
+	static function UNK_86_DELAY(unk1)
 	{
-		//this.TODO();
+		this.TODO();
 		Screen.delay(unk1);
 	}
 }

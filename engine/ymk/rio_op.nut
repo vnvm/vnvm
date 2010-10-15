@@ -28,16 +28,21 @@ class RIO_OP_base
 	}
 
 	</ id=0x55, format="1", description="" />
-	static function TEXT_CLEAR(unk)
+	static function UNK_55(unk)
 	{
-		//this.draw_interface = true;
+		//this.interface.enabled = false;
+		/*
+		this.interface.enabled = true;
+		this.interface.text_title = "";
+		this.interface.text_body = "";
 		this.TODO();
+		*/
 	}
 
 	</ id=0x68, format="2221", description="" />
 	static function INTERFACE_HIDE(unk1, unk2, unk3, unk4)
 	{
-		this.draw_interface = false;
+		this.interface.enabled = false;
 		this.TODO();
 	}
 
@@ -48,9 +53,9 @@ class RIO_OP_base
 		movie.load(::path_to_files + "/" + name);
 		movie.viewport(0, 0, screen.w, screen.h);
 		movie.play();
-		local timer = Timer(500);
+		local timer = TimerComponent(500);
 		while (movie.playing) {
-			input_update();
+			input.update();
 
 			if (can_stop && timer.ended && pressedNext()) break;
 

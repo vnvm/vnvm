@@ -10,12 +10,16 @@ if (exists_in_game_path_any(["prwaltz.exe"])) {
 
 printf("Detected engine: '%s'\n", engine_version);
 
-include("ymk/tbl.nut");
-include("ymk/anm.nut");
-include("ymk/arc.nut");
+include("ymk/formats/tbl.nut");
+include("ymk/formats/anm.nut");
+include("ymk/formats/arc.nut");
+include("ymk/formats/wip.nut");
+
 include("ymk/state.nut");
+include("ymk/scene.nut");
+include("ymk/interface.nut");
 include("ymk/rio_op.nut");
-include("ymk/rio_op_anim.nut");
+include("ymk/rio_op_table.nut");
 include("ymk/rio_op_audio.nut");
 include("ymk/rio_op_flow.nut");
 include("ymk/rio_op_text.nut");
@@ -24,7 +28,6 @@ include("ymk/rio_op_scene.nut");
 include("ymk/rio_op_menus.nut");
 include("ymk/rio_op_effects.nut");
 include("ymk/rio.nut");
-include("ymk/wip.nut");
 include("ymk/resman.nut");
 
 Audio.init();
@@ -126,6 +129,9 @@ switch (engine_version) {
 	break;
 }
 
+//rio.load("pw0001", 1, 0x3EDB);
+//rio.load("pw0001", 1, 0x431A);
+//rio.load("pw0001", 1, 0x43E7);
 //rio.load("pw0015_1", 1, 0x17AED);
 //rio.load("pw0015_1", 1, 0x9E11);
 //rio.load("t001_02a", 1, 0x8B76);

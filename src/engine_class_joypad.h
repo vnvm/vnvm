@@ -50,6 +50,7 @@ int Joypad_pressed_pressing(Joypad *joypad, char *button, int pressing) {
 	else if (strcmp(button, "left"   ) == 0) ibutton = JOYPAD_LEFT;
 	else if (strcmp(button, "accept" ) == 0) ibutton = JOYPAD_ACCEPT;
 	else if (strcmp(button, "cancel" ) == 0) ibutton = JOYPAD_CANCEL;
+	else if (strcmp(button, "skip"   ) == 0) ibutton = JOYPAD_SKIP;
 	else if (strcmp(button, "menu"   ) == 0) ibutton = JOYPAD_MENU;
 	else if (strcmp(button, "special") == 0) ibutton = JOYPAD_SPECIAL;
 	else if (strcmp(button, "select" ) == 0) ibutton = JOYPAD_SELECT;
@@ -59,6 +60,15 @@ int Joypad_pressed_pressing(Joypad *joypad, char *button, int pressing) {
 	else if (strcmp(button, "lmenu2" ) == 0) ibutton = JOYPAD_LMENU2;
 	else if (strcmp(button, "rmenu2" ) == 0) ibutton = JOYPAD_RMENU2;
 	return pressing ? joypad->pressing(ibutton) : joypad->pressed(ibutton);
+}
+
+DSQ_METHOD(Joypad, pressed_pressing)
+{
+	EXTRACT_PARAM_START();
+	EXTRACT_PARAM_SELF(Joypad);
+	EXTRACT_PARAM_STR(2, button, 0);
+	EXTRACT_PARAM_INT(3, pressing, 0);
+	RETURN_INT(Joypad_pressed_pressing(self, button.stringz, pressing));
 }
 
 DSQ_METHOD(Joypad, pressed)
@@ -97,6 +107,7 @@ void engine_register_joypad()
 		NEWSLOT_METHOD(Joypad, update, 0, "");
 		NEWSLOT_METHOD(Joypad, pressed, 0, "");
 		NEWSLOT_METHOD(Joypad, pressing, 0, "");
+		NEWSLOT_METHOD(Joypad, pressed_pressing, 0, "");
 		NEWSLOT_METHOD(Joypad, _get, 0, "");
 		NEWSLOT_METHOD(Joypad, setVibration, 0, "");
 	}

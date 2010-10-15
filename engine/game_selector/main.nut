@@ -55,8 +55,7 @@ while (1) {
 	local selectedEngine = null;
 
 	while (selectedEngine == null) {
-		mouse.update();
-		keyboard.update();
+		input.update();
 		
 		screen.clear([0, 0, 0, 1]);
 
@@ -64,9 +63,9 @@ while (1) {
 		local x = 8;
 		foreach (engine in engines) {
 			if (!engine.enabled) continue;
-			if (mouse.x >= x && mouse.y >= y && mouse.x <= x + engine.image.w && mouse.y <= y + engine.image.h) {
+			if (::input.mouseInRect({x=x, y=y, w=engine.image.w, h=engine.image.h})) {
 				engine.setSelected(1);
-				if (mouse.clicked(0)) {
+				if (input.mouse.clicked(0)) {
 					selectedEngine = engine;
 				}
 			} else {

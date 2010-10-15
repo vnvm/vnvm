@@ -32,13 +32,25 @@ class RESMAN
 			while (memory_size_cur >= memory_size_max) {
 				local resource = table.pop();
 				if (resource.can_release) {
-					printf("RESMAN:DELETE('%s'):\n", resource.index_name);
+					printf("RESMAN.releasing('%s')...", resource.index_name);
 					resources.rawdelete(resource.index_name);
 					memory_size_cur -= resource.size;
+					printf("\n");
 				}
 			}
 		}
 		//print();
+	}
+	
+	function getMaxUseCount() {
+		local maxUseCount = null;
+		foreach (resource in resources) {
+			if ((maxUseCount == null) || (maxUseCount < resource.use_count)) {
+				maxUseCount = resource.use_count;
+			}
+		}
+		if (maxUseCount == null) maxUseCount = 0;
+		return maxUseCount;
 	}
 	
 	function print()
@@ -56,8 +68,10 @@ class RESMAN
 		local type = "WIP";
 		local index_name = name + "." + type;
 		if (!(index_name in resources)) {
+			printf("RESMAN.Loading '%s'...", name);
 			local data = callback(name);
 			local size = data.memory_size;
+			printf("loaded\n");
 			// printf("SIZE: %d\n", size);
 			resources[index_name] <- {
 				name        = name,
@@ -65,7 +79,7 @@ class RESMAN
 				index_name  = index_name,
 				data        = data,
 				can_release = 0,
-				use_count   = 8,
+				use_count   = getMaxUseCount() + 1,
 				size        = size,
 			};
 			memory_size_cur += resources[index_name].size;

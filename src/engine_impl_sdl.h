@@ -165,6 +165,7 @@ typedef struct {
 #define JOYPAD_LEFT     3
 #define JOYPAD_ACCEPT   4
 #define JOYPAD_CANCEL   5
+#define JOYPAD_SKIP     5
 #define JOYPAD_MENU     6
 #define JOYPAD_SPECIAL  7
 #define JOYPAD_SELECT   8
