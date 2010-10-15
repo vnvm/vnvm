@@ -250,7 +250,7 @@ class Effect : public ShaderProgram
 	
 	void setEffectTransition()
 	{
-		setFragmentShaderAndLink("\
+		setFragmentShaderAndLink((char *)"\
 			uniform sampler2D image; \
 			uniform sampler2D mask; \
 			uniform float     step; \
@@ -271,7 +271,7 @@ class Effect : public ShaderProgram
 	
 	void setEffectInvert()
 	{
-		setFragmentShaderAndLink("\
+		setFragmentShaderAndLink((char *)"\
 			uniform sampler2D image; \
 			uniform float     step; \
 			uniform bool      reverse; \
@@ -287,7 +287,7 @@ class Effect : public ShaderProgram
 
 	void setEffectNormal()
 	{
-		setFragmentShaderAndLink("\
+		setFragmentShaderAndLink((char *)"\
 			uniform sampler2D image; \
 			uniform float     step; \
 			\
@@ -300,7 +300,7 @@ class Effect : public ShaderProgram
 
 	void setEffectTint()
 	{
-		setFragmentShaderAndLink("\
+		setFragmentShaderAndLink((char *)"\
 			uniform vec4 ccolor; \
 			uniform sampler2D image; \
 			\
@@ -314,10 +314,10 @@ class Effect : public ShaderProgram
 	void setEffect(char *effectName = NULL)
 	{
 		if (effectName != NULL) {
-			if (strcmp(effectName, "normal") == 0) return setEffectNormal();
-			if (strcmp(effectName, "tint") == 0) return setEffectTint();
-			if (strcmp(effectName, "invert") == 0) return setEffectInvert();
-			if (strcmp(effectName, "transition") == 0) return setEffectTransition();
+			if (strcmp((const char *)effectName, (const char *)"normal") == 0) return setEffectNormal();
+			if (strcmp((const char *)effectName, (const char *)"tint") == 0) return setEffectTint();
+			if (strcmp((const char *)effectName, (const char *)"invert") == 0) return setEffectInvert();
+			if (strcmp((const char *)effectName, (const char *)"transition") == 0) return setEffectTransition();
 		}
 		return setEffectNormal();
 	}

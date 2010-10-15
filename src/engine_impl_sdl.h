@@ -5,22 +5,34 @@
 
 #define USE_OPENGL 1
 
+//#undef M_PI
+//#include "math.h"
+#ifndef M_PI
+	#define M_PI 3.141592653589793238462643
+#endif
+
 #include <SDL.h>
+#include <SDL_stdinc.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <SDL_mixer.h>
 #ifdef USE_OPENGL
 	#include <SDL_opengl.h>
 #endif
+//#include <SDL_compat.h>
 
 #undef main
 
-#define sdl_long int
-#define sdl_size_t int
-//#define sdl_size_t size_t
-//#define SDL_GetKeyboardState SDL_GetKeyState
+#if 0
+	#define sdl_long long
+	#define sdl_size_t size_t
+	#define SDL_GetKeyState SDL_GetKeyboardState
+#else
+	#define sdl_long int
+	#define sdl_size_t int
+#endif
 
-sdl_long sqstream_rwops_seek(struct SDL_RWops *context, sdl_long offset, int whence) {
+sdl_long SDLCALL sqstream_rwops_seek(struct SDL_RWops *context, sdl_long offset, int whence) {
 	SQStream *stream = (SQStream *)context->hidden.unknown.data1;
 	int ret = 0;
 	switch (whence) {
@@ -33,7 +45,7 @@ sdl_long sqstream_rwops_seek(struct SDL_RWops *context, sdl_long offset, int whe
 	return ret;
 }
 
-sdl_size_t sqstream_rwops_read(struct SDL_RWops *context, void *ptr, sdl_size_t size, sdl_size_t maxnum) {
+sdl_size_t SDLCALL sqstream_rwops_read(struct SDL_RWops *context, void *ptr, sdl_size_t size, sdl_size_t maxnum) {
 	SQStream *stream = (SQStream *)context->hidden.unknown.data1;
 	//int pos_start = stream->Tell();
 	sdl_size_t ret = stream->Read(ptr, size * maxnum);
@@ -43,14 +55,14 @@ sdl_size_t sqstream_rwops_read(struct SDL_RWops *context, void *ptr, sdl_size_t 
 	return ret;
 }
 
-sdl_size_t sqstream_rwops_write(struct SDL_RWops *context, const void *ptr, sdl_size_t size, sdl_size_t num) {
+sdl_size_t SDLCALL sqstream_rwops_write(struct SDL_RWops *context, const void *ptr, sdl_size_t size, sdl_size_t num) {
 	SQStream *stream = (SQStream *)context->hidden.unknown.data1;
 	sdl_size_t ret = stream->Write((void *)ptr, size * num);
 	//printf("Write(%08X, %d) : %d\n", ptr, size * num, ret);
 	return ret;
 }
 
-int sqstream_rwops_close(struct SDL_RWops * context) {
+int SDLCALL sqstream_rwops_close(struct SDL_RWops * context) {
 	SQStream *stream = (SQStream *)context->hidden.unknown.data1;
 	//printf("Close()\n");
 	return 0;
@@ -97,6 +109,7 @@ class Mouse { public:
 		buttons_before = buttons_now;
 		x_before = x_now;
 		y_before = y_now;
+		//buttons_now = SDL_GetMouseState(1, &x_now, &y_now);
 		buttons_now = SDL_GetMouseState(&x_now, &y_now);
 		dx = x_now - x_before;
 		dy = y_now - y_before;
@@ -156,8 +169,6 @@ typedef struct {
 	float rthumb_x, rthumb_y;
 	unsigned int buttons[14];
 } JoypadState;
-
-#define M_PI 3.141592653589793238462643
 
 #define JOYPAD_UP       0
 #define JOYPAD_RIGHT    1

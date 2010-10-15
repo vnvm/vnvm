@@ -17,11 +17,17 @@ class Animation
 		this.to = {};
 		this.timer = TimerComponent(totalTime);
 	}
+
+	function set(key, from = 0, to = 0)
+	{
+		try { this.from[key] <- from; } catch (e) { }
+		try { this.to[key] <- to; } catch (e) { }
+	}
 	
 	function increment(key, inc = 0)
 	{
-		try { this.from[key] <- this.updateObject[key]; } catch (e) { }
-		try { this.to[key] <- this.from[key] + inc; } catch (e) { }
+		local initialValue = this.updateObject[key];
+		set(key, initialValue, initialValue + inc);
 	}
 	
 	function ended()

@@ -54,7 +54,7 @@ public:
 	
 	Font() {
 		bitmap = Bitmap::create(IMG_Convert_TO_32(IMG_Load("lucon.ttf.png")));
-		effect = new Effect("tint");
+		effect = new Effect((char *)"tint");
 		characters_per_row = 16;
 		characters_per_column = 16;
 		font_height = 32;
@@ -110,7 +110,7 @@ public:
 		this->color = color;
 		for (int n = 0; n < 4; n++) colorf[n] = (float)color.v[n] / (float)255;
 		int test = 0;
-		effect->set_vars(EVT_FLOAT, "ccolor", 4, colorf);
+		effect->set_vars(EVT_FLOAT, (char *)"ccolor", 4, colorf);
 	}
 
 	void setSlice(int from, int to)

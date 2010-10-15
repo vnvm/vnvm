@@ -84,6 +84,18 @@ class RIO_OP_base
 		}
 		movie.stop();
 	}
+	
+	</ id=0x4E, format="4", description="" />
+	static function UNK_4E(param)
+	{
+		this.TODO();
+	}
+
+	</ id=0x76, format="441", description="" />
+	static function UNK_76(unk1, unk2, unk3)
+	{
+		this.TODO();
+	}
 
 	</ id=0x62, format="1", description="" />
 	static function UNK_62(param)

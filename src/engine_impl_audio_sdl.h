@@ -267,16 +267,16 @@ class Audio { public:
 	static int init(int frequency) {
 		if (!initialized) {
 			initialized = true;
-			//Mix_Init(MIX_INIT_OGG | MIX_INIT_MP3 | MIX_INIT_MOD);
+			Mix_Init(MIX_INIT_OGG | MIX_INIT_MP3 | MIX_INIT_MOD);
 			printf("Audio::init(%d)\n", frequency);
 			//frequency = 44100;
-			frequency = 22050;
-			Mix_Init(MIX_INIT_OGG);
+			//Mix_Init(MIX_INIT_OGG);
 			Mix_OpenAudio(frequency, MIX_DEFAULT_FORMAT, 2, 1024);
-			Mix_AllocateChannels(MAX_NUM_CHANNELS);
+			//Mix_AllocateChannels(MAX_NUM_CHANNELS);
 			for (int n = 0; n < MAX_NUM_CHANNELS; n++) {
 				if (channels[n] == NULL) channels[n] = new SoundChannel(n);
 			}
+			//printf("aaaaaaaa\n");
 		}
 		return 0;
 	}

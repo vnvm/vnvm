@@ -2,6 +2,22 @@
 cls
 del engine.exe 2> NUL
 
+REM SET ENGINE_INCLUDE=
+REM SET ENGINE_INCLUDE=%ENGINE_INCLUDE% -I"src\platforms\win32\include"
+REM SET ENGINE_INCLUDE=%ENGINE_INCLUDE% -I"src\platforms\win32\include\SDL"
+REM SET ENGINE_INCLUDE=%ENGINE_INCLUDE% -I"src\smpeg"
+REM SET ENGINE_INCLUDE=%ENGINE_INCLUDE% -I"src\include"
+
+REM SET ENGINE_LIBS=
+REM SET ENGINE_LIBS=%ENGINE_LIBS% -Lsrc\platforms\win32\lib
+REM SET ENGINE_LIBS=%ENGINE_LIBS% -lsquirrel -lsqstdlib
+REM SET ENGINE_LIBS=%ENGINE_LIBS% -lSDL -lSDL_mixer -lSDL_ttf -lSDL_image -lopengl32 -lsmpeg
+REM SET ENGINE_LIBS=%ENGINE_LIBS% -lstdc++ -enable-auto-import
+
+REM g++ src\engine.cpp -oengine.exe %ENGINE_INCLUDE% %ENGINE_LIBS%
+
+REM exit /b
+
 SET LIBS=
 SET LIBS=%LIBS% squirrel.lib
 SET LIBS=%LIBS% sqstdlib.lib

@@ -71,11 +71,16 @@ class RIO_OP_EFFECTS_base
 		if (this.skipping()) {
 			time /= 5;
 		}
-		local anim = this.scene.get(object_id).animation;
+		local object = this.scene.get(object_id);
+		local anim = object.animation;
 		anim.reset(time);
 		anim.increment("x", inc_x);
 		anim.increment("y", inc_y);
-		anim.increment("alpha", alpha);
+		if (alpha == -1) {
+			anim.set("alpha", 1.0, 0.0);
+		} else if (alpha == 1) {
+			anim.set("alpha", 0.0, 1.0);
+		}
 		
 		this.TODO();
 	}

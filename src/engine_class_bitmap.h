@@ -114,7 +114,7 @@ DSQ_METHOD(Bitmap, fromData)
 	int width = 0, height = 0, bpp = 32, interleaved = 1, pal_bpp = 4, pal_bpp_use = 4, flip_x = 0, flip_y = 0;
 	Bitmap *bitmap = NULL;
 	STRING color_order = {0};
-	color_order.stringz = "rgba";
+	color_order.stringz = (char *)"rgba";
 	//color_order.stringz = "argb";
 
 	EXTRACT_PARAM_START();
@@ -358,8 +358,8 @@ DSQ_METHOD(Bitmap, getpixel)
 {
 	EXTRACT_PARAM_START();
 	EXTRACT_PARAM_SELF(Bitmap);
-	EXTRACT_PARAM_INT(2, x, NULL);
-	EXTRACT_PARAM_INT(3, y, NULL);
+	EXTRACT_PARAM_INT(2, x, 0);
+	EXTRACT_PARAM_INT(3, y, 0);
 	
 	int retval = self->getpixel(x, y);
 

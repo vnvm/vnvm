@@ -7,6 +7,7 @@ class RIO_OP_SCENE
 		background.x = x;
 		background.y = y;
 		background.index = index;
+		background.alpha = 1.0;
 		background.name = name;
 		background.color = null;
 		background.enabled = true;
@@ -51,6 +52,7 @@ class RIO_OP_SCENE
 		object.x = x;
 		object.y = y;
 		object.name = name;
+		object.alpha = 1.0;
 		object.enabled = true;
 		
 		this.TODO();
@@ -65,6 +67,7 @@ class RIO_OP_SCENE
 		object.x = x;
 		object.y = y;
 		object.name = name;
+		object.alpha = 1.0;
 		object.enabled = true;
 		
 		this.TODO();
