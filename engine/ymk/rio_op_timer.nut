@@ -32,4 +32,11 @@ class RIO_OP_TIMER
 			Screen.delay(delay_ms);
 		}
 	}
+
+	</ id=0x86, format="2", description="" />
+	static function UNK_86(unk1)
+	{
+		//this.TODO();
+		Screen.delay(unk1);
+	}
 }

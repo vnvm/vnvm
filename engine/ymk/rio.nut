@@ -260,7 +260,12 @@ class RIO
 			local c = sparams[n];
 			switch (c) {
 				case '*': return [];
-				case '.': data.readn('b'); break;
+				case '.':
+					local value = data.readn('b');
+					if (value != 0) {
+						printf("WARNING: ignored parameter has a value different than zero!\n");
+					}
+				break;
 				case '1': l.push(data.readn('b')); break;
 				case '2': l.push(data.readn('s')); break;
 				case '4': l.push(data.readn('i')); break;

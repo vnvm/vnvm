@@ -10,7 +10,7 @@ function between(v, m, M)
 	return (v >= m) && (v < M);
 }
 
-function between2(point, rect)
+function pointInRect(point, rect)
 {
 	return (
 		between(point.x, rect.x, rect.x + rect.w) &&

@@ -28,11 +28,19 @@ class RIO_OP_base
 	}
 
 	</ id=0x55, format="1", description="" />
-	static function UNK_55(unk)
+	static function TEXT_CLEAR(unk)
 	{
+		//this.draw_interface = true;
 		this.TODO();
 	}
-	
+
+	</ id=0x68, format="2221", description="" />
+	static function INTERFACE_HIDE(unk1, unk2, unk3, unk4)
+	{
+		this.draw_interface = false;
+		this.TODO();
+	}
+
 	</ id=0x61, format="1s", description="" />
 	static function MOVIE(can_stop, name)
 	{
@@ -40,7 +48,7 @@ class RIO_OP_base
 		movie.load(::path_to_files + "/" + name);
 		movie.viewport(0, 0, screen.w, screen.h);
 		movie.play();
-		local timer = Timer(2000);
+		local timer = Timer(500);
 		while (movie.playing) {
 			input_update();
 
@@ -64,12 +72,6 @@ class RIO_OP_base
 		this.TODO();
 	}
 
-	</ id=0x68, format="2221", description="" />
-	static function UNK_68(unk1, unk2, unk3, unk4)
-	{
-		this.TODO();
-	}
-
 	</ id=0x84, format="1", description="" />
 	static function UNK_84(param)
 	{
@@ -78,12 +80,6 @@ class RIO_OP_base
 
 	</ id=0x85, format="2", description="" />
 	static function UNK_85(param)
-	{
-		this.TODO();
-	}
-
-	</ id=0x86, format="2", description="" />
-	static function UNK_86(unk1)
 	{
 		this.TODO();
 	}

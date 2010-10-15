@@ -37,6 +37,8 @@ class RIO_OP_SCENE
 		};
 		this.state.sprites_l1[index] = sprite;
 		this.updateSceneLayer();
+		
+		this.TODO();
 	}
 	
 	// OBJ_PUT : [243,276,0,0,0,"EC_001"]

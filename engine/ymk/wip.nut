@@ -82,15 +82,20 @@ class WIP
 		));
 	}
 	
-	function drawTo(dst, idx = 0, x = 0, y = 0, alpha = 1.0)
+	function drawTo(destinationBitmap, index = 0, x = 0, y = 0, alpha = 1.0)
 	{
-		local info = infos[idx];
-		dst.drawBitmap(images[idx], info.x + x, info.y + y, alpha);
+		local info = infos[index];
+		destinationBitmap.drawBitmap(images[index], info.x + x, info.y + y, alpha);
 	}
 	
 	function len()
 	{
 		return images.len();
+	}
+	
+	function pointInImage(index, point)
+	{
+		return pointInRect(point, this.infos[index]);
 	}
 }
 

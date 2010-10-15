@@ -1,6 +1,7 @@
 #include <SDL_syswm.h>
 #include <SDL_mouse.h>
 
+#include <string.h>
 #include <iostream>
 #include <map>
 #include <vector>
@@ -11,9 +12,9 @@
 using namespace std;
 
 #ifdef USE_OPENGL
-	#define GL_BIND_EXT(func) *((void **)&func##EXT) = wglGetProcAddress(#func "EXT"); if (!func##EXT) { fprintf( stderr, "OpenGL: Can't find function '%s'\n", #func ); exit(-1); }
-	#define GL_BIND_NOR(func) *((void **)&func     ) = wglGetProcAddress(#func      ); if (!func     ) { fprintf( stderr, "OpenGL: Can't find function '%s'\n", #func ); exit(-1); }
-	#define GL_BIND(func)     *((void **)&func     ) = wglGetProcAddress(#func "EXT"); if (!func     ) { fprintf( stderr, "OpenGL: Can't find function '%s'\n", #func ); exit(-1); }
+	#define GL_BIND_EXT(func) *((void **)&func##EXT) = SDL_GL_GetProcAddress(#func "EXT"); if (!func##EXT) { fprintf( stderr, "OpenGL: Can't find function '%s'\n", #func ); exit(-1); }
+	#define GL_BIND_NOR(func) *((void **)&func     ) = SDL_GL_GetProcAddress(#func      ); if (!func     ) { fprintf( stderr, "OpenGL: Can't find function '%s'\n", #func ); exit(-1); }
+	#define GL_BIND(func)     *((void **)&func     ) = SDL_GL_GetProcAddress(#func "EXT"); if (!func     ) { fprintf( stderr, "OpenGL: Can't find function '%s'\n", #func ); exit(-1); }
 	#define GL_DEF(type, name) type name = NULL;
 	#define GL_DEF_PROC(type, name) PFN##type##PROC name = NULL;
 
@@ -49,10 +50,18 @@ using namespace std;
 	GL_DEF(PFNGLACTIVETEXTUREPROC   , glActiveTexture);
 
 	//glBlendFuncSeparate
+	
+	int enabled_textureNonPowerOfTwo = 0;
+	int enabled_textureRectangle = 0;
 
 	void gl_ext_prepare()
 	{
 		static int initialized = 0; if (initialized) return;
+		
+		//printf("GL('%s')\n", glGetString(GL_EXTENSIONS));
+		
+		enabled_textureNonPowerOfTwo = (strstr((const char *)glGetString(GL_EXTENSIONS), "GL_ARB_texture_non_power_of_two ") != NULL);
+		enabled_textureRectangle = (strstr((const char *)glGetString(GL_EXTENSIONS), "GL_ARB_texture_rectangle ") != NULL);
 
 		GL_BIND(glBlendFuncSeparate);
 		GL_BIND(glRenderbufferStorage);
@@ -337,14 +346,22 @@ public:
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			switch (surface->format->BitsPerPixel) {
-				case 8 : glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RED , GL_UNSIGNED_BYTE       , surface->pixels); break;
-				case 24: glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGB , GL_UNSIGNED_INT_8_8_8_8, surface->pixels); break;
-				case 32: glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, surface->pixels); break;
-				default:
-					fprintf(stderr, "Invalid bpp for opengl\n");
-				break;
+			
+			//enabled_textureNonPowerOfTwo
+			//enabled_textureRectangle
+			
+			SDL_LockSurface(surface);
+			{
+				switch (surface->format->BitsPerPixel) {
+					case 8 : glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RED , GL_UNSIGNED_BYTE       , surface->pixels); break;
+					case 24: glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGB , GL_UNSIGNED_INT_8_8_8_8, surface->pixels); break;
+					case 32: glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, surface->w, surface->h, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, surface->pixels); break;
+					default:
+						fprintf(stderr, "Invalid bpp for opengl\n");
+					break;
+				}
 			}
+			SDL_UnlockSurface(surface);
 		}
 		
 		void gl_render_to()
@@ -762,6 +779,7 @@ public:
 		#ifdef USE_OPENGL
 			flags |= SDL_OPENGL;
 		#endif
+		SDL_WM_SetCaption("VNVM", "VNVM");
 		Video_screen = SDL_SetVideoMode(w, h, 32, flags);
 		#ifdef USE_OPENGL
 			gl_ext_prepare();

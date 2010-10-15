@@ -190,7 +190,7 @@ class Joypad { public:
 			XINPUT_VIBRATION vibration;
 			vibration.wLeftMotorSpeed  = left  * 60000;
 			vibration.wRightMotorSpeed = right * 60000;
-			XInputSetState(0, &vibration);
+			if (XInputSetState) XInputSetState(0, &vibration);
 		#endif
 	}
 
@@ -235,7 +235,7 @@ class Joypad { public:
 					*(void **)&XInputSetState = (void *)GetProcAddress(lib, "XInputSetState");
 					*(void **)&XInputGetState = (void *)GetProcAddress(lib, "XInputGetState");
 				}
-				XInputEnable(TRUE);
+				if (XInputEnable) XInputEnable(TRUE);
 				//XINPUT_VIBRATION vibration = {320, 0};
 			#endif
 			
@@ -258,7 +258,7 @@ class Joypad { public:
 		#ifdef WIN32
 			XINPUT_STATE state = {0};
 
-			XInputGetState(0, &state);
+			if (XInputGetState) XInputGetState(0, &state);
 
 			now.lthumb_x = state.Gamepad.sThumbLX / 32768.0f;
 			now.lthumb_y = state.Gamepad.sThumbLY / 32768.0f;

@@ -153,7 +153,7 @@ class RIO_OP_TEXT_base
 
 			foreach (option in options) {
 				local selwnd = selwnd0;
-				if (between2({x=mouse.x, y=mouse.y}, option.rect)) {
+				if (pointInRect({x=mouse.x, y=mouse.y}, option.rect)) {
 					selwnd = selwnd1;
 					if (mouse.pressed(0)) {
 						selectedOption = option;

@@ -35,8 +35,8 @@ DSQ_METHOD(Joypad, _get)
 		if (strcmp(c, "lthumb_y") == 0) RETURN_INT(self->now.lthumb_y);
 		if (strcmp(c, "rthumb_x") == 0) RETURN_INT(self->now.rthumb_x);
 		if (strcmp(c, "rthumb_y") == 0) RETURN_INT(self->now.rthumb_y);
-		if (strcmp(c, "dpad_x") == 0) RETURN_INT(self->now.dpad_x);
-		if (strcmp(c, "dpad_y") == 0) RETURN_INT(self->now.dpad_y);
+		if (strcmp(c, "dpad_x"  ) == 0) RETURN_INT(self->now.dpad_x);
+		if (strcmp(c, "dpad_y"  ) == 0) RETURN_INT(self->now.dpad_y);
 	}
 	
 	return 0;
@@ -44,20 +44,20 @@ DSQ_METHOD(Joypad, _get)
 
 int Joypad_pressed_pressing(Joypad *joypad, char *button, int pressing) {
 	int ibutton = -1;
-	if (strcmp(button, "up") == 0) ibutton = JOYPAD_UP;
-	else if (strcmp(button, "right") == 0) ibutton = JOYPAD_RIGHT;
-	else if (strcmp(button, "down") == 0) ibutton = JOYPAD_DOWN;
-	else if (strcmp(button, "left") == 0) ibutton = JOYPAD_LEFT;
-	else if (strcmp(button, "accept") == 0) ibutton = JOYPAD_ACCEPT;
-	else if (strcmp(button, "cancel") == 0) ibutton = JOYPAD_CANCEL;
-	else if (strcmp(button, "menu") == 0) ibutton = JOYPAD_MENU;
+	     if (strcmp(button, "up"     ) == 0) ibutton = JOYPAD_UP;
+	else if (strcmp(button, "right"  ) == 0) ibutton = JOYPAD_RIGHT;
+	else if (strcmp(button, "down"   ) == 0) ibutton = JOYPAD_DOWN;
+	else if (strcmp(button, "left"   ) == 0) ibutton = JOYPAD_LEFT;
+	else if (strcmp(button, "accept" ) == 0) ibutton = JOYPAD_ACCEPT;
+	else if (strcmp(button, "cancel" ) == 0) ibutton = JOYPAD_CANCEL;
+	else if (strcmp(button, "menu"   ) == 0) ibutton = JOYPAD_MENU;
 	else if (strcmp(button, "special") == 0) ibutton = JOYPAD_SPECIAL;
-	else if (strcmp(button, "select") == 0) ibutton = JOYPAD_SELECT;
-	else if (strcmp(button, "start") == 0) ibutton = JOYPAD_START;
-	else if (strcmp(button, "lmenu") == 0) ibutton = JOYPAD_LMENU;
-	else if (strcmp(button, "rmenu") == 0) ibutton = JOYPAD_RMENU;
-	else if (strcmp(button, "lmenu2") == 0) ibutton = JOYPAD_LMENU2;
-	else if (strcmp(button, "rmenu2") == 0) ibutton = JOYPAD_RMENU2;
+	else if (strcmp(button, "select" ) == 0) ibutton = JOYPAD_SELECT;
+	else if (strcmp(button, "start"  ) == 0) ibutton = JOYPAD_START;
+	else if (strcmp(button, "lmenu"  ) == 0) ibutton = JOYPAD_LMENU;
+	else if (strcmp(button, "rmenu"  ) == 0) ibutton = JOYPAD_RMENU;
+	else if (strcmp(button, "lmenu2" ) == 0) ibutton = JOYPAD_LMENU2;
+	else if (strcmp(button, "rmenu2" ) == 0) ibutton = JOYPAD_RMENU2;
 	return pressing ? joypad->pressing(ibutton) : joypad->pressed(ibutton);
 }
 
