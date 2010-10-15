@@ -7,10 +7,11 @@ class RIO_OP_EFFECTS_base
 		this.TODO();
 	}
 
-	</ id=0x4A, format="12.", description="" />
-	static function TRANSITION(kind, ms_time)
+	</ id=0x4A, format="121", description="" />
+	static function TRANSITION(kind, ms_time, unk1)
 	{
 		local effect = null;
+		//if (ms_time == 0) ms_time = 1;
 		
 		switch (kind) {
 			case 0: // EFFECT
@@ -47,7 +48,7 @@ class RIO_OP_EFFECTS_base
 			break;
 		}
 		
-		if (ms_time <= 225) {
+		if (ms_time <= 225 && ms_time > 10) {
 			input.setVibration(0.2, 0.8, 40 * (300.0 / ms_time.tofloat()), 0);
 		}
 		
@@ -65,7 +66,7 @@ class RIO_OP_EFFECTS_base
 	}
 	
 	</ id=0x4B, format="1222221", description="" />
-	static function ANIMATE_ADD(object_id, inc_x, inc_y, time, unk0, unk1, unk2)
+	static function ANIMATE_ADD(object_id, inc_x, inc_y, time, unk0, alpha, unk2)
 	{
 		if (this.skipping()) {
 			time /= 5;
@@ -74,6 +75,7 @@ class RIO_OP_EFFECTS_base
 		anim.reset(time);
 		anim.increment("x", inc_x);
 		anim.increment("y", inc_y);
+		anim.increment("alpha", alpha);
 		
 		this.TODO();
 	}
@@ -92,8 +94,11 @@ class RIO_OP_EFFECTS_base
 	{
 		local kinds = [null, "quake", "heat"];
 		
+		printf("EFFECT(%d, %d, %d, %d)\n", kind, duration, quantity, unk1);
+		
 		switch (kinds[kind]) {
 			case "quake":
+				if (duration >= 255) duration = 20;
 				//printf("duration: %d\n", duration);
 				::input.setVibration(1.0, 0.0, 50 * duration, 0);
 				local ms_time = (duration * 5) * 1000 / fps;
@@ -102,14 +107,15 @@ class RIO_OP_EFFECTS_base
 				//printf("quake: %f, %f\n", q, ms_time);
 				this.scene.setEffectTime(ms_time);
 				while (!this.ended()) {
-					this.scene.x = (rand() % q) - q / 2;
-					this.scene.y = (rand() % q) - q / 2;
+					this.scene.x = rand_between(-q, q);
+					this.scene.y = rand_between(-q, q);
 					//printf("quake: %d, %d\n", this.scene.x, this.scene.y);
 					gameStep();
 				}
 				this.scene.x = 0;
 				this.scene.y = 0;
 				this.scene.copyDrawLayerToShowLayer();
+				gameStep();
 			break;
 			default:
 				this.TODO();

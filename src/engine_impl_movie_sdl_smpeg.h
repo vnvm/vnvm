@@ -108,6 +108,7 @@ class Movie { public:
 				ImplColor color = {0, 0, 0, 255};
 				Video::screen->clear(color);
 				Bitmap::gl_unbind();
+				glMatrixMode(GL_MODELVIEW); glLoadIdentity();
 				glRasterPos2i(0, 0);
 				glPixelZoom(1.0f, -1.0f);
 				glDrawPixels(surface->w, surface->h, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, surface->pixels);

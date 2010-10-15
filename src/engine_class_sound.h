@@ -51,7 +51,6 @@ DSQ_METHOD(Sound, _get)
 {
 	EXTRACT_PARAM_START();
 	EXTRACT_PARAM_STR(2, s, NULL);
-	EXTRACT_PARAM_INT(3, smooth, 0);
 
 	Sound *sound = Sound::createFromFile((char *)s.data);
 	CREATE_OBJECT(Sound, sound);
@@ -63,7 +62,6 @@ DSQ_METHOD(Sound, fromStream)
 	SQStream *stream = NULL;
 	Sound *sound = NULL;
 	EXTRACT_PARAM_START();
-	EXTRACT_PARAM_INT(3, smooth, 0);
 
 	if (SQ_FAILED(sq_getinstanceup(v, 2, (SQUserPointer*)&stream, (SQUserPointer)0x80000000)))
 	{

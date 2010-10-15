@@ -99,21 +99,24 @@ static SoundChannel* channels[MAX_NUM_CHANNELS] = {NULL};
 		
 	int Sound::playing() {
 		int count = 0;
-		for (int n = 0; n < 32; n++) if (Mix_Playing(n) && Mix_GetChunk(n) == chunk) count++;
+		for (int n = 0; n < 32; n++) if (Mix_Playing(n) && (Mix_GetChunk(n) == chunk)) count++;
 		return count;
 	}
 		
 	SoundChannel *Sound::play(int channel = -1, int loops = 1, int fadein_ms = 0) {
 		SoundChannel *ch = SoundChannel::get(channel);
 		ch->setSound(this);
+		//printf("Playing sound at channel: %d\n", ch->index);
+		
 		ch->play(loops, fadein_ms);
+		//Mix_PlayChannel(-1, chunk, 0);
 		return ch;
 	}
 		
 	Sound *Sound::loadFromRW(SDL_RWops* rwops, int autorelease = 1) {
 		Mix_Chunk *chunk = NULL;
 		
-		//chunk = Mix_LoadWAV_RW(rwops, autorelease);
+		chunk = Mix_LoadWAV_RW(rwops, autorelease);
 		
 		if (chunk == NULL) {
 			fprintf(stderr, "Can't load sound\n");
@@ -127,9 +130,7 @@ static SoundChannel* channels[MAX_NUM_CHANNELS] = {NULL};
 	}
 
 	Sound *Sound::loadFromData(STRING data) {
-		//FILE *f = fopen("sound_temp", "wb"); fwrite(data.data, 1, data.len, f); fclose(f);
-		//return Sound::loadFromRW(SDL_RWFromConstMem(data.data, data.len), 0);
-		return Sound::loadFromRW(SDL_RWFromMem(data.data, data.len), 1);
+		return Sound::loadFromRW(SDL_RWFromConstMem(data.data, data.len), 0);
 	}
 
 	Sound *Sound::loadFromSQStream(SQStream* stream) {
@@ -168,11 +169,20 @@ static SoundChannel* channels[MAX_NUM_CHANNELS] = {NULL};
 	void SoundChannel::play(int loops = 1, int fadein_ms = 0) {
 		if ((this->sound == NULL) || (this->sound->chunk == NULL)) return;
 		this->started = SDL_GetTicks();
-		Mix_FadeInChannel(index, this->sound->chunk, loops - 1, fadein_ms);
+		//printf("Playing channel... %d\n", index);
+		if (fadein_ms == 0) {
+			Mix_PlayChannel(index, this->sound->chunk, loops - 1);
+		} else {
+			Mix_FadeInChannel(index, this->sound->chunk, loops - 1, fadein_ms);
+		}
 	}
 	
 	int SoundChannel::stop(int fadeout_ms = 0) {
-		return Mix_FadeOutChannel(index, fadeout_ms);
+		if (fadeout_ms == 0) {
+			return Mix_HaltChannel(index);
+		} else {
+			return Mix_FadeOutChannel(index, fadeout_ms);
+		}
 	}
 
 	SoundChannel *SoundChannel::get(int channel) {
@@ -193,7 +203,7 @@ static SoundChannel* channels[MAX_NUM_CHANNELS] = {NULL};
 	}
 	
 	float SoundChannel::fprogress() {
-		if (!playing() || (this->sound = NULL)) return 1.0;
+		if (!playing() || (this->sound == NULL)) return 1.0;
 		return (double)progress() / (double)this->sound->length();
 	}
 	
@@ -221,8 +231,15 @@ static SoundChannel* channels[MAX_NUM_CHANNELS] = {NULL};
 	
 	int Music::play(int loops, int fadein_ms = 0, double position = 0.0) {
 		if (this->handle == NULL) return 0;
+		int result;
 		Mix_HaltMusic();
-		return Mix_FadeInMusicPos(handle, loops - 1, fadein_ms, position);
+		if (fadein_ms == 0) {
+			result = Mix_PlayMusic(handle, loops - 1);
+		} else {
+			result = Mix_FadeInMusic(handle, loops - 1, fadein_ms);
+		}
+		if (position != 0.0) Mix_SetMusicPosition(position);
+		return result;
 	}
 	
 	int Music::stop(int fadeout_ms = 0) {
@@ -248,12 +265,18 @@ class Audio { public:
 	static bool initialized;
 
 	static int init(int frequency) {
-		initialized = true;
-		Mix_Init(MIX_INIT_OGG | MIX_INIT_MP3 | MIX_INIT_MOD);
-		Mix_OpenAudio(frequency, MIX_DEFAULT_FORMAT, 2, 1024);
-		Mix_AllocateChannels(MAX_NUM_CHANNELS);
-		for (int n = 0; n < MAX_NUM_CHANNELS; n++) {
-			if (channels[n] == NULL) channels[n] = new SoundChannel(n);
+		if (!initialized) {
+			initialized = true;
+			//Mix_Init(MIX_INIT_OGG | MIX_INIT_MP3 | MIX_INIT_MOD);
+			printf("Audio::init(%d)\n", frequency);
+			//frequency = 44100;
+			frequency = 22050;
+			Mix_Init(MIX_INIT_OGG);
+			Mix_OpenAudio(frequency, MIX_DEFAULT_FORMAT, 2, 1024);
+			Mix_AllocateChannels(MAX_NUM_CHANNELS);
+			for (int n = 0; n < MAX_NUM_CHANNELS; n++) {
+				if (channels[n] == NULL) channels[n] = new SoundChannel(n);
+			}
 		}
 		return 0;
 	}

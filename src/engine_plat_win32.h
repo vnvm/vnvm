@@ -10,8 +10,7 @@
 //#include <unistd.h>
 
 void game_init() {
-	SDL_Init(0);
-	SDL_Init(SDL_INIT_VIDEO);
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
 	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 	SDL_putenv("SDL_VIDEO_CENTERED=center");
 }

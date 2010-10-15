@@ -24,3 +24,18 @@ function interpolate(from, to, stepf)
 	return (to - from) * stepf + from;
 }
 
+/**
+ * Returns an integer value between min and max, excluding max.
+ */
+function rand_between(min, max)
+{
+	return min + (rand() % (max - min));
+}
+
+/**
+ * Returns a float value between 0.0 and 1.0
+ */
+function rand_float()
+{
+	return rand() / RAND_MAX.tofloat();
+}

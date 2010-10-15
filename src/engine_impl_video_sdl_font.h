@@ -196,6 +196,7 @@ public:
 				float scale = (((float)local_size / (float)font_height) * 0.76) * size;
 				glScalef(scale, scale, 1.0);
 				print2(dst_bmp, text, 0, 0);
+				glMatrixMode(GL_MODELVIEW); glLoadIdentity();
 			#else
 				assert(0);
 			#endif

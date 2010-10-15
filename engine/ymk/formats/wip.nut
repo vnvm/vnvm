@@ -82,10 +82,10 @@ class WIP
 		));
 	}
 	
-	function drawTo(destinationBitmap, index = 0, x = 0, y = 0, alpha = 1.0)
+	function drawTo(destinationBitmap, index = 0, x = 0, y = 0, alpha = 1.0, size = 1.0)
 	{
 		local info = infos[index];
-		destinationBitmap.drawBitmap(images[index], info.x + x, info.y + y, alpha);
+		destinationBitmap.drawBitmap(images[index], info.x + x, info.y + y, alpha, size);
 	}
 	
 	function len()

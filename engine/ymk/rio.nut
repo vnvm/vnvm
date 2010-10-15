@@ -4,7 +4,7 @@ class RIO extends Component
 	name    = null;
 	data    = null;
 	state   = null;
-	fps     = 25;
+	fps     = 50;
 	ms_per_frame = 0;
 	sound   = null;
 	todo    = 0;

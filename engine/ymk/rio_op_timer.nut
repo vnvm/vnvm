@@ -25,19 +25,15 @@ class RIO_OP_TIMER
 		//this.TODO();
 	}
 
-	</ id=0x82, format="2.", description="" />
-	static function WAIT(delay_ms)
+	</ id=0x82, format="21", description="" />
+	static function WAIT(delay_ms, unk1)
 	{
-		if (!this.skipping()) {
-			Screen.delay(delay_ms);
+		local timer = Timer(delay_ms);
+		while (!timer.ended) {
+			if (this.skipping()) break;
+			timer.update(ms_per_frame);
+			gameStep();
 		}
 		this.TODO();
-	}
-
-	</ id=0x86, format="11", description="" />
-	static function UNK_86_DELAY(unk1, unk2)
-	{
-		this.TODO();
-		Screen.delay(unk1);
 	}
 }

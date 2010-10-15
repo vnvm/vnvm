@@ -250,6 +250,7 @@ public:
 	// Destructs the surface;
 	~Bitmap()
 	{
+		//printf("~Bitmap[%d][", gltex);
 		if (surface != NULL) {
 			surface->refcount--;
 			if (surface->refcount <= 1) {
@@ -259,6 +260,7 @@ public:
 				#endif
 			}
 		}
+		//printf("]");
 	}
 
 	/*void setColorKey(int color) {
@@ -323,17 +325,17 @@ public:
 			}
 		}
 		
-		static void gl_draw_slice(int x, int y, int tx, int ty, int w, int h) {
+		static void gl_draw_slice(int x, int y, int tx, int ty, int w, int h, int cx = 0, int cy = 0) {
 			glBegin(GL_QUADS);
-				glTexCoord2i(tx + 0, ty + 0); glVertex2i(x + 0, y + 0); 
-				glTexCoord2i(tx + w, ty + 0); glVertex2i(x + w, y + 0);
-				glTexCoord2i(tx + w, ty + h); glVertex2i(x + w, y + h);
-				glTexCoord2i(tx + 0, ty + h); glVertex2i(x + 0, y + h);
+				glTexCoord2i(tx + 0, ty + 0); glVertex2i(x + 0 - cx, y + 0 - cy); 
+				glTexCoord2i(tx + w, ty + 0); glVertex2i(x + w - cx, y + 0 - cy);
+				glTexCoord2i(tx + w, ty + h); glVertex2i(x + w - cx, y + h - cy);
+				glTexCoord2i(tx + 0, ty + h); glVertex2i(x + 0 - cx, y + h - cy);
 			glEnd();
 		}
 
 		void gl_draw_clip() {
-			gl_draw_slice(0, 0, clip.x, clip.y, clip.w, clip.h);
+			gl_draw_slice(0, 0, clip.x, clip.y, clip.w, clip.h, cx, cy);
 		}
 
 		void gl_init()
@@ -341,6 +343,7 @@ public:
 			gl_gl_updated = 0;
 			gl_sdl_updated = 0;
 			glGenTextures(1, &gltex);
+			//printf("gl_init[%d", gltex);
 			gl_bind();
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -362,6 +365,7 @@ public:
 				}
 			}
 			SDL_UnlockSurface(surface);
+			//printf("]");
 		}
 		
 		void gl_render_to()
@@ -371,7 +375,8 @@ public:
 			static GLuint prevTex = -2;
 			GLuint curTex = isScreen() ? -1 : gltex;
 			
-			if (prevTex != curTex) {
+			//if (prevTex != curTex)
+			{
 				prevTex = curTex;
 				//printf("%08X, %08X\n", surface, Video_screen);
 
@@ -408,7 +413,7 @@ public:
 					glOrtho(clip.x, clip.x + clip.w, clip.y, clip.y + clip.h, -1.0, 1.0);
 				}
 
-				glMatrixMode(GL_MODELVIEW); glLoadIdentity();
+				//glMatrixMode(GL_MODELVIEW); glLoadIdentity();
 			}
 		}
 	#endif
@@ -649,12 +654,17 @@ public:
 		if (strcmp(name, "red"  ) == 0) return 0;
 		if (strcmp(name, "green") == 0) return 1;
 		if (strcmp(name, "blue" ) == 0) return 2;
-		if (strcmp(name, "alpga") == 0) return 3;
+		if (strcmp(name, "alpha") == 0) return 3;
 		return 0;
 	}
 	
 	void copyChannel(Bitmap *mask, char *channel_from = "red", char *channel_to = "alpha", int invert = 0)
 	{
+		if ((mask->surface->w != this->surface->w) || (mask->surface->h != this->surface->h)) {
+			fprintf(stderr, "copyChannel only works with images of the same size!! current(%dx%d) mask(%dx%d)", this->surface->w, this->surface->h, mask->surface->w, mask->surface->h);
+			return;
+		}
+	
 		#if USE_OPENGL
 			int v_channel_from = gl_channel_name_to_constant(channel_from);
 			int v_channel_to   = gl_channel_name_to_constant(channel_to);
@@ -662,34 +672,23 @@ public:
 			glPixelStorei(GL_PACK_ALIGNMENT, 1);
 			int mw = mask->surface->w, mh = mask->surface->h;
 			int msize = mw * mh;
-			unsigned char *mask_data = (unsigned char *)malloc(msize);
+			unsigned char *mask_data  = (unsigned char *)malloc(msize);
+			unsigned char *color_data = (unsigned char *)malloc(msize * 4);
 			{
-				//mask->gl_render_to();
-				//mask->gl_render_to(); glReadPixels(0, 0, mw, mh, v_channel_from, GL_UNSIGNED_BYTE, mask_data);
 				mask->gl_bind(); glGetTexImage(GL_TEXTURE_2D, 0, v_channel_from, GL_UNSIGNED_BYTE, mask_data);
-				//STRING str = {mask_data, mw * mh}; STRING_FILE_PUT(str, "../game_data/test.bin");
-				if (glGetError() > 0) {
-					printf("glGetError(): %d\n", glGetError());
-				}
+				this->gl_bind(); glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, color_data);
 
-				if (!invert) for (int n = 0; n < msize; n++) mask_data[n] = 0xFF - mask_data[n];
+				int m = gl_channel_name_to_pos(channel_to);
+				if (invert) {
+					for (int n = 0; n < msize; n++, m += 4) color_data[m] = mask_data[n];
+				} else {
+					for (int n = 0; n < msize; n++, m += 4) color_data[m] = 0xFF - mask_data[n];
+				}
 				
-				switch (v_channel_to) {
-					case GL_RED  : glColorMask(1, 0, 0, 0); break;
-					case GL_GREEN: glColorMask(0, 1, 0, 0); break;
-					case GL_BLUE : glColorMask(0, 0, 1, 0); break;
-					case GL_ALPHA: glColorMask(0, 0, 0, 1); break;
-				}
-				{
-					Bitmap::gl_unbind();
-					mask->gl_render_to();
-					this->gl_render_to();
-					glDisable(GL_BLEND);				
-					glDrawPixels(mw, mh, v_channel_to, GL_UNSIGNED_BYTE, mask_data);
-				}
-				glColorMask(1, 1, 1, 1);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this->surface->w, this->surface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, color_data);
 			}
 			free(mask_data);
+			free(color_data);
 		#else
 			do_transition_tick(this->surface, mask->surface, 0.5f, 0, 0, invert);
 		#endif

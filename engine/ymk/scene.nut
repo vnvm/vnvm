@@ -215,6 +215,8 @@ class SceneObject extends Component
 	type = null;
 	x = 0;
 	y = 0;
+	cx = 0;
+	cy = 0;
 	alpha = 1.0;
 	size = 1.0;
 	name = "";
@@ -234,6 +236,10 @@ class SceneObject extends Component
 		this.color     = null;
 		this.name      = "";
 		this.animation = Animation(this);
+		/*if (type == "background") {
+			this.cx = 800;
+			this.cy = 600;
+		}*/
 	}
 	
 	function update(elapsed_time)
@@ -255,8 +261,16 @@ class SceneObject extends Component
 			destinationBitmap.clear(color);
 		} else {
 			local rx = x, ry = y;
-			if (type == "background") { rx = -x; ry = -y; }
-			resman.get_image(name).drawTo(destinationBitmap, index, rx, ry);
+			if (type == "background") {
+				//rx = 800 - x; ry = y;
+				rx = 800 - x; ry = -y;
+				resman.get_image(name).images[0].cx = 800;
+				resman.get_image(name).images[0].cy = 0;
+				/*
+				printf("%d, %d\n", rx, ry);
+				*/
+			}
+			resman.get_image(name).drawTo(destinationBitmap, index, rx, ry, alpha, size);
 		}
 	}
 }

@@ -12,9 +12,47 @@ class RIO_OP_base
 	</ id=0x28, format="12", description="" />
 	static function UNK_28(param, text)
 	{
+		//this.interface.enabled = false;
+		//gameStep();
 		this.TODO();
 	}
 	
+	/*
+		pw0001@04DC: OP(0x86) : UNK_86_DELAY : [230,0]
+		pw0001@04DC: OP(0x86) : UNK_86_DELAY : [230,0]...  @TODO
+		pw0001@04DF: OP(0x01) : JUMP_IF : [3,998,0,20]
+		pw0001@04EA: OP(0x03) : SET : [1,996,0,1]
+		**SET 996=1
+		pw0001@04F2: OP(0x82) : WAIT : [1000,0]
+	*/
+
+	</ id=0x86, format="11", description="" />
+	static function UNK_86_DELAY(unk1, unk2)
+	{
+		if (unk1 > 0)
+		{
+			this.interface.enabled = false;
+			//this.interface.enabled = 0;
+			//gameStep();
+		}
+		this.TODO();
+		//Screen.delay(unk1);
+	}
+	
+	</ id=0x55, format="1", description="" />
+	static function UNK_55(unk)
+	{
+		//this.interface.enabled = false;
+		//gameStep();
+		//this.interface.enabled = false;
+		/*
+		this.interface.enabled = true;
+		this.interface.text_title = "";
+		this.interface.text_body = "";
+		*/
+		this.TODO();
+	}
+
 	</ id=0x29, format="22", description="" />
 	static function UNK_29(param1, param2)
 	{
@@ -24,25 +62,6 @@ class RIO_OP_base
 	</ id=0x30, format="22", description="" />
 	static function UNK_30(param1, param2)
 	{
-		this.TODO();
-	}
-
-	</ id=0x55, format="1", description="" />
-	static function UNK_55(unk)
-	{
-		//this.interface.enabled = false;
-		/*
-		this.interface.enabled = true;
-		this.interface.text_title = "";
-		this.interface.text_body = "";
-		this.TODO();
-		*/
-	}
-
-	</ id=0x68, format="2221", description="" />
-	static function INTERFACE_HIDE(unk1, unk2, unk3, unk4)
-	{
-		this.interface.enabled = false;
 		this.TODO();
 	}
 

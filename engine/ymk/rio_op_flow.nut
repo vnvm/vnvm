@@ -64,7 +64,12 @@ class RIO_OP_FLOW
 			for (local n = 0; n < 1000; n++) this.state.flags[n] = 0;
 			//printf("**SET_ALL_TEMPORAL_FLAGS_TO_ZERO()\n");
 		} else {
-			this.state.flags[left_flag % State.MAX_FLAGS] = RIO_OP_FLOW.binary_operation(RIO_OP_FLOW.ops_set[operation], left, right, this.state.flags);
+			local value = RIO_OP_FLOW.binary_operation(RIO_OP_FLOW.ops_set[operation], left, right, this.state.flags);
+			this.state.flags[left_flag % State.MAX_FLAGS] = value;
+			if (left_flag == 996 && value) {
+				//this.interface.enabled = false;
+				//gameStep();
+			}
 			//printf("**SET %d=%d\n", left_flag, this.state.flags[left_flag % State.MAX_FLAGS]);
 		}
 		//this.TODO();

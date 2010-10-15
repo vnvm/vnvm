@@ -31,7 +31,18 @@ class RIO_OP_SCENE
 			break;
 		}
 	}
-	
+
+	</ id=0x68, format="2221", description="Sets background size and position x and y coords are dividead by 2." />
+	static function BACKGROUND_INFO(size, x2, y2, unk4)
+	{
+		// @TODO: Temporal until we find out how should it work.
+		this.scene.background.size = size / 100.0;
+		//this.scene.background.cx = x2 * 2;
+		//this.scene.background.cy = y2 * 2;
+		this.TODO();
+		this.interface.enabled = false;
+	}
+
 	</ id=0x48, format="122221s", description="" />
 	static function CHARA_PUT(index, x, y, unk1, unk2, index2, name)
 	{
