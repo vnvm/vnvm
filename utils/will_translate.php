@@ -219,6 +219,7 @@ switch (@$argv[1]) {
 		$files_texts = array();
 		foreach (glob("{$acme_folder}/*.txt") as $file) {
 			list($baseName) = explode('$', pathinfo($file, PATHINFO_FILENAME));
+			echo "{$baseName}...";
 			$pointers = explode("## POINTER ", file_get_contents($file));
 			foreach (array_slice($pointers, 1) as $pointer) {
 				@list($info, $title, $text) = $pointer_e = explode("\n", $pointer, 3);
@@ -228,16 +229,18 @@ switch (@$argv[1]) {
 				}
 				$id = (int)$info;
 				$title = trim($title);
+				$text = str_replace("\r", "", rtrim($text));
 				if ($title == '-') $title = '';
 				//echo "'$title'\n";
-				$files_texts[$baseName][$id] = array(rtrim($text), ($title));
+				$files_texts[$baseName][$id] = array($text, $title);
 				//echo "$id: $baseName\n";
 			}
+			echo "\n";
 		}
 		foreach ($files_texts as $baseName => $texts) {
 			$f = fopen("{$translation_folder}/{$baseName}.nut", 'wb');
 			foreach ($texts as $id => $text) {
-				fprintf($f, "translation.add(%d, \"%s\", \"%s\");\n", $id, addcslashes($text[0], "\n"), addcslashes($text[1], "\n"));
+				fprintf($f, "translation.add(%d, \"%s\", \"%s\");\n", $id, addcslashes($text[0], "\n\r\t"), addcslashes($text[1], "\n\r\t"));
 			}
 			fclose($f);
 		}
