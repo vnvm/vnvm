@@ -1,105 +1,105 @@
-translation.add(0, "En algún lugar lejos de aquí, había un reino.", "");
-translation.add(1, "El gran reino estaba dividido en seis países.\ngobernado cada uno por un rey.", "");
-translation.add(2, "Y para gobernarlos a todos, había un único Emperador.", "");
-translation.add(3, "El Emperador tenía una única esposa, que eligió\nde entre las seis princesas del reino.", "");
-translation.add(4, "La Emperatriz daría a luz a un príncipe, y ese\npríncipe se convertiría en el nuevo Emperador\nalgún día.", "");
-translation.add(5, "Las seis princesas lucharían por el puesto\nde Emperatriz bailando con el príncipe.", "");
-translation.add(6, "La Princesa Waltz.", "");
-translation.add(7, "La princesa que quedase, podría reclamar para sí\nla mano del príncipe...", "");
-translation.add(8, "''Y ahora, encantadoras princesas,\n¿estáis listas?''", "");
-translation.add(9, "Los gritos revolotean por el aire, alternándose\ncon el sonido del repique del acero contra acero.", "");
-translation.add(10, "Un destello de luz, y la sensación del frío acero\nrozando mi piel.", "");
-translation.add(11, "La hoja se desliza por el aire, trayendo la muerte\npor donde quiera que pase.", "");
-translation.add(12, "Y a pesar de todo, tengo los ojos fijos en algo\ncompletamente diferente.", "");
-translation.add(13, "Noto el viento en mi cara. Es el viento del\nmoribundo atardecer que da paso a la noche.", "");
-translation.add(14, "Su traje blanco, ondeando con el viento.\nSu cabello dorado, contorneándola.", "");
-translation.add(15, "Y brillando a través de su pelo, dos profundos\nojos verdes.", "");
-translation.add(16, "Que me miran fijamente produciéndome pavor...", "");
+translation.add(0, "Érase una vez un gran reino.", "");
+translation.add(1, "Estaba dividido en seis naciones,\ndirigidas cada una de ellas por un rey.", "");
+translation.add(2, "Y un único emperador para gobernarlos a todos.", "");
+translation.add(3, "El emperador tenía una sola esposa, que había\nelegido de entre las seis princesas del reino.", "");
+translation.add(4, "La emperatriz daría a luz a un príncipe,\nque a su vez se convertiría en el nuevo emperador.", "");
+translation.add(5, "Las seis princesas lucharían por el puesto\nde emperatriz bailando para el príncipe.", "");
+translation.add(6, "La princesa Waltz.", "");
+translation.add(7, "La princesa vencedora podría reclamar para sí\nla mano del príncipe.", "");
+translation.add(8, "«Y ahora, princesitas, ¿estáis preparadas?».", "");
+translation.add(9, "Los gritos se alzan en el aire, mezclándose\ncon el repiqueteo del acero contra el acero.", "");
+translation.add(10, "Un destello de luz y la sensación\ndel frío metal rozando mi piel.", "");
+translation.add(11, "La hoja se desliza por el aire portando \nla muerte por doquiera que pase.", "");
+translation.add(12, "Y, pese a todo, mantengo\nlos ojos fijos en otro punto.", "");
+translation.add(13, "Siento el viento en mi cara.\nEl viento que anuncia la caída del atardecer.", "");
+translation.add(14, "Su atavío níveo ondeando por la brisa.\nSu áureo cabello perfilando su semblante.", "");
+translation.add(15, "Y brillando a través de sus hebras,\ndos insondables ojos glaucos.", "");
+translation.add(16, "Cuya intensa mirada casi me hace estremecer.", "");
 translation.add(17, "Pupilas esmeralda...", "");
-translation.add(18, "¡¡¡RINGGGGGGGGG!!!", "");
+translation.add(18, "¡RINGGGGGGGGG!", "");
 translation.add(19, "...", "Arata");
-translation.add(20, "¡¡¡¡RIIIIIIIIIIIIIINGGGGGGGGGGGGGGGGG!!!!", "");
+translation.add(20, "¡¡RIIIIIIIIIIIIIINGGGGGGGGGGGGGGGGG!!", "");
 translation.add(21, "...", "Arata");
-translation.add(22, "¡¡¡¡¡RIIIIIIIIIIIIIINNNNNNNNNNNGGGGGGGGGGGGGGGGG!!!!!", "");
+translation.add(22, "¡¡¡RIIIIIIIIIIIIIINNNNNNNNNNNGGGGGGGGGGGGGGGGG!!!", "");
 translation.add(23, "...", "Arata");
-translation.add(24, "....Lessee...... 7:41......", "");
+translation.add(24, "Son las... 7:41.", "");
 translation.add(25, "Eh...", "Arata");
-translation.add(26, "¡JODER! ¡Me he quedado dormido!", "Arata");
+translation.add(26, "¡MIERDA! ¡Me he quedado dormido!", "Arata");
 translation.add(27, "¡Dormido! ¡Dormido! ¡Me he quedado dormido!", "Arata");
-translation.add(28, "Menudo lío.", "Shizuka");
-translation.add(29, "¡Hermanita! ¡Buenos días!", "Arata");
-translation.add(30, "Buenos días, Arata.\n¿Qué haces tan frenético de buena mañana?", "Shizuka");
+translation.add(28, "Menudo jaleo.", "Shizuka");
+translation.add(29, "¡Shizuka! ¡Buenos días!", "Arata");
+translation.add(30, "Buenos días, Arata.\n¿A qué viene tanta actividad de buena mañana?", "Shizuka");
 translation.add(31, "I've got day duty today! I'm totally late!", "Arata");
-translation.add(32, "Scrubscrubscrubswipe!", "");
-translation.add(33, "Lavado de cara... ¡listo!", "");
-translation.add(34, "Gurglegurglegurgleptooie!", "");
+translation.add(32, "¡Fris, fras, fris, fras!", "");
+translation.add(33, "Lavado de cara... ¡Listo!", "");
+translation.add(34, "Ras, ras, ras, ras. ¡Glú, glú, glú!", "");
 translation.add(35, "Cepillado de dientes... ¡Listo!", "");
 translation.add(36, "Ponerme la ropa... ¡Listo!", "");
-translation.add(37, "Venga, ¡hasta luego!", "Arata");
+translation.add(37, "Ale, ¡hasta luego!", "Arata");
 translation.add(38, "Para el carro.", "Shizuka");
-translation.add(39, "Gwoh!?", "Arata");
-translation.add(40, "Conforme giro la cabeza, me empotran una rebanada\nde pan en la boca.", "");
-translation.add(41, "Uhm. No está mal este pan.", "");
-translation.add(42, "El desayuno es fundamental para empezar bien el día.\nInviertes tres minutos preparándolo y uno comiéndolo.", "Shizuka");
-translation.add(43, "Mgg, mgg. (Ajá, ajá...)", "Arata");
+translation.add(39, "¡Mmmgg!", "Arata");
+translation.add(40, "En cuanto giro la cabeza, una enorme rebanada\nde pan se estampa contra mi boca.", "");
+translation.add(41, "Mmm. Pues no sabe nada mal.", "");
+translation.add(42, "El desayuno es fundamental para empezar bien el día.\nInviertes tres minutos preparándolo y uno comiéndolo.", "Shizuka");
+translation.add(43, "Mgg, mgg. (Ajá, ajá).", "Arata");
 translation.add(44, "Toma, ya está listo.", "Shizuka");
 translation.add(45, "Down the hatch!", "Arata");
-translation.add(46, "Munchmunchmunchmunch, gobblegobblegobble.", "");
-translation.add(47, "Arata, no deberías ir tan acelerado.", "Shizuka");
-translation.add(48, "Si actúas precipitadamente, no te quedará tiempo\npara tomar decisiones con el debido cuidado.", "Shizuka");
-translation.add(49, "Si te preparases las cosas antes de dormir,\ntendrías más tiempo por las mañanas.\nDe todas formas...", "Shizuka");
-translation.add(50, "Que sí, que sí. Que ya lo serghmgmgm... ¿Uhm?\n¡¡Hfffggggggg!!", "Arata");
+translation.add(46, "Ñam, ñam, ñam. Glup, glup, glup.", "");
+translation.add(47, "No deberías ir tan acelerado.", "Shizuka");
+translation.add(48, "Si actúas precipitadamente, no te quedará tiempo\npara tomar decisiones con el debido cuidado.", "Shizuka");
+translation.add(49, "Si te preparases las cosas antes de dormir,\ntendrías más tiempo por las mañanas.\nDe todas formas...", "Shizuka");
+translation.add(50, "Que sí, que sí. Que ya lo serghmgmgm... ¿Uhm?\n¡¡Hfffggggggg!!", "Arata");
 translation.add(51, "...", "Shizuka");
 translation.add(52, "Toma, un poco de té.", "Shizuka");
 translation.add(53, "Gulp, gulp, gulp...", "Arata");
 translation.add(54, "¡Ahhh! ¡Gracias!", "Arata");
-translation.add(55, "Ah, por cierto. Hoy no habrá entrenamiento.\nEl señor Nonomiya se ha fastidiado la espalda.", "Shizuka");
-translation.add(56, "¿Hmffmmff? (¿En serio?) Mgg mmff mfffmfff mfff.\n(Supongo que se va haciendo viejo.)", "Arata");
+translation.add(55, "Ah, por cierto. Hoy no habrá entrenamiento.\nEl señor Nonomiya se ha fastidiado la espalda.", "Shizuka");
+translation.add(56, "¿Hmffmmff? (¿En serio?) Mgg mmff mfffmfff mfff.\n(Supongo que se va haciendo viejo.)", "Arata");
 translation.add(57, "I'm standing in for the junior group today. I'll\nbe back late, so take care of dinner.", "Shizuka");
 translation.add(58, "¡Hamgggg! (¡Entendido!)", "Arata");
-translation.add(59, "Y ten cuidado de no merodear mucho por ahí.\nHan habido algunos incidentes muy extraños\nen el vecindario últimamente.", "Shizuka");
+translation.add(59, "Y ten cuidado de no merodear mucho por ahí.\nHan habido algunos incidentes muy extraños\nen el vecindario últimamente.", "Shizuka");
 translation.add(60, "¿Momffgg?", "Arata");
-translation.add(61, "Paredes rotas, postes de teléfono partidos. Ese tipo\nde cosas. La gente cree que ha sido algún conductor\ndescuidado. Pero todavía no han capturado a nadie.", "Shizuka");
-translation.add(62, "Alertaré también a los chicos del dojo.\nLa verdad es que estoy bastante preocupada.", "Shizuka");
+translation.add(61, "Paredes rotas, postes de teléfono partidos. Ese tipo\nde cosas. La gente cree que ha sido algún conductor\ndescuidado. Pero todavía no han capturado a nadie.", "Shizuka");
+translation.add(62, "Alertaré también a los chicos del dojo.\nLa verdad es que estoy bastante preocupada.", "Shizuka");
 translation.add(63, "Mm, gulp. Okay, I'll help out.", "Arata");
 translation.add(64, "No, no te preocupes. Puedo hacerlo sola.", "Shizuka");
-translation.add(65, "¡Oye! Que me he vuelto bastante fuerte, ¿eh?\n¡Te consigo ganar una de cada diez!", "Arata");
+translation.add(65, "¡Oye! Que me he vuelto bastante fuerte, ¿eh?\n¡Te consigo ganar una de cada diez!", "Arata");
 translation.add(66, "Te sobre valoras. ¿No será una de cada cien?", "Shizuka");
-translation.add(67, "Además, no me fío un pelo de un dormilón como tú.\nEstate quieto, que voy a peinarte.", "Shizuka");
+translation.add(67, "Además, no me fío un pelo de un dormilón como tú.\nEstate quieto, que voy a peinarte.", "Shizuka");
 translation.add(68, "Aw, crud.", "Arata");
 translation.add(69, "Crud me no cruds.", "Shizuka");
 translation.add(70, "Que sí...", "Arata");
-translation.add(71, "¡Ding-dong!\n¡Ding-dong!", "");
+translation.add(71, "¡Ding-dong!\n¡Ding-dong!", "");
 translation.add(72, "Solo hay una persona que tocaría así.", "Shizuka");
 translation.add(73, "¡Maldición! ¡Debe ser Nodoka!", "Arata");
 translation.add(74, "Mumgg... ¡Gulp! ¡Todo listo! ¡Hora de irme!", "Arata");
 translation.add(75, "Oye... que todavía no he terminado de pein...", "Shizuka");
 translation.add(76, "¡Gracias por el desayuno, hermanita!", "Arata");
-translation.add(77, "¡Ding-Dong!\n¡Ding-Dong!", "");
+translation.add(77, "¡Ding-Dong!\n¡Ding-Dong!", "");
 translation.add(78, "¡DING! ¡DONG!", "");
 translation.add(79, "¡Aarrrggg! ¡Ya vooooy!", "Arata");
-translation.add(80, "No te precipites.\nY ten cuidado con lo del conductor.", "Shizuka");
+translation.add(80, "No te precipites.\nY ten cuidado con lo del conductor.", "Shizuka");
 translation.add(81, "Vale. ¡Lo tendré!", "Arata");
 translation.add(82, "Ains...", "Shizuka");
 translation.add(83, "Yaawn... What's going on? What's all the noise?", "Nanae");
 translation.add(84, "¿Eh...? ¡Mamá!", "Shizuka");
 translation.add(85, "Nos días, Shizuka.", "Nanae");
-translation.add(86, "Lo siento.\nNunca se me habría ocurrido que pudieses\nestar todavía en la cama...", "Shizuka");
+translation.add(86, "Lo siento.\nNunca se me habría ocurrido que pudieses\nestar todavía en la cama...", "Shizuka");
 translation.add(87, "¿Eh?", "Nanae");
 translation.add(88, "Mira la hora...", "Shizuka");
 translation.add(89, "Oh...", "Nanae");
 translation.add(90, "¡¡Aaaaaahhhhh!! ¡Voy a llegar tarde!", "Nanae");
 translation.add(91, "¡Llegas taaaaaaaaaaaaaarde!", "Nodoka");
 translation.add(92, "En mi pueblo, 'tarde' lleva solo una 'a'.", "Arata");
-translation.add(93, "¡Llegas tardisisísimo! ¡DIEZ minutarros tarde!\n¿¡Pero qué hora te crees que es!?", "Nodoka");
-translation.add(94, "Hace tan solo ocho minutos estaba todavía en la\ncama. Soy la leche de rápido.", "Arata");
-translation.add(95, "¿¡A quién le importa eso!?\n¿¡No te dije ayer que te pusieses el despertador!?", "Nodoka");
-translation.add(96, "¡Y mira los pelos que llevas!\n¡Pareces un espantapájaros!", "Nodoka");
+translation.add(93, "¡Llegas tardisisísimo! ¡DIEZ minutarros tarde!\n¿¡Pero qué hora te crees que es!?", "Nodoka");
+translation.add(94, "Hace tan solo ocho minutos estaba todavía en la\ncama. Soy la leche de rápido.", "Arata");
+translation.add(95, "¿¡A quién le importa eso!?\n¿¡No te dije ayer que te pusieses el despertador!?", "Nodoka");
+translation.add(96, "¡Y mira los pelos que llevas!\n¡Pareces un espantapájaros!", "Nodoka");
 translation.add(97, "Come on, hair, schmair, surely? I'm not a girl,\nyou know.", "Arata");
 translation.add(98, "¡Ah, no! ¡Los chicos también tenéis que cuidaros!", "Nodoka");
 translation.add(99, "Te lo apañaré en un periquete, ¡no te muevas!", "Nodoka");
 translation.add(100, "¡Ah! Ey, ¡ya basta! ¡Ni que fueses mi hermana!", "Arata");
-translation.add(101, "De todas formas, se me volverá\na despeinar mientras corremos.", "Arata");
+translation.add(101, "De todas formas, se me volverá\na despeinar mientras corremos.", "Arata");
 translation.add(102, "¡Quietecito y calladito!", "Nodoka");
 translation.add(103, "Hngg! Hnngg!", "Nodoka");
 translation.add(104, "¡Au! ¡Au, au!", "Arata");
