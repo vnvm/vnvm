@@ -78,9 +78,9 @@ DSQ_METHOD(Bitmap, fromFile)
 {
 	EXTRACT_PARAM_START();
 	EXTRACT_PARAM_STR(2, s, NULL);
-	EXTRACT_PARAM_INT(3, smooth, 0);
+	EXTRACT_PARAM_INT(3, smooth, 1);
 
-	Bitmap *newbmp = Bitmap::createFromFile((char *)s.data);
+	Bitmap *newbmp = Bitmap::createFromFile(s.stringz);
 	CREATE_OBJECT(Bitmap, newbmp);
 	return 1;
 }
@@ -90,7 +90,7 @@ DSQ_METHOD(Bitmap, fromStream)
 	SQStream *data = NULL;
 	Bitmap *newbmp = NULL;
 	EXTRACT_PARAM_START();
-	EXTRACT_PARAM_INT(3, smooth, 0);
+	EXTRACT_PARAM_INT(3, smooth, 1);
 
 	if (SQ_FAILED(sq_getinstanceup(v, 2, (SQUserPointer*)&data, (SQUserPointer)0x80000000)))
 	{
@@ -348,8 +348,9 @@ DSQ_METHOD(Bitmap, save)
 	EXTRACT_PARAM_START();
 	EXTRACT_PARAM_SELF(Bitmap);
 	EXTRACT_PARAM_STR(2, name, NULL);
+	EXTRACT_PARAM_STR(3, format, "bmp");
 	
-	self->save((char *)name.data);
+	self->save(name.stringz, format.stringz);
 
 	return 0;
 }

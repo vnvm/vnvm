@@ -51,6 +51,8 @@ engines.push(Engine("ymk", "ymk"));
 engines.push(Engine("dividead", "dividead"));
 engines.push(Engine("tlove", "tlove"));
 
+//local image = Bitmap.fromFile(info.game_data_path + "/pw/translation/es/EC_001.0 - copia.png");
+
 while (1) {
 	local selectedEngine = null;
 
@@ -75,6 +77,7 @@ while (1) {
 			screen.drawBitmap(engine.image, x, y, engine.alpha);
 			y += engine.image.h + 8;
 		}
+		//screen.drawBitmap(image);
 		Screen.frame();
 		Screen.flip();
 	}

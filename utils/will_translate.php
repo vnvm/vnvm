@@ -165,32 +165,89 @@ class RIO {
 	}
 }
 
-@mkdir($translation_folder = "../game_data/pw/translation", 0777, true);
+@mkdir($translation_folder = __DIR__ . "/../game_data/pw/translation/es", 0777, true);
+@mkdir($acme_folder = "{$translation_folder}/SRC", 0777, true);
 
-$rio = new RIO();
-$arc = new ARC();
-$arc->loadFile("../game_data/pw/rio.arc");
-foreach ($arc->getFileNames() as $fileName) {
-	$baseName = pathinfo($fileName, PATHINFO_FILENAME);
-	echo "{$baseName}...";
-	$data = rot2($arc->get($fileName));
-	echo "Ok\n";
-	$rio->loadData($data);
-	try {
-		$texts = $rio->extractTexts();
-		if (count($texts)) {
+//print_r($argv);
+
+switch (@$argv[1]) {
+	case 'e':
+		$rio = new RIO();
+		$arc = new ARC();
+		$arc->loadFile(__DIR__ . "/game_data/pw/rio.arc");
+		foreach ($arc->getFileNames() as $fileName) {
+			$baseName = pathinfo($fileName, PATHINFO_FILENAME);
+			echo "{$baseName}...";
+			$data = rot2($arc->get($fileName));
+			echo "Ok\n";
+			$rio->loadData($data);
+			try {
+				$texts = $rio->extractTexts();
+				if (count($texts)) {
+					$f = fopen("{$translation_folder}/{$baseName}.nut", 'wb');
+					foreach ($texts as $id => $text) {
+						fprintf($f, "translation.add(%d, \"%s\", \"%s\");\n", $id, addcslashes($text[0], "\n"), addcslashes($text[1], "\n"));
+					}
+					fclose($f);
+					$f = fopen("{$acme_folder}/{$baseName}$1.txt", 'wb');
+					$count2 = 0;
+					$count = 0;
+					foreach ($texts as $id => $text) {
+						if ($text[1] == '') $text[1] = '-';
+						if ($count == 0) {
+							$f = fopen("{$translation_folder}/SRC/{$baseName}\${$count2}.txt", 'wb');
+							$count2++;
+						}
+						$count++;
+						fprintf($f, "## POINTER %d\n%s\n%s\n\n", $id, $text[1], str_replace('\n', "\n", $text[0]));
+						if ($count >= 200) {
+							$count = 0;
+						}
+					}
+					fclose($f);
+				}
+				//translation.add(0, "¿Ya has terminado la sesión de compras?", "Kouhei");
+				//translation.add(1, "No, todavía no.", "Aeka");
+				//print_r($texts);
+
+			} catch (Exception $e) {
+				echo "$e\n";
+			}
+		}
+	break;
+	case 'r':
+		$files_texts = array();
+		foreach (glob("{$acme_folder}/*.txt") as $file) {
+			list($baseName) = explode('$', pathinfo($file, PATHINFO_FILENAME));
+			$pointers = explode("## POINTER ", file_get_contents($file));
+			foreach (array_slice($pointers, 1) as $pointer) {
+				@list($info, $title, $text) = $pointer_e = explode("\n", $pointer, 3);
+				if (count($pointer_e) < 3) {
+					echo "{$baseName}\n";
+					print_r($pointer_e);
+				}
+				$id = (int)$info;
+				$title = trim($title);
+				if ($title == '-') $title = '';
+				//echo "'$title'\n";
+				$files_texts[$baseName][$id] = array(rtrim($text), ($title));
+				//echo "$id: $baseName\n";
+			}
+		}
+		foreach ($files_texts as $baseName => $texts) {
 			$f = fopen("{$translation_folder}/{$baseName}.nut", 'wb');
 			foreach ($texts as $id => $text) {
 				fprintf($f, "translation.add(%d, \"%s\", \"%s\");\n", $id, addcslashes($text[0], "\n"), addcslashes($text[1], "\n"));
 			}
 			fclose($f);
 		}
-		//translation.add(0, "¿Ya has terminado la sesión de compras?", "Kouhei");
-		//translation.add(1, "No, todavía no.", "Aeka");
-		//print_r($texts);
-
-	} catch (Exception $e) {
-		echo "$e\n";
-	}
-	
+	break;
+	default:
+		printf("will_translate <option>\n");
+		printf("\n");
+		printf("Options:\n");
+		printf("  e - extract in acme format\n");
+		printf("  r - reinsert from acme format\n");
+		exit;
+	break;
 }

@@ -1,0 +1,16 @@
+translation.add(0, "Urghh!!!", "Arata");
+translation.add(1, "I still can't think of a way to take it down. I\ncan only avoid its attacks.", "");
+translation.add(2, "The Elder Guardener never lets up.", "");
+translation.add(3, "There's no end to it!!", "Arata");
+translation.add(4, "If we keep running around like this, it is only\ngoing to gain in power.", "Shizuka");
+translation.add(5, "Isn't there some way to beat it in one hit?", "Shizuka");
+translation.add(6, "Well, there is...... But if we fail, we'll be\ncompletely defenseless.", "Arata");
+translation.add(7, "I realize that, but......", "Shizuka");
+translation.add(8, "Gahh!", "Arata");
+translation.add(9, "The Elder Guardener notices our impatience and\nraises its fist.", "");
+translation.add(10, "It's massive. One hit from that and we'll be\nsmashed into a pulp.", "");
+translation.add(11, "Do we have to do it......?", "Arata");
+translation.add(12, "But right then, there is the sound of an\nexplosion.", "");
+translation.add(13, "What!?", "Shizuka");
+translation.add(14, "Oh, looks like it's started.", "Pigeon");
+translation.add(15, "", "");

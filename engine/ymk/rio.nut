@@ -60,15 +60,15 @@ class RIO extends Component
 	function load(name, call = 1, position = 0)
 	{
 		translation.reset();
-		local translation_script = "../game_data/ymk/translation/" + name.toupper() + ".nut";
+		local translation_script = info.game_data_path + "/translation/es/" + name.toupper() + ".nut";
 		if (file_exists(translation_script)) {
 			printf("Loaded translation: '%s'\n", translation_script);
 			include(translation_script);
 		}
 
-		//printf("-----------------------------------------------\n");
+		printf("-----------------------------------------------\n");
 		printf("@@@ RIO.load('%s', %d, %d)\n", name, call, position);
-		//printf("-----------------------------------------------\n");
+		printf("-----------------------------------------------\n");
 		if (name != this.name) {
 			this.name = name;
 			local stream = arc[name + ".WSC"];

@@ -1,5 +1,6 @@
 class WIP
 {
+	name = "";
 	data = null;
 	infos = null;
 	count = 0;
@@ -7,9 +8,10 @@ class WIP
 	images = null;
 	memory_size = 0;
 	
-	constructor(data)
+	constructor(data, name)
 	{
 		if (data == null) throw("Invalid WIP");
+		this.name = name;
 		this.data = data;
 		this.infos = [];
 		this.images = [];
@@ -99,12 +101,20 @@ class WIP
 	}
 }
 
-function WIP_MSK(wip_s, msk_s) {
-	local wip = WIP(wip_s);
+function WIP_MSK(wip_s, msk_s, name) {
+	local translation_path = info.game_data_path + "/translation/es/";
+	// + name + ".png";
+	local wip = WIP(wip_s, name);
+	//info.game_data_path + "/translation/es/" + name.toupper() + ".nut"
 	try {
-		local msk = WIP(msk_s);
+		local msk = WIP(msk_s, name);
 		for (local n = 0; n < wip.images.len(); n++) {
-			wip.images[n].copyChannel(msk.images[n], "red", "alpha", 1);
+			local slice_image = format("%s/%s.%d.png", translation_path, name, n);
+			if (file_exists(slice_image)) {
+				wip.images[n] = Bitmap.fromFile(slice_image);
+			} else {
+				wip.images[n].copyChannel(msk.images[n], "red", "alpha", 1);
+			}
 		}
 	} catch (e) {
 	}

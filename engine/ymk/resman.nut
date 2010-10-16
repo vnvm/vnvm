@@ -96,14 +96,14 @@ class RESMAN
 	function get_image(name, can_release = 1)
 	{
 		return get_resource(name, "WIP", function(name) {
-			return WIP_MSK(arc.get(name + ".WIP", 1), arc.get(name + ".MSK", 0));
+			return WIP_MSK(arc.get(name + ".WIP", 1), arc.get(name + ".MSK", 0), name);
 		}, can_release);
 	}
 
 	function get_mask(name, can_release = 1)
 	{
 		return get_resource(name, "MSK", function(name) {
-			return WIP(arc.get(name + ".MSK", 0));
+			return WIP(arc.get(name + ".MSK", 0), name);
 		}, can_release);
 	}
 	

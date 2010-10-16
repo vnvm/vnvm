@@ -214,10 +214,16 @@ int do_transition_tick(SDL_Surface *buffer, SDL_Surface *transition, float stepf
 //#define RGBA_MASK Video_screen->format->Rmask, Video_screen->format->Gmask, Video_screen->format->Bmask, Video_screen->format->Amask
 
 SDL_Surface *IMG_Convert_TO_32(SDL_Surface *src, bool free_src = true) {
-	SDL_Surface *new_surface = SDL_CreateRGBSurface(SDL_SWSURFACE, src->w, src->h, 32, RGBA_MASK);
-	SDL_BlitSurface(src, NULL, new_surface, NULL); 
-	if (free_src) SDL_FreeSurface(src);
-	return new_surface;
+	/*if (src->format->BitsPerPixel == 32) {
+		return src;
+	} else */{
+		SDL_Surface *new_surface = SDL_CreateRGBSurface(SDL_SWSURFACE, src->w, src->h, 32, RGBA_MASK);
+		SDL_SetAlpha(new_surface, 0, SDL_ALPHA_OPAQUE);
+		SDL_SetAlpha(src, 0, SDL_ALPHA_OPAQUE);
+		SDL_BlitSurface(src, NULL, new_surface, NULL); 
+		if (free_src) SDL_FreeSurface(src);
+		return new_surface;
+	}
 }
 
 struct BitmapSlice {
@@ -225,6 +231,10 @@ struct BitmapSlice {
 	int tx, ty;
 	int w, h;
 };
+
+void fwrite1(FILE *f, unsigned char  v) { fwrite(&v, 1, 1, f); }
+void fwrite2(FILE *f, unsigned short v) { fwrite(&v, 2, 1, f); }
+void fwrite4(FILE *f, unsigned int   v) { fwrite(&v, 4, 1, f); }
 
 class Bitmap {
 public:
@@ -645,8 +655,35 @@ public:
 		#endif
 	}
 	
-	void save(char *filename) {
-		SDL_SaveBMP(this->surface, filename);
+	void save(char *filename, char *format) {
+		if (strcmp(format, "bmp") == 0) {
+			SDL_SaveBMP(this->surface, filename);
+			return;
+		}
+		if (strcmp(format, "tga") == 0) {
+			FILE *f = fopen(filename, "wb");
+			if (f) {
+				fwrite1(f, 0 );    // 0     - ubyte idlength
+				fwrite1(f, 0 );    // 1     - ubyte colourmaptype
+				fwrite1(f, 2 );    // 2     - ubyte datatypecode
+				fwrite2(f, 0 );    // 3-4   - colourmaporigin
+				fwrite2(f, 0 );    // 5-6   - colourmaplength
+				fwrite1(f, 24);    // 7     - colourmapdepth
+				fwrite2(f, 0 );    // 8-9   - x_origin
+				fwrite2(f, 0 );    // 10-11 - y_origin
+				fwrite2(f, surface->w);    // 12-13 - width
+				fwrite2(f, surface->h);    // 14-15 - height
+				fwrite1(f, 32);    // 16    - bitsperpixel
+				fwrite1(f, (1 << 5));    // 17    - imagedescriptor
+				SDL_LockSurface(surface);
+				{
+					fwrite(surface->pixels, 1, surface->pitch * surface->h, f);
+				}
+				SDL_UnlockSurface(surface);
+				fclose(f);
+			}
+		}
+		fprintf(stderr, "Unknown Bitmap.save.format '%s'\n", format);
 	}
 	
 	int gl_channel_name_to_pos(char *name)
