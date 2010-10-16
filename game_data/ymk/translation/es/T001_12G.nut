@@ -1,0 +1,15 @@
+translation.add(0, "Ya, claro.\nYo puedo oír un tren que no existe,\npero ver cosas que no están...", "Kouhei");
+translation.add(1, "Me quedo mudo.", "");
+translation.add(-1, "", "");
+translation.add(3, "¿Me ha pillado con la guardia baja\npor culpa del subidón del corredor?", "");
+translation.add(4, "Me dedica una amplia sonrisa. Está claro\nque ahora me considera uno de los suyos.", "");
+translation.add(5, "¡N-No soy igual que tú!", "Kouhei");
+translation.add(6, "Ah, siempre he sabido que tenías aptitudes.\nHice bien en elegirte.", "Nekoko");
+translation.add(7, "Lo sabía. Somos iguales.", "Nekoko");
+translation.add(8, "Eh... no. Todavía estoy cuerdo y todo eso.\nVamos a ser solo amigos, ¿vale?", "Kouhei");
+translation.add(9, "Estoy segura de que contigo a mi lado\npodré encontrar la llave al hogar de las hadas.", "Nekoko");
+translation.add(10, "Mmm... ¿De verdad se cree todo eso?", "");
+translation.add(11, "La miro a los ojos.", "");
+translation.add(12, "Son tan claros y límpidos como una joya\nen una fría noche de invierno.\nTiene que decirlo completamente en serio.", "");
+translation.add(13, "Vamos...\nAyúdame a encontrar el hogar de las hadas.", "Nekoko");
+translation.add(14, "Buf, es demasiado repentino. ¿Y ahora qué hago?", "");

@@ -1,0 +1,12 @@
+translation.add(0, "Eso no es verdad... Me gustas, Kirimiya-senpai.", "Kouhei");
+translation.add(1, "Me gusta muchísimo, en serio.\nPero sin pensar en ella como una posesión.", "");
+translation.add(2, ".........", "");
+translation.add(3, "..................", "");
+translation.add(4, ".........", "");
+translation.add(5, "Silencio.\nEmpiezo a sentir que he dicho algo que no debía.", "");
+translation.add(6, "Mmm... ¿Va todo bien?", "Kouhei");
+translation.add(7, "Eh... E-Estaba pensando que recibir\nuna confesión así debería hacerme feliz.", "Mizuki");
+translation.add(8, "¿Una... confesión?", "");
+translation.add(9, "Oh, sí... Supongo que es lo que acabo de hacer.", "");
+translation.add(10, "No parece muy afectada.\n¿Se ha puesto colorada o es solo mi imaginación?", "");
+translation.add(11, "Vale, recordaré que piensas en mí de esa forma.", "Mizuki");

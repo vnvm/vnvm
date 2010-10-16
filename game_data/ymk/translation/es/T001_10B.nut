@@ -1,0 +1,13 @@
+translation.add(0, "Ahí no se me ha perdido nada.", "");
+translation.add(1, "Me iré a casa...", "");
+translation.add(2, "Alzo la vista al cielo.\nNo sé por qué, pero tenía ganas de hacerlo.", "");
+translation.add(3, "Unos ojos me miran desde arriba...", "");
+translation.add(4, "¿Eh? ¿Shiraki-san?", "");
+translation.add(5, "Empiezo a sentirme extrañamente incómodo.", "");
+translation.add(6, "Le gusta mucho subir a la azotea.\nNo tiene nada de raro que esté allí.", "");
+translation.add(7, "Pero siento una extraña aprensión.\nNos observamos un rato más,\ny es entonces cuando me doy cuenta.", "");
+translation.add(8, "Lleva la manta... ¿enrollada sobre su cuerpo?", "");
+translation.add(9, "El viento sopla con fuerza, es cierto.\nPero hay algo que no encaja...", "");
+translation.add(10, "Aunque no logro descubrir el qué.\nShiraki aparta la cabeza.", "");
+translation.add(11, "Ha desaparecido de mi vista.", "");
+translation.add(12, "¿Debería haberle preguntado si quería\nque la acompañara a casa?", "");

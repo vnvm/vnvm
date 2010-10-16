@@ -44,6 +44,7 @@ class RIO_OP_EFFECTS_base
 				//printf("Effect::transition_blend\n");
 			break;
 			default: // UNKNOWN EFFECT
+				this.scene.setEffect("normal");
 				this.TODO();
 			break;
 		}
@@ -60,7 +61,7 @@ class RIO_OP_EFFECTS_base
 
 		loopUntilAnimationEnds(0);
 
-		this.TODO();
+		//this.TODO();
 		this.scene.setEffect("normal");
 		//printf("-------------------------------\n");
 	}

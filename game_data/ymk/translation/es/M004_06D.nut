@@ -1,0 +1,14 @@
+translation.add(0, "¡Bum, bum! ¡Bum, bum!", "");
+translation.add(1, "Ah... Lo has echado todo sobre mis pies...", "Mizuki");
+translation.add(2, "El semen gotea hasta el suelo.", "");
+translation.add(3, "Mira cuánto sale... Y eso que ayer ya\nte corriste un montón... Hay tanto...", "Mizuki");
+translation.add(4, "El esperma sirve como lubricante,\nque también me da placer.", "");
+translation.add(5, "Me hace cosquillas, pero aun así\nes el dolor lo que prevalece.", "");
+translation.add(6, "Aah...", "Kouhei");
+translation.add(7, "Mi campo de visión se nubla.", "");
+translation.add(8, "Siento el tacto de unos folios en la frente.", "");
+translation.add(9, "Estoy echado sobre el escritorio.", "");
+translation.add(10, "La voz de Kirimiya... parece tan lejana.", "");
+translation.add(11, "¿Se trata del bajón habitual después\nde eyacular, o es algo más serio?", "");
+translation.add(12, "La oscuridad se cierne sobre mí...", "");
+translation.add(13, "Pierdo la consciencia instantes después\nde echar el último chorro de semen.", "");
