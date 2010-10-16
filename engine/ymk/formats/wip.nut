@@ -20,6 +20,13 @@ class WIP
 		this.memory_size = get_memory_size();
 	}
 	
+	function export(folder)
+	{
+		foreach (n, image in images) {
+			image.save(format("%s/%s.%d.png", folder, name, n), "png");
+		}
+	}
+	
 	function get_memory_size()
 	{
 		local memory_size = 0;

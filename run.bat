@@ -29,6 +29,7 @@ SET LIBS=%LIBS% SDL_ttf.lib
 SET LIBS=%LIBS% opengl32.lib
 SET LIBS=%LIBS% kernel32.lib
 SET LIBS=%LIBS% user32.lib
+SET LIBS=%LIBS% zlib.lib
 
 SET ENGINE_INCLUDE=
 SET ENGINE_INCLUDE=%ENGINE_INCLUDE% /Isrc\platforms\win32\include

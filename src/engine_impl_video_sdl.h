@@ -1,6 +1,7 @@
 #include <SDL_syswm.h>
 #include <SDL_mouse.h>
 
+#include <zlib.h>
 #include <string.h>
 #include <iostream>
 #include <map>
@@ -232,9 +233,128 @@ struct BitmapSlice {
 	int w, h;
 };
 
+unsigned int bswap(unsigned int v) {
+	return (
+		(((v >> 24) & 0xFF) <<  0) |
+		(((v >> 16) & 0xFF) <<  8) |
+		(((v >>  8) & 0xFF) << 16) |
+		(((v >>  0) & 0xFF) << 24) |
+	0);
+}
+
 void fwrite1(FILE *f, unsigned char  v) { fwrite(&v, 1, 1, f); }
 void fwrite2(FILE *f, unsigned short v) { fwrite(&v, 2, 1, f); }
 void fwrite4(FILE *f, unsigned int   v) { fwrite(&v, 4, 1, f); }
+
+int zlib_compress(char *src_dat, int src_len, char **dst_dat, int *dst_len, int level) {
+    *dst_len = src_len + ((src_len + 1023) / 1024) + 12;
+	*dst_dat = (char *)malloc(*dst_len);
+    
+    int err = compress2((Bytef *)*dst_dat, (uLongf *)dst_len, (Bytef *)src_dat, (uLongf)src_len, level);
+    if (err) {
+		free(*dst_dat);
+		*dst_dat = NULL;
+		*dst_len = 0;
+		return -1;
+    }
+	
+    return 0;
+}
+
+void fwrite_png_header(FILE *f) {
+	unsigned char bytes[] = {0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A};
+	for (int n = 0; n < 8; n++) fwrite1(f, bytes[n]);
+}
+
+void fwrite_png_chunk(FILE *f, char *chunk_name, void *data = NULL, int data_length = 0) {
+	unsigned int be_data_length = bswap(data_length);
+	unsigned int crc = crc32(0L, Z_NULL, 0);
+	fwrite4(f, be_data_length);
+	for (int n = 0; n < 4; n++) fwrite1(f, chunk_name[n]);
+	crc = crc32(crc, (const Bytef *)chunk_name, 4);
+	crc = crc32(crc, (const Bytef *)data, data_length);
+	fwrite(data, 1, data_length, f);
+	fwrite4(f, bswap(crc));
+}
+
+#pragma pack(push)
+#pragma pack(1)
+typedef struct PNG_IHDR {
+	unsigned int  width;
+	unsigned int  height;
+	unsigned char bps;       // = 8;
+	unsigned char ctype;     // = 6;
+	unsigned char comp;      // = 0;
+	unsigned char filter;    // = 0;
+	unsigned char interlace; // = 0;
+} PNG_IHDR;
+#pragma pack(pop)
+
+void fwrite_png_ihdr(FILE *f, SDL_Surface *surface) {
+	PNG_IHDR header;
+	header.width  = bswap(surface->w);
+	header.height = bswap(surface->h);
+	//header.bps    = surface->format->BitsPerPixel;
+	header.bps    = 8;
+	header.ctype  = 6;
+	header.comp   = 0;
+	header.filter = 0;
+	header.interlace = 0;
+	fwrite_png_chunk(f, "IHDR", &header, sizeof(header));
+}
+
+void fwrite_png_idat(FILE *f, SDL_Surface *surface) {
+	SDL_LockSurface(surface);
+	{
+		int   ulen = (surface->pitch + 1) * surface->h;
+		char *udat = (char *)malloc(ulen);
+		int   clen = 0;
+		char *cdat = NULL;
+		char *pixels = NULL;
+		
+		#if USE_OPENGL
+			pixels = (char *)malloc(surface->pitch * surface->h);
+			glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+		#else
+			pixels = (char *)surface->pixels;
+		#endif
+		
+		//memset(udat, 0, ulen);
+		int n = 0;
+		for (int y = 0; y < surface->h; y++) {
+			udat[n++] = 0;
+			int pos = surface->pitch * y;
+			for (int x = 0; x < surface->pitch; x += 4) {
+				udat[n++] = pixels[pos + x + 0];
+				udat[n++] = pixels[pos + x + 1];
+				udat[n++] = pixels[pos + x + 2];
+				udat[n++] = pixels[pos + x + 3];
+			}
+		}
+		
+		int error = zlib_compress(udat, ulen, &cdat, &clen, 9);
+		//surface->pixels
+		if (!error) {
+			fwrite_png_chunk(f, "IDAT", cdat, clen);
+			free(cdat);
+		}
+		#if USE_OPENGL
+			free(pixels);
+		#endif
+	}
+	SDL_UnlockSurface(surface);
+}
+
+void fwrite_png_iend(FILE *f) {
+	fwrite_png_chunk(f, "IEND");
+}
+
+void fwrite_png(FILE *f, SDL_Surface *surface) {
+	fwrite_png_header(f);
+	fwrite_png_ihdr(f, surface);
+	fwrite_png_idat(f, surface);
+	fwrite_png_iend(f);
+}
 
 class Bitmap {
 public:
@@ -327,8 +447,8 @@ public:
 				lastBitmapBind = this;
 				glEnable(GL_BLEND);
 				//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-				//glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-				glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
+				glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+				//glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
 				glEnable(GL_TEXTURE_2D);
 				glBindTexture(GL_TEXTURE_2D, gltex);
 				glMatrixMode(GL_TEXTURE); glLoadIdentity(); glScalef(1.0 / surface->w, 1.0 / surface->h, 1.0);
@@ -682,6 +802,18 @@ public:
 				SDL_UnlockSurface(surface);
 				fclose(f);
 			}
+			return;
+		}
+		if (strcmp(format, "png") == 0) {
+			#if USE_OPENGL
+				gl_bind();
+			#endif
+			FILE *f = fopen(filename, "wb");
+			if (f) {
+				fwrite_png(f, surface);
+				fclose(f);
+			}
+			return;
 		}
 		fprintf(stderr, "Unknown Bitmap.save.format '%s'\n", format);
 	}

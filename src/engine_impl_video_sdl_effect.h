@@ -25,7 +25,7 @@
 				glGetShaderInfoLog(shader, infologLength, &charsWritten, infoLog);
 				if (strlen(infoLog)) {
 					fprintf(stderr, "ShaderProgram::showErrors('%s')\n", infoLog);
-					exit(-1);
+					//exit(-1);
 				}
 				free(infoLog);
 			}
