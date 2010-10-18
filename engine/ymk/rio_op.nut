@@ -7,7 +7,7 @@ PRINCESS WALTZ:
 	sub_406F00
 */
 
-class RIO_OP_base
+class RIO_OP
 {
 	</ id=0x28, format="12", description="" />
 	static function UNK_28(param, text)
@@ -31,7 +31,7 @@ class RIO_OP_base
 	{
 		if (unk1 > 0)
 		{
-			this.interface.enabled = false;
+			//this.interface.enabled = false;
 			//this.interface.enabled = 0;
 			//gameStep();
 		}
@@ -103,12 +103,6 @@ class RIO_OP_base
 		this.TODO();
 	}
 
-	</ id=0x64, format="1111", description="" />
-	static function CHARA_PUT_INFO(unk1, unk2, unk3, unk4)
-	{
-		this.TODO();
-	}
-
 	</ id=0x85, format="2", description="" />
 	static function UNK_85(param)
 	{
@@ -164,30 +158,4 @@ class RIO_OP_base
 		this.TODO();
 	}
 	*/
-}
-
-switch (engine_version) {
-	case "pw": // For Pricess Waltz.
-		class RIO_OP extends RIO_OP_base
-		{
-			</ id=0x28, format=".....", description="" />
-			static function UNK_28()
-			{
-				this.TODO();
-			}
-
-			</ id=0x64, format="111111", description="" />
-			static function CHARA_PUT_INFO(index, unk2, unk3, unk4, unk5, unk6)
-			{
-				this.TODO();
-			}
-		}
-	break;
-	// For YMK and others.
-	default:
-	//case "ymk": 
-		class RIO_OP extends RIO_OP_base
-		{
-		}
-	break;
 }

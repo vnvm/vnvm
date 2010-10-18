@@ -32,6 +32,13 @@ class RIO_OP_EFFECTS
 			case 13: // TRANSITION MASK (show)
 				this.scene.setEffect("transition", {
 					blend = 0,
+					reverse = 1
+				});
+				//printf("Effect::transition_show\n");
+			break;
+			case 23: // TRANSITION MASK (show)
+				this.scene.setEffect("transition", {
+					blend = 0,
 					reverse = 0
 				});
 				//printf("Effect::transition_show\n");
@@ -78,6 +85,12 @@ class RIO_OP_EFFECTS
 		local object = this.scene.get(object_id);
 		local anim = object.animation;
 		anim.reset(time);
+		
+		if (object_id == 0) {
+			inc_x = -inc_x;
+			inc_y = -inc_y;
+		}
+		
 		anim.increment("x", inc_x);
 		anim.increment("y", inc_y);
 		if (alpha == -1) {

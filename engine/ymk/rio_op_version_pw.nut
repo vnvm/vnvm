@@ -23,3 +23,26 @@ class RIO_OP_AUDIO extends RIO_OP_AUDIO_base
 		RIO_OP_AUDIO_base.SOUND_PLAY(channel, repeat, blocking, start_time, fade_in_ms, volume, sound_file);
 	}
 }
+
+RIO_OP_base <- RIO_OP;
+class RIO_OP extends RIO_OP_base
+{
+	</ id=0x28, format=".....", description="" />
+	static function UNK_28()
+	{
+		this.TODO();
+	}
+}
+
+RIO_OP_SCENE_base <- RIO_OP_SCENE;
+class RIO_OP_SCENE extends RIO_OP_SCENE_base
+{
+	</ id=0x64, format="1221", description="" />
+	static function CHARA_PUT_INFO(index, size, rotation, unk6)
+	{
+		local object = this.scene.sprites_l1[index];
+		object.size = size / 100.0;
+		object.rotation = rotation / -640.0;
+		this.TODO();
+	}
+}

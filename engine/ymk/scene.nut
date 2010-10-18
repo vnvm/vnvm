@@ -14,16 +14,32 @@ class Scene extends Component
 	effect      = null;
 	effectTimer = null;
 	stepf       = 0.0;
+	viewport    = null;
 	x = 0;
 	y = 0;
 	
 	not_ended_object = "<none>";
 	
+	function setViewport(sizef, center_x, center_y)
+	{
+		local virtual_screen_size = {w = 800 / sizef, h = 600 / sizef};
+		
+		//this.viewport = {size = size, x = x, y = y};
+		this.viewport = {
+			size = sizef,
+			x = -(center_x - virtual_screen_size.w / 2) * sizef,
+			y = -(center_y - virtual_screen_size.h / 2) * sizef,
+		};
+		printf("setViewport(%f, %d, %d) : (%d, %d)\n", sizef, center_x, center_y, viewport.x, viewport.y);
+	}
+	
 	constructor(state = null)
 	{
-		all        = array(8);
-		sprites_l1 = array(3);
-		sprites_l2 = array(3);
+		this.all        = array(8);
+		this.sprites_l1 = array(3);
+		this.sprites_l2 = array(3);
+		
+		this.setViewport(1.0, 400, 300);
 	
 		for (local n = 0; n < 8; n++) this.all[n] = SceneObject(null);
 
@@ -134,17 +150,18 @@ class Scene extends Component
 	function copyDrawLayerToShowLayer()
 	{
 		this.showLayer.clear([0, 0, 0, 1]);
-		this.showLayer.drawBitmap(this.drawLayer);
+		this.showLayer.drawBitmap(this.drawLayer, viewport.x, viewport.y, 1.0, viewport.size);
 	}
 	
 	function drawTo(destinationBitmap)
 	{
 		destinationBitmap.clear([0, 0, 0, 1]);
 
+		if ((x != 0) || (y != 0)) {
+			destinationBitmap.drawBitmap(this.showLayer, 0, 0);
+		}
+
 		if (this.stepf < 1) {
-			if (x != 0 || y != 0) {
-				destinationBitmap.drawBitmap(this.showLayer, 0, 0);
-			}
 			destinationBitmap.drawBitmap(this.showLayer, x, y);
 		}
 
@@ -153,7 +170,7 @@ class Scene extends Component
 		
 			Screen.pushEffect(this.effect);
 			{
-				destinationBitmap.drawBitmap(this.drawLayer, x, y);
+				destinationBitmap.drawBitmap(this.drawLayer, x + viewport.x, y + viewport.y, 1.0, viewport.size);
 			}
 			Screen.popEffect();
 		}
@@ -239,6 +256,7 @@ class SceneObject extends Component
 	cy = 0;
 	alpha = 1.0;
 	size = 1.0;
+	rotation = 0.0;
 	name = "";
 	//wip = null;
 	animation = null;
@@ -248,11 +266,12 @@ class SceneObject extends Component
 	constructor(type = null)
 	{
 		this.type      = type;
-		this.x         = 0;
-		this.y         = 0;
+		this.x         = 400;
+		this.y         = 300;
 		this.index     = 0;
 		this.alpha     = 1.0;
 		this.size      = 1.0;
+		this.rotation  = 0.0;
 		this.color     = null;
 		this.name      = "";
 		this.animation = Animation(this);
@@ -274,6 +293,15 @@ class SceneObject extends Component
 		return animation.ended();
 	}
 	
+	function setXY(x, y, anchorX, anchorY)
+	{
+		local wip = resman.get_image(name);
+		cx = wip.images[0].w / 2;
+		cy = wip.images[0].h / 2;
+		this.x = x + cx;
+		this.y = y + cy;
+	}
+	
 	function drawTo(destinationBitmap)
 	{
 		//printf("SceneObject.drawTo('%s') : '%d'\n", type, enabled ? 1 : 0);
@@ -281,17 +309,17 @@ class SceneObject extends Component
 		if (color != null) {
 			destinationBitmap.clear(color);
 		} else {
+			local wip = resman.get_image(name);
 			local rx = x, ry = y;
-			if (type == "background") {
-				//rx = 800 - x; ry = y;
-				rx = 800 - x; ry = -y;
-				resman.get_image(name).images[0].cx = 800;
-				resman.get_image(name).images[0].cy = 0;
-				/*
+			wip.images[0].cx = cx;
+			wip.images[0].cy = cy;
+			/*if (type == "background") {
+				//rx = -x; ry = -y;
+				//resman.get_image(name).images[0].cx = 400;
+				//resman.get_image(name).images[0].cy = 300;
 				printf("%d, %d\n", rx, ry);
-				*/
-			}
-			resman.get_image(name).drawTo(destinationBitmap, index, rx, ry, alpha, size);
+			}*/
+			wip.drawTo(destinationBitmap, index, rx, ry, alpha, size, rotation);
 		}
 	}
 }

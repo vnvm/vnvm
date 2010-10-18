@@ -290,6 +290,8 @@ class RIO extends Component
 		local start_pos = data.tell();
 		local op = data.readn('b');
 		local name = "?", params_format = "", vparams = [], variadic = false;
+		//local show_all_opcodes = true;
+		local show_all_opcodes = false;
 		try {
 			local cop = RIO.opcodes[op];
 			name = cop.name;
@@ -304,7 +306,9 @@ class RIO extends Component
 				todo = 0;
 				//printf("---%s\n" name);
 				
-				printf("%s@%04X: OP(0x%02X) : %s : %s\n", this.name, start_pos, op, name, ::object_to_string(vparams.slice(1)));
+				if (show_all_opcodes) {
+					printf("%s@%04X: OP(0x%02X) : %s : %s\n", this.name, start_pos, op, name, ::object_to_string(vparams.slice(1)));
+				}
 				
 				local retval;
 				//printf("Variadic: %d\n", cop.variadic);
@@ -314,7 +318,9 @@ class RIO extends Component
 					retval = cop.__class[name].acall(vparams);
 				}
 				if (todo) {
-					//printf("%s@%04X: OP(0x%02X) : %s : %s...", this.name, start_pos, op, name, ::object_to_string(vparams.slice(1)));
+					if (!show_all_opcodes) {
+						printf("%s@%04X: OP(0x%02X) : %s : %s...", this.name, start_pos, op, name, ::object_to_string(vparams.slice(1)));
+					}
 					printf("  @TODO\n");
 					//print(retval);
 					//printf("\n");
