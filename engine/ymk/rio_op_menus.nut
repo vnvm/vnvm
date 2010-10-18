@@ -3,6 +3,27 @@ class RIO_OP_MENUS
 	</ id=0x83, format=".", description="" />
 	static function RUN_LOAD()
 	{
+		this.TODO();
+	}
+
+	</ id=0x84, format="1", description="" />
+	static function RUN_SAVE(param)
+	{
+		this.TODO();
+	}
+
+	</ id=0x88, format="111", description="" />
+	static function BATTLE(unk1, battle_id, unk3)
+	{
+		this.TODO();
+		this.state.flags[916] = 1; // WIN
+		//this.state.flags[916] = 0; // LOOSE
+	}
+
+	</ id=0x8A, format="1", description="" />
+	static function UNK_8A(param)
+	{
+		this.TODO();
 	}
 
 	</ id=0x8B, format=".", description="" />

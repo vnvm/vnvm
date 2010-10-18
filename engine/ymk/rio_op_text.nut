@@ -1,4 +1,4 @@
-class RIO_OP_TEXT_base
+class RIO_OP_TEXT
 {
 	static function TEXT_COMMON(text_id, title, text, reset = 1)
 	{
@@ -61,91 +61,56 @@ class RIO_OP_TEXT_base
 		local selectedOption = null;
 		
 		while (selectedOption == null) {
-			this.input_update();
+			::input.update();
 			
-			this.frame_draw();
-			if (draw_interface) this.frame_draw_interface(0);
+			this.drawTo(screen);
 
 			foreach (option in options) {
 				local selwnd = selwnd0;
-				if (pointInRect({x=mouse.x, y=mouse.y}, option.rect)) {
+				if (pointInRect({x=::input.mouse.x, y=::input.mouse.y}, option.rect)) {
 					selwnd = selwnd1;
-					if (mouse.pressed(0)) {
+					if (::input.mouse.pressed(0)) {
 						selectedOption = option;
-						this.input_update();
+						::input.update();
 					}
 				}
 				selwnd.drawTo(screen, 0, option.rect.x, option.rect.y);
-				print_text(option.text, option.rect.x + 26, option.rect.y + 12);
+				this.interface.print_text(option.text, option.rect.x + 26, option.rect.y + 12);
 			}
 			//selwnd0.drawTo(screen, 0, 100, 100);
 
-			this.frame_tick();
+			Screen.flip();
+			Screen.frame(this.fps);
 			//break;
 		}
 		
-		if ("flag" in selectedOption) {
-			this.state.flags[selectedOption.flag] = 1;
+		if ("flag" in selectedOption.result) {
+			this.state.flags[selectedOption.result.flag] = selectedOption.result.value;
 		}
-		if ("script" in selectedOption) {
-			this.load(selectedOption.script, 0);
+		if ("script" in selectedOption.result) {
+			this.load(selectedOption.result.script, 0);
+		}
+		if ("address" in selectedOption.result) {
+			this.jump_absolute(selectedOption.result.address);
 		}
 	}
 
 	//  02.? [0200], [7201], "Tell her", [01520307], @t001_02b@, [7301], "Don't tell her", [01530307], @t001_02c@
-	</ id=0x02, format="C[2t4s]", description="Show a list of options" variadic=1 />
-	static function OPTION_SELECT(params)
+	</ id=0x02, format="C[2t3c]", description="Show a list of options" />
+	static function OPTION_SELECT(roptions)
 	{
+		printf("::: %s\n\n\n", object_to_string(roptions));
 		local options = [];
-		local count = params[1];
-		for (local n = 0; n < count; n++) {
-			local flag = params[2 + n * 4 + 0];
-			local text = params[2 + n * 4 + 1];
-			local unk1 = params[2 + n * 4 + 2];
-			local script = params[2 + n * 4 + 3];
-			options.push({n=n, flag=flag, text=text, script=script});
+		foreach (n, option in roptions) {
+			local option_info = {};
+			option_info.n      <- n;
+			option_info.index  <- option[0];
+			option_info.text   <- option[1];
+			option_info.unk1   <- option[2];
+			option_info.result <- option[3];
+			options.push(option_info);
 		}
-		RIO_OP_TEXT_base.OPTION_SELECT_common(options);
+		RIO_OP_TEXT.OPTION_SELECT_common(options);
 		this.TODO();
 	}
-}
-
-switch (engine_version) {
-	case "pw":
-		class RIO_OP_TEXT extends RIO_OP_TEXT_base
-		{
-			//  02.? [0200], [7201], "Tell her", [01520307], @t001_02b@, [7301], "Don't tell her", [01530307], @t001_02c@
-			//</ id=0x02, format="C[Ct44[.]]", description="Show a list of options" variadic=1 />
-			</ id=0x02, format="*", description="Show a list of options" variadic=1 />
-			static function OPTION_SELECT(params)
-			{
-				local options = [];
-				local count = data.readn('s');
-				local extras = {};
-				for (local n = 0; n < count; n++) {
-					local extra = data.readn('s');
-					extras[n] <- extra;
-					local text = process_text(data.readstringz(-1));
-					data.readn('s');
-					data.readn('s');
-					data.readn('s');
-					data.readn('s');
-					//data.readn('s');
-					//data.readn('b');
-					for (local m = 0; m < extras[0]; m++) {
-						data.readn('b');
-					}
-					options.push({n=n, text=text});
-				}
-				RIO_OP_TEXT_base.OPTION_SELECT_common(options);
-				printf("Selected!\n");
-				this.TODO();
-			}
-		}
-	break;
-	default:
-		class RIO_OP_TEXT extends RIO_OP_TEXT_base
-		{
-		}
-	break;
 }

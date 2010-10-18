@@ -47,6 +47,10 @@ class Timer
 			}
 		}
 	}
+	
+	function tostring() {
+		return ::format("Timer(%d, %d, %d)", start, getCurrent(), length);
+	}
 }
 
 class TimerComponent extends Timer

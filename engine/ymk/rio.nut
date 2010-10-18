@@ -162,12 +162,11 @@ class RIO extends Component
 		//return text;
 	}
 	
-	function process_params(sparams)
+	function process_params(pformat, level = 0)
 	{
 		local last_kind = 0;
 		local l = [];
-		local loop_to = 0;
-		local loop = 0;
+		local loop_count = 0;
 		local variadic = false;
 		/*
 			'l' processor dependent, 32bits on 32bits processors, 64bits on 64bits prcessors returns an integer 
@@ -179,8 +178,10 @@ class RIO extends Component
 			'f' 32bits float returns an float 
 			'd' 64bits float returns an float 
 		*/
-		for (local n = 0; n < sparams.len(); n++) {
-			local c = sparams[n];
+		//printf("-- process_params('%s', %d)\n", pformat, level);
+		for (local n = 0; n < pformat.len(); n++) {
+			local c = pformat[n];
+			//printf("PARAM:%c\n", c);
 			switch (c) {
 				case '*': return [];
 				case '.':
@@ -189,6 +190,7 @@ class RIO extends Component
 						printf("WARNING: ignored parameter has a value different than zero!\n");
 					}
 				break;
+				case '3': l.push([data.readn('b'), data.readn('b'), data.readn('b')]); break;
 				case '1': l.push(data.readn('b')); break;
 				case '2': l.push(data.readn('s')); break;
 				case '4': l.push(data.readn('i')); break;
@@ -200,16 +202,64 @@ class RIO extends Component
 				case 'O': l.push(data.readn('b')); last_kind = (l[l.len() - 1] >> 4); break; // JUMP_IF_OP
 				case 'f': l.push(data.readn('w')); break;
 				case 'k': l.push(data.readn('b')); last_kind = l[l.len() - 1]; break;
+				case 'c':
+					local v = data.readn('b');
+					switch (v) {
+						case 3:
+							data.readn('b');
+							local flag = data.readn('s');
+							data.readn('b');
+							local value = data.readn('s');
+							data.readn('b');
+
+							l.push({
+								flag  = flag,
+								value = value,
+							});
+						break;
+						case 6:
+							l.push({
+								address = data.readn('i')
+							});
+							data.readn('b');
+						break;
+						case 7:
+							l.push({
+								script = data.readstringz(-1)
+							});
+						break;
+						default:
+							throw("Unknown option-jump address: " + v);
+						break;
+					}
+				break;
 				case 'C':
-					loop = data.readn('w');
-					l.push(loop);
+					loop_count = data.readn('w');
 				break;
 				case '[':
-					loop_to = n;
-					variadic = true;
+					local rc = 0;
+					local start = n + 1, end = -1;
+					for (; end == -1 && n < pformat.len(); n++) {
+						switch (pformat[n]) {
+							case '[': rc++; break;
+							case ']':
+								rc--;
+								if (rc == 0) {
+									end = n;
+								}
+							break;
+						}
+					}
+					//printf("'%s'\n", pformat.slice(start, end));
+					local sub_pformat = pformat.slice(start, end);
+					local lv = [];
+					for (local m = 0 ; m < loop_count; m++) {
+						lv.push(process_params(sub_pformat, level + 1));
+					}
+					l.push(lv);
 				break;
 				case ']':
-					if (--loop > 0) n = loop_to;
+					throw("Invalid format ']'");
 				break;
 				case 'F':
 					if (last_kind) {
@@ -224,6 +274,7 @@ class RIO extends Component
 				break;
 			}
 		}
+		//printf("---------------- (%d)\n", level);
 		return l;
 	}
 	
@@ -253,7 +304,7 @@ class RIO extends Component
 				todo = 0;
 				//printf("---%s\n" name);
 				
-				//printf("%s@%04X: OP(0x%02X) : %s : %s\n", this.name, start_pos, op, name, ::object_to_string(vparams.slice(1)));
+				printf("%s@%04X: OP(0x%02X) : %s : %s\n", this.name, start_pos, op, name, ::object_to_string(vparams.slice(1)));
 				
 				local retval;
 				//printf("Variadic: %d\n", cop.variadic);
@@ -263,7 +314,7 @@ class RIO extends Component
 					retval = cop.__class[name].acall(vparams);
 				}
 				if (todo) {
-					printf("%s@%04X: OP(0x%02X) : %s : %s...", this.name, start_pos, op, name, ::object_to_string(vparams.slice(1)));
+					//printf("%s@%04X: OP(0x%02X) : %s : %s...", this.name, start_pos, op, name, ::object_to_string(vparams.slice(1)));
 					printf("  @TODO\n");
 					//print(retval);
 					//printf("\n");

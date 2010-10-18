@@ -109,20 +109,8 @@ class RIO_OP_base
 		this.TODO();
 	}
 
-	</ id=0x84, format="1", description="" />
-	static function UNK_84(param)
-	{
-		this.TODO();
-	}
-
 	</ id=0x85, format="2", description="" />
 	static function UNK_85(param)
-	{
-		this.TODO();
-	}
-
-	</ id=0x88, format="111", description="" />
-	static function UNK_88(unk1, unk2, unk3)
 	{
 		this.TODO();
 	}

@@ -12,6 +12,7 @@ class RIO_OP_SCENE
 		background.color = null;
 		background.enabled = true;
 		this.scene.table.enabled = false;
+		this.TODO();
 	}
 	
 	</ id=0x47, format="11", description="" />

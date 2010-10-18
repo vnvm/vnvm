@@ -27,6 +27,10 @@ include("ymk/rio_op_timer.nut");
 include("ymk/rio_op_scene.nut");
 include("ymk/rio_op_menus.nut");
 include("ymk/rio_op_effects.nut");
+switch (engine_version) {
+	case "ymk": include("ymk/rio_op_version_ymk.nut"); break;
+	case "pw" : include("ymk/rio_op_version_pw.nut" ); break;
+}
 include("ymk/rio.nut");
 include("ymk/resman.nut");
 
@@ -136,6 +140,11 @@ function export_images_to_translate() {
 //export_images_to_translate();
 
 //resman.get_image("EC_001").images[0].save("EC_001.tga", "tga");
+//resman.get_image("BG16_001").images[0].save("BG16_001.png", "png");
+
+
+//rio.load("pw0001", 1, 0x7192);
+//rio.load("pw0015_1", 1, 0x1779F);
 
 //rio.load("pw0001", 1, 0xBC0A);
 //rio.load("pw0002_1", 1, 0x2025);

@@ -10,6 +10,11 @@ function rot2($str) {
 	}
 	return $str;
 }
+
+function object_to_string($v) {
+	return json_encode($v);
+}
+
 class ARC {
 	public $f;
 	public $files;
@@ -76,25 +81,30 @@ class RIO {
 	function __construct($version = "ymk") {
 		$this->opcodes = array();
 
-		foreach (glob("../engine/ymk/rio_op*.nut") as $file) {
-			$nut = file_get_contents($file);
-			
-			switch ($version) {
-				case 'ymk':
-					$nut = preg_replace('@case "pw":(.*)break;@Umsi', '', $nut);
-					/*if (preg_match_all('@case "pw":(.*)break;@Umsi', $nut, $matches)) {
-						print_r($matches);
-					}*/
-				break;
-			}
-			
-			
-			if (preg_match_all('@</ id=0x(.*), format="(.*)"@Umsi', $nut, $matches, PREG_SET_ORDER)) {
-				//print_r($matches);
-				foreach ($matches as $match) {
-					$id = hexdec($match[1]);
-					$format = $match[2];
-					$this->opcodes[$id] = $format;
+		$files = glob("../engine/ymk/rio_op*.nut");
+		foreach (array(false, true) as $include_version) {
+			foreach ($files as $file) {
+				if (preg_match('@^rio_op_version_(\\w+)\\.nut$@Umsi', basename($file), $matches)) {
+					if (!$include_version) continue;
+					if ($matches[1] != $version) continue;
+				} else {
+					if ($include_version) continue;
+				}
+				echo "{$file}\n";
+				$nut = file_get_contents($file);
+
+				if (preg_match_all('@</ id=0x(.*), format="(.*)".*function (\w+)\\(@Umsi', $nut, $matches, PREG_SET_ORDER)) {
+					//print_r($matches);
+					foreach ($matches as $match) {
+						$id = hexdec($match[1]);
+						$format = $match[2];
+						$name = $match[3];
+						$this->opcodes[$id] = (object)array(
+							'id'     => $id,
+							'name'   => $name,
+							'format' => $format,
+						);
+					}
 				}
 			}
 		}
@@ -111,35 +121,81 @@ class RIO {
 		$this->instructions = array();
 	}
 	
-	static function extractFormat($f, $format) {
+	static function extractFormat($f, $format, $level = 0) {
 		$params = array();
-		$counts = array();
-		$positions = array();
 		$current_count = 0;
+		//printf("extractFormat('%s', %d)\n", $format, $level);
+		if (feof($f)) {
+			return array();
+			//die("extractFormat :: feof\n");
+		}
 		for ($n = 0, $l = strlen($format); $n < $l; $n++) {
 			$c = $format[$n];
+			//printf("PARAM:%08X: '%s'\n", ftell($f), $c);
 			switch ($c) {
 				case '*':
 					throw(new Exception("Unprocessed opcode"));
 				break;
 				case '.': fread($f, 1); break;
+				case 3:
+					$params[] = array(ord(fread($f, 1)), ord(fread($f, 1)), ord(fread($f, 1)));
+				break;
 				case '1': case 'O': case 'o': case 'k': $params[] = ord(fread($f, 1)); break;
 				case '2': case 'f': case 'F': list(,$params[]) = unpack('v', fread($f, 2)); break;
 				case 'l': case 'L': case '4': list(,$params[]) = unpack('V', fread($f, 4)); break;
 				case 'C':
 					list(,$current_count) = unpack('v', fread($f, 2));
-					$params[] = $current_count;
+					//printf("COUNT: %d\n", $current_count);
+				break;
+				case 'c':
+					$current_count_2 = ord(fread($f, 1));
+					switch ($current_count_2) {
+						case 3:
+							//$current_count = 7;
+							$sub_params = array();
+							//for ($m = 0; $m < 7; $m++) $sub_params[] = ord(fread($f, 1));
+							//list(,$params[]) = unpack('v3', fread($f, 6));
+							fread($f, 1);
+							list(,$params[]) = unpack('v', fread($f, 2));
+							fread($f, 1);
+							list(,$params[]) = unpack('v', fread($f, 2));
+							fread($f, 1);
+							//list(,$params[]) = unpack('v', fread($f, 1));
+							//$params[] = $sub_params;
+						break;
+						case 6:
+							//$current_count = 5;
+							//fread($f, 4);
+							list(,$params[]) = unpack('V', fread($f, 4));
+							fread($f, 1);
+						break;
+						default:
+							//$current_count = 0;
+						break;
+					}
+					//printf("COUNT2: %d, %d\n", $current_count_2, $current_count);
 				break;
 				case '[':
-					$counts[] = $current_count;
-					$positions[] = $n - 1;
+					$curl = 0;
+					$start = $n + 1;
+					for (; $n < $l; $n++) {
+						if ($format[$n] == '[') {
+							$curl++;
+						} else if ($format[$n] == ']') {
+							$curl--;
+							if ($curl == 0) break;
+						}
+					}
+					$end = $n;
+					$sub_params = array();
+					$sub_format = substr($format, $start, $end - $start);
+					while ($current_count-- > 0) {
+						$sub_params[] = static::extractFormat($f, $sub_format, $level + 1);
+					}
+					$params[] = $sub_params;
 				break;
 				case ']':
-					$current_count = array_pop($counts);
-					$current_count--;
-					if ($current_count > 0) {
-						$n = array_pop($positions);
-					}
+					assert(0);
 				break;
 				case 's': case 't':
 					$s = '';
@@ -150,8 +206,8 @@ class RIO {
 					}
 					if ($c == 't') {
 						//echo "$s\n";
-						$params[] = $s;
 					}
+					$params[] = $s;
 				break;
 				default:
 					throw(new Exception("Unknown format '{$c}'"));
@@ -163,34 +219,43 @@ class RIO {
 	
 	function extractOpcodes() {
 		$f = $this->f;
-		$ops = array();
 		$this->instructions = array();
 		try {
 			while (!feof($f)) {
+				$position = ftell($f);
 				$op = ord(fread($f, 1));
-				$ops[] = $op;
 				//printf("OP: %02X\n", $op);
-				$format = &$this->opcodes[$op];
+				$opi = &$this->opcodes[$op];
+				$format = $opi->format;
+				$name = $opi->name;
 				if (!isset($format)) {
 					throw(new Exception(sprintf("Unknown opcode 0x%02X\n", $op)));
-					
 				}
 				//echo "$format\n";
 				$params = static::extractFormat($f, $format);
 				
-				$this->instructions[] = array($op, $params);
+				$this->instructions[] = (object)array(
+					'opcode'   => $opi,
+					'position' => $position,
+					'params'   => $params
+				);
 			}
 		} catch (Exception $e) {
-			print_r(array_slice($ops, -4));
+			print_r(array_slice($this->instructions, -4));
 			throw($e);
+		}
+	}
+	
+	function dumpInstructions() {
+		if (!count($this->instructions)) $this->extractOpcodes();
+		foreach ($this->instructions as $instruction) {
+			printf("%08d:%s %s\n", $instruction->position, $instruction->opcode->name, object_to_string($instruction->params));
 		}
 	}
 	
 	function extractTexts() {
 		$texts = array();
-		if (!count($this->instructions)) {
-			$this->extractOpcodes();
-		}
+		if (!count($this->instructions)) $this->extractOpcodes();
 		foreach ($this->instructions as $i) {
 			list($op, $params) = $i;
 			//print_r($params);
@@ -229,8 +294,8 @@ class RIO {
 
 //print_r($argv);
 @$project_path = __DIR__ . "/../game_data/" . basename($argv[2]);
-@mkdir($translation_folder = "{$project_path}/translation/es", 0777, true);
-@mkdir($acme_folder = "{$translation_folder}/SRC", 0777, true);
+$translation_folder_base = "{$project_path}/translation";
+$lang = 'en';
 
 if (!isset($argv[2])) $argv[1] = '-h';
 if (!is_dir($project_path)) {
@@ -242,15 +307,50 @@ if (!is_dir($project_path)) {
 @$arc = new ARC();
 
 switch (@$argv[1]) {
-	case '-e':
-		$arc->loadFile("{$project_path}/rio.arc");
-		
+	case '-e': $lang = 'en'; break;
+	case '-d': $lang = 'en'; break;
+	case '-r': $lang = 'es'; break;
+}
+
+$translation_folder = "{$translation_folder_base}/{$lang}";
+$acme_folder = "{$translation_folder}/SRC";
+$ws_folder = "{$project_path}/WS";
+
+
+@mkdir($translation_folder, 0777, true);
+@mkdir($acme_folder, 0777, true);
+@mkdir($ws_folder, 0777, true);
+
+$arc->loadFile("{$project_path}/rio.arc");
+
+switch (@$argv[1]) {
+	case '-d':
 		foreach ($arc->getFileNames() as $fileName) {
+			$baseName = pathinfo($fileName, PATHINFO_FILENAME);
+			echo "{$baseName}...";
+			$data = rot2($arc->get($fileName));
+			$rio->loadData($data);
+			ob_start();
+			$rio->dumpInstructions();
+			$contents = ob_get_clean();
+			file_put_contents("{$ws_folder}/{$baseName}.ws", $contents);
+			echo "Ok\n";
+		}
+	break;
+	case '-e':
+		foreach ($arc->getFileNames() as $fileName) {
+		//foreach (array("SLG_SAVE.WSC") as $fileName) {
+		//foreach (array("BATTLE.WSC") as $fileName) {
+		//foreach (array("pw0015_1.WSC") as $fileName) {
 			$baseName = pathinfo($fileName, PATHINFO_FILENAME);
 			echo "{$baseName}...";
 			$data = rot2($arc->get($fileName));
 			echo "Ok\n";
 			$rio->loadData($data);
+			$rio->extractOpcodes();
+			//$rio->dumpInstructions();
+			//print_r($rio->instructions);
+			//exit;
 			try {
 				$texts = $rio->extractTexts();
 				if (count($texts)) {
@@ -265,8 +365,8 @@ switch (@$argv[1]) {
 					$f = fopen("{$acme_folder}/{$baseName}$1.txt", 'wb');
 					$count2 = 0;
 					$count = 0;
-					foreach ($texts as $id => $text) {
-						if ($text[1] == '') $text[1] = '-';
+					foreach ($texts as $id => $rio_text) {
+						if ($rio_text->title == '') $rio_text->title = '-';
 						if ($count == 0) {
 							$f = fopen("{$translation_folder}/SRC/{$baseName}\${$count2}.txt", 'wb');
 							$count2++;
@@ -289,20 +389,16 @@ switch (@$argv[1]) {
 		}
 	break;
 	case '-r':
-		$arc->loadFile("{$project_path}/rio.arc");
 		$files_texts = array();
 		foreach (glob("{$acme_folder}/*.txt") as $file) {
 			list($baseName) = explode('$', pathinfo($file, PATHINFO_FILENAME));
-			//echo "{$baseName}...";
 			$pointers = explode("## POINTER ", file_get_contents($file));
 			foreach (array_slice($pointers, 1) as $pointer) {
 				@list($info, $text) = $pointer_e = explode("\n", $pointer, 2);
 				$id = (int)$info;
-				//echo "'$title'\n";
-				$files_texts[$baseName][] = $text = str_replace("\r", "", rtrim($text));
-				//echo "$id: $baseName\n";
+				//$files_texts[$baseName][] = $text = str_replace("\r", "", rtrim($text));
+				$files_texts[$baseName][$id] = $text = str_replace("\r", "", rtrim($text));
 			}
-			//echo "\n";
 		}
 		
 		foreach ($files_texts as $baseName => $texts) {
@@ -331,6 +427,7 @@ switch (@$argv[1]) {
 		printf("\n");
 		printf("Options:\n");
 		printf("  -e - extract in acme format\n");
+		printf("  -d - dump script\n");
 		printf("  -r - reinsert from acme format\n");
 		printf("\n");
 		printf("Projects:\n");

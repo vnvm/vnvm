@@ -1,4 +1,4 @@
-class RIO_OP_EFFECTS_base
+class RIO_OP_EFFECTS
 {
 	</ id=0x54, format="s", description="" />
 	static function TRANS_IMAGE(name)
@@ -35,6 +35,9 @@ class RIO_OP_EFFECTS_base
 					reverse = 0
 				});
 				//printf("Effect::transition_show\n");
+			break;
+			case 25: // TRANSITION NORMAL FADE IN (alpha)
+				this.scene.setEffect("normal");
 			break;
 			case 42: // TRANSITION MASK (blend)
 				this.scene.setEffect("transition", {
@@ -99,10 +102,12 @@ class RIO_OP_EFFECTS_base
 	static function EFFECT(kind, duration, quantity, unk1)
 	{
 		local kinds = [null, "quake", "heat"];
+		local kind_name = (kind in kinds) ? kinds[kind] : "unknown";
 		
-		printf("EFFECT(%d, %d, %d, %d)\n", kind, duration, quantity, unk1);
+		printf("EFFECT(%d('%s'), %d, %d, %d)\n", kind, kind_name, duration, quantity, unk1);
 		
-		switch (kinds[kind]) {
+		
+		switch (kind_name) {
 			case "quake":
 				if (duration >= 255) duration = 20;
 				//printf("duration: %d\n", duration);
@@ -125,28 +130,9 @@ class RIO_OP_EFFECTS_base
 			break;
 			default:
 				this.TODO();
-				throw("Unprocessed effect: " + kind);
+				printf("Unprocessed effect: " + kind);
+				//throw("Unprocessed effect: " + kind);
 			break;
 		}
 	}
-}
-
-switch (engine_version) {
-	case "pw": // For Pricess Waltz.
-		class RIO_OP_EFFECTS extends RIO_OP_EFFECTS_base
-		{
-			</ id=0x4C, format="1.", description="" />
-			static function ANIMATE_PLAY(can_skip)
-			{
-				RIO_OP_EFFECTS_base.ANIMATE_PLAY(can_skip);
-			}
-		}
-	break;
-	// For YMK and others.
-	default:
-	//case "ymk": 
-		class RIO_OP_EFFECTS extends RIO_OP_EFFECTS_base
-		{
-		}
-	break;
 }

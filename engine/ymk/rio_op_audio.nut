@@ -1,4 +1,4 @@
-class RIO_OP_AUDIO_base
+class RIO_OP_AUDIO
 {
 	</ id=0x21, format="12s", description="" />
 	static function MUSIC_PLAY(repeats, fadein_ms, bgm_file)
@@ -50,30 +50,4 @@ class RIO_OP_AUDIO_base
 			gameStep();
 		}
 	}
-}
-
-switch (engine_version) {
-	case "pw": // For Pricess Waltz.
-		class RIO_OP_AUDIO extends RIO_OP_AUDIO_base
-		{
-			</ id=0x21, format="12.s", description="" />
-			static function MUSIC_PLAY(repeats, fadein_ms, bgm_file)
-			{
-				RIO_OP_AUDIO_base.MUSIC_PLAY(repeats, fadein_ms, bgm_file);
-			}
-
-			</ id=0x25, format="111122.s", description="" />
-			static function SOUND_PLAY(channel, repeat, blocking, start_time, fade_in_ms, volume, sound_file)
-			{
-				RIO_OP_AUDIO_base.SOUND_PLAY(channel, repeat, blocking, start_time, fade_in_ms, volume, sound_file);
-			}
-		}
-	break;
-	// For YMK and others.
-	default:
-	//case "ymk": 
-		class RIO_OP_AUDIO extends RIO_OP_AUDIO_base
-		{
-		}
-	break;
 }

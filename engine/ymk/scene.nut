@@ -17,6 +17,8 @@ class Scene extends Component
 	x = 0;
 	y = 0;
 	
+	not_ended_object = "<none>";
+	
 	constructor(state = null)
 	{
 		all        = array(8);
@@ -58,7 +60,11 @@ class Scene extends Component
 	
 	function get(object_id)
 	{
-		printf("WARNING: Invalid object_id('%d')\n", object_id);
+		if (object_id < 0 || object_id >= all.len()) {
+			printf("WARNING: Invalid object_id('%d')\n", object_id);
+			//throw(format("WARNING: Invalid object_id('%d')\n", object_id));
+			//return all[0];
+		}
 		return all[object_id % all.len()];
 	}
 	
@@ -87,18 +93,32 @@ class Scene extends Component
 		table.update(elapsed_time);
 		foreach (obj in all) {
 			obj.update(elapsed_time);
+			//obj.animation.timer.update(elapsed_time);
 		}
 		// Updates effect step.
 		this.stepf = this.effectTimer.elapsedf;
 		this.effect.step = this.stepf;
 		//printf("%f\n", this.stepf);
 	}
-	
+
 	function ended()
 	{
+		local v = ended2();
+		//printf("ended():%d : %s\n", v ? 1 : 0, not_ended_object);
+		return v;
+	}
+	
+	function ended2()
+	{
 		//printf("++++++\n");
-		foreach (obj in all) if (!obj.animation.timer.ended) return false;
-		if (!this.effectTimer.ended) return false;
+		foreach (n, obj in all) if (!obj.ended()) {
+			this.not_ended_object = format("%d:%s", n, obj.animation.timer.tostring());
+			return false;
+		}
+		if (!this.effectTimer.ended) {
+			this.not_ended_object = "-1";
+			return false;
+		}
 		//printf("------\n");
 		return true;
 	}
@@ -250,6 +270,7 @@ class SceneObject extends Component
 	
 	function ended()
 	{
+		if (!enabled) return true;
 		return animation.ended();
 	}
 	

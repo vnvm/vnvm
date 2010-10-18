@@ -19,6 +19,11 @@ function object_to_string(v)
 			foreach (c in v) vv.push(object_to_string(c));
 			return "[" + array_join(vv, ",") + "]";
 		break;
+		case "table":
+			local vv = [];
+			foreach (k, c in v) vv.push(object_to_string(k) + " = " + object_to_string(c));
+			return "{" + array_join(vv, ",") + "}";
+		break;
 		case "string":
 			return "\"" + v + "\"";
 		break;
