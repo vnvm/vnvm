@@ -93,7 +93,7 @@ class State
 	{
 		printf("Saving...");
 		{
-			this.saveStream(file(format("save%03d", index), "wb"));
+			this.saveStream(file(format("%s/%s_save%03d", info.game_save_path, engine_version, index), "wb"));
 		}
 		printf("Ok\n");
 	}
@@ -101,20 +101,23 @@ class State
 	function load(index = 0)
 	{
 		printf("Loading...");
-		{
-			this.loadStream(file(format("save%03d", index), "rb"));
+		try {
+			this.loadStream(file(format("%s/%s_save%03d", info.game_save_path, engine_version, index), "rb"));
+			
+			printf("Ok\n");
+			// Jump to the lastest script position.
+			this.rio.load(script_get().name, 0, script_get().pc);
+			this.rio.scene.table.enabled = false;
+		} catch (e) {
+			printf("Error (" + e + ")\n");
 		}
-		printf("Ok\n");
-
-		// Jump to the lastest script position.
-		this.rio.load(script_get().name, 0, script_get().pc);
 	}
 
 	function save_system()
 	{
 		printf("Saving system...");
 		{
-			local f = file("savesystem", "wb");
+			local f = file(format("%s/%s_savesystem", info.game_save_path, engine_version), "wb");
 			for (local n = 1000; n < MAX_FLAGS; n++) {
 				f.writen(flags[n], 's');
 			}
@@ -126,16 +129,16 @@ class State
 	{
 		printf("Loading system...");
 		try {
-			local f = file("savesystem", "rb");
+			local f = file(format("%s/%s_savesystem", info.game_save_path, engine_version), "rb");
 			for (local n = 1000; n < MAX_FLAGS; n++) {
 				flags[n] = f.readn('s');
 			}
 			printf("Ok\n");
 		} catch (e) {
-			printf("Didn't exist\n");
+			printf("Error (" + e + ")\n");
 		}
 	}
-	
+
 	function flag_set(index, value)
 	{
 		if (this.flags[index] != value) {
@@ -153,7 +156,16 @@ class State
 	
 	function flags_set_range(start, end, value = 0)
 	{
-		for (local n = start; n <= end; n++) flag_set(n, value);
+		local updated_system = 0;
+		for (local index = start; index <= end; index++) {
+			if (this.flags[index] != value) {
+				this.flags[index] = value;
+				if (index >= 1000) updated_system++;
+			}
+		}
+		if (updated_system > 0) {
+			save_system();
+		}
 	}
 
 	function flags_set_range_count(start, count, value = 0)

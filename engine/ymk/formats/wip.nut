@@ -120,10 +120,8 @@ class WIP
 }
 
 function WIP_MSK(wip_s, msk_s, name) {
-	local translation_path = info.game_data_path + "/translation/es/";
-	// + name + ".png";
+	local translation_path = info.game_data_path + "/translation/" + ::info.game_lang + "/";
 	local wip = WIP(wip_s, name);
-	//info.game_data_path + "/translation/es/" + name.toupper() + ".nut"
 	try {
 		local msk = WIP(msk_s, name);
 		for (local n = 0; n < wip.images.len(); n++) {
