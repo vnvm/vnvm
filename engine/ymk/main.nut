@@ -101,13 +101,13 @@ switch (engine_version) {
 //pw0001
 
 rio <- RIO();
+rio.state.load_system();
 rio.load("START");
 
 switch (engine_version) {
 	case "pw":
-		rio.state.flags_set_range_count(1050, 30, 1); // ENABLE BGM
-		
-		rio.state.flags_set_range(1000, 2999, 1); // ENABLE ALL
+		//rio.state.flags_set_range_count(1050, 30, 1); // ENABLE BGM
+		//rio.state.flags_set_range(1000, 2999, 1); // ENABLE ALL
 	break;
 	default: /*case "ymk":*/
 		rio.state.flags_set_range(1051, 1067, 1); // ENABLE BGM

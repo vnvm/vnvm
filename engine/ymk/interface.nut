@@ -2,6 +2,7 @@ class Interface extends Component
 {
 	text_title   = "";
 	text_body    = "";
+	wip_winbase0 = null;
 	wip_clkwait  = null;
 	wip_clkwait_frames = null;
 	font         = null;
@@ -15,9 +16,13 @@ class Interface extends Component
 	color_border = null;
 	text_size = 1.0;
 	waitingSkip = true;
+	interface_position = null;
+	rio = null;
+	buttons = null;
 
-	constructor()
+	constructor(rio = null)
 	{
+		this.rio = rio;
 		this.text_title = "";
 		this.text_body  = "";
 		this.text_size = 1.0;
@@ -27,16 +32,33 @@ class Interface extends Component
 		this.wip_clkwait = resman.get_image("CLKWAIT", 0);
 		
 		local iwait = wip_clkwait.images[0];
-		
+
+		this.wip_winbase0 = resman.get_image("WINBASE0", 0);
+		interface_position = {x=800 / 2 - wip_winbase0.infos[0].w / 2, y=600 - wip_winbase0.infos[0].h - 8};
+
+		local num_buttons = 0;
 		switch (engine_version) {
 			case "pw":
 				this.wip_clkwait_frames = iwait.slice(1, 0, iwait.w, iwait.h).split(55, iwait.h);
+				num_buttons = 9;
 			break;
 			default:
 				this.wip_clkwait_frames = iwait.split(iwait.h, iwait.h);
+				num_buttons = 7;
 			break;
 		}
 		this.font = Font("lucon.ttf", 19);
+		
+		buttons = {};
+		for (local n = 1; n <= num_buttons; n++) {
+			buttons[n] <- {
+				index   = n,
+				enabled = 0,
+				hover   = 0,
+			};
+		}
+		buttons[1].enabled = 1;
+		buttons[2].enabled = 1;
 
 		this.position_title = { x = 60, y = screen.h - 152, w = 0, h = 0};
 		this.position_body  = { x = 80, y = 512           , w = 0, h = 0};
@@ -46,11 +68,12 @@ class Interface extends Component
 
 		switch (engine_version) {
 			case "pw":
-				this.position_title.y = screen.h - 166;
-				this.position_title.x = 90;
-				this.position_body.y = 512 - 40;
-				this.position_wait.x = 680;
-				this.position_wait.y = screen.h - 72;
+				this.position_title.x = interface_position.x + 52;
+				this.position_title.y = interface_position.y + 26;
+				this.position_body.x  = interface_position.x + 52;
+				this.position_body.y  = interface_position.y + 64;
+				this.position_wait.x  = 680;
+				this.position_wait.y  = screen.h - 72;
 				this.color_border   = rgba("FFA700");
 			break;
 		}
@@ -67,6 +90,24 @@ class Interface extends Component
 			this.skip = true;
 		}
 
+		foreach (button in buttons) {
+			if (!button.enabled) continue;
+			local rect = wip_winbase0.getRect(button.index, interface_position.x, interface_position.y);
+			if (::input.mouseInRect(rect)) {
+				if (::input.mouse.clicked(0)) {
+					printf("UI Clicked: %d (%s)\n", button.index, object_to_string(rect));
+					switch (button.index) {
+						case 1: this.rio.opcall("RUN_QLOAD", []); break;
+						case 2: this.rio.opcall("RUN_QSAVE", []); break;
+					}
+					return;
+				}
+				button.hover = true;
+			} else {
+				button.hover = false;
+			}
+		}
+
 		if (::input.mouse.clicked(0) || ::input.pad_pressed("accept")) {
 			if (!endedDrawText()) {
 				this.textProgress = this.text_body.len();
@@ -74,7 +115,7 @@ class Interface extends Component
 				this.skip = true;
 			}
 		}
-		
+
 		this.textProgress = clamp(this.textProgress + 1, 0, this.text_body.len());
 		this.clkwait_tick++;
 	}
@@ -83,27 +124,25 @@ class Interface extends Component
 	{
 		if (!enabled) return;
 		
-		local wip = resman.get_image("WINBASE0", 0);
-		local x = 800 / 2 - wip.infos[0].w / 2;
-		local y = 600 - wip.infos[0].h;
-		
-		local num_buttons;
-		
-		switch (engine_version) {
-			case "pw":
-				num_buttons = 10;
-			break;
-			default:
-				num_buttons = 8;
-			break;
-		}
-		
-		for (local n = 0; n < num_buttons; n++) {
-			wip.drawTo(destinationBitmap, n, x, y);
+		// Textbox
+		wip_winbase0.drawTo(destinationBitmap, 0, interface_position.x, interface_position.y);
+
+		// Buttons
+		foreach (button in buttons) {
+			//printf("%d: %d\n", button.index, button.enabled);
+			local type = 0;
+			if (button.enabled) {
+				if (!button.hover) {
+					type = 1;
+				} else {
+					type = 2;
+				}
+			}
+			wip_winbase0.drawTo(destinationBitmap, 1 + (button.index - 1) + (buttons.len() * type), interface_position.x, interface_position.y);
 		}
 		
 		if (this.text_title.len()) {
-			wip.drawTo(destinationBitmap, num_buttons * 3 + 1, x, y);
+			wip_winbase0.drawTo(destinationBitmap, 1 + (buttons.len() + 1) * 3, interface_position.x, interface_position.y);
 		}
 		
 		this.font.setSize(text_size);

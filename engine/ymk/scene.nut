@@ -175,6 +175,16 @@ class Scene extends Component
 			Screen.popEffect();
 		}
 	}
+	
+	function saveStream(stream)
+	{
+		foreach (v in all) v.saveStream(stream);
+	}
+
+	function loadStream(stream)
+	{
+		foreach (v in all) v.loadStream(stream);
+	}
 }
 
 class SceneTable extends Component
@@ -232,8 +242,8 @@ class SceneTable extends Component
 		if (input.mouse.clicked(2)) { click = -1; mask_kind = 0; }
 
 		
-		if (flag_move_click != -1) this.table.state.flags[flag_move_click] = click;
-		if (flag_mask_kind  != -1) this.table.state.flags[flag_mask_kind]  = mask_kind;
+		if (flag_move_click != -1) this.table.state.flag_set(flag_move_click, click);
+		if (flag_mask_kind  != -1) this.table.state.flag_set(flag_mask_kind, mask_kind);
 		
 		flag_move_click = -1;
 		flag_mask_kind = -1;
@@ -262,6 +272,34 @@ class SceneObject extends Component
 	animation = null;
 	index = 0;
 	color = null;
+	
+	function saveStream(stream)
+	{
+		stream.writen(enabled ? 1 : 0, 'b');
+		stream.writen(index, 'i');
+		stream.writen(x, 'i');
+		stream.writen(y, 'i');
+		stream.writen(cx, 'i');
+		stream.writen(cy, 'i');
+		stream.writen(alpha, 'f');
+		stream.writen(size, 'f');
+		stream.writen(rotation, 'f');
+		_writestringz(stream, name);
+	}
+
+	function loadStream(stream)
+	{
+		enabled  = stream.readn('b') ? true : false;
+		index    = stream.readn('i');
+		x        = stream.readn('i');
+		y        = stream.readn('i');
+		cx       = stream.readn('i');
+		cy       = stream.readn('i');
+		alpha    = stream.readn('f');
+		size     = stream.readn('f');
+		rotation = stream.readn('f');
+		name     = stream.readstringz(-1);
+	}
 
 	constructor(type = null)
 	{

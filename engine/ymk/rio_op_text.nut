@@ -85,7 +85,7 @@ class RIO_OP_TEXT
 		}
 		
 		if ("flag" in selectedOption.result) {
-			this.state.flags[selectedOption.result.flag] = selectedOption.result.value;
+			this.state.flag_set(selectedOption.result.flag, selectedOption.result.value);
 		}
 		if ("script" in selectedOption.result) {
 			this.load(selectedOption.result.script, 0);

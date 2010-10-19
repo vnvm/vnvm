@@ -35,9 +35,9 @@ class RIO_OP_FLOW
 	{
 		local is_right_flag = (operation >> 4);
 		local operator = RIO_OP_FLOW.ops_jump_if[operation & 0x0F];
-		local left = this.state.flags[left_flag % State.MAX_FLAGS];
+		local left = this.state.flag_get(left_flag % State.MAX_FLAGS);
 		local right = right_value_or_flag;
-		if (is_right_flag) right = this.state.flags[right_value_or_flag % State.MAX_FLAGS];
+		if (is_right_flag) right = this.state.flag_get(right_value_or_flag % State.MAX_FLAGS);
 		
 		local result = RIO_OP_FLOW.binary_operation(operator, left, right);
 		//printf("JUMP_IF %d(%d) %s %d(%d)...\n", left_flag, left, operator, right_value_or_flag, right);
@@ -56,16 +56,16 @@ class RIO_OP_FLOW
 	</ id=0x03, format="ofkF.", description="Sets the value of a flag" />
 	static function SET(operation, left_flag, is_right_flag, right_value_or_flag)
 	{
-		local left  = this.state.flags[left_flag % State.MAX_FLAGS];
+		local left  = this.state.flag_get(left_flag % State.MAX_FLAGS);
 		local right = right_value_or_flag;
-		if (is_right_flag) right = this.state.flags[right_value_or_flag % State.MAX_FLAGS];
+		if (is_right_flag) right = this.state.flag_get(right_value_or_flag % State.MAX_FLAGS);
 	
 		if (operation == 0) {
-			for (local n = 0; n < 1000; n++) this.state.flags[n] = 0;
+			this.state.flags_set_range_count(0, 1000, 0);
 			//printf("**SET_ALL_TEMPORAL_FLAGS_TO_ZERO()\n");
 		} else {
 			local value = RIO_OP_FLOW.binary_operation(RIO_OP_FLOW.ops_set[operation], left, right, this.state.flags);
-			this.state.flags[left_flag % State.MAX_FLAGS] = value;
+			this.state.flag_set(left_flag % State.MAX_FLAGS, value);
 			if (left_flag == 996 && value) {
 				//this.interface.enabled = false;
 				//gameStep();

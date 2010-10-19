@@ -3,6 +3,7 @@ class RIO_OP_MENUS
 	</ id=0x83, format=".", description="" />
 	static function RUN_LOAD()
 	{
+		this.state.load(100);
 		this.TODO();
 	}
 
@@ -16,8 +17,8 @@ class RIO_OP_MENUS
 	static function BATTLE(unk1, battle_id, unk3)
 	{
 		this.TODO();
-		this.state.flags[916] = 1; // WIN
-		//this.state.flags[916] = 0; // LOOSE
+		this.state.flag_set(916, 1); // WIN
+		//this.state.flag_set(916, 0); // LOOSE
 	}
 
 	</ id=0x8A, format="1", description="" />
@@ -57,6 +58,17 @@ class RIO_OP_MENUS
 	</ id=0xE2, format=".", description="" />
 	static function RUN_QLOAD()
 	{
+		printf("RUN_QLOAD()\n");
+		this.state.load(100);
+		this.TODO();
+	}
+
+	// Special.
+	</ id=0x201, format="", description="" />
+	static function RUN_QSAVE()
+	{
+		printf("RUN_QSAVE()\n");
+		this.state.save(100);
 		this.TODO();
 	}
 }

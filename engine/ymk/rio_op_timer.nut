@@ -20,7 +20,8 @@ class RIO_OP_TIMER
 	static function TIMER_DEC(flag, param)
 	{
 		if (this.state.timer > 0) this.state.timer--;
-		this.state.flags[flag % State.MAX_FLAGS] = (this.state.timer <= 0) ? 1 : 0;
+		
+		this.state.flag_set(flag % State.MAX_FLAGS, (this.state.timer <= 0) ? 1 : 0);
 		return this.state.timer;
 		//this.TODO();
 	}

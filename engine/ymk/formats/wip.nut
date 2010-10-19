@@ -91,6 +91,17 @@ class WIP
 		));
 	}
 	
+	function getRect(index = 0, x = 0, y = 0)
+	{
+		local info = infos[index];
+		return {
+			x = info.x + x,
+			y = info.y + y,
+			w = info.w,
+			h = info.h,
+		};
+	}
+	
 	function drawTo(destinationBitmap, index = 0, x = 0, y = 0, alpha = 1.0, size = 1.0, rotation = 0.0)
 	{
 		local info = infos[index];

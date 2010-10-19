@@ -16,7 +16,7 @@ class RIO_OP_EFFECTS
 		switch (kind) {
 			case 0: // EFFECT
 				// FLAGS: 996, 999 (effect_type related)
-				local effect_type = this.state.flags[996];
+				local effect_type = this.state.flag_get(996);
 				switch (effect_type) {
 					case 0:
 						//this.scene.setEffect("normal");

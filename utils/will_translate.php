@@ -248,39 +248,43 @@ class RIO {
 	
 	function dumpInstructions() {
 		if (!count($this->instructions)) $this->extractOpcodes();
+		$lines = array();
 		foreach ($this->instructions as $instruction) {
-			printf("%08d:%s %s\n", $instruction->position, $instruction->opcode->name, object_to_string($instruction->params));
+			if ($instruction->opcode->name == "RUN_SAVE") {
+				print_r($instruction->params);
+			}
+			$lines[] = sprintf("%08d:%s %s", $instruction->position, $instruction->opcode->name, object_to_string($instruction->params));
 		}
+		return $lines;
 	}
 	
 	function extractTexts() {
 		$texts = array();
 		if (!count($this->instructions)) $this->extractOpcodes();
 		foreach ($this->instructions as $i) {
-			list($op, $params) = $i;
 			//print_r($params);
-			switch ($op) {
-				case 0xB6:
-				case 0x41: // TEXT:
+			switch ($i->opcode->name) {
+				case 'TEXT_ADD':
+				case 'TEXT':
 					//print_r($params);
-					$texts[$params[0]] = (object)array(
-						'op'    => $op,
-						'id'    => $params[0],
-						'body'  => $params[1],
+					$texts[$i->params[0]] = (object)array(
+						'op'    => $i->opcode->id,
+						'id'    => $i->params[0],
+						'body'  => $i->params[1],
 						'title' => '',
 					);
 				break;
-				case 0x42: // TEXT2:
-					$texts[$params[0]] = (object)array(
-						'op'    => $op,
-						'id'    => $params[0],
-						'body'  => $params[2],
-						'title' => $params[1],
+				case 'TEXT2':
+					$texts[$i->params[0]] = (object)array(
+						'op'    => $i->opcode->id,
+						'id'    => $i->params[0],
+						'body'  => $i->params[2],
+						'title' => $i->params[1],
 					);
 				break;
-				case 0x02: // OPTION_SELECT
-					$texts[$params[0]] = (object)array(
-						'op'    => $op,
+				case 'OPTION_SELECT': // OPTION_SELECT
+					$texts[$i->params[0]] = (object)array(
+						'op'    => $i->opcode->id,
 						'id'    => -1,
 						//'body'  => $params[2],
 						//'title' => $params[1]
@@ -330,10 +334,12 @@ switch (@$argv[1]) {
 			echo "{$baseName}...";
 			$data = rot2($arc->get($fileName));
 			$rio->loadData($data);
-			ob_start();
-			$rio->dumpInstructions();
-			$contents = ob_get_clean();
-			file_put_contents("{$ws_folder}/{$baseName}.ws", $contents);
+			$f = fopen("{$ws_folder}/{$baseName}.ws", 'wb');
+				foreach ($rio->dumpInstructions() as $line) {
+					fwrite($f, "{$line}\n");
+				}
+			fclose($f);
+			//file_put_contents("{$ws_folder}/{$baseName}.ws", $contents);
 			echo "Ok\n";
 		}
 	break;
@@ -409,6 +415,12 @@ switch (@$argv[1]) {
 			foreach ($rio_texts as $rio_text) {
 				$title = $text = '';
 				//printf("%s@%03d:%s\n", $baseName, $rio_text->id, $rio_text->body);
+				
+				@list($title, $text) = explode("\n", $texts[$rio_text->id], 2);
+				
+				if ($title == '-') $title = '';
+				
+				/*
 				if (!empty($rio_text->title)) {
 					//echo "{$rio_text->title}\n";
 					@list($title, $text) = explode("\n", $texts[$rio_text->id], 2);
@@ -416,6 +428,7 @@ switch (@$argv[1]) {
 				} else {
 					$text = $texts[$rio_text->id];
 				}
+				*/
 				fprintf($f, "translation.add(%d, \"%s\", \"%s\");\n", $rio_text->id, addcslashes($text, "\n\r\t"), addcslashes($title, "\n\r\t"));
 			}
 			fclose($f);

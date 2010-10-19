@@ -1,6 +1,7 @@
 class RIO extends Component
 {
 	static opcodes = {};
+	static opcodesByName = {};
 	name    = null;
 	data    = null;
 	state   = null;
@@ -24,9 +25,9 @@ class RIO extends Component
 		this.running = true;
 		this.ms_per_frame = (1000 / this.fps).tointeger();
 
-		this.state = State();
+		this.state = State(this);
 		this.addChildComponent(this.scene     = Scene(this.state));
-		this.addChildComponent(this.interface = Interface());
+		this.addChildComponent(this.interface = Interface(this));
 	}
 	
 	function gameStep(can_skip = false, updateCallback = null)
@@ -160,6 +161,19 @@ class RIO extends Component
 		//return text.replace("\\n", "\n");
 		return replace(text, "\\n", "\n");
 		//return text;
+	}
+	
+	function opcall(opName, vparams)
+	{
+		todo = 0;
+		local op = opcodesByName[opName];
+		vparams.insert(0, this);
+		local retval = op.__class[opName].acall(vparams);
+		if (todo) {
+			printf("%s@%04X: OP(0x%02X) : %s : %s...", "<UI>", 0, op.id, op.name, ::object_to_string(vparams.slice(1)));
+			printf("  @TODO\n");
+		}
+		return retval;
 	}
 	
 	function process_params(pformat, level = 0)
@@ -337,12 +351,21 @@ class RIO extends Component
 	static function opcode_clean()
 	{
 		RIO.opcodes <- {};
+		RIO.opcodesByName <- {};
 	}
 
 	static function opcode_info(__class, id, name, params_format, variadic)
 	{
 		RIO.opcodes[id] <- {
 			__class = __class,
+			id = id,
+			name = name,
+			params_format = params_format,
+			variadic = variadic,
+		};
+		RIO.opcodesByName[name] <- {
+			__class = __class,
+			id = id,
 			name = name,
 			params_format = params_format,
 			variadic = variadic,
