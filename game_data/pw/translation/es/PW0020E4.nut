@@ -4,7 +4,7 @@ translation.add(2, "Pero, ¿qué vamos a hacer con esta puerta?", "Liesel");
 translation.add(3, "Shouldn't it open now that we've defeated the\ngatekeeper? That's what usually happens.", "Liliana");
 translation.add(4, "¿Por qué no la echamos abajo?", "Angela");
 translation.add(5, "¿Eh?", "Liesel");
-translation.add(6, "Tambíén es verdad.", "Suzushiro");
+translation.add(6, "También es verdad.", "Suzushiro");
 translation.add(7, "¿Qué?", "Liesel");
 translation.add(8, "¡Quietos ahí! Debe haber algún modo de abrirla.", "Arata");
 translation.add(9, "Suzushiro, you've gotten into the palace before,\nhaven't you?", "Arata");
