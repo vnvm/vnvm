@@ -343,6 +343,25 @@ switch (@$argv[1]) {
 			echo "Ok\n";
 		}
 	break;
+	case '-a':
+		$effects = array();
+		foreach ($arc->getFileNames() as $fileName) {
+			$baseName = pathinfo($fileName, PATHINFO_FILENAME);
+			$data = rot2($arc->get($fileName));
+			$rio->loadData($data);
+			$rio->extractOpcodes();
+			foreach ($rio->instructions as $i) {
+				if ($i->opcode->name == 'TRANSITION') {
+					$effect = &$effects[$i->params[0]];
+					if (!isset($effect)) $effect = 0;
+					$effect++;
+				}
+			}
+		}
+		echo "EFFECT USAGE:\n";
+		ksort($effects);
+		print_r($effects);
+	break;
 	case '-e':
 		foreach ($arc->getFileNames() as $fileName) {
 		//foreach (array("SLG_SAVE.WSC") as $fileName) {
@@ -442,6 +461,7 @@ switch (@$argv[1]) {
 		printf("  -e - extract in acme format\n");
 		printf("  -d - dump script\n");
 		printf("  -r - reinsert from acme format\n");
+		printf("  -a - analyze script for statistics\n");
 		printf("\n");
 		printf("Projects:\n");
 		printf("  ymk - Yume Miru Kusuri\n");

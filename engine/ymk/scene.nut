@@ -43,7 +43,7 @@ class Scene extends Component
 		
 		this.state         = state;
 		this.table         = SceneTable(state);
-		
+
 		this.drawLayer     = Bitmap(screen.w, screen.h);
 		this.maskLayer     = Bitmap(screen.w, screen.h);
 		this.maskLayer2    = Bitmap(screen.w, screen.h);
@@ -171,10 +171,20 @@ class Scene extends Component
 			local effect = Effect("postEffect");
 			local eftype = this.state.flags[999].tointeger();
 			effect.image = this.tempLayer;
-			effect.eftype = eftype;
 			switch (eftype) {
+				case 1:
+					effect.eftype = 1;
+				break;
+				case 2:
+					effect.color = rgb("ffffff");
+					effect.eftype = 3;
+				break;
 				case 3:
 					effect.color = rgb("efca97");
+					effect.eftype = 3;
+				break;
+				default:
+					effect.eftype = eftype;
 				break;
 			}
 			Screen.pushEffect(effect);

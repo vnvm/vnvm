@@ -395,6 +395,16 @@ DSQ_METHOD(Bitmap, setColorKey)
 }
 */
 
+
+DSQ_METHOD(Bitmap, setBlending)
+{
+	EXTRACT_PARAM_START();
+	EXTRACT_PARAM_SELF(Bitmap);
+	EXTRACT_PARAM_STR(2, blending, "normal");
+	self->setBlending(blending.stringz);
+	return 0;
+}
+
 DSQ_METHOD(Bitmap, setColor)
 {
 	float colorf[] = {1, 1, 1, 1};
@@ -425,6 +435,7 @@ void engine_register_bitmap()
 		NEWSLOT_METHOD(Bitmap, drawBitmap, 0, ".");
 		NEWSLOT_METHOD(Bitmap, drawFillRect, 0, ".");
 		NEWSLOT_METHOD(Bitmap, copyChannel, 0, ".");
+		NEWSLOT_METHOD(Bitmap, setBlending, 0, ".");
 		//NEWSLOT_METHOD(Bitmap, setColorKey, 0, ".");
 		NEWSLOT_METHOD(Bitmap, dup, 0, ".");
 		NEWSLOT_METHOD(Bitmap, save, 0, ".");

@@ -348,12 +348,41 @@ class Effect : public ShaderProgram
 			uniform float     pixelSize; \
 			\
 			void main() { \
-				gl_FragColor.rgb = texture2D(image, floor(gl_TexCoord[0].xy / pixelSize) * pixelSize).rgb; \
+				/*vec2 textureSize = (vec4(1.0, 1.0, 0.0, 0.0) * gl_TextureMatrix[0]).xy;*/ \
+				vec2 textureSize = vec2(800, 600); \
+				vec2 texPosTex = gl_TexCoord[0].xy * textureSize; \
+				texPosTex = (floor(texPosTex / pixelSize)) * pixelSize; \
+				gl_FragColor.rgb = texture2D(image, texPosTex / textureSize).rgb; \
 				gl_FragColor.a = 1.0; \
 			} \
 		");
 	}
-	
+
+	void setEffectWave()
+	{
+		setFragmentShaderAndLink((char *)"\
+			uniform sampler2D image; \
+			uniform float     amplitude; \
+			uniform float     width; \
+			uniform float     displacement; \
+			uniform float     alpha; \
+			vec2 fixCoord(vec2 v) { return (vec4(v.x, v.y, 0.0, 0.0) * gl_TextureMatrix[0]).xy; } \
+			void main() { \
+				vec2 pos           = gl_TexCoord[0].xy; \
+				vec2 amplitude2    = fixCoord(vec2(amplitude, 0.0)); \
+				vec2 width2        = fixCoord(vec2(width, 0.0)); \
+				vec2 displacement2 = fixCoord(vec2(displacement, 0.0)); \
+				pos = pos + vec2(amplitude2.x * cos((pos.y + displacement2.x) / width2.x * 3.14159), 0.0); \
+				gl_FragColor.rgb = texture2D(image, pos.xy).rgb; \
+				if (pos.x < 0.0 || pos.y < 0.0 || pos.x >= 1.0 || pos.y >= 1.0) { \
+					gl_FragColor.a = 0.0; \
+				} else { \
+					gl_FragColor.a = alpha; \
+				} \
+			} \
+		");
+	}
+
 	void setEffect(char *effectName = NULL)
 	{
 		if (effectName != NULL) {
@@ -363,6 +392,7 @@ class Effect : public ShaderProgram
 			if (strcmp((const char *)effectName, (const char *)"transition") == 0) return setEffectTransition();
 			if (strcmp((const char *)effectName, (const char *)"postEffect") == 0) return setEffectPostEffect();
 			if (strcmp((const char *)effectName, (const char *)"pixelate") == 0) return setEffectPixelate();
+			if (strcmp((const char *)effectName, (const char *)"wave") == 0) return setEffectWave();
 		}
 		return setEffectNormal();
 	}

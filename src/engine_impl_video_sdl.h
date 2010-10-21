@@ -446,9 +446,6 @@ public:
 			{
 				lastBitmapBind = this;
 				glEnable(GL_BLEND);
-				//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-				glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-				//glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
 				glEnable(GL_TEXTURE_2D);
 				glBindTexture(GL_TEXTURE_2D, gltex);
 				glMatrixMode(GL_TEXTURE); glLoadIdentity(); glScalef(1.0 / surface->w, 1.0 / surface->h, 1.0);
@@ -876,6 +873,22 @@ public:
 			assert(0);
 		#endif
 	}
+	
+	void setBlending(char *blending)
+	{
+		#ifdef USE_OPENGL
+			if (strcmp(blending, "normal") == 0) {
+				glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+				return;
+			}
+			if (strcmp(blending, "burn") == 0) {
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+				return;
+			}
+		#else
+			assert(0);
+		#endif
+	}
 
 	void setColorf(float colorf[4])
 	{
@@ -958,6 +971,9 @@ public:
 		#ifdef USE_OPENGL
 			screen->gl_render_to();
 			flip();
+			//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+			//glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE);
 		#endif
 
 		return screen;

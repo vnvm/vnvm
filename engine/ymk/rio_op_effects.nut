@@ -29,21 +29,34 @@ class RIO_OP_EFFECTS
 				}
 				this.scene.setEffect("normal");
 			break;
+			//case 6: // BOXES; // pw0002_1@0FC1
+			break;
+			//case 9: // DIAGONAL TRANSITION
+			break;
+			case 11: // COURTAIN TOP-BOTTOM:
+			case 12: // COURTAIN BOTTOM-TOP:
 			case 13: // COURTAIN LEFT->RIGHT
 			case 14: // COURTAIN RIGHT->LEFT
 				local mask2 = this.scene.maskLayer2;
 				mask2.clear([0, 0, 0, 1]);
 				local step_width = 16, wave_width = 64;
+				local vertical = (kind == 11) || (kind == 12);
+				local reverse  = (kind == 12) || (kind == 14);
+				local totalSize = vertical ? 600 : 800;
 
-				for (local n = 0; n < mask2.w; n += step_width) {
-					local nf = (n.tofloat() / mask2.w.tofloat()) * 255;
+				for (local n = 0; n < totalSize; n += step_width) {
+					local nf = (n.tofloat() / totalSize.tofloat()) * 255;
 					local set = [ nf, nf + wave_width ];
 					for (local m = 0; m < step_width; m++) {
 						local mf = m.tofloat() / step_width.tofloat();
 						local value = interpolate(set[0], set[1], mf) / (255.0 + wave_width);
-						if (kind == 14) value = 1.0 - value;
+						if (reverse) value = 1.0 - value;
 						mask2.setColor([value, 0, 0, 1.0]);
-						mask2.drawFillRect(n + m, 0, 1, mask2.h);
+						if (vertical) {
+							mask2.drawFillRect(0, n + m, mask2.w, 1);
+						} else {
+							mask2.drawFillRect(n + m, 0, 1, mask2.h);
+						}
 					}
 				}
 				
@@ -60,7 +73,56 @@ class RIO_OP_EFFECTS
 			break;
 			case 21: // PIXELATE
 				this.scene.setEffectCallback(function(scene, destinationBitmap, kind) {
-				});
+					local effect = Effect("pixelate");
+					local pixelSize = 1;
+					local maxPixelSize = 40;
+					local showBitmap;
+					if (scene.stepf < 0.5) {
+						local stepf = scene.stepf / 0.5;
+						pixelSize = (stepf * maxPixelSize.tofloat()).tointeger();
+						showBitmap = scene.showLayer;
+					} else {
+						local stepf = (scene.stepf - 0.5) / 0.5;
+						pixelSize = ((1.0 - stepf) * maxPixelSize.tofloat()).tointeger();
+						showBitmap = scene.drawLayer;
+					}
+					pixelSize = clamp(pixelSize, 1, maxPixelSize).tointeger();
+					//printf("pixelSize: %d\n", pixelSize);
+					effect.image = showBitmap;
+					effect.pixelSize = pixelSize.tofloat();
+					Screen.pushEffect(effect);
+					{
+						destinationBitmap.drawBitmap(showBitmap, 0, 0, 1.0);
+					}
+					Screen.popEffect();
+				}, kind);
+			break;
+			case 5:
+			case 22: // ZOOM IN
+			case 34:
+				this.scene.setEffectCallback(function(scene, destinationBitmap, kind) {
+					local alpha = scene.stepf;
+					destinationBitmap.drawBitmap(scene.showLayer, 0, 0, 1.0);
+					scene.drawLayer.cx = 400;
+					scene.drawLayer.cy = 300;
+					if (kind == 5) alpha = 1.0;
+					destinationBitmap.drawBitmap(scene.drawLayer, 400, 300, alpha, interpolate(3.0, 1.0, scene.stepf));
+					scene.drawLayer.cx = 0;
+					scene.drawLayer.cy = 0;
+				}, kind);
+			break;
+			case 35: // ZOOM OUT
+				this.scene.setEffectCallback(function(scene, destinationBitmap, kind) {
+					local alpha = 1.0 - scene.stepf;
+
+					destinationBitmap.drawBitmap(scene.drawLayer, 0, 0, 1.0);
+
+					scene.showLayer.cx = 400;
+					scene.showLayer.cy = 300;
+					destinationBitmap.drawBitmap(scene.showLayer, 400, 300, alpha, interpolate(1.0, 3.0, scene.stepf));
+					scene.showLayer.cx = 0;
+					scene.showLayer.cy = 0;
+				}, kind);
 			break;
 			case 23: // TRANSITION MASK (NO BLEND) (REVERSED=0)
 			case 24: // TRANSITION MASK (NO BLEND) (REVERSED=1)
@@ -76,8 +138,13 @@ class RIO_OP_EFFECTS
 				this.scene.setEffect("normal");
 			break;
 			case 26: // TRANSITION NORMAL FADE IN BURN (alpha)
-				this.scene.setEffect("normal");
-				this.TODO();
+				this.scene.setEffectCallback(function(scene, destinationBitmap, kind) {
+					destinationBitmap.drawBitmap(scene.showLayer, 0, 0, 1.0);
+					destinationBitmap.setBlending("burn");
+					destinationBitmap.drawBitmap(scene.drawLayer, 0, 0, scene.stepf);
+					destinationBitmap.setBlending("normal");
+				}, kind);
+				//this.TODO();
 				// Burn effect. glBlendFunc 
 			break;
 			case 28: // BOTTOM->TOP EFFECT
@@ -112,13 +179,40 @@ class RIO_OP_EFFECTS
 				//ms_time *= 2;
 			break;
 			case 36: // WAVE
-				this.scene.setEffect("normal");
-				this.TODO();
+				//ms_time *= 2;
+				this.scene.setEffectCallback(function(scene, destinationBitmap, kind) {
+					destinationBitmap.drawBitmap(scene.showLayer, 0, 0);
+					
+					local effect = Effect("wave");
+					effect.amplitude    = sin(scene.stepf * 3.145982 * 2) * 80.0;
+					effect.width        = 200.0;
+					effect.displacement = scene.stepf * 200.0;
+					//effect.width     = [240.0, 0.0];
+					effect.alpha     = scene.stepf;
+					Screen.pushEffect(effect);
+					{
+						destinationBitmap.drawBitmap(scene.drawLayer, 0, 0, 1.0);
+					}
+					Screen.popEffect();
+				}, kind);
+			break;
+			case 40: // ROTATE CLOCK WISE
+				this.scene.setEffectCallback(function(scene, destinationBitmap, kind) {
+					destinationBitmap.drawBitmap(scene.showLayer, 0, 0);
+					scene.drawLayer.cx = 400;
+					scene.drawLayer.cy = 300;
+					destinationBitmap.drawBitmap(scene.drawLayer, 400, 300, scene.stepf, 1.0, scene.stepf * PI * 2.0);
+					scene.drawLayer.cx = 0;
+					scene.drawLayer.cy = 0;
+				}, kind);
+			break;
+			//case 43: // STRETCHING EFFECT (pw0002_1@A5D2)
 			break;
 			case 42: // TRANSITION MASK (blend)
+			case 44: // TRANSITION MASK (blend) (reverse)
 				this.scene.setEffect("transition", {
-					blend = 1,
-					reverse = 0
+					blend   = 1,
+					reverse = (kind == 44) ? 1 : 0,
 					mask    = this.scene.maskLayer,
 				});
 				//printf("Effect::transition_blend\n");

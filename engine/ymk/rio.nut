@@ -304,8 +304,8 @@ class RIO extends Component
 		local start_pos = data.tell();
 		local op = data.readn('b');
 		local name = "?", params_format = "", vparams = [], variadic = false;
-		//local show_all_opcodes = true;
-		local show_all_opcodes = false;
+		local show_all_opcodes = true;
+		//local show_all_opcodes = false;
 		try {
 			local cop = RIO.opcodes[op];
 			name = cop.name;
