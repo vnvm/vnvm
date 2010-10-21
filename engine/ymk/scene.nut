@@ -9,38 +9,27 @@ class Scene extends Component
 	allUpdate   = null;
 	allDraw     = null;
 	drawLayer   = null;
+	tempLayer   = null;
 	maskLayer   = null;
+	maskLayer2  = null;
 	showLayer   = null;
 	effect      = null;
 	effectTimer = null;
+	state       = null;
 	stepf       = 0.0;
-	viewport    = null;
+	effectCallback = null;
+	effectCallbackParameter = null;
 	x = 0;
 	y = 0;
 	
 	not_ended_object = "<none>";
-	
-	function setViewport(sizef, center_x, center_y)
-	{
-		local virtual_screen_size = {w = 800 / sizef, h = 600 / sizef};
-		
-		//this.viewport = {size = size, x = x, y = y};
-		this.viewport = {
-			size = sizef,
-			x = -(center_x - virtual_screen_size.w / 2) * sizef,
-			y = -(center_y - virtual_screen_size.h / 2) * sizef,
-		};
-		printf("setViewport(%f, %d, %d) : (%d, %d)\n", sizef, center_x, center_y, viewport.x, viewport.y);
-	}
 	
 	constructor(state = null)
 	{
 		this.all        = array(8);
 		this.sprites_l1 = array(3);
 		this.sprites_l2 = array(3);
-		
-		this.setViewport(1.0, 400, 300);
-	
+
 		for (local n = 0; n < 8; n++) this.all[n] = SceneObject(null);
 
 		this.background    = this.all[0]; this.background.type = "background";
@@ -52,11 +41,16 @@ class Scene extends Component
 		this.sprites_l2[2] = this.all[6]; this.sprites_l2[2].type = "sprites_l2[2]";
 		this.overlay       = this.all[7]; this.overlay.type = "overlay";
 		
+		this.state         = state;
 		this.table         = SceneTable(state);
 		
 		this.drawLayer     = Bitmap(screen.w, screen.h);
 		this.maskLayer     = Bitmap(screen.w, screen.h);
+		this.maskLayer2    = Bitmap(screen.w, screen.h);
 		this.showLayer     = Bitmap(screen.w, screen.h);
+		this.tempLayer     = Bitmap(screen.w, screen.h);
+		
+		this.maskLayer2.clear([0, 0, 0, 1]);
 		
 		this.x = 0;
 		this.y = 0;
@@ -89,10 +83,35 @@ class Scene extends Component
 		printf("setEffect('%s')\n", effectName);
 		this.effect = Effect(effectName);
 		this.effect.image = drawLayer;
-		this.effect.mask  = maskLayer;
+		//this.effect.mask  = maskLayer;
 		foreach (k, v in extraParams) {
 			this.effect[k] = v;
 		}
+		setEffectCallback(normalEffectCallback);
+	}
+	
+	function normalEffectCallback(scene, destinationBitmap, param)
+	{
+		if ((scene.x != 0) || (scene.y != 0)) {
+			destinationBitmap.drawBitmap(scene.showLayer, 0, 0);
+		}
+
+		if (scene.stepf < 1) {
+			destinationBitmap.drawBitmap(scene.showLayer, scene.x, scene.y);
+		}
+		if (scene.stepf > 0) {
+			Screen.pushEffect(scene.effect);
+			{
+				destinationBitmap.drawBitmap(scene.drawLayer, scene.x, scene.y, 1.0, 1.0);
+			}
+			Screen.popEffect();
+		}
+	}
+	
+	function setEffectCallback(callback, param = null)
+	{
+		this.effectCallback = callback;
+		this.effectCallbackParameter = param;
 	}
 	
 	function setEffectTime(time = 0)
@@ -145,12 +164,31 @@ class Scene extends Component
 		foreach (obj in allDraw) {
 			obj.drawTo(this.drawLayer);
 		}
+
+		if (this.state.flags[999]) {
+			this.tempLayer.clear([0, 0, 0, 1]); this.tempLayer.drawBitmap(this.drawLayer);
+			
+			local effect = Effect("postEffect");
+			local eftype = this.state.flags[999].tointeger();
+			effect.image = this.tempLayer;
+			effect.eftype = eftype;
+			switch (eftype) {
+				case 3:
+					effect.color = rgb("efca97");
+				break;
+			}
+			Screen.pushEffect(effect);
+			{
+				this.drawLayer.drawBitmap(this.tempLayer, 0, 0, 1.0, 1.0);
+			}
+			Screen.popEffect();
+		}
 	}
 	
 	function copyDrawLayerToShowLayer()
 	{
 		this.showLayer.clear([0, 0, 0, 1]);
-		this.showLayer.drawBitmap(this.drawLayer, viewport.x, viewport.y, 1.0, viewport.size);
+		this.showLayer.drawBitmap(this.drawLayer, 0, 0, 1.0, 1.0);
 	}
 	
 	function drawTo(destinationBitmap)
@@ -167,13 +205,9 @@ class Scene extends Component
 
 		if (this.stepf > 0) {
 			this.updateDrawLayer();
-		
-			Screen.pushEffect(this.effect);
-			{
-				destinationBitmap.drawBitmap(this.drawLayer, x + viewport.x, y + viewport.y, 1.0, viewport.size);
-			}
-			Screen.popEffect();
 		}
+		
+		effectCallback(this, destinationBitmap, this.effectCallbackParameter);
 	}
 	
 	function saveStream(stream)

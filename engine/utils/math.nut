@@ -20,6 +20,11 @@ function pointInRect(point, rect)
 
 function interpolate(from, to, stepf)
 {
+	if ((typeof(from) == "array") && (typeof(to) == "array")) {
+		local ret = [];
+		for (local n = 0; n < from.len(); n++) ret.push(interpolate(from[n], to[n], stepf));
+		return ret;
+	}
 	stepf = clamp(stepf, 0.0, 1.0);
 	return (to - from) * stepf + from;
 }

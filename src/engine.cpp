@@ -37,7 +37,7 @@ void errorfunc(HSQUIRRELVM v,const SQChar *s,...)
 	va_end(vl);
 }
 
-extern "C" void game_main() {
+extern "C" void game_main(int argc, char **argv) {
 	v = sq_open(1024);	
 	//sq_setprintfunc(v, printfunc, errorfunc);
 	sq_setprintfunc(v, printfunc);
@@ -71,7 +71,7 @@ extern "C" void game_main() {
 		sq_push(v, -2);
 		sq_createslot(v, -4);
 		{
-			init_vm_system();
+			init_vm_system(argc, argv);
 		}
 		sq_pop(v, 1);
 

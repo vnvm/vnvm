@@ -81,3 +81,8 @@ function rgba(str)
 	}
 	return v;
 }
+
+function rgb(str)
+{
+	return rgba(str).slice(0, 3);
+}

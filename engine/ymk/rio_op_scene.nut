@@ -46,7 +46,6 @@ class RIO_OP_SCENE
 		this.scene.background.size = sizef;
 		this.scene.background.x = 400 - x * sizef;
 		this.scene.background.y = 300 - y * sizef;
-		//this.scene.setViewport(size / 100.0, x, y);
 		//this.TODO();
 		//this.interface.enabled = false;
 	}

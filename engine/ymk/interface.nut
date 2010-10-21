@@ -72,8 +72,8 @@ class Interface extends Component
 				this.position_title.y = interface_position.y + 26;
 				this.position_body.x  = interface_position.x + 52;
 				this.position_body.y  = interface_position.y + 64;
-				this.position_wait.x  = 680;
-				this.position_wait.y  = screen.h - 72;
+				this.position_wait.x  = interface_position.x + 650;
+				this.position_wait.y  = interface_position.y + 118;
 				this.color_border   = rgba("FFA700");
 			break;
 		}

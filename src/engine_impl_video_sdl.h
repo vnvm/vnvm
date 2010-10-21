@@ -692,8 +692,8 @@ public:
 		if (h == -1) h = Video_screen->h;
 		#ifdef USE_OPENGL
 			this->gl_render_to();
-			//gl_unbind();
-			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+			gl_unbind();
+			gl_set_color();
 			glMatrixMode(GL_MODELVIEW); glLoadIdentity(); glTranslatef(x, y, 0);
 			glBegin(GL_QUADS);
 				glTexCoord2i(x + 0, y + 0); glVertex2i(0, 0); 
@@ -776,6 +776,10 @@ public:
 	}
 	
 	void save(char *filename, char *format) {
+		#if USE_OPENGL
+			gl_bind();
+			this->gl_render_to();
+		#endif
 		if (strcmp(format, "bmp") == 0) {
 			SDL_SaveBMP(this->surface, filename);
 			return;
@@ -805,9 +809,6 @@ public:
 			return;
 		}
 		if (strcmp(format, "png") == 0) {
-			#if USE_OPENGL
-				gl_bind();
-			#endif
 			FILE *f = fopen(filename, "wb");
 			if (f) {
 				fwrite_png(f, surface);
@@ -895,6 +896,7 @@ public:
 		#ifdef USE_OPENGL
 			//printf("%d, %d, %d, %d\n", color.r, color.g, color.b, color.a);
 			this->gl_render_to();
+			gl_unbind();
 			glClearColor((float)color.r / 255.0f, (float)color.g / 255.0f, (float)color.b / 255.0f, (float)color.a / 255.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			if (!isScreen()) {

@@ -175,6 +175,11 @@ function export_images_to_translate() {
 //rio.load("EVCHK")
 
 //rio.save("MAINMENU.BIN");
+
+if (info.auto_quick_load) {
+	rio.state.load(100);
+}
+
 rio.execute();
 
 //arc_bgm.print(); local music = Music.fromStream(arc_bgm["BGM07.OGG"]); music.play(); loop_forever();

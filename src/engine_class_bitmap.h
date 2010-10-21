@@ -395,6 +395,16 @@ DSQ_METHOD(Bitmap, setColorKey)
 }
 */
 
+DSQ_METHOD(Bitmap, setColor)
+{
+	float colorf[] = {1, 1, 1, 1};
+	EXTRACT_PARAM_START();
+	EXTRACT_PARAM_SELF(Bitmap);
+	EXTRACT_PARAM_COL(2, colorf);
+	self->setColorf(colorf);
+	return 0;
+}
+
 void engine_register_bitmap()
 {
 	// Bitmap.
@@ -411,6 +421,7 @@ void engine_register_bitmap()
 		NEWSLOT_METHOD(Bitmap, slice, 0, ".");
 		NEWSLOT_METHOD(Bitmap, split, 0, ".");
 		NEWSLOT_METHOD(Bitmap, clear, 0, ".");
+		NEWSLOT_METHOD(Bitmap, setColor, 0, ".");
 		NEWSLOT_METHOD(Bitmap, drawBitmap, 0, ".");
 		NEWSLOT_METHOD(Bitmap, drawFillRect, 0, ".");
 		NEWSLOT_METHOD(Bitmap, copyChannel, 0, ".");

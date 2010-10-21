@@ -50,5 +50,5 @@ IF EXIST "engine.exe" (
 	del engine.lib 2> NUL
 	del vc90.pdb 2> NUL
 	del vc100.pdb 2> NUL
-	engine.exe
+	engine.exe %*
 )

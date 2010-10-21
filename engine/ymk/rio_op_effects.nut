@@ -29,27 +29,97 @@ class RIO_OP_EFFECTS
 				}
 				this.scene.setEffect("normal");
 			break;
-			case 13: // TRANSITION MASK (show)
+			case 13: // COURTAIN LEFT->RIGHT
+			case 14: // COURTAIN RIGHT->LEFT
+				local mask2 = this.scene.maskLayer2;
+				mask2.clear([0, 0, 0, 1]);
+				local step_width = 16, wave_width = 64;
+
+				for (local n = 0; n < mask2.w; n += step_width) {
+					local nf = (n.tofloat() / mask2.w.tofloat()) * 255;
+					local set = [ nf, nf + wave_width ];
+					for (local m = 0; m < step_width; m++) {
+						local mf = m.tofloat() / step_width.tofloat();
+						local value = interpolate(set[0], set[1], mf) / (255.0 + wave_width);
+						if (kind == 14) value = 1.0 - value;
+						mask2.setColor([value, 0, 0, 1.0]);
+						mask2.drawFillRect(n + m, 0, 1, mask2.h);
+					}
+				}
+				
+				//ms_time *= 20;
+				
+				ms_time *= 2;
+				
+				//mask2.save("test2.png", "png");
 				this.scene.setEffect("transition", {
-					blend = 0,
-					reverse = 1
+					blend   = 0,
+					reverse = 0,
+					mask    = mask2,
 				});
-				//printf("Effect::transition_show\n");
 			break;
-			case 23: // TRANSITION MASK (show)
-				this.scene.setEffect("transition", {
-					blend = 0,
-					reverse = 0
+			case 21: // PIXELATE
+				this.scene.setEffectCallback(function(scene, destinationBitmap, kind) {
 				});
-				//printf("Effect::transition_show\n");
+			break;
+			case 23: // TRANSITION MASK (NO BLEND) (REVERSED=0)
+			case 24: // TRANSITION MASK (NO BLEND) (REVERSED=1)
+				this.scene.setEffect("transition", {
+					blend   = 0,
+					reverse = ((kind == 24) ? 1 : 0),
+					mask    = this.scene.maskLayer,
+				});
+				ms_time *= 2;
+				//printf("Effect::transition_hide_show\n");
 			break;
 			case 25: // TRANSITION NORMAL FADE IN (alpha)
 				this.scene.setEffect("normal");
+			break;
+			case 26: // TRANSITION NORMAL FADE IN BURN (alpha)
+				this.scene.setEffect("normal");
+				this.TODO();
+				// Burn effect. glBlendFunc 
+			break;
+			case 28: // BOTTOM->TOP EFFECT
+			case 29: // TOP->BOTTOM EFFECT
+			case 30: // RIGHT->LEFT EFFECT
+			case 31: // LEFT->RIGHT EFFECT
+				//this.scene.setEffect("normal");
+				this.scene.setEffectCallback(function(scene, destinationBitmap, kind) {
+					local vector = {x=0, y=0};
+					
+					switch (kind) {
+						case 28: vector = {x= 0, y=-1}; break;
+						case 29: vector = {x= 0, y= 1}; break;
+						case 30: vector = {x=-1, y= 0}; break;
+						case 31: vector = {x= 1, y= 0}; break;
+					}
+					
+					destinationBitmap.drawBitmap(scene.showLayer, 0, 0);
+					destinationBitmap.drawBitmap(
+						scene.showLayer,
+						(scene.stepf * 800) * vector.x,
+						(scene.stepf * 600) * vector.y,
+						1.0 - scene.stepf
+					);
+					destinationBitmap.drawBitmap(
+						scene.drawLayer,
+						(scene.stepf * 800) * vector.x - (800 * vector.x),
+						(scene.stepf * 600) * vector.y - (600 * vector.y),
+						scene.stepf
+					);
+				}, kind);
+				//ms_time *= 2;
+			break;
+			case 36: // WAVE
+				this.scene.setEffect("normal");
+				this.TODO();
 			break;
 			case 42: // TRANSITION MASK (blend)
 				this.scene.setEffect("transition", {
 					blend = 1,
 					reverse = 0
+					mask    = this.scene.maskLayer,
 				});
 				//printf("Effect::transition_blend\n");
 			break;
@@ -58,6 +128,8 @@ class RIO_OP_EFFECTS
 				this.TODO();
 			break;
 		}
+		
+		//this.TODO();
 		
 		if (ms_time <= 225 && ms_time > 10) {
 			input.setVibration(0.2, 0.8, 40 * (300.0 / ms_time.tofloat()), 0);

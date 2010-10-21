@@ -10,6 +10,7 @@ include("utils/timer.nut");
 info.game_data_path <- info.engine_path + "/../game_data";
 info.game_save_path <- info.engine_path + "/../game_save";
 info.game_lang <- "es";
+info.auto_quick_load <- false;
 
 printf("Information:\n");
 printf("  Platform: %s\n", info.platform);
@@ -18,6 +19,7 @@ printf("  Engine path: %s\n", info.engine_path);
 printf("  Game data path: %s\n", info.game_data_path);
 printf("  Game save path: %s\n", info.game_save_path);
 printf("  Game language: %s\n", info.game_lang);
+printf("  Game argv: %s\n", object_to_string(info.argv));
 
 function loop_forever(fps = 40)
 {

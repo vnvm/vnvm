@@ -153,6 +153,8 @@ class EffectValues
 	#ifdef USE_OPENGL
 	void send(int& index, bool showDebugParams = false)
 	{
+		// @TODO: Check types and sizes.
+		// glGetActiveUniformsiv
 		switch (this->type)
 		{
 			case EVT_INT   :
@@ -311,6 +313,47 @@ class Effect : public ShaderProgram
 		");
 	}
 	
+	void setEffectPostEffect()
+	{
+		setFragmentShaderAndLink((char *)"\
+			uniform sampler2D image; \
+			uniform vec3      color; \
+			uniform int       eftype; \
+			vec3 rgbToVec3(int r, int g, int b) { \
+				return vec3(float(r) / 255.0, float(g) / 255.0, float(b) / 255.0); \
+			} \
+			void main() { \
+				vec3 texPixelColor = texture2D(image, gl_TexCoord[0].xy).rgb; \
+				switch (eftype) { \
+					default : \
+					case 0: /* normal */ \
+						gl_FragColor.rgb = texPixelColor; \
+					break; \
+					case 1: /* invert */ \
+						gl_FragColor.rgb = vec3(1.0) - texPixelColor; \
+					break; \
+					case 3: /* colorize */ \
+						gl_FragColor.rgb = color * ((texPixelColor.r + texPixelColor.g + texPixelColor.b) / 3.0); \
+					break; \
+				} \
+				gl_FragColor.a = 1.0; \
+			} \
+		");
+	}
+
+	void setEffectPixelate()
+	{
+		setFragmentShaderAndLink((char *)"\
+			uniform sampler2D image; \
+			uniform float     pixelSize; \
+			\
+			void main() { \
+				gl_FragColor.rgb = texture2D(image, floor(gl_TexCoord[0].xy / pixelSize) * pixelSize).rgb; \
+				gl_FragColor.a = 1.0; \
+			} \
+		");
+	}
+	
 	void setEffect(char *effectName = NULL)
 	{
 		if (effectName != NULL) {
@@ -318,6 +361,8 @@ class Effect : public ShaderProgram
 			if (strcmp((const char *)effectName, (const char *)"tint") == 0) return setEffectTint();
 			if (strcmp((const char *)effectName, (const char *)"invert") == 0) return setEffectInvert();
 			if (strcmp((const char *)effectName, (const char *)"transition") == 0) return setEffectTransition();
+			if (strcmp((const char *)effectName, (const char *)"postEffect") == 0) return setEffectPostEffect();
+			if (strcmp((const char *)effectName, (const char *)"pixelate") == 0) return setEffectPixelate();
 		}
 		return setEffectNormal();
 	}

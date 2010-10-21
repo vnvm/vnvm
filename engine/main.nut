@@ -1,5 +1,10 @@
 include("common.nut");
 
+if ((info.argv.len() >= 2) && (info.argv[1] == "qload")) {
+	info.auto_quick_load <- true;
+	info.game_data_path <- info.game_data_path + "/pw"; include("ymk/main.nut"); return;
+}
+
 //include("test.nut");
 
 if (exists_in_game_path_any(["chip.arc"])) {
