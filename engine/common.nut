@@ -21,6 +21,9 @@ printf("  Game save path: %s\n", info.game_save_path);
 printf("  Game language: %s\n", info.game_lang);
 printf("  Game argv: %s\n", object_to_string(info.argv));
 
+;
+//printf("  TEST BINARY: %d\n", ("z" + "\0z").len());
+
 function loop_forever(fps = 40)
 {
 	while (1) { Screen.flip(); Screen.frame(40); }

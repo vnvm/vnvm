@@ -534,6 +534,31 @@ void engine_register_screen()
 	CLASS_END;
 }
 
+#include "engine_iconv.h"
+
+DSQ_FUNC(iconv)
+{
+	EXTRACT_PARAM_START();
+	EXTRACT_PARAM_STR(2, in_charset_name, NULL);
+	EXTRACT_PARAM_STR(3, out_charset_name, NULL);
+	EXTRACT_PARAM_STR(4, text, NULL);
+	
+	void *out_ptr = NULL;
+	int out_len = 0;
+	
+	iconv(
+		in_charset_name.stringz,
+		out_charset_name.stringz,
+		text.stringz,
+		text.len,
+		&out_ptr,
+		&out_len
+	);
+	
+	sq_pushstring(v, (char *)out_ptr, out_len);
+	return 1;
+}
+
 void engine_register_functions()
 {
 	NEWSLOT_FUNC(printf, 0, "");
@@ -541,6 +566,8 @@ void engine_register_functions()
 
 	NEWSLOT_FUNC(sign, 0, "");
 	NEWSLOT_FUNC(replace, 0, "");
+	
+	NEWSLOT_FUNC(iconv, 0, "");
 
 	NEWSLOT_FUNC(lz_decode, 0, "");
 	

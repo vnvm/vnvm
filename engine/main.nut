@@ -1,4 +1,5 @@
 include("common.nut");
+include("tests.nut");
 
 if ((info.argv.len() >= 2) && (info.argv[1] == "qload")) {
 	info.auto_quick_load <- true;
