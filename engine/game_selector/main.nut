@@ -1,15 +1,16 @@
 class Engine
 {
-	name = "";
+	name        = "";
 	engine_name = "";
-	image = null;
-	alpha = 0.3;
-	alphaFrom = 0;
-	alphaTo = 0;
-	alphaStep = 0;
-	selected = -1;
-	enabled = 0;
-	base_path = "";
+	image       = null;
+	alpha       = 0.3;
+	alphaFrom   = 0;
+	alphaTo     = 0;
+	alphaStep   = 0;
+	selected    = -1;
+	enabled     = 0;
+	base_path   = "";
+	rect        = null;
 
 	constructor(name, engine_name)
 	{
@@ -50,24 +51,48 @@ engines.push(Engine("pw", "ymk"));
 engines.push(Engine("ymk", "ymk"));
 engines.push(Engine("dividead", "dividead"));
 engines.push(Engine("tlove", "tlove"));
+local x = 8, y = 8;
+foreach (index, engine in engines) {
+	engine.rect = {x = x, y = y, w = engine.image.w, h = engine.image.h };
+	y += engine.image.h + 8;
+}
 
 //local image = Bitmap.fromFile(info.game_data_path + "/pw/translation/es/EC_001.0 - copia.png");
 
+
+local option_index = 0;
 while (1) {
 	local selectedEngine = null;
+	local using_mouse = false;
+	local option_clicked = false;
 
 	while (selectedEngine == null) {
-		input.update();
+		::input.update();
+		
+		if (::input.pad_pressed("up"    )) { option_index--; using_mouse = false; option_index = clamp(option_index, 0, engines.len() - 1); }
+		if (::input.pad_pressed("down"  )) { option_index++; using_mouse = false; option_index = clamp(option_index, 0, engines.len() - 1); }
+		if (::input.pad_pressed("accept")) { option_clicked = true; using_mouse = false; }
+		if (::input.pad_pressed("cancel")) { }
+		
+		if (::input.mouseMoved()) using_mouse = true;
+		if (::input.mouse.pressed(0)) {
+			option_clicked = true;
+			using_mouse = true;
+		}
+		
+		if (using_mouse) {
+			option_index = -1;
+			foreach (n, engine in engines) if (::input.mouseInRect(engine.rect)) option_index = n;
+		}
 		
 		screen.clear([0, 0, 0, 1]);
 
-		local y = 8;
-		local x = 8;
-		foreach (engine in engines) {
+		local x = 8, y = 8;
+		foreach (index, engine in engines) {
 			if (!engine.enabled) continue;
-			if (::input.mouseInRect({x=x, y=y, w=engine.image.w, h=engine.image.h})) {
+			if (index == option_index) {
 				engine.setSelected(1);
-				if (input.mouse.clicked(0)) {
+				if (option_clicked) {
 					selectedEngine = engine;
 				}
 			} else {

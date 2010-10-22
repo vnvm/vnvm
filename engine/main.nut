@@ -3,7 +3,9 @@ include("tests.nut");
 
 if ((info.argv.len() >= 2) && (info.argv[1] == "qload")) {
 	info.auto_quick_load <- true;
-	info.game_data_path <- info.game_data_path + "/pw"; include("ymk/main.nut"); return;
+	local subgame_path = "pw";
+	if (info.argv.len() >= 3) subgame_path = info.argv[2];
+	info.game_data_path <- info.game_data_path + "/" + subgame_path;
 }
 
 //include("test.nut");

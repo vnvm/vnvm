@@ -34,12 +34,13 @@ class Interface extends Component
 		local iwait = wip_clkwait.images[0];
 
 		this.wip_winbase0 = resman.get_image("WINBASE0", 0);
-		interface_position = {x=800 / 2 - wip_winbase0.infos[0].w / 2, y=600 - wip_winbase0.infos[0].h - 8};
+		this.interface_position = {x=800 / 2 - wip_winbase0.infos[0].w / 2, y=600 - wip_winbase0.infos[0].h};
 
 		local num_buttons = 0;
 		switch (engine_version) {
 			case "pw":
 				this.wip_clkwait_frames = iwait.slice(1, 0, iwait.w, iwait.h).split(55, iwait.h);
+				this.interface_position.y -= 8;
 				num_buttons = 9;
 			break;
 			default:
@@ -53,12 +54,22 @@ class Interface extends Component
 		for (local n = 1; n <= num_buttons; n++) {
 			buttons[n] <- {
 				index   = n,
+				action  = "none",
 				enabled = 0,
 				hover   = 0,
 			};
 		}
-		buttons[1].enabled = 1;
-		buttons[2].enabled = 1;
+		switch (engine_version) {
+			case "pw":
+				buttons[1].enabled = 1; buttons[1].action = "QLOAD";
+				buttons[2].enabled = 1; buttons[2].action = "QSAVE";
+			break;
+			case "ymk":
+			default:
+				buttons[1].enabled = 1; buttons[1].action = "QSAVE";
+				buttons[2].enabled = 1; buttons[2].action = "QLOAD";
+			break;
+		}
 
 		this.position_title = { x = 60, y = screen.h - 152, w = 0, h = 0};
 		this.position_body  = { x = 80, y = 512           , w = 0, h = 0};
@@ -96,9 +107,9 @@ class Interface extends Component
 			if (::input.mouseInRect(rect)) {
 				if (::input.mouse.clicked(0)) {
 					printf("UI Clicked: %d (%s)\n", button.index, object_to_string(rect));
-					switch (button.index) {
-						case 1: this.rio.opcall("RUN_QLOAD", []); break;
-						case 2: this.rio.opcall("RUN_QSAVE", []); break;
+					switch (button.action) {
+						case "QLOAD": this.rio.opcall("RUN_QLOAD", []); break;
+						case "QSAVE": this.rio.opcall("RUN_QSAVE", []); break;
 					}
 					return;
 				}

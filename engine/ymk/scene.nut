@@ -259,15 +259,15 @@ class SceneTable extends Component
 		local click = 0;
 		local mask_kind = 0;
 
-		if (input.pad_pressed("up"    )) { this.table.keymap_move( 0, -1); this.table.using_mouse = false; }
-		if (input.pad_pressed("down"  )) { this.table.keymap_move( 0,  1); this.table.using_mouse = false; }
-		if (input.pad_pressed("left"  )) { this.table.keymap_move(-1,  0); this.table.using_mouse = false; }
-		if (input.pad_pressed("right" )) { this.table.keymap_move( 1,  0); this.table.using_mouse = false; }
-		if (input.pad_pressed("accept")) { click =  1; this.table.using_mouse = false; }
-		if (input.pad_pressed("cancel")) { click = -1; this.table.using_mouse = false; }
+		if (::input.pad_pressed("up"    )) { this.table.keymap_move( 0, -1); this.table.using_mouse = false; }
+		if (::input.pad_pressed("down"  )) { this.table.keymap_move( 0,  1); this.table.using_mouse = false; }
+		if (::input.pad_pressed("left"  )) { this.table.keymap_move(-1,  0); this.table.using_mouse = false; }
+		if (::input.pad_pressed("right" )) { this.table.keymap_move( 1,  0); this.table.using_mouse = false; }
+		if (::input.pad_pressed("accept")) { click =  1; this.table.using_mouse = false; }
+		if (::input.pad_pressed("cancel")) { click = -1; this.table.using_mouse = false; }
 
 		//printf("@@@@@@@@@POSITION: (%d, %d, %d)\n", this.table.position.x, this.table.position.y, this.table.position.kind);
-		if (input.mouseMoved()) {
+		if (::input.mouseMoved()) {
 			this.table.using_mouse = true;
 		}
 		

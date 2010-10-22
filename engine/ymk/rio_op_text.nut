@@ -54,6 +54,9 @@ class RIO_OP_TEXT
 		local option_w = selwnd0.images[0].w;
 		local option_h = selwnd0.images[0].h;
 		local margin_h = 16;
+		local using_mouse = true;
+		local option_index = 0;
+		local option_clicked = false;
 
 		foreach (option in options) {
 			option.rect <- {x=screen.w / 2 - option_w / 2, y=100 + option.n * (option_h + margin_h), w=option_w, h=option_h};
@@ -63,13 +66,32 @@ class RIO_OP_TEXT
 		while (selectedOption == null) {
 			::input.update();
 			
+			option_clicked = false; 
+			
+			if (::input.pad_pressed("up"    )) { option_index--; using_mouse = false; option_index = clamp(option_index, 0, options.len() - 1); }
+			if (::input.pad_pressed("down"  )) { option_index++; using_mouse = false; option_index = clamp(option_index, 0, options.len() - 1); }
+			if (::input.pad_pressed("accept")) { option_clicked = true; using_mouse = false; }
+			if (::input.pad_pressed("cancel")) { }
+			
+			if (::input.mouseMoved()) using_mouse = true;
+			if (::input.mouse.pressed(0)) {
+				option_clicked = true;
+				using_mouse = true;
+			}
+			
+			if (using_mouse) {
+				option_index = -1;
+				foreach (n, option in options) if (::input.mouseInRect(option.rect)) option_index = n;
+			}
+			
 			this.drawTo(screen);
 
-			foreach (option in options) {
+			foreach (n, option in options) {
 				local selwnd = selwnd0;
-				if (pointInRect({x=::input.mouse.x, y=::input.mouse.y}, option.rect)) {
+				//if (pointInRect({x=::input.mouse.x, y=::input.mouse.y}, option.rect)) {
+				if (n == option_index) {
 					selwnd = selwnd1;
-					if (::input.mouse.pressed(0)) {
+					if (option_clicked) {
 						selectedOption = option;
 						::input.update();
 					}
