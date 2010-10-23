@@ -137,6 +137,7 @@ function export_images_to_translate() {
 	for (local n = 1; n <= 18; n++) resman.get_image(format("EC_%03d", n)).export(path_to_files + "/translation/en");
 	resman.get_image("MAIN_BGP").export(path_to_files + "/translation/en");
 }
+//resman.get_image("CONTINUE").export(path_to_files + "/translation/en");
 //export_images_to_translate();
 
 //resman.get_image("EC_001").images[0].save("EC_001.tga", "tga");

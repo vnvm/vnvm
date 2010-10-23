@@ -140,9 +140,11 @@ class RIO_OP_EFFECTS
 			case 26: // TRANSITION NORMAL FADE IN BURN (alpha)
 				this.scene.setEffectCallback(function(scene, destinationBitmap, kind) {
 					destinationBitmap.drawBitmap(scene.showLayer, 0, 0, 1.0);
-					destinationBitmap.setBlending("burn");
-					destinationBitmap.drawBitmap(scene.drawLayer, 0, 0, scene.stepf);
-					destinationBitmap.setBlending("normal");
+					destinationBitmap.setBlending("burn"  ); destinationBitmap.drawBitmap(scene.drawLayer, 0, 0, scene.stepf * 2.0);
+					destinationBitmap.setBlending("normal"); destinationBitmap.drawBitmap(scene.drawLayer, 0, 0, (scene.stepf - 0.5) * 2.0);
+					// @TODO: Check this works.
+					//destinationBitmap.setBlending("burn"  ); destinationBitmap.drawBitmap(scene.drawLayer, 0, 0, convertRange(scene.stepf, 0.0, 0.5, 0.0, 1.0));
+					//destinationBitmap.setBlending("normal"); destinationBitmap.drawBitmap(scene.drawLayer, 0, 0, convertRange(scene.stepf, 0.5, 1.0, 0.0, 1.0));
 				}, kind);
 				//this.TODO();
 				// Burn effect. glBlendFunc 
@@ -189,6 +191,9 @@ class RIO_OP_EFFECTS
 					effect.displacement = scene.stepf * 200.0;
 					//effect.width     = [240.0, 0.0];
 					effect.alpha     = scene.stepf;
+					
+					destinationBitmap.drawBitmap(scene.drawLayer, 0, 0, 1.0);
+
 					Screen.pushEffect(effect);
 					{
 						destinationBitmap.drawBitmap(scene.drawLayer, 0, 0, 1.0);

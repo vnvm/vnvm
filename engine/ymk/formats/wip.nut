@@ -122,17 +122,19 @@ class WIP
 function WIP_MSK(wip_s, msk_s, name) {
 	local translation_path = info.game_data_path + "/translation/" + ::info.game_lang + "/";
 	local wip = WIP(wip_s, name);
+	local msk = null;
 	try {
-		local msk = WIP(msk_s, name);
-		for (local n = 0; n < wip.images.len(); n++) {
-			local slice_image = format("%s/%s.%d.png", translation_path, name, n);
-			if (file_exists(slice_image)) {
-				wip.images[n] = Bitmap.fromFile(slice_image);
-			} else {
-				wip.images[n].copyChannel(msk.images[n], "red", "alpha", 1);
-			}
-		}
+		msk = WIP(msk_s, name);
 	} catch (e) {
+	}
+	for (local n = 0; n < wip.images.len(); n++) {
+		local slice_image_file = format("%s/%s.%d.png", translation_path, name, n);
+		//printf("FILE: '%s'\n", slice_image_file);
+		if (file_exists(slice_image_file)) {
+			wip.images[n] = Bitmap.fromFile(slice_image_file);
+		} else {
+			if (msk) wip.images[n].copyChannel(msk.images[n], "red", "alpha", 1);
+		}
 	}
 	return wip;
 }

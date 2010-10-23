@@ -69,7 +69,7 @@ class RESMAN
 		local type = "WIP";
 		local index_name = name + "." + type;
 		if (!(index_name in resources)) {
-			printf("RESMAN.Loading '%s'...", name);
+			printf("RESMAN.Loading (%s) '%s'...", type, name);
 			local data = callback(name);
 			local size = data.memory_size;
 			printf("loaded (size:%d)\n", size);

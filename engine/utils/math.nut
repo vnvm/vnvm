@@ -10,6 +10,15 @@ function between(v, m, M)
 	return (v >= m) && (v < M);
 }
 
+function convertRange(value, from1, to1, from2 = 0.0, to2 = 1.0, clamp = true)
+{
+	local size1 = to1 - from1;
+	local size2 = to2 - from2;
+	local result = (((value - from1) / size1) * size2) + from2;
+	if (clamp) result = ::clamp(from2, to2);
+	return result;
+}
+
 function pointInRect(point, rect)
 {
 	return (
