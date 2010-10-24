@@ -56,7 +56,7 @@
 #define EXTRACT_PARAM_START() int nargs = sq_gettop(v);
 #define EXTRACT_PARAM_SELF(TYPE) TYPE *self = NULL; (nargs >= 1) && sq_getinstanceup(v, 1, (SQUserPointer *)&self, SQTAG_##TYPE); if (self == NULL) return 0;
 #define EXTRACT_PARAM_OBJ(N, TYPE, V) TYPE *V = NULL; (nargs >= N) && sq_getinstanceup(v, N, (SQUserPointer *)&V, SQTAG_##TYPE);
-#define EXTRACT_PARAM_STR(N, V, D) STRING V = {(ubyte *)D, sizeof(D) - 1}; (nargs >= N) && (sq_getstring(v, N, (const SQChar **)&V.data) == 0) && (V.len = strlen((const char *)V.data));
+#define EXTRACT_PARAM_STR(N, V, D) STRING V = {(ubyte *)D, sizeof(D) - 1}; (nargs >= N) && (sq_getstring(v, N, (const SQChar **)&V.data) == 0) && (V.len = sq_getsize(v, N));
 #define EXTRACT_PARAM_INT(N, V, D) int V = D; (nargs >= N) && sq_getinteger(v, N, &V);
 #define EXTRACT_PARAM_FLO(N, V, D) float V = D; (nargs >= N) && sq_getfloat(v, N, &V);
 #define EXTRACT_PARAM_COL(N, V) /*float V[4] = D;*/ (nargs >= N) && color_extract(v, N, &V);

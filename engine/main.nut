@@ -34,10 +34,18 @@ if (exists_in_game_path_any(["chip.arc"])) {
 	include("tlove/main.nut");
 } else if (exists_in_game_path_any(["sysprg.arc"])) {
 	// -----------------
-	// True love
+	// Ethornell
 	// -----------------
-	// True love
+	// Shuffle!
+	// Edelweiss
+	// ...
 	include("shuffle/main.nut");
+} else if (exists_in_game_path_any(["MSD", "SE", "VOICE"])) {
+	// -----------------
+	// Sono hanabira
+	// -----------------
+	// Sono hanabira
+	include("hanabira/main.nut");
 } else {
 	include("game_selector/main.nut");
 	//printf("Not detected any compatible Visual Novel\n");

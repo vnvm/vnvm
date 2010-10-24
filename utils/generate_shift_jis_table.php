@@ -41,3 +41,10 @@ unsigned short table_sjis_translate_ex(SJIS_COVERT *table_ptr, int table_len, un
 
 EOF
 );
+
+$f = fopen('charset.bin', 'wb');
+for ($n = 0; $n < 256; $n++) $table[] = $n;
+$table = array_unique($table, SORT_NUMERIC);
+asort($table);
+foreach ($table as $to) fwrite($f, pack('v', $to));
+fclose($f);

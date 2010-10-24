@@ -34,6 +34,16 @@ DSQ_METHOD(Music, fromStream)
 	return 1;
 }
 
+DSQ_METHOD(Music, fromFile)
+{
+	EXTRACT_PARAM_START();
+	EXTRACT_PARAM_STR(2, s, NULL);
+
+	Music *music = Music::loadFromFile(s.stringz);
+	CREATE_OBJECT(Music, music);
+	return 1;
+}
+
 DSQ_METHOD(Music, play)
 {
 	EXTRACT_PARAM_START();
@@ -66,6 +76,7 @@ void engine_register_music()
 	CLASS_START(Music);
 	{
 		NEWSLOT_METHOD(Music, fromStream, 0, "");
+		NEWSLOT_METHOD(Music, fromFile, 0, "");
 		NEWSLOT_METHOD(Music, _typeof, 0, "");
 		NEWSLOT_METHOD(Music, play, 0, ".");
 		NEWSLOT_METHOD(Music, playing, 0, "");

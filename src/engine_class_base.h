@@ -559,6 +559,57 @@ DSQ_FUNC(iconv)
 	return 1;
 }
 
+#include "engine_md5.h"
+
+/*
+extern void MD5_Init(MD5_CTX *ctx);
+extern void MD5_Update(MD5_CTX *ctx, void *data, unsigned long size);
+extern void MD5_Final(unsigned char *result, MD5_CTX *ctx);
+*/
+
+DSQ_FUNC(md5)
+{
+	EXTRACT_PARAM_START();
+	EXTRACT_PARAM_STR(2, input, NULL);
+	EXTRACT_PARAM_INT(1, output_binary, 0);
+	
+	unsigned char output_bin[16];
+	MD5_CTX ctx;
+	MD5_Init(&ctx);
+	MD5_Update(&ctx, input.stringz, input.len);
+	MD5_Final(output_bin, &ctx);
+	if (output_binary) {
+		sq_pushstring(v, (const SQChar *)output_bin, 16);
+	} else {
+		unsigned char output_str[32];
+		static const char hex_chars[] = "0123456789abcdef";
+		for (int n = 0; n < 16; n++) {
+			output_str[n * 2 + 0] = hex_chars[(output_bin[n] >> 4) & 0xF];
+			output_str[n * 2 + 1] = hex_chars[(output_bin[n] >> 0) & 0xF];
+		}
+
+		sq_pushstring(v, (const SQChar *)output_str, 32);
+	}
+	return 1;
+}
+
+DSQ_FUNC(xor_string)
+{
+	EXTRACT_PARAM_START();
+	EXTRACT_PARAM_STR(2, input, NULL);
+	EXTRACT_PARAM_STR(3, mask, NULL);
+	
+	//printf("%d, %d\n", input.len, mask.len);
+
+	char *output = (char *)sq_getscratchpad(v, input.len);
+	for (int n = 0; n < input.len; n++) {
+		output[n] = input.stringz[n] ^ mask.stringz[n % mask.len];
+	}
+	
+	sq_pushstring(v, output, input.len);
+	return 1;
+}
+
 void engine_register_functions()
 {
 	NEWSLOT_FUNC(printf, 0, "");
@@ -568,6 +619,8 @@ void engine_register_functions()
 	NEWSLOT_FUNC(replace, 0, "");
 	
 	NEWSLOT_FUNC(iconv, 0, "");
+	NEWSLOT_FUNC(md5, 0, "");
+	NEWSLOT_FUNC(xor_string, 0, "");
 
 	NEWSLOT_FUNC(lz_decode, 0, "");
 	

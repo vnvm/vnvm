@@ -269,6 +269,17 @@ SQInteger _stream_writestream(HSQUIRRELVM v)
 	return 0;
 }
 
+SQInteger _stream_writestring(HSQUIRRELVM v)
+{
+	SQChar *data = NULL;
+	SQInteger size = 0;
+	SETUP_STREAM(v);
+	sq_getstring(v, 2, (const SQChar **)&data);
+	size = sq_getsize(v, 2);
+	if (self->Write(data, size) != size) return sq_throwerror(v, _SC("io error"));
+	sq_pushinteger(v, size);
+	return 1;
+}
 
 SQInteger _stream_writen(HSQUIRRELVM v)
 {
@@ -405,6 +416,7 @@ static SQRegFunction _stream_methods[] = {
 	_DECL_STREAM_FUNC(readstringz,2,_SC("xn")),
 	_DECL_STREAM_FUNC(writeblob,-2,_SC("xx")),
 	_DECL_STREAM_FUNC(writestream,-2,_SC("xx")),
+	_DECL_STREAM_FUNC(writestring,-2,_SC("xs")),
 	_DECL_STREAM_FUNC(writen,3,_SC("xnn")),
 	_DECL_STREAM_FUNC(seek,-2,_SC("xnn")),
 	_DECL_STREAM_FUNC(tell,1,_SC("x")),

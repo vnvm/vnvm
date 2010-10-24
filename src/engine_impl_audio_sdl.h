@@ -50,8 +50,12 @@ class Music : public RefcountObject { public:
 	int play(int loops, int fadein_ms, double position);
 	static int stop(int fadeout_ms);
 	static int playing();
+	static Music *loadFromFile(char *name);
 	static Music *loadFromRW(SDL_RWops* rwops);
 	static Music *loadFromSQStream(SQStream* sq);
+
+private:
+	void checkHandle(char *source);
 };
 
 static SoundChannel* channels[MAX_NUM_CHANNELS] = {NULL};
@@ -250,9 +254,23 @@ static SoundChannel* channels[MAX_NUM_CHANNELS] = {NULL};
 		return Mix_PlayingMusic();
 	}
 	
+	void Music::checkHandle(char *source) {
+		if (handle == NULL) {
+			fprintf(stderr, "Error loading music from '%s'\n", source);
+		}
+	}
+	
 	Music *Music::loadFromRW(SDL_RWops* rwops) {
 		Music *music = new Music();
 		music->handle = Mix_LoadMUS_RW(rwops);
+		music->checkHandle("<unknown>");
+		return music;
+	}
+	
+	Music *Music::loadFromFile(char* fileName) {
+		Music *music = new Music();
+		music->handle = Mix_LoadMUS(fileName);
+		music->checkHandle(fileName);
 		return music;
 	}
 	

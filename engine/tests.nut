@@ -5,3 +5,6 @@ printf("  Test encoding (latin1->utf8)        : '%s'\n", iconv("latin1", "utf8",
 printf("  Test encoding (latin1->utf8->latin1): '%s'\n", iconv("utf8", "latin1", iconv("latin1", "utf8", "Hello world αινσϊ")));
 printf("  Test encoding (latin1->shiftjis)    : '%s'\n", iconv("latin1", "shift-jis", "Hello world αινσϊ"));
 printf("  Test encoding (shiftjis->utf8)      : '%s'\n", iconv("shift-jis", "utf-8", file("test_sjis.txt", "rb").readstringz(13)));
+printf("  Test md5 ('')                       : '%s'\n", md5(""));
+printf("  Test md5 ('hello world')            : '%s'\n", md5("hello world"));
+printf("  Test xor ('test')                   : '%s'\n", xor_string("test", "\x01\x00"));
