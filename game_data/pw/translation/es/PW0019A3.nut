@@ -75,4 +75,4 @@ translation.add(73, "What are you doing, just standing there?", "Angela");
 translation.add(74, "Angela......", "Arata");
 translation.add(75, "There is still more than enough time until the\nfated hour. You should rest a little.", "Angela");
 translation.add(76, "If you don't, you won't be able to rise to the\noccasion.", "Angela");
-translation.add(77, "", "");
+translation.add(77, "I remember what Iris told me earlier.", "");

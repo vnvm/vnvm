@@ -83,4 +83,4 @@ translation.add(81, "No matter how hard the road may be, Chris will be\nat the e
 translation.add(82, "This time I will do things differently. It won't\nbe the same as last time.", "");
 translation.add(83, "Only one of us can survive? There's no way I'll\naccept that.", "");
 translation.add(84, "Yes. I'm going to save her.", "");
-translation.add(85, "", "");
+translation.add(85, "I'm going to save Chris!", "");

@@ -123,4 +123,4 @@ translation.add(121, "Yes...... I did my best, too.", "Liesel");
 translation.add(122, "Great. You really helped us out, everyone.", "Arata");
 translation.add(123, "Haha, you should also thank Crow...... Hey? Where\nIS Crow?", "Angela");
 translation.add(124, "What's the matter?", "Arata");
-translation.add(125, "", "");
+translation.add(125, "Looks like Crow went off somewhere. She was with\nus a moment ago, though.", "Angela");

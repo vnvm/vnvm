@@ -126,4 +126,4 @@ translation.add(124, "......Now then, let's put some backbone into\nthis.", "Lil
 translation.add(125, "I've got to make my entry on the field of battle.\nElse people are going to think I'm a comic relief\ncharacter.", "Liliana");
 translation.add(126, "Blub......", "Shachi");
 translation.add(127, "Time for Liliana, the princess of the storm, to\nmake her debut.", "Liliana");
-translation.add(128, "", "");
+translation.add(128, "Who shall I challenge?", "Liliana");

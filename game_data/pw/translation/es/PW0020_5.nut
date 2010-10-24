@@ -124,4 +124,4 @@ translation.add(122, "It means that all the Tiaras have now been\ndestroyed.", "
 translation.add(123, "Now there is nothing left to hold back the Crown.", "Eldhin");
 translation.add(124, "Ahh...... Aahhh......", "Iris");
 translation.add(125, "I will return to Eldhiland, see to it that it is\nruined, and then settle things once and for all!!", "Eldhin");
-translation.add(126, "", "");
+translation.add(126, "Heh heh heh......... Hahahahahahaha!!!!!", "Eldhin");

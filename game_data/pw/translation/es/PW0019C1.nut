@@ -48,4 +48,4 @@ translation.add(46, "Do your best, now.", "Nanae");
 translation.add(47, "Nanae moves back into the house.", "");
 translation.add(48, "As for Liliana......", "");
 translation.add(49, "Yep, I'm gonna do my best!", "Liliana");
-translation.add(50, "", "");
+translation.add(50, "There is nobody to see it, but a fire begins to\nburn in Liliana's eyes.", "");

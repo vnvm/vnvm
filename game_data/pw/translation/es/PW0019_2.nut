@@ -39,4 +39,4 @@ translation.add(37, "Excuse me, can you pass me an egg?", "Suzushiro");
 translation.add(38, "This meat...... Is good.", "Riko");
 translation.add(39, "Angelaaaa!!", "Glen");
 translation.add(40, "Ahahahahahaha! Wooohooo!", "Liliana");
-translation.add(41, "", "");
+translation.add(41, "Blub, blub!", "Shachi");

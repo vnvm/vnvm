@@ -56,4 +56,4 @@ translation.add(54, "We are walking a road that has no end.", "");
 translation.add(55, "So let's keep walking.", "");
 translation.add(56, "Let's walk to places we haven't seen before. To a\nfuture nobody knows. Beyond the next sunrise.", "");
 translation.add(57, "And right now......", "");
-translation.add(58, "", "");
+translation.add(58, "We are setting the first step.", "");

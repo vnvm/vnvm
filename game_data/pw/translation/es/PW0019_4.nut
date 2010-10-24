@@ -179,4 +179,4 @@ translation.add(177, "Damn it!!!!!!", "Arata");
 translation.add(178, "Through sheer willpower, I make my body leap. The\nabomination raises its arm.", "");
 translation.add(179, "I don't intend to avoid it! I'm gonna break\nthrough!!", "");
 translation.add(180, "But then, just before we meet for a second\ntime......", "");
-translation.add(181, "", "");
+translation.add(181, "Something hits me from the side and knocks me off\ncourse.", "");

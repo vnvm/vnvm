@@ -13,4 +13,4 @@ translation.add(11, "Do we have to do it......?", "Arata");
 translation.add(12, "But right then, there is the sound of an\nexplosion.", "");
 translation.add(13, "What!?", "Shizuka");
 translation.add(14, "Oh, looks like it's started.", "Pigeon");
-translation.add(15, "", "");
+translation.add(15, "What the......? Look, it flinched!", "Arata");

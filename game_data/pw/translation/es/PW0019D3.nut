@@ -75,4 +75,4 @@ translation.add(73, "A, Arata........", "Riko");
 translation.add(74, "Riko.......", "Arata");
 translation.add(75, "Umm........ I'll be fine.........", "Riko");
 translation.add(76, "I'm prepared...... To offer myself......", "Riko");
-translation.add(77, "", "");
+translation.add(77, "Riko's valiant show of courage reminds me of what\nIris told me earlier.", "");

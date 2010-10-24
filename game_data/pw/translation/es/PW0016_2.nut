@@ -98,4 +98,4 @@ translation.add(96, "I know this girl. Of course I do. She's my\nclassmate.", ""
 translation.add(97, "Then why do I feel I only just remembered about\nher?", "");
 translation.add(98, "You're Kanada...... Right?", "Arata");
 translation.add(99, "Huh......? Y, yes......", "Riko");
-translation.add(100, "", "");
+translation.add(100, "As usual, Kanada tries to make herself smaller.\nShe nods timidly at me.", "");

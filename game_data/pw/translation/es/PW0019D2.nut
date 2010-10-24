@@ -92,4 +92,4 @@ translation.add(90, "Nodoka laughs heartily and slaps Riko on the\nshoulder.", "
 translation.add(91, "Come on, let's rejoin the party.", "Nodoka");
 translation.add(92, "Okay.", "Riko");
 translation.add(93, "Riko can't help but smile.", "");
-translation.add(94, "", "");
+translation.add(94, "Together, they head back to the living room.", "");

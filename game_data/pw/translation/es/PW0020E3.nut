@@ -140,4 +140,4 @@ translation.add(138, "No, not really.", "Angela");
 translation.add(139, "Huh? Huh?", "Liliana");
 translation.add(140, "Lun Lun frantically looks around.", "");
 translation.add(141, "What's the matter?", "Arata");
-translation.add(142, "", "");
+translation.add(142, "Where's Crow? She was with us a moment ago.", "Liliana");

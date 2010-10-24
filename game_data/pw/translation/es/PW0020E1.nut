@@ -44,4 +44,4 @@ translation.add(42, "But......", "Arata");
 translation.add(43, "I only barely beat a similar Guardener much less\nbeefy than this one with a full-powered Eldhi\nArc.", "");
 translation.add(44, "This one is orders of magnitude more powerful.\nWhere am I going to get the power to beat it!?", "");
 translation.add(45, "Ugh!!", "Shizuka");
-translation.add(46, "", "");
+translation.add(46, "It's got a projectile weapon......! It's not\ngiving us time to think!", "Arata");

@@ -42,4 +42,4 @@ translation.add(40, "......I love you, Eldhin.", "Iris");
 translation.add(41, "........Iris......", "Eldhin");
 translation.add(42, "Come, let us sleep.", "Iris");
 translation.add(43, "Let us watch over the future of our children.", "Iris");
-translation.add(44, "", "");
+translation.add(44, "Together with you, I will go anywhere......", "Iris");

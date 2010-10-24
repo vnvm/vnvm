@@ -125,11 +125,11 @@ class RIO_OP_TEXT
 		local options = [];
 		foreach (n, option in roptions) {
 			local option_info = {};
-			option_info.n      <- n;
-			option_info.index  <- option[0];
-			option_info.text   <- option[1];
-			option_info.unk1   <- option[2];
-			option_info.result <- option[3];
+			option_info.n       <- n;
+			option_info.text_id <- option[0];
+			option_info.text    <- option[1];
+			option_info.unk1    <- option[2];
+			option_info.result  <- option[3];
 			options.push(option_info);
 		}
 		RIO_OP_TEXT.OPTION_SELECT_common(options);

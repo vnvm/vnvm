@@ -53,4 +53,4 @@ translation.add(51, "......I've got to try my best not to make the cute\nlittle 
 translation.add(52, "........!?", "Pigeon");
 translation.add(53, "........Ow, ow, ow...... Damn...... The wound has\nopened.", "Pigeon");
 translation.add(54, "So. Even thinking of betraying him has this great\nan effect. My life is in Shichiou's hands\nindeed......", "Pigeon");
-translation.add(55, "", "");
+translation.add(55, "Ouch...... This is tough. For me, but for them,\ntoo.", "Pigeon");

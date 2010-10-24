@@ -155,4 +155,4 @@ translation.add(153, "Eldhin....... You have lost.", "Iris");
 translation.add(154, "Let's go together.", "");
 translation.add(155, "If you can't move, I'll carry you.", "");
 translation.add(156, "That's right, as far as I can.", "");
-translation.add(157, "", "");
+translation.add(157, "And I won't stop.", "");

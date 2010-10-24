@@ -82,4 +82,4 @@ translation.add(80, "..................", "Arata");
 translation.add(81, "......It's got to be my imagination.", "Arata");
 translation.add(82, "I shake my head to clear the treacherous thought\nout of my head.", "");
 translation.add(83, "Yeah, that's it.", "Arata");
-translation.add(84, "", "");
+translation.add(84, "I nod to myself, then head back to the party.", "");

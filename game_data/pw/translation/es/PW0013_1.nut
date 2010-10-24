@@ -191,4 +191,4 @@ translation.add(189, "Graaaaaaaaaaaaahhhhhhhhhhhh!!!!!!!!", "??");
 translation.add(190, "Hahaha! Good answer!!", "Angela");
 translation.add(191, "It raises its halberd, but by that time the lance\nhas already found a mark.", "");
 translation.add(192, "Both of them become blurs.", "");
-translation.add(193, "", "");
+translation.add(193, "At the same time, there is a terrible noise.", "");

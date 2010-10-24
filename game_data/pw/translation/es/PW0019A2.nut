@@ -54,4 +54,4 @@ translation.add(52, "This sort of thing happens very rarely indeed.", "Angela");
 translation.add(53, "All right, I'll feel honored.", "Arata");
 translation.add(54, "Then see you tomorrow. Good night.", "Angela");
 translation.add(55, "Yeah, night.", "Arata");
-translation.add(56, "", "");
+translation.add(56, "Angela turns and walks back into the house.", "");

@@ -7,7 +7,7 @@ translation.add(5, "And it's not an exaggeration. The sound does come\nfrom down
 translation.add(6, "Regeneration. The remains of the Guardeners in the\narea merge together to form one large Guardener.", "");
 translation.add(7, "One by one, the Guardeners rise off the ground and\nadvance on the exhausted woman.", "");
 translation.add(8, "But Iris doesn't move. Her master, Fukamori Arata,\nhas already passed out of consciousness.", "");
-translation.add(9, "One of the monsters raises a claw overhead.", "");
+translation.add(9, "One of the monsters raises a claw overhead. ", "");
 translation.add(10, "Sparks flash in the darkness.", "");
 translation.add(11, "The claw falling to its prey is stopped by a\nweapon of steel.", "");
 translation.add(12, "Before the Guardener can determine the shape of\nthe weapon, it is torn to pieces.", "");
@@ -51,4 +51,4 @@ translation.add(49, "B, but...... Pigeon......", "Crow");
 translation.add(50, "You're too young, so you aren't affected by the\ncurse.", "Pigeon");
 translation.add(51, "......Well, then I have no choice...............\nYou'll have to disappear, Crow.", "Pigeon");
 translation.add(52, "Ahh...... Ahhhhhhh.........", "Crow");
-translation.add(53, "", "");
+translation.add(53, "Crow watches on in mute shock as Pigeon's face\nbreaks into a wicked grin.", "");

@@ -13,4 +13,4 @@ translation.add(11, "Blub!", "Shachi");
 translation.add(12, "But just as Liliana makes up her mind, a pair of\nGuardeners appears.", "");
 translation.add(13, "Muh......! Guardeners...... Number: 2. Alma level:\nmedium.", "Crow");
 translation.add(14, "Right! They'll do for starters!", "Liliana");
-translation.add(15, "", "");
+translation.add(15, "A grin appears on Liliana's face. Then she charges\ninto battle.", "");

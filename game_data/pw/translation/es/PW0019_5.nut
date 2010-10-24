@@ -11,4 +11,4 @@ translation.add(9, "There are many possible connections between\npeople. I will 
 translation.add(10, "Tomorrow at noon. Meet me here.", "Iris");
 translation.add(11, "Raising our affinity. That means doing what I did\nwith Chris.", "");
 translation.add(12, "Though she said I should decide on the method\nmyself, I know no other.", "");
-translation.add(13, "", "");
+translation.add(13, "So...... That means we should have sex.", "");

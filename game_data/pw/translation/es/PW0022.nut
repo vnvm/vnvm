@@ -55,4 +55,4 @@ translation.add(53, "All RIGHT!!", "Nodoka");
 translation.add(54, "I think I'll go catch me a prince!", "Nodoka");
 translation.add(55, "I take a big step forward.", "");
 translation.add(56, "And then......", "");
-translation.add(57, "", "");
+translation.add(57, "I pass through the doorway.", "");

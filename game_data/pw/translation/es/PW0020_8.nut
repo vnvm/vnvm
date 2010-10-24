@@ -124,4 +124,4 @@ translation.add(122, "Come to think of it, we haven't said it yet.", "Suzushiro"
 translation.add(123, "Yes.", "Liesel");
 translation.add(124, "Heh......", "Angela");
 translation.add(125, "All right, one, two......", "Liliana");
-translation.add(126, "", "");
+translation.add(126, "Welcome back, our prince!!", "");

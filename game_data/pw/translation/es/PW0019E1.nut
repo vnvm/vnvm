@@ -51,4 +51,4 @@ translation.add(49, "What is it now?", "Angela");
 translation.add(50, "Why are you so preoccupied with the princess of\nWisley?", "Arata");
 translation.add(51, "It's weird for you to care about someone's lineage\nlike that.", "Arata");
 translation.add(52, "Angela thinks for a moment, then flashes me a\ngrin.", "");
-translation.add(53, "", "");
+translation.add(53, "That beast has something of mine. That's all.", "Angela");

@@ -77,4 +77,4 @@ translation.add(75, "Ohhhhhh! Such an open mind you have! That's why\nyou're my 
 translation.add(76, "So, how old are you? About the same age as\nShizuka?", "Arata");
 translation.add(77, "Y, yeah! Something like that, ohohohohoho.", "Liliana");
 translation.add(78, "Uh, later, Arata. Let's talk about you next time.", "Liliana");
-translation.add(79, "", "");
+translation.add(79, "So she rattled off her say and left...... Well,\nthat's just like her.", "Arata");

@@ -149,4 +149,4 @@ translation.add(147, "Whueeh? Why not?", "Arata");
 translation.add(148, "Because I say so! Really, you should learn a\nlittle refinement!", "Suzushiro");
 translation.add(149, "She pulls her hand from mine and turns one hundred\nand eighty. Then she stalks back into the house.", "");
 translation.add(150, "I don't get it. What's she so mad about?", "");
-translation.add(151, "", "");
+translation.add(151, "I watch Suzushiro stomp down the hallway, then\nshake my head.", "");

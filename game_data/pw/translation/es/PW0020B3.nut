@@ -74,7 +74,7 @@ translation.add(72, "The stone paving begins to crack up. Our arms and\nlegs beg
 translation.add(73, "The ground can't support our weight!", "");
 translation.add(74, "It's a gravitational field......!", "Suzushiro");
 translation.add(75, "Gravitational field......? Oh, I get it!", "Arata");
-translation.add(76, "It's mimicking Suzushiro's power!", "");
+translation.add(76, "It's mimicking Suzushiro's power! ", "");
 translation.add(77, "Urghh...... Guhhhhhh!!!", "Arata");
 translation.add(78, "I pull my arms out of the earth, place them on my\nknees and force my body upright. Every movement is\nheavy.", "");
 translation.add(79, "In the mean time, the Guardener has recovered.\nIt's now slowly walking towards us.", "");
@@ -159,4 +159,4 @@ translation.add(157, "Great. You really helped us out, everyone.", "Arata");
 translation.add(158, "Thanks to you all we could beat that\nGuardener...... Say, is something amiss, princess\nLiliana?", "Suzushiro");
 translation.add(159, "Huh? Huh?", "Liliana");
 translation.add(160, "What's the matter?", "Arata");
-translation.add(161, "", "");
+translation.add(161, "Where's Crow? She was with us a moment ago.", "Liliana");

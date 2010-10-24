@@ -79,4 +79,4 @@ translation.add(77, "Hurry, or the water will cool down.", "Suzushiro");
 translation.add(78, "Err...... Um, uh. You go in first, yeah.", "Arata");
 translation.add(79, "It would not be polite to enter the bath before\nyou did, but if you insist, I will.", "Suzushiro");
 translation.add(80, "O, okay.", "Arata");
-translation.add(81, "", "");
+translation.add(81, "Suzushiro gives me a formal bow. I'm reminded of\nwhat Iris told me earlier.", "");

@@ -150,4 +150,4 @@ translation.add(148, "Hey! That's just because Crow set me free last!\n......Hey
 translation.add(149, "Huh? Huh?", "Liliana");
 translation.add(150, "Lun Lun frantically looks around.", "");
 translation.add(151, "What's the matter?", "Arata");
-translation.add(152, "", "");
+translation.add(152, "Where's Crow? She was with us a moment ago.", "Liliana");

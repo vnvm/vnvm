@@ -32,4 +32,4 @@ translation.add(30, "I'm counting on you, Arata!", "Beast princess");
 translation.add(31, "Geez. Look at them, all acting cool.", "Liliana");
 translation.add(32, "This is the Waltz. This is where we princesses\nturn our feelings into strength and offer it to\nthe prince.", "Suzushiro");
 translation.add(33, "Let us offer our power, then......", "Suzushiro");
-translation.add(34, "", "");
+translation.add(34, "For the sake of our prince!!", "Suzushiro");

@@ -138,4 +138,4 @@ translation.add(136, "..........", "Crow");
 translation.add(137, "She nods.", "");
 translation.add(138, "Basically, we'd be in real deep trouble.", "");
 translation.add(139, "Let's hurry!", "Arata");
-translation.add(140, "", "");
+translation.add(140, "I throw open the door and rush out into the\ncorridor.", "");

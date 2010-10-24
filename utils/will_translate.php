@@ -283,12 +283,16 @@ class RIO {
 					);
 				break;
 				case 'OPTION_SELECT': // OPTION_SELECT
-					$texts[$i->params[0]] = (object)array(
-						'op'    => $i->opcode->id,
-						'id'    => -1,
-						//'body'  => $params[2],
-						//'title' => $params[1]
-					);
+					foreach ($i->params[0] as $option_params) {
+						$texts[$option_params[0]] = (object)array(
+							'op'    => $i->opcode->id,
+							'id'    => $option_params[0],
+							'body'  => $option_params[1],
+							'title' => '',
+						);
+					}
+					//print_r($i->params);
+					//exit;
 				break;
 			}
 		}
@@ -448,7 +452,8 @@ switch (@$argv[1]) {
 					$text = $texts[$rio_text->id];
 				}
 				*/
-				fprintf($f, "translation.add(%d, \"%s\", \"%s\");\n", $rio_text->id, addcslashes($text, "\n\r\t"), addcslashes($title, "\n\r\t"));
+				$escape_chars = "\n\r\t\"";
+				fprintf($f, "translation.add(%d, \"%s\", \"%s\");\n", $rio_text->id, addcslashes($text, $escape_chars), addcslashes($title, $escape_chars));
 			}
 			fclose($f);
 			//exit;

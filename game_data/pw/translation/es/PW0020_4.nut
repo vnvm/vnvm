@@ -172,4 +172,4 @@ translation.add(170, "Iris takes me on her back and jumps. She soars up\ninto th
 translation.add(171, "We swiftly draw closer to the shattered sphere.\nFive pairs of eyes watch us go.", "");
 translation.add(172, "They're waiting for me. I'll turn this monster\ninto a wreck!", "");
 translation.add(173, "Aaaahhhhhhhhh!!!!!!", "Arata");
-translation.add(174, "", "");
+translation.add(174, "We pass the boundary of the shattered sphere and\nplunge into the darkness.", "");

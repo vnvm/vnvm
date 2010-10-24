@@ -78,4 +78,4 @@ translation.add(76, "She looks right into my eyes.", "");
 translation.add(77, "I've already firmly made up my mind, you know.\nIt's all your call now.", "Liliana");
 translation.add(78, "No, I've already made my decision. I can't think\nof any other way.", "Arata");
 translation.add(79, "......I see. Then wait for me in your room. I need\nto get ready.", "Liliana");
-translation.add(80, "", "");
+translation.add(80, "Lun Lun colors red. I am reminded of what Iris\ntold me earlier.", "");

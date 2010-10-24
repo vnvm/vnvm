@@ -38,4 +38,4 @@ translation.add(36, "......Then should I prepare the stage?", "April");
 translation.add(37, "Yes, see that you do.", "Eldhin");
 translation.add(38, "Understood.", "April");
 translation.add(39, "Behold, April. This is the finale of a Waltz that\nhas lasted for a thousand years.", "Eldhin");
-translation.add(40, "", "");
+translation.add(40, "..................", "April");

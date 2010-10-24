@@ -137,7 +137,7 @@ translation.add(135, "W, WHAT? But you're only a child!", "Chris");
 translation.add(136, "I am not a child anymore!", "Suzushiro");
 translation.add(137, "!!", "Chris");
 translation.add(138, "I have trained very hard for this day!", "Suzushiro");
-translation.add(139, "If I have to fight... Um... Even if I'm a girl...", "Suzushiro");
+translation.add(139, "If I have to fight... Um... Even if I'm a girl...\n", "Suzushiro");
 translation.add(140, "I'm not going to lose to anyone!", "");
 translation.add(141, "Suzushiro... You're so...", "Chris");
 translation.add(142, "?? What are you talking about?", "Arata");

@@ -11,4 +11,4 @@ translation.add(9, "But then again, none of the princesses escape\nunharmed.", "
 translation.add(10, "It's not necessary for this power to score a\ndirect hit. It's just a violent burst of raw\nenergy.", "");
 translation.add(11, "Ughh.......! Such power!", "Angela");
 translation.add(12, "This is...... The power of the Crown......", "Liesel");
-translation.add(13, "", "");
+translation.add(13, "........Arata........", "Beast princess");

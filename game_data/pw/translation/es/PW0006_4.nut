@@ -190,4 +190,4 @@ translation.add(188, "I see. So this is something you can tell by\ntouch.", "");
 translation.add(189, ".........Night.", "Chris");
 translation.add(190, ".........Yeah... Good night........", "Arata");
 translation.add(191, "I feel warm, as though I'm a small child sleeping\nwith his mother.", "");
-translation.add(192, "", "");
+translation.add(192, "I close my eyes.", "");

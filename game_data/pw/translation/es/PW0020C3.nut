@@ -13,4 +13,4 @@ translation.add(11, "Six towers...... I wonder how many I'll get?", "Angela");
 translation.add(12, "But just as Angela makes up her mind, a pair of\nGuardeners appears.", "");
 translation.add(13, "Muh......! Guardeners...... Number: 2. Alma level:\nmedium.", "Crow");
 translation.add(14, "Heheh, sounds like fun. Here we go!", "Angela");
-translation.add(15, "", "");
+translation.add(15, "A grin appears on Angela's face. Then she charges\ninto battle.", "");

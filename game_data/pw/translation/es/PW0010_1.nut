@@ -353,7 +353,7 @@ translation.add(351, "Her gaze is fixed on me. Not on my face, lower\nthan that.
 translation.add(352, "I also stare down at the area below her navel.", "");
 translation.add(353, "In the moonlight, her skin is so white that I can\nsee a faint halo around her.", "");
 translation.add(354, "The one exception is the faint crack running down\nthat skin - that is colored pink.", "");
-translation.add(355, "This... This is your......", "Arata");
+translation.add(355, "This... This is your...... ", "Arata");
 translation.add(356, "Huff...... Huff...... Arata......", "Chris");
 translation.add(357, "Don't stare...... Don't stare at me like\nthat......", "Chris");
 translation.add(358, "You're... Looking too. You're all sticky... down\nthere.", "Arata");

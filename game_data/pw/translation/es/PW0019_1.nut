@@ -83,4 +83,4 @@ translation.add(81, "What do you mean?", "Shizuka");
 translation.add(82, "Nothing. Just what I said.", "Angela");
 translation.add(83, "I don't know what you're after, but yes, it was\ntough, as you can see.", "Shizuka");
 translation.add(84, "Very well then. Looks like I was mistaken.", "Angela");
-translation.add(85, "", "");
+translation.add(85, ".................?", "Shizuka");
