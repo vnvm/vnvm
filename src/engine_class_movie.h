@@ -18,7 +18,9 @@ DSQ_METHOD(Movie, load)
 	EXTRACT_PARAM_SELF(Movie);
 	EXTRACT_PARAM_STR(2, filename, NULL);
 	self->load((char *)filename.data);
-	RETURN_VOID;
+	CREATE_OBJECT(Bitmap, self->buffer);
+	self->buffer->capture();
+	return 1;
 }
 
 DSQ_METHOD(Movie, _get)

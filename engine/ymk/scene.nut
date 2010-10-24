@@ -306,6 +306,8 @@ class SceneObject extends Component
 	type = null;
 	x = 0;
 	y = 0;
+	add_x = 0;
+	add_y = 0;
 	cx = 0;
 	cy = 0;
 	alpha = 1.0;
@@ -348,8 +350,15 @@ class SceneObject extends Component
 	constructor(type = null)
 	{
 		this.type      = type;
-		this.x         = 400;
-		this.y         = 300;
+		this.x         = 0;
+		this.y         = 0;
+		if (type == "background") {
+			this.add_x     = 400;
+			this.add_y     = 300;
+		} else {
+			this.add_x     = 0;
+			this.add_y     = 0;
+		}
 		this.index     = 0;
 		this.alpha     = 1.0;
 		this.size      = 1.0;
@@ -392,7 +401,7 @@ class SceneObject extends Component
 			destinationBitmap.clear(color);
 		} else {
 			local wip = resman.get_image(name);
-			local rx = x, ry = y;
+			local rx = x + add_x, ry = y + add_y;
 			wip.images[0].cx = cx;
 			wip.images[0].cy = cy;
 			/*if (type == "background") {

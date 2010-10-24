@@ -69,10 +69,12 @@ class RIO_OP
 	static function MOVIE(can_stop, name)
 	{
 		local movie = Movie();
-		movie.load(::path_to_files + "/" + name);
+		local movie_buffer = movie.load(::path_to_files + "/" + name);
 		movie.viewport(0, 0, screen.w, screen.h);
 		movie.play();
 		local timer = TimerComponent(500);
+		movie_buffer.cx = 400;
+		movie_buffer.cy = 300;
 		while (movie.playing) {
 			input.update();
 
@@ -80,8 +82,13 @@ class RIO_OP
 
 			timer.update(this.ms_per_frame);
 			movie.update();
+			::screen.drawBitmap(movie_buffer, 400, 300, 1.0, 1.0, 0.0);
+			//this.interface.print_text("Hello", 100, 100);
+			Screen.flip();
 			Screen.frame(30);
 		}
+		this.scene.showLayer.clear([0, 0, 0, 1]);
+		this.scene.showLayer.drawBitmap(movie_buffer, 400, 300, 1.0, 1.0);
 		movie.stop();
 	}
 	

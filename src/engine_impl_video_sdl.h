@@ -356,7 +356,7 @@ void fwrite_png(FILE *f, SDL_Surface *surface) {
 	fwrite_png_iend(f);
 }
 
-class Bitmap {
+class Bitmap : public RefcountObject {
 public:
 	SDL_Surface *surface;
 	SDL_Rect clip;
@@ -376,6 +376,10 @@ public:
 		color.a = 0xFF;
 		colorf[0] = colorf[1] = colorf[2] = colorf[3] = 1.0;
 	}
+	
+	void deleteObject() {
+		delete this;
+	}
 
 	// Destructs the surface;
 	~Bitmap()
@@ -388,7 +392,9 @@ public:
 				#ifdef USE_OPENGL
 					glDeleteTextures(1, &gltex);
 				#endif
+				//printf("TEXTURE DELETED\n");
 			}
+			//printf("Refcount: %d\n", surface->refcount);
 		}
 		//printf("]");
 	}

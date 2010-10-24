@@ -1,7 +1,7 @@
 screen <- Screen.init(640, 480);
 
-image_color <- Bitmap.fromFile("../game_data/2ico.jpg");
-image_mask <- Bitmap.fromFile("../game_data/2mask.jpg");
+//image_color <- Bitmap.fromFile(info.game_data_path + "/2ico.jpg");
+//image_mask <- Bitmap.fromFile(info.game_data_path + "/2mask.jpg");
 
 //image_color.copyChannel(image_mask, "red", "alpha", 1);
 
@@ -28,20 +28,26 @@ test.draw(test2, 0, 0);
 	Screen.frame(30);
 }*/
 
+local testbmp = Bitmap(800, 600, 32);
+testbmp.clear([1, 0, 0, 1]);
+
 local alpha = 0.0;
 
 while (1) {
 	screen.clear([0, 0, 1, 1]);
-	mouse.update();
+	::input.mouse.update();
 	/*
 	test2.draw(screen, 10, 10, alpha);
 	test.draw(screen, 600, 10);
 	mask.draw(screen, 600, 200);
 	*/
 	
-	image_color.drawTransition(screen, image_mask, 0, 0, alpha, "", 0);
+	testbmp = Bitmap(800, 600, 32);
+	
+	//image_color.drawTransition(screen, image_mask, 0, 0, alpha, "", 0);
+	screen.drawBitmap(testbmp);
 	//image_color.draw(screen);
-	printf("%d, %d : %d, %d : %d\r", mouse.x, mouse.y, mouse.dx, mouse.dy, mouse.dwheel);
+	printf("%d, %d : %d, %d : %d               \r", ::input.mouse.x, ::input.mouse.y, ::input.mouse.dx, ::input.mouse.dy, ::input.mouse.dwheel);
 	Screen.flip();
 	Screen.frame(30);
 	alpha += 0.01;

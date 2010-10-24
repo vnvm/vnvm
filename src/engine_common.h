@@ -192,24 +192,26 @@ class RefcountObject { public:
 		
 		//printf("RefcountObject(%08X) : %d\n", this, refcount);
 	}
+	
+	virtual void deleteObject() {
+		delete this;
+	}
+	
+	void updateRefCount(int offset) {
+		refcount += offset;
+		//printf("RefcountObject::updateRecount(%08X) : %d(%d) -> %d", this, refcount - offset, offset, refcount);
+		if (refcount <= 0) {
+			//printf(" :: DELETED");
+			deleteObject();
+		}
+		//printf("\n");
+	}
 
 	void capture() {
-		/*if (sqvm != NULL) {
-			//printf("[[%08X]] : %08X\n", sqvm, sq_addref);
-			sq_addref(sqvm, &sqobject);
-			//printf("-----------------\n");
-		}*/
-		refcount++;
-		//printf("RefcountObject::capture(%08X) : %d -> %d\n", this, refcount - 1, refcount);
+		updateRefCount(+1);
 	}
 
 	void release() {
-		//if (sqvm != NULL) sq_release(sqvm, &sqobject);
-		refcount--;
-		//printf("RefcountObject::release(%08X) : %d -> %d\n", this, refcount + 1, refcount); fflush(stdout);
-		if (refcount <= 0) {
-			//printf(" :: DELETED\n"); fflush(stdout);
-			delete this;
-		}
+		updateRefCount(-1);
 	}
 };

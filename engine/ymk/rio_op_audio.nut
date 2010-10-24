@@ -31,7 +31,7 @@ class RIO_OP_AUDIO
 	static function SOUND_PLAY(channel, repeat, blocking, start_time, fade_in_ms, volume, sound_file)
 	{
 		//sound_file = "pw003_1.ogg";
-		printf("SOUND_PLAY!: '%s'\n", sound_file);
+		//printf("SOUND_PLAY!: '%s'\n", sound_file);
 		resman.get_sound(sound_file).play(channel, repeat + 1, fade_in_ms);
 		//this.TODO();
 	}

@@ -3,6 +3,7 @@
 class Movie { public:
     SMPEG* mpeg;
 	SDL_Surface *surface;
+	Bitmap *buffer;
     SMPEG_Info mpeg_info;
 	SDL_Rect rect;
 	static Movie *movie;
@@ -12,6 +13,7 @@ class Movie { public:
 		mpeg = NULL;
 		surface = NULL;
 		movie = this;
+		buffer = NULL;
 		updated_surface = 0;
 		last_updated_surface = -1;
 	}
@@ -44,7 +46,9 @@ class Movie { public:
 		
 		if ((mpeg == NULL) || (mpeg_info.width == 0)) { printf("Invalid file\n"); return; }
 		
-		surface = SDL_CreateRGBSurface(SDL_SWSURFACE, mpeg_info.width, mpeg_info.height, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
+		surface = SDL_CreateRGBSurface(SDL_SWSURFACE, mpeg_info.width, mpeg_info.height, 24, 0x000000FF, 0x0000FF00, 0x00FF0000, 0);
+		buffer = Bitmap::create(mpeg_info.width, mpeg_info.height, 24);
+		buffer->capture();
 		
 		if (0) {
 			printf("Ok\n");
@@ -77,6 +81,9 @@ class Movie { public:
 			SMPEG_delete(mpeg);
 			mpeg = NULL;
 		}
+		if (buffer != NULL) {
+			buffer->release();
+		}
 	}
 	
 	void stop() {
@@ -98,21 +105,19 @@ class Movie { public:
 	static void updateSurface(SDL_Surface *surface, int x, int y, unsigned int w, unsigned int h) {
 		//printf("updateSurface\n");
 		updated_surface++;
+		SDL_UpdateRect(surface, x, y, w, h);
 	}
 
 	void update() {
 		#ifdef USE_OPENGL
-			Video::screen->gl_render_to();
-			if (last_updated_surface != updated_surface) {
+			if (updated_surface != last_updated_surface) {
 				last_updated_surface = updated_surface;
-				ImplColor color = {0, 0, 0, 255};
-				Video::screen->clear(color);
-				Bitmap::gl_unbind();
-				glMatrixMode(GL_MODELVIEW); glLoadIdentity();
-				glRasterPos2i(0, 0);
-				glPixelZoom(1.0f, -1.0f);
-				glDrawPixels(surface->w, surface->h, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, surface->pixels);
-				SDL_GL_SwapBuffers();
+				buffer->gl_bind();
+				SDL_LockSurface(surface);
+				{
+					glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this->surface->w, this->surface->h, 0, GL_RGB, GL_UNSIGNED_BYTE, surface->pixels);
+				}
+				SDL_UnlockSurface(surface);
 			}
 		#endif
 	}

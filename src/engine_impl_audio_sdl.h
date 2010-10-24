@@ -26,6 +26,10 @@ class SoundChannel { public:
 class Sound : public RefcountObject { public:
 	Mix_Chunk *chunk;
 
+	void deleteObject() {
+		delete this;
+	}
+
 	Sound();
 	~Sound();
 	int playing();
@@ -42,6 +46,10 @@ class Music : public RefcountObject { public:
 	HSQOBJECT sqobject;
 	
 	void release();
+	
+	void deleteObject() {
+		delete this;
+	}
 
 	Music();
 	

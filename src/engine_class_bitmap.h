@@ -1,6 +1,6 @@
 #define SQTAG_Bitmap (SQUserPointer)0x80000000
-//DSQ_RELEASE_AUTO_RELEASECAPTURE(Bitmap);
-DSQ_RELEASE_AUTO(Bitmap);
+DSQ_RELEASE_AUTO_RELEASECAPTURE(Bitmap);
+//DSQ_RELEASE_AUTO(Bitmap);
 
 DSQ_METHOD(Bitmap, constructor)
 {
@@ -10,6 +10,7 @@ DSQ_METHOD(Bitmap, constructor)
 	EXTRACT_PARAM_INT(4, bpp, 32);
 
 	Bitmap *self = Bitmap::create(width, height, bpp);
+	self->capture();
 	sq_setinstanceup(v, 1, self);
 	sq_setreleasehook(v, 1, CSQ_RELEASE(Bitmap));
 	return 0;
@@ -81,6 +82,7 @@ DSQ_METHOD(Bitmap, fromFile)
 	EXTRACT_PARAM_INT(3, smooth, 1);
 
 	Bitmap *newbmp = Bitmap::createFromFile(s.stringz);
+	newbmp->capture();
 	CREATE_OBJECT(Bitmap, newbmp);
 	return 1;
 }
@@ -103,6 +105,7 @@ DSQ_METHOD(Bitmap, fromStream)
 		newbmp = Bitmap::createFromStream(image_data);
 		STRING_FREE(&image_data);
 	}
+	newbmp->capture();
 	CREATE_OBJECT(Bitmap, newbmp);
 	return 1;
 }
@@ -229,6 +232,7 @@ DSQ_METHOD(Bitmap, fromData)
 	if (bitmap) {
 		bitmap->flip_x = flip_x;
 		bitmap->flip_y = flip_y;
+		bitmap->capture();
 		CREATE_OBJECT(Bitmap, bitmap);
 		return 1;
 	} else {
@@ -246,6 +250,7 @@ DSQ_METHOD(Bitmap, slice)
 	EXTRACT_PARAM_INT(5, h, -1);
 
 	Bitmap *newbmp = self->slice(x, y, w, h);
+	newbmp->capture();
 	CREATE_OBJECT(Bitmap, newbmp);
 	return 1;
 }
@@ -256,6 +261,7 @@ DSQ_METHOD(Bitmap, dup)
 	EXTRACT_PARAM_SELF(Bitmap);
 
 	Bitmap *newbmp = self->dup();
+	newbmp->capture();
 	CREATE_OBJECT(Bitmap, newbmp);
 	return 1;
 }
@@ -289,6 +295,7 @@ DSQ_METHOD(Bitmap, split)
 			Bitmap *newbmp = self->slice(x, y, w, h);
 			newbmp->cx = cx;
 			newbmp->cy = cy;
+			newbmp->capture();
 			CREATE_OBJECT(Bitmap, newbmp);
 			sq_arrayappend(v, -4);
 			sq_pop(v, 2);
