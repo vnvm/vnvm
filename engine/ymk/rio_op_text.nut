@@ -8,9 +8,12 @@ class RIO_OP_TEXT
 		}
 		local trans = translation.get(text_id, text, title);
 		this.interface.textProgress = this.interface.text_body.len();
-		this.interface.enabled    = true;
+		this.interface.enabled     = true;
+		this.interface.text_id     = text_id;
 		this.interface.text_title += trans.title;
 		this.interface.text_body  += trans.text;
+		this.interface.text_title_ori = title;
+		this.interface.text_body_ori  = text;
 		this.interface.skip = false;
 
 		this.interface.waitingSkip = true;

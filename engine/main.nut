@@ -1,6 +1,8 @@
 include("common.nut");
 include("tests.nut");
 
+//translation.askTranslate("Hello", "Hola");
+
 //include("test.nut");
 
 if ((info.argv.len() >= 2)) {

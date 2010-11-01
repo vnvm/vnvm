@@ -4,6 +4,23 @@ function _writestringz(f, text, zero = 1)
 	if (zero) f.writen(0, 'b');
 }
 
+function writefile(fname, text) {
+	local f = file(fname, "wb");
+	 _writestringz(f, text, 0);
+	 f = null;
+}
+
+function readfile(fname) {
+	local f = file(fname, "rb");
+	local r = f.readstring(f.len());
+	f = null;
+	return r;
+}
+
+function copyfile(from, to) {
+	writefile(to, readfile(from));
+}
+
 function saveblob(name, blob)
 {
 	local file = ::file(name, "wb");

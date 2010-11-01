@@ -60,12 +60,8 @@ class RIO extends Component
 	
 	function load(name, call = 1, position = 0)
 	{
-		translation.reset();
-		local translation_script = info.game_data_path + "/translation/" + ::info.game_lang + "/" + name.toupper() + ".nut";
-		if (file_exists(translation_script)) {
-			printf("Loaded translation: '%s'\n", translation_script);
-			include(translation_script);
-		}
+		// Try to set translation file.
+		translation.setFile(info.game_data_path + "/translation/" + ::info.game_lang + "/" + name.toupper() + ".nut");
 
 		printf("-----------------------------------------------\n");
 		printf("@@@ RIO.load('%s', %d, %d)\n", name, call, position);

@@ -1,12 +1,15 @@
 class Interface extends Component
 {
-	text_title   = "";
-	text_body    = "";
-	wip_winbase0 = null;
-	wip_clkwait  = null;
+	text_id        = 0;
+	text_title     = "";
+	text_body      = "";
+	text_title_ori = "";
+	text_body_ori  = "";
+	wip_winbase0   = null;
+	wip_clkwait    = null;
 	wip_clkwait_frames = null;
-	font         = null;
-	textProgress = -1;
+	font           = null;
+	textProgress   = -1;
 	position_title = null;
 	position_body  = null;
 	position_wait  = null;
@@ -124,6 +127,18 @@ class Interface extends Component
 				this.textProgress = this.text_body.len();
 			} else {
 				this.skip = true;
+			}
+		}
+		
+		if (::input.keyboard.pressed("f2")) {
+			//while (::input.keyboard.pressed("f2")) { ::input.keyboard.update(); Screen.frame(60); }
+			local result = ::translation.askTranslate(this.text_body_ori, this.text_body);
+			//printf("%s\n", typeof result);
+			if ((typeof result) != "bool") {
+				// Update texts.
+				this.text_body = result;
+				translation.texts[text_id] <- {text=this.text_body, title=this.text_title};
+				translation.save();
 			}
 		}
 

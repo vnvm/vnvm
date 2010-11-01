@@ -73,6 +73,11 @@ int pressed_pressing(int get_pressing)
 			else if (strcmp(c, "down"     ) == 0) key = SDLK_DOWN;
 			else if (strcmp(c, "left"     ) == 0) key = SDLK_LEFT;
 			else if (strcmp(c, "right"    ) == 0) key = SDLK_RIGHT;
+			// F1, F2... F9
+			else if ((l == 2) && (c[0] == 'f') && (c[1] >= '1' && c[1] <= '9')) {
+				key = SDLK_F1 + (c[1] - '1');
+				//printf("FX: %d\n", key);
+			}
 			
 			// Special
 			else if (strcmp(c, "accept"   ) == 0) key = SDLK_RETURN;

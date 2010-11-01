@@ -69,6 +69,22 @@ function substr(str, start = 0, len = null)
 	return str.slice(start, end);
 }
 
+function addcslashes(str)
+{
+	local str_out = "";
+	for (local n = 0, l = str.len(); n < l; n++) {
+		local c = str[n];
+		switch (c) {
+			case '\n': str_out += "\\n"; break;
+			case '\r': str_out += "\\r"; break;
+			case '\t': str_out += "\\t"; break;
+			case '"' : str_out += "\\\""; break;
+			default: str_out += format("%c", c);
+		}
+	}
+	return str_out;
+}
+
 function rgba(str)
 {
 	local v = [0.0, 0.0, 0.0, 1.0];
