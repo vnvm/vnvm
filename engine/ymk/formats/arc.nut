@@ -50,7 +50,12 @@ class ARC
 				local file_size  = file.readn('i');
 				local file_start = file.readn('i');
 				
-				types[type_name][file_name] <- [file_start, file_size];
+				types[type_name][file_name] <- {
+					type     = type_name,
+					name     = file_name,
+					position = file_start,
+					size     = file_size,
+				};
 			}
 		}
 	}
@@ -67,8 +72,8 @@ class ARC
 	
 	static function getslice(slice)
 	{
-		file.seek(slice[0]);
-		return file.readslice(slice[1]);
+		file.seek(slice.position);
+		return file.readslice(slice.size);
 	}
 	
 	function get(name, show_error = 1)
@@ -110,6 +115,16 @@ class ARC
 			}
 		}
 	}
+
+	function iterator()
+	{
+		foreach (files in types) {
+			foreach (file in files) {
+				yield file;
+			}
+		}
+		return null;
+	}
 }
 
 class ARC_CONTAINER
@@ -144,5 +159,15 @@ class ARC_CONTAINER
 	function _get(name)
 	{
 		return get(name, 1);
+	}
+
+	function iterator()
+	{
+		foreach (arc in arc_list) {
+			foreach (file in arc.iterator()) {
+				yield file;
+			}
+		}
+		return null;
 	}
 }

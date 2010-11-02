@@ -138,6 +138,18 @@ function export_images_to_translate() {
 	resman.get_image("MAIN_BGP").export(path_to_files + "/translation/en");
 }
 
+// EXTRACT ALL THE IMAGES:
+
+/*
+{
+	foreach (file in arc.iterator()) if (file.type == "WIP") {
+		if (!file_exists(path_to_files + "/wip/" + file.name + ".0.png")) {
+			resman.get_image(file.name).export(path_to_files + "/wip");
+		}
+	}
+}
+//*/
+
 //resman.get_image("CG04_03").export(path_to_files + "/translation/en");
 //resman.get_image("MAINIP").export(path_to_files + "/translation/en");
 //resman.get_image("MAIN_AGP").export(path_to_files + "/translation/en");
