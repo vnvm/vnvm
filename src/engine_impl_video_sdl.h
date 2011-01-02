@@ -252,6 +252,7 @@ int zlib_compress(char *src_dat, int src_len, char **dst_dat, int *dst_len, int 
     
     int err = compress2((Bytef *)*dst_dat, (uLongf *)dst_len, (Bytef *)src_dat, (uLongf)src_len, level);
     if (err) {
+		fprintf(stderr, "zlib err: %d\n", err);
 		free(*dst_dat);
 		*dst_dat = NULL;
 		*dst_len = 0;
@@ -337,6 +338,8 @@ void fwrite_png_idat(FILE *f, SDL_Surface *surface) {
 		if (!error) {
 			fwrite_png_chunk(f, "IDAT", cdat, clen);
 			free(cdat);
+		} else {
+			fprintf(stderr, "zlib: Error compressing\n");
 		}
 		#if USE_OPENGL
 			free(pixels);
