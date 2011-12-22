@@ -81,7 +81,9 @@ class DATOP // T_LOVE95.EXE:00409430
 		if (log_ins) printf("  IMG_LOAD(%s, %d)\n", name, layer_dst);
 		local mrs = ::MRS(::pak_mrs[name + ".MRS"]);
 		//layers[layer_dst] = mrs.image;
-		mrs.image.draw(layers[layer_dst], 0, 0);
+		
+		layers[layer_dst].drawBitmap(mrs.image, 0, 0);
+		//mrs.image.draw(layers[layer_dst], 0, 0); // OLD
 		//layers[layer_dst] = mrs.image;
 	}
 
@@ -105,7 +107,9 @@ class DATOP // T_LOVE95.EXE:00409430
 		local src = layers[layer_src].slice(slice_x, slice_y, slice_w, slice_h);
 		//layer_dst = 0;
 		local dst = layers[layer_dst];
-		src.draw(dst, put_x, put_y);
+		//src.draw(dst, put_x, put_y); // OLD
+		dst.drawBitmap(src, put_x, put_y); // OLD
+		
 		Screen.flip();
 		//Screen.delay(16);
 	}

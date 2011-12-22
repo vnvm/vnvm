@@ -14,6 +14,7 @@ if ((info.argv.len() >= 2)) {
 	}
 }
 
+//include("tlove/main.nut"); return;
 //include("test.nut");
 
 if (exists_in_game_path_any(["chip.arc"])) {

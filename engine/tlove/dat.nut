@@ -150,6 +150,7 @@ class DAT
 					DATOP[cop.name].acall(vpar);
 				} catch (e) {
 					printf("ERROR(%02X:%s):%d: %s\n", op, cop.name, script.tell(), e);
+					throw(e);
 				}
 			} else {
 				printf("Not implemented DATOP.'%s'\n", cop.name);
