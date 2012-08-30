@@ -1,6 +1,0 @@
-/*
-Data
-*/
-class DAT
-{
-}

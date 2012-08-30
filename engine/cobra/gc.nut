@@ -1,6 +1,0 @@
-/*
-Graphic Cell
-*/
-class GC
-{
-}
