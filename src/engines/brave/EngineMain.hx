@@ -111,8 +111,6 @@ class EngineMain extends Sprite
 		Log.setColor(0xFF0000);
 #end
 		
-		GameInput.init();
-		
 		/*
 		var faceId = 57;
 		BraveLog.trace(StringEx.sprintf("Z_%02d_%02d", [Std.int(faceId / 100), Std.int(faceId % 100)]));

@@ -1,8 +1,16 @@
 package engines.dividead;
+import common.GraphicUtils;
 import common.io.Stream;
 import common.io.VirtualFileSystem;
 import common.script.ScriptOpcodes;
+import nme.display.Bitmap;
 import nme.display.BitmapData;
+import nme.display.PixelSnapping;
+import nme.display.Sprite;
+import nme.media.Sound;
+import nme.media.SoundChannel;
+import nme.text.TextField;
+import nme.text.TextFormat;
 import nme.utils.ByteArray;
 
 /**
@@ -21,6 +29,11 @@ class Game
 	 * WaVe files
 	 */
 	public var wv:DL1;
+	
+	/**
+	 * 
+	 */
+	public var fileSystem:VirtualFileSystem;
 
 	/**
 	 * 
@@ -49,18 +62,75 @@ class Game
 	
 	/**
 	 * 
+	 */
+	public var textField:TextField;
+	
+	/**
+	 * 
+	 */
+	public var gameSprite:Sprite;
+	
+	/**
+	 * 
+	 */
+	public var voiceChannel:SoundChannel;
+
+	/**
+	 * 
+	 */
+	public var effectChannel:SoundChannel;
+
+	/**
+	 * 
+	 */
+	public var musicChannel:SoundChannel;
+
+	/**
+	 * 
+	 */
+	//public var blackSprite:Sprite;
+
+	/**
+	 * 
 	 * @param	sg
 	 * @param	wv
 	 */
-	private function new(sg:DL1, wv:DL1) 
+	private function new(fileSystem:VirtualFileSystem, sg:DL1, wv:DL1) 
 	{
+		this.fileSystem = fileSystem;
 		this.sg = sg;
 		this.wv = wv;
 		this.imageCache = new Hash<BitmapData>();
 		this.scriptOpcodes = ScriptOpcodes.createWithClass(AB_OP);
 		this.state = new GameState();
-		this.back = new BitmapData(640, 480);
-		this.front = new BitmapData(640, 480);
+		this.back = new BitmapData(640, 480, false, 0xFF000000);
+		this.front = new BitmapData(640, 480, false, 0xFF000000);
+		this.textField = new TextField();
+		textField.defaultTextFormat = new TextFormat("Arial", 12, 0xFFFFFF);
+		textField.selectable = false;
+		textField.x = 110;
+		textField.y = 400;
+		textField.width = 420;
+		textField.height = 60;
+		textField.text = "";
+		textField.textColor = 0xFFFFFF;
+		
+		/*
+		blackSprite = new Sprite();
+		GraphicUtils.drawSolidFilledRectWithBounds(blackSprite.graphics, 0, 0, 640, 480, 0x000000, 1.0);
+		blackSprite.alpha = 0;
+		blackSprite.visible = 0;
+		*/
+		
+		gameSprite = new Sprite();
+		gameSprite.addChild(new Bitmap(front, PixelSnapping.AUTO, true));
+		gameSprite.addChild(textField);
+		//gameSprite.addChild(blackSprite);
+	}
+	
+	static private function addExtensionsWhenRequired(name:String, expectedExtension:String):String {
+		if (name.indexOf(".") == -1) name += "." + expectedExtension;
+		return name;
 	}
 	
 	/**
@@ -69,8 +139,7 @@ class Game
 	 * @param	done
 	 */
 	public function getImageCachedAsync(imageName:String, done:BitmapData -> Void):Void {
-		if (imageName.indexOf(".") == -1) imageName += ".bmp";
-		imageName = imageName.toUpperCase();
+		imageName = addExtensionsWhenRequired(imageName, "bmp").toUpperCase();
 		
 		if (imageCache.exists(imageName)) {
 			done(imageCache.get(imageName));
@@ -84,6 +153,31 @@ class Game
 	
 	/**
 	 * 
+	 * @param	soundName
+	 * @param	done
+	 */
+	public function getSound(soundName:String, done:Sound -> Void):Void {
+		soundName = addExtensionsWhenRequired(soundName, "wav").toUpperCase();
+
+		var byteArray:ByteArray;
+		wv.openAndReadAllAsync(soundName, function(byteArray:ByteArray) {
+			var sound:Sound = new Sound();
+			sound.loadCompressedDataFromByteArray(byteArray, byteArray.length);
+			done(sound);
+		});
+	}
+	
+	public function getMusic(musicName:String, done:Sound -> Void):Void {
+		var byteArray:ByteArray;
+		fileSystem.openAndReadAllAsync(Std.format("MID/$musicName.MID"), function(byteArray:ByteArray):Void {
+			var sound:Sound = new Sound();
+			sound.loadCompressedDataFromByteArray(byteArray, byteArray.length);
+			done(sound);
+		});
+	}
+	
+	/**
+	 * 
 	 * @param	fileSystem
 	 * @param	done
 	 */
@@ -92,7 +186,7 @@ class Game
 		fileSystem.openAsync("wv.dl1", function(wvStream:Stream) {
 			DL1.loadAsync(sgStream, function(sg:DL1) {
 			DL1.loadAsync(wvStream, function(wv:DL1) {
-				done(new Game(sg, wv));
+				done(new Game(fileSystem, sg, wv));
 			});
 			});
 		});

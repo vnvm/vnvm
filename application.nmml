@@ -27,9 +27,11 @@
 	<assets path="assets/img" rename="img" />
 	-->
 	
+	<!--
 	<section if="ios">
 		<assets path="assets" rename="assets" include="*" exclude="nme.svg" />
 	</section>
+	-->
 	
 	<!-- DLLs -->
 	<ndll name="std" />

@@ -1,4 +1,5 @@
 package ;
+import common.GameInput;
 import nme.display.Sprite;
 import nme.events.Event;
 import nme.Lib;
@@ -23,6 +24,8 @@ class Main extends Sprite
 
 	private function init(e) 
 	{
+		GameInput.init();
+		
 		addChild(new engines.dividead.EngineMain());
 		//addChild(new engines.brave.EngineMain());
 	}

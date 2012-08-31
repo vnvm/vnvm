@@ -1,5 +1,6 @@
 package engines.dividead;
 import common.AssetsFileSystem;
+import common.GameScalerSprite;
 import common.io.SubVirtualFileSystem;
 import common.io.VirtualFileSystem;
 import nme.display.Bitmap;
@@ -27,7 +28,7 @@ class EngineMain extends Sprite
 		
 		Game.newAsync(SubVirtualFileSystem.fromSubPath(fs, "dividead"), function(game:Game) {
 			var ab:AB = new AB(game);
-			addChild(new Bitmap(game.front));
+			addChild(new GameScalerSprite(640, 480, game.gameSprite));
 			ab.loadScriptAsync("aastart", function():Void {
 				ab.execute();
 			});

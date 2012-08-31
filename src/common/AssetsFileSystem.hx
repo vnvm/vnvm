@@ -12,7 +12,7 @@ import sys.FileSystem;
 class AssetsFileSystem 
 {
 	static public function getAssetsFileSystem():VirtualFileSystem {
-		for (tryPath in [nme.filesystem.File.applicationDirectory.nativePath + "/assets", "assets", "../assets", "../../assets", "../../../assets", "../../../../assets"]) {
+		for (tryPath in ["/private/var/mobile/vnvm", nme.filesystem.File.applicationDirectory.nativePath + "/assets", "assets", "../assets", "../../assets", "../../../assets", "../../../../assets"]) {
 			if (FileSystem.isDirectory(tryPath)) {
 				return new LocalFileSystem(tryPath);
 			}

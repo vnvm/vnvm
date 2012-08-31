@@ -1,4 +1,7 @@
 package engines.dividead;
+import common.Event2;
+import common.GameInput;
+import common.Keys;
 import cpp.Utf8;
 import engines.brave.formats.Decrypt;
 import engines.dividead.AB;
@@ -6,7 +9,12 @@ import haxe.Log;
 import haxe.Timer;
 import nme.display.BitmapData;
 import nme.errors.Error;
+import nme.events.Event;
+import nme.events.MouseEvent;
 import nme.geom.Matrix;
+import nme.media.Sound;
+import nme.media.SoundTransform;
+import nme.text.TextField;
 
 class AB_OP
 {
@@ -22,23 +30,16 @@ class AB_OP
 	@Opcode({ id:0x00, format:"<T", description:"Prints a text on the screen", savepoint:1 })
 	public function TEXT(done:Void -> Void, text:String):Void
 	{
-		/*
-		//printf("TEXT: '%s'\n", text);
-		local temp = Bitmap(::screen.w, ::screen.h);
-		::screen.draw(temp);
-		::font.print(::screen, text, AB_OP.margin.x, AB_OP.margin.y);
-		paint(2, 1);
-		while (true) {
-			//if (::mouse.)
-			if (Screen.input().mouse.click_left) break;
-			if (Screen.input().mouse.press_right) break;
-			Screen.frame();
-		}
-		temp.draw(::screen);
-		paint(1, 1);
-		*/
-		Log.trace("TEXT: " + text);
-		done();
+		ab.game.textField.text = StringTools.replace(text, '@', '"');
+
+		Event2.registerOnceAny([GameInput.onClick, GameInput.onKeyPress], function(e:Event):Void {
+			ab.game.textField.text = '';
+			if (ab.game.voiceChannel != null) {
+				ab.game.voiceChannel.stop();
+				ab.game.voiceChannel = null;
+			}
+			done();
+		});
 	}
 
 	@Opcode({ id:0x01, format:"PT", description:"Adds an option to the list of options" })
@@ -171,30 +172,45 @@ class AB_OP
 		ab.end();
 	}
 
-	@Opcode({ id:0x1E, format:"", description:"Performs a fade out to color black" })
-	public function FADE_OUT_BLACK()
+	@Opcode({ id:0x1E, format:"<", description:"Performs a fade out to color black" })
+	public function FADE_OUT_BLACK(done:Void -> Void)
 	{
-		ab.paint_to_color([0, 0, 0], 1000);
+		ab.paintToColorAsync([0x00, 0x00, 0x00], 1.0, done);
 	}
 
-	@Opcode({ id:0x1F, format:"", description:"Performs a fade out to color white" })
-	public function FADE_OUT_WHITE()
+	@Opcode({ id:0x1F, format:"<", description:"Performs a fade out to color white" })
+	public function FADE_OUT_WHITE(done:Void -> Void)
 	{
+		ab.paintToColorAsync([0xFF, 0xFF, 0xFF], 1.0, done);
 	}
 
-	@Opcode({ id:0x26, format:"S", description:"Starts a music" })
-	public function MUSIC_PLAY(name)
+	@Opcode({ id:0x26, format:"<S", description:"Starts a music" })
+	public function MUSIC_PLAY(done:Void -> Void, name:String):Void
 	{
+		MUSIC_STOP();
+		ab.game.getMusic(name, function(sound:Sound) {
+			ab.game.musicChannel = sound.play(0, 0, new SoundTransform(1, 0));
+			done();
+		});
 	}
 
 	@Opcode({ id:0x28, format:"", description:"Stops the currently playing music" })
-	public function MUSIC_STOP()
+	public function MUSIC_STOP():Void
 	{
+		if (ab.game.musicChannel != null) {
+			ab.game.musicChannel.stop();
+			ab.game.musicChannel = null;
+		}
 	}
 
-	@Opcode({ id:0x2B, format:"S", description:"Plays a sound in the voice channel" })
-	public function VOICE_PLAY(name)
+	@Opcode({ id:0x2B, format:"<S", description:"Plays a sound in the voice channel" })
+	public function VOICE_PLAY(done:Void -> Void, name:String):Void
 	{
+		var sound:Sound;
+		ab.game.getSound(name, function(sound:Sound):Void {
+			ab.game.voiceChannel = sound.play(0, 0, new SoundTransform(1, 0));
+			done();
+		});
 	}
 
 	@Opcode({ id:0x30, format:"2222", description:"Sets a clipping for the screen" })
@@ -202,14 +218,24 @@ class AB_OP
 	{
 	}
 
-	@Opcode({ id:0x35, format:"S", description:"Plays a sound in the effect channel" })
-	public function EFFECT_PLAY(name)
+	@Opcode({ id:0x35, format:"<S", description:"Plays a sound in the effect channel" })
+	public function EFFECT_PLAY(done:Void -> Void, name:String):Void
 	{
+		var sound:Sound;
+		EFFECT_STOP();
+		ab.game.getSound(name, function(sound:Sound):Void {
+			ab.game.effectChannel = sound.play(0, 0, new SoundTransform(1, 0));
+			done();
+		});
 	}
 
 	@Opcode({ id:0x36, format:"", description:"Stops the sound playing in the effect channgel" })
-	public function EFFECT_STOP()
+	public function EFFECT_STOP():Void
 	{
+		if (ab.game.effectChannel != null) {
+			ab.game.effectChannel.stop();
+			ab.game.effectChannel = null;
+		}
 	}
 
 	@Opcode({ id:0x37, format:"SS", description:"Sets the images that will be used in the map overlay" })

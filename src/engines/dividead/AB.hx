@@ -1,6 +1,7 @@
 package engines.dividead;
 import common.Animation;
 import common.ByteArrayUtils;
+import common.GraphicUtils;
 import common.IteratorUtilities;
 import common.script.Instruction;
 import common.script.Opcode;
@@ -8,6 +9,8 @@ import common.StringEx;
 import haxe.Log;
 import haxe.Timer;
 import nme.display.BitmapInt32;
+import nme.display.Sprite;
+import nme.geom.ColorTransform;
 import nme.geom.Point;
 import nme.geom.Rectangle;
 import nme.utils.ByteArray;
@@ -18,6 +21,7 @@ class AB
 	public var game:Game;
 	private var script:ByteArray = null;
 	private var running:Bool;
+	public var throttle:Bool;
 	
 	public function new(game:Game)
 	{
@@ -96,8 +100,16 @@ class AB
 		this.running = false;
 	}
 	
-	public function paint_to_color(color, time)
+	public function paintToColorAsync(color:Array<Int>, time:Float, done:Void -> Void):Void
 	{
+		var sprite:Sprite = new Sprite();
+		GraphicUtils.drawSolidFilledRectWithBounds(sprite.graphics, 0, 0, 640, 480, 0x000000, 1.0);
+		
+		Animation.animate(done, time, { }, { }, Animation.Linear, function(step:Float):Void {
+			game.front.copyPixels(game.back, game.back.rect, new Point(0, 0));
+			//sprite.alpha = step;
+			game.front.draw(sprite, null, new ColorTransform(1, 1, 1, step, 0, 0, 0, 0));
+		});
 		/*
 		if (throttle) return;
 
@@ -132,7 +144,7 @@ class AB
 			default: {
 				addFlipSet(function(rects:Array<Rectangle>) { rects.push(new Rectangle(0, 0, 640, 480)); } );
 			}
-			case 2: {
+			case 4: { // Rows
 				var block_size:Int = 16;
 				for (n in 0 ... block_size) {
 					addFlipSet(function(rects:Array<Rectangle>) { 
@@ -142,7 +154,7 @@ class AB
 					});
 				}
 			}
-			case 3: {
+			case 2: { // Columns
 				var block_size:Int = 16;
 				for (n in 0 ... block_size) {
 					addFlipSet(function(rects:Array<Rectangle>) { 
@@ -152,9 +164,19 @@ class AB
 					});
 				}
 			}
+			case 3: { // Courtine
+				for (y in IteratorUtilities.xrange(0, 480, 4)) {
+					addFlipSet(function(rects:Array<Rectangle>) { 
+						rects.push(new Rectangle(0, y, 640, 2));
+						rects.push(new Rectangle(0, 480 - 2 - y, 640, 2));
+					});
+				}
+			}
 		}
 		
 		var step = null;
+		
+		var frameTime:Int = Std.int(300 / allRects.length);
 		
 		step = function() {
 			if (allRects.length > 0) {
@@ -166,54 +188,12 @@ class AB
 				}
 				game.front.unlock();
 				
-				Timer.delay(step, 20);
+				Timer.delay(step, frameTime);
 			} else {
 				done();
 			}
 		};
 		
 		step();
-		
-		//Timer.delay(done, 1000);
-		/*
-		if (throttle) type = 0;
-		
-		local clips = [];
-		
-		local draw_row = function(clips, y) { clips.push([0, y, 640, 1]); };
-		local draw_col = function(clips, x) { clips.push([x, 0, 1, 480]); };
-		local flip = function(clips, fps) {
-			Screen.flip(clips);
-			Screen.frame(fps);
-			clips.clear();
-		}
-		switch (type) {
-			case 0:
-				flip(clips, 10000);
-			break;
-			case 0:
-			case 2:
-				local block_size = 16;
-				for (local n = 0; n < block_size; n++) {
-					for (local x = 0; x < 640; x += block_size) draw_col(clips, x + n);
-					flip(clips, 60);
-				}
-			break;
-			case 3:
-				for (local y = 0; y < 240; y++) {
-					draw_row(clips, y * 2);
-					draw_row(clips, 480 - y * 2 - 1);
-					if (y % 8 == 0) flip(clips, 60);
-				}
-			break;
-			case 1:
-				flip(clips, 10000);
-			break;
-			default:
-				printf("Unknown paint type %d\n", type);
-				flip(clips, 10000);
-			break;
-		}
-		*/
 	}
 }

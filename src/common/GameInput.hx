@@ -1,5 +1,7 @@
-package engines.brave;
+package common;
 
+import haxe.Log;
+import nme.events.Event;
 import nme.events.KeyboardEvent;
 import nme.events.MouseEvent;
 import nme.geom.Point;
@@ -18,6 +20,9 @@ class GameInput
 	{
 	}
 	
+	static public var onClick:Event2<MouseEvent>;
+	static public var onKeyPress:Event2<KeyboardEvent>;
+	
 	static public function init() {
 		pressing = new IntHash<Void>();
 		Lib.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
@@ -25,6 +30,19 @@ class GameInput
 		Lib.stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
 		Lib.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 		Lib.stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+		Lib.stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+		Lib.stage.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent) {
+			onClick.trigger(e);
+		});
+		
+		onClick = new Event2<MouseEvent>();
+		onKeyPress = new Event2<KeyboardEvent>();
+	}
+	
+	static public function onEnterFrame(e:Event):Void {
+		for (key in pressing.keys()) {
+			onKeyPress.trigger(new KeyboardEvent("onPress", true, false, 0, key));
+		}
 	}
 	
 	static public function isPressing(keyCode:Int):Bool {
@@ -52,14 +70,14 @@ class GameInput
 	
 	static private function onMouseDown(e:MouseEvent):Void {
 		if (e.buttonDown) {
-			BraveLog.trace(Std.format("onMouseDown : ${e.stageX}, ${e.stageY}"));
+			//Log.trace(Std.format("onMouseDown : ${e.stageX}, ${e.stageY}"));
 			mouseStart = new Point(e.stageX, e.stageY);
 			//e.stageX
 		}
 	}
 
 	static private function onMouseUp(e:MouseEvent):Void {
-		BraveLog.trace(Std.format("onMouseUp : ${e.stageX}, ${e.stageY}"));
+		//Log.trace(Std.format("onMouseUp : ${e.stageX}, ${e.stageY}"));
 		setKey(Keys.Left, false);
 		setKey(Keys.Right, false);
 		setKey(Keys.Up, false);
@@ -70,11 +88,11 @@ class GameInput
 
 	static private function onMouseMove(e:MouseEvent):Void {
 		if (e.buttonDown) {
-			BraveLog.trace(Std.format("onMouseMove : ${e.stageX}, ${e.stageY}"));
+			//Log.trace(Std.format("onMouseMove : ${e.stageX}, ${e.stageY}"));
 			mouseCurrent = new Point(e.stageX, e.stageY);
 			var offset:Point = mouseCurrent.subtract(mouseStart);
 			
-			BraveLog.trace(Std.format("--> ${offset.x}, ${offset.y}"));
+			//Log.trace(Std.format("--> ${offset.x}, ${offset.y}"));
 			
 			setKey(Keys.Left, (offset.x < -deltaThresold));
 			setKey(Keys.Right, (offset.x > deltaThresold));

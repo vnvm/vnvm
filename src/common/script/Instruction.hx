@@ -28,6 +28,6 @@ class Instruction {
 	}
 	
 	public function toString():String {
-		return Std.format("$opcode ${parameters.join(', ')}");
+		return Std.format("${opcode.opcodeId}.${opcode.methodName} ${parameters.join(', ')}");
 	}
 }
