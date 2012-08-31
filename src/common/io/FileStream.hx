@@ -1,6 +1,7 @@
 package common.io;
 import common.ByteUtils;
 import haxe.io.Bytes;
+import nme.errors.Error;
 import nme.utils.ByteArray;
 import sys.FileStat;
 import sys.FileSystem;
@@ -20,6 +21,7 @@ class FileStream extends Stream
 
 	public function new(name:String) 
 	{
+		if (!FileSystem.exists(name)) throw(new Error(Std.format("File '$name' doesn't exist")));
 		this.fileInput = File.read(name);
 		this.position = 0;
 		this.fileStat = FileSystem.stat(name);
@@ -31,6 +33,9 @@ class FileStream extends Stream
 		fileInput.seek(position, FileSeek.SeekBegin);
 		
 		var bytes:Bytes = fileInput.read(length);
+		
+		position += bytes.length;
+		
 		done(ByteUtils.BytesToByteArray(bytes));
 	}
 	

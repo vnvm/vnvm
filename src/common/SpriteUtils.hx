@@ -16,7 +16,11 @@ class SpriteUtils
 		sprite.y = -sprite.height * cy;
 		return sprite;
 	}
-	
+
+	static public function removeSpriteChilds(container:Sprite):Void {
+		while (container.numChildren > 0) container.removeChildAt(0);
+	}
+
 	static public function extractSpriteChilds(container:Sprite):Array<DisplayObject> {
 		var children:Array<DisplayObject> = new Array<DisplayObject>();
 		while (container.numChildren > 0) {

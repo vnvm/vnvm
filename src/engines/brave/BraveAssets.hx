@@ -1,6 +1,7 @@
 package engines.brave;
 
 import common.AssetsFileSystem;
+import common.ByteUtils;
 import engines.brave.cgdb.CgDb;
 import engines.brave.cgdb.CgDbEntry;
 import engines.brave.formats.BraveImage;
@@ -114,7 +115,7 @@ class BraveAssets
 	}
 
 	static public function getSoundAsync(name:String, done:Sound -> Void):Void {
-		#if !cpp || ios
+		#if !cpp
 			done(getDummySound());
 		#else
 			if (soundPack == null) {
@@ -125,14 +126,7 @@ class BraveAssets
 	}
 
 	static public function getVoiceAsync(name:String, done:Sound -> Void):Void {
-		#if !cpp || ios
-			/*
-			BraveAssets.getBytesAsync(Std.format("voice/$name.wav"), function(voiceArray:ByteArray):Void {
-				var sound:Sound = new Sound();
-				sound.loadCompressedDataFromByteArray(voiceArray, voiceArray.length);
-				done(sound);
-			});
-			*/
+		#if !cpp
 			done(getDummySound());
 		#else
 			if (voicePack == null) {
@@ -143,7 +137,7 @@ class BraveAssets
 	}
 	
 	static public function getMusicAsync(name:String, done:Sound -> Void):Void {
-		#if !cpp || ios
+		#if !cpp
 			done(getDummySound());
 		#else
 			BraveAssets.getBytesAsync("midi/" + name + ".mid", function(bytes:ByteArray) {
@@ -159,7 +153,7 @@ class BraveAssets
 		#end
 	}
 
-	#if !cpp
+	#if !cpp && !nme
 		static public function getBytesAsync(name:String, done:ByteArray -> Void):Void {
 			var loader:URLLoader = new URLLoader();
 			loader.addEventListener(Event.COMPLETE, function(e) {

@@ -13,8 +13,6 @@ import sys.io.File;
  * @author soywiz
  */
 
-private typedef BmpColor = { r:Int, g:Int, b:Int, reserved:Int };
-
 class BMP 
 {
 	static public function decode(bytes:ByteArray):BitmapData {
@@ -60,7 +58,7 @@ class BMP
 				var g:Int = bytes.readUnsignedByte();
 				var b:Int = bytes.readUnsignedByte();
 				var reserved:Int = bytes.readUnsignedByte();
-				palette.push({ r : r, g : g, b : b, reserved : reserved });
+				palette.push({ r : r, g : g, b : b, a : 0xFF });
 			}
 		}
 		
@@ -83,9 +81,9 @@ class BMP
 
 	@:nostack static private function decodeRows8(bytes:ByteArray, bitmapData:BitmapData, palette:Array<BmpColor>):Void {
 		var width:Int = bitmapData.width, height:Int = bitmapData.height;
-		
+
+		var bmpData:ByteArray = new ByteArray();
 		for (y in 0 ... height) {
-			var bmpData:ByteArray = new ByteArray();
 			bmpData.position = 0;
 			for (x in 0 ... width) {
 				var index:Int = bytes.readUnsignedByte();
@@ -96,6 +94,7 @@ class BMP
 				bmpData.writeByte(color.g);
 				bmpData.writeByte(color.r);
 			}
+			bmpData.position = 0;
 			bitmapData.setPixels(new Rectangle(0, height - y - 1, width, 1), bmpData);
 		}
 	}
@@ -103,8 +102,8 @@ class BMP
 	@:nostack static private function decodeRows24(bytes:ByteArray, bitmapData:BitmapData):Void {
 		var width:Int = bitmapData.width, height:Int = bitmapData.height;
 
+		var bmpData:ByteArray = new ByteArray();
 		for (y in 0 ... height) {
-			var bmpData:ByteArray = new ByteArray();
 			bmpData.position = 0;
 			for (x in 0 ... width) {
 				var r:Int = bytes.readUnsignedByte();
@@ -116,6 +115,7 @@ class BMP
 				bmpData.writeByte(g);
 				bmpData.writeByte(r);
 			}
+			bmpData.position = 0;
 			bitmapData.setPixels(new Rectangle(0, height - y - 1, width, 1), bmpData);
 		}
 	}

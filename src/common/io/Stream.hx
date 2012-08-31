@@ -16,4 +16,8 @@ class Stream
 	{
 		throw(Std.format("Not implemented Stream.readBytesAsync : $this"));
 	}
+	
+	public function readAllBytesAsync(done:ByteArray -> Void):Void {
+		return readBytesAsync(length, done);
+	}
 }

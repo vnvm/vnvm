@@ -1,12 +1,15 @@
 package engines.brave.sound;
+import common.ByteUtils;
 import haxe.io.Bytes;
 import haxe.io.BytesData;
 import haxe.io.BytesInput;
 import haxe.Log;
+import nme.errors.Error;
 import nme.events.Event;
 import nme.media.Sound;
 import nme.utils.ByteArray;
 import nme.utils.Endian;
+import sys.io.File;
 
 /**
  * ...
@@ -92,10 +95,7 @@ class SoundInstance
 	*/
 	
 	private function loadData():Void  {
-	#if !ios
 		sound.loadPCMFromByteArray(ByteArray.fromBytes(soundEntry.bytes), Std.int(soundEntry.bytes.length / 2 / fromChannels), "short", (fromChannels == 2) ? true : false, FromRate);
-	#end
-		//sound.addEventListener(SampleDataEvent.SAMPLE_DATA, playSound);
 	}
 	
 	/*

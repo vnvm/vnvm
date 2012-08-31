@@ -241,9 +241,6 @@ class ScriptInstructions
 	@Opcode(0x17, "<P")
 	@Unimplemented(1)
 	public function MUSIC_PLAY(done:Void -> Void, index:Int) {
-		#if ios
-			done();
-		#else
 		MUSIC_STOP();
 		var fileName:String = StringEx.sprintf('bgm%02dgm', [index]);
 		BraveAssets.getMusicAsync(fileName, function(music:Sound) {
@@ -251,7 +248,6 @@ class ScriptInstructions
 			scriptThread.gameState.musicChannel = music.play();
 			done();
 		});
-		#end
 	}
 	
 	/**
@@ -524,20 +520,16 @@ class ScriptInstructions
 				GameState.waitClickOrKeyPress(function() {
 					textSprite.endText();
 					if (voiceChannel != null) voiceChannel.stop();
-					done();
+					Timer.delay(done, 1);
 				});
 			});
 		};
 
 		if (voiceName != "") {
-			#if ios
+			BraveAssets.getVoiceAsync(voiceName, function(voice:Sound) {
+				voiceChannel = voice.play();
 				internal();
-			#else
-				BraveAssets.getVoiceAsync(voiceName, function(voice:Sound) {
-					voiceChannel = voice.play();
-					internal();
-				});
-			#end
+			});
 		} else {
 			internal();
 		}

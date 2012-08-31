@@ -24,7 +24,7 @@ class StringEx
 	}
 
 	static public function sprintf(format:String, params: Array<Dynamic>):String {
-		var reg:EReg = ~/%(-)?(0)?(\d*)(d|x|s)/g;
+		var reg:EReg = ~/%(-)?(0)?(\d*)(d|x|X|s)/g;
 		var f:EReg;
 		
 		return reg.customReplace(format, function (f:EReg):String {

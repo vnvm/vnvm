@@ -137,6 +137,7 @@ class GameState
 		rootClip.backgroundBack.visible = true;
 		
 		out.draw(rootClip.backgroundBack);
+		
 		//rootClip.backgroundBack
 		var pixels:ByteArray = out.getPixels(out.rect);
 		
@@ -154,7 +155,7 @@ class GameState
 		
 		out.setPixels(out.rect, pixels);
 		
-		SpriteUtils.extractSpriteChilds(rootClip.backgroundBack);
+		SpriteUtils.removeSpriteChilds(rootClip.backgroundBack);
 		rootClip.backgroundBack.addChild(new Bitmap(out, PixelSnapping.AUTO, true));
 	}
 

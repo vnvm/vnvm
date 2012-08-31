@@ -19,7 +19,14 @@
 	
 	<!-- classpath, haxe libs -->
 	<source path="src" />
+
 	<haxelib name="nme" />
+	
+	<!-- TEST Libraries -->
+	<haxelib name="munit" />
+	<!--
+	<haxelib name="hamcres" />
+	-->
 	
 	<!-- assets -->
 	<icon path="assets/logo.svg" />

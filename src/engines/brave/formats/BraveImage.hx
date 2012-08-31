@@ -1,6 +1,6 @@
 package engines.brave.formats;
 
-import engines.brave.ByteUtils;
+import common.ByteUtils;
 import haxe.io.Bytes;
 import nme.display.BitmapData;
 import nme.errors.Error;

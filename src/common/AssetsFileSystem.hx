@@ -13,7 +13,7 @@ class AssetsFileSystem
 {
 	static public function getAssetsLocalPath():String {
 		for (tryPath in ["/private/var/mobile/vnvm", nme.filesystem.File.applicationDirectory.nativePath + "/assets", "assets", "../assets", "../../assets", "../../../assets", "../../../../assets"]) {
-			if (FileSystem.isDirectory(tryPath)) {
+			if (FileSystem.exists(tryPath) && FileSystem.isDirectory(tryPath)) {
 				return tryPath;
 			}
 		}
