@@ -11,12 +11,16 @@ import sys.FileSystem;
 
 class AssetsFileSystem 
 {
-	static public function getAssetsFileSystem():VirtualFileSystem {
+	static public function getAssetsLocalPath():String {
 		for (tryPath in ["/private/var/mobile/vnvm", nme.filesystem.File.applicationDirectory.nativePath + "/assets", "assets", "../assets", "../../assets", "../../../assets", "../../../../assets"]) {
 			if (FileSystem.isDirectory(tryPath)) {
-				return new LocalFileSystem(tryPath);
+				return tryPath;
 			}
 		}
 		throw(new Error("Can't locate assets folder"));
+	}
+
+	static public function getAssetsFileSystem():VirtualFileSystem {
+		return new LocalFileSystem(getAssetsLocalPath());
 	}
 }

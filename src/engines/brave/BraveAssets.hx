@@ -1,5 +1,6 @@
 package engines.brave;
 
+import common.AssetsFileSystem;
 import engines.brave.cgdb.CgDb;
 import engines.brave.cgdb.CgDbEntry;
 import engines.brave.formats.BraveImage;
@@ -184,12 +185,7 @@ class BraveAssets
 		static private function getBasePath():String
 		{
 			if (cachedBasePath == null) {
-				for (tryPath in [File.applicationDirectory.nativePath + "/assets/brave", "assets/brave", "../assets/brave", "../../assets/brave", "../../../assets/brave", "../../../../assets/brave"]) {
-					if (FileSystem.isDirectory(tryPath)) {
-						cachedBasePath = FileSystem.fullPath(tryPath);
-						break;
-					}
-				}
+				cachedBasePath = AssetsFileSystem.getAssetsLocalPath() + "/brave";
 			}
 			
 			if (cachedBasePath != null) {

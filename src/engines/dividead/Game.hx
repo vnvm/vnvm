@@ -168,8 +168,10 @@ class Game
 	}
 	
 	public function getMusic(musicName:String, done:Sound -> Void):Void {
+		musicName = addExtensionsWhenRequired(musicName, "mid").toUpperCase();
+		
 		var byteArray:ByteArray;
-		fileSystem.openAndReadAllAsync(Std.format("MID/$musicName.MID"), function(byteArray:ByteArray):Void {
+		fileSystem.openAndReadAllAsync(Std.format("MID/$musicName"), function(byteArray:ByteArray):Void {
 			var sound:Sound = new Sound();
 			sound.loadCompressedDataFromByteArray(byteArray, byteArray.length);
 			done(sound);
@@ -182,8 +184,8 @@ class Game
 	 * @param	done
 	 */
 	static public function newAsync(fileSystem:VirtualFileSystem, done:Game -> Void):Void {
-		fileSystem.openAsync("sg.dl1", function(sgStream:Stream) {
-		fileSystem.openAsync("wv.dl1", function(wvStream:Stream) {
+		fileSystem.openAsync("SG.DL1", function(sgStream:Stream) {
+		fileSystem.openAsync("WV.DL1", function(wvStream:Stream) {
 			DL1.loadAsync(sgStream, function(sg:DL1) {
 			DL1.loadAsync(wvStream, function(wv:DL1) {
 				done(new Game(fileSystem, sg, wv));
