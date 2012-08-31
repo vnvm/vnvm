@@ -1,10 +1,10 @@
 package engines.brave;
 
+import common.GraphicUtils;
 import engines.brave.BraveAssets;
 import engines.brave.formats.BraveImage;
 import engines.brave.GameInput;
 import engines.brave.GameState;
-import engines.brave.GraphicUtils;
 import engines.brave.map.Map;
 import engines.brave.script.Script;
 import engines.brave.script.ScriptReader;
@@ -13,7 +13,6 @@ import engines.brave.sound.SoundPack;
 import engines.brave.sprites.GameSprite;
 import engines.brave.sprites.map.Character;
 import engines.brave.sprites.map.MapSprite;
-import engines.brave.StringEx;
 import haxe.Timer;
 import nme.geom.Rectangle;
 import nme.media.Sound;

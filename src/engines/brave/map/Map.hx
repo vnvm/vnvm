@@ -1,8 +1,8 @@
 package engines.brave.map;
+import common.ByteArrayUtils;
+import common.LangUtils;
 import engines.brave.BraveAssets;
-import engines.brave.ByteArrayUtils;
 import engines.brave.formats.Decrypt;
-import engines.brave.LangUtils;
 import haxe.Log;
 import nme.display.Graphics;
 import nme.errors.Error;

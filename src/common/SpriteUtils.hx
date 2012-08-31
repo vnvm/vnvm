@@ -1,4 +1,4 @@
-package engines.brave;
+package common;
 import haxe.Log;
 import nme.display.DisplayObject;
 import nme.display.Graphics;
@@ -34,7 +34,7 @@ class SpriteUtils
 	}
 	
 	static public function dumpSpriteChildren(name:String, sprite:Sprite):Void {
-		for (n in 0 ... sprite.numChildren) BraveLog.trace(name + ":" + sprite.getChildAt(n));
+		for (n in 0 ... sprite.numChildren) Log.trace(name + ":" + sprite.getChildAt(n));
 	}
 
 	static public function swapSpriteChildren(sprite1:Sprite, sprite2:Sprite):Void {

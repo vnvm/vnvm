@@ -1,5 +1,5 @@
 package engines.brave.map;
-import engines.brave.GraphicUtils;
+import common.GraphicUtils;
 import nme.display.Graphics;
 import nme.geom.Matrix;
 

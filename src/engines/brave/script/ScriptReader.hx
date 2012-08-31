@@ -1,8 +1,8 @@
 package engines.brave.script;
+import common.ByteArrayUtils;
 import common.script.Instruction;
 import common.script.Opcode;
 import common.script.ScriptOpcodes;
-import engines.brave.ByteArrayUtils;
 import haxe.Log;
 import nme.errors.Error;
 

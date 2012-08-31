@@ -1,4 +1,4 @@
-package engines.brave;
+package common;
 
 import nme.events.Event;
 import nme.utils.Timer;

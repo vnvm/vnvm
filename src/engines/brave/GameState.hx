@@ -1,6 +1,8 @@
 package engines.brave;
 
+import common.Animation;
 import common.script.ScriptOpcodes;
+import common.SpriteUtils;
 import engines.brave.map.Map;
 import engines.brave.script.Script;
 import engines.brave.script.ScriptInstructions;

@@ -1,4 +1,5 @@
 package common.script;
+import haxe.Log;
 import haxe.rtti.Meta;
 import nme.errors.Error;
 
@@ -38,10 +39,10 @@ class ScriptOpcodes
 				var description:String = "";
 				
 				// Format with object
-				if (Reflect.getProperty(opcodeAttribute, "id")) {
-					id = opcodeAttribute.id;
-					format = opcodeAttribute.format;
-					description = opcodeAttribute.description;
+				if (Reflect.isObject(opcodeAttribute[0])) {
+					id = opcodeAttribute[0].id;
+					format = opcodeAttribute[0].format;
+					description = opcodeAttribute[0].description;
 				}
 				// Format with array
 				else {
@@ -49,7 +50,10 @@ class ScriptOpcodes
 					format = opcodeAttribute[Std.int(opcodeAttribute.length - 1)];
 				}
 
-				opcodesById.set(id, new Opcode(key, id, format, description, unimplemented));
+				var opcode:Opcode = new Opcode(key, id, format, description, unimplemented);
+				//Log.trace(opcodeAttribute);
+				//Log.trace(opcode);
+				opcodesById.set(id, opcode);
 			}
 		}
 	}

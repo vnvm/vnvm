@@ -1,6 +1,6 @@
 package engines.brave.sprites;
+import common.SpriteUtils;
 import engines.brave.sprites.map.MapSprite;
-import engines.brave.SpriteUtils;
 import nme.display.Graphics;
 import nme.display.Sprite;
 import nme.text.TextField;

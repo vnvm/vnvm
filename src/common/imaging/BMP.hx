@@ -6,6 +6,7 @@ import nme.geom.ColorTransform;
 import nme.geom.Rectangle;
 import nme.utils.ByteArray;
 import nme.utils.Endian;
+import sys.io.File;
 
 /**
  * ...
@@ -18,6 +19,8 @@ class BMP
 {
 	static public function decode(bytes:ByteArray):BitmapData {
 		bytes.endian = Endian.LITTLE_ENDIAN;
+		
+		//File.saveBytes("c:/temp/temp.bmp", bytes);
 		
 		// BITMAPFILEHEADER
 		var magic:String = bytes.readUTFBytes(2);
@@ -48,13 +51,17 @@ class BMP
 		
 		var palette:Array<BmpColor> = new Array<BmpColor>();
 		
-		// RGBQUAD - Palette
-		for (n in 0 ... colorsUsed) {
-			var r:Int = bytes.readUnsignedByte();
-			var g:Int = bytes.readUnsignedByte();
-			var b:Int = bytes.readUnsignedByte();
-			var reserved:Int = bytes.readUnsignedByte();
-			palette.push({ r : r, g : g, b : b, reserved : reserved });
+		if (bitCount == 8) {
+			if (colorsUsed == 0) colorsUsed = 0x100;
+			// RGBQUAD - Palette
+			//for (n in 0 ... colorsUsed) {
+			for (n in 0 ... colorsUsed) {
+				var r:Int = bytes.readUnsignedByte();
+				var g:Int = bytes.readUnsignedByte();
+				var b:Int = bytes.readUnsignedByte();
+				var reserved:Int = bytes.readUnsignedByte();
+				palette.push({ r : r, g : g, b : b, reserved : reserved });
+			}
 		}
 		
 		// LINES
@@ -81,7 +88,8 @@ class BMP
 			var bmpData:ByteArray = new ByteArray();
 			bmpData.position = 0;
 			for (x in 0 ... width) {
-				var index:Int = bytes.readByte();
+				var index:Int = bytes.readUnsignedByte();
+				//Log.trace(Std.format("INDEX: $index, ${palette.length}"));
 				var color:BmpColor = palette[index];
 				bmpData.writeByte(0xFF);
 				bmpData.writeByte(color.b);
@@ -99,9 +107,9 @@ class BMP
 			var bmpData:ByteArray = new ByteArray();
 			bmpData.position = 0;
 			for (x in 0 ... width) {
-				var r:Int = bytes.readByte();
-				var g:Int = bytes.readByte();
-				var b:Int = bytes.readByte();
+				var r:Int = bytes.readUnsignedByte();
+				var g:Int = bytes.readUnsignedByte();
+				var b:Int = bytes.readUnsignedByte();
 				var a:Int = 0xFF;
 				bmpData.writeByte(a);
 				bmpData.writeByte(b);

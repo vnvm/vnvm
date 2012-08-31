@@ -1,9 +1,9 @@
 package engines.brave.script;
+import common.StringEx;
 import engines.brave.BraveAssets;
 import engines.brave.GameState;
 import engines.brave.sprites.map.Character;
 import engines.brave.sprites.TextSprite;
-import engines.brave.StringEx;
 import haxe.Log;
 import haxe.Timer;
 import nme.errors.Error;

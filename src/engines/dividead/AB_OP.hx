@@ -1,9 +1,16 @@
 package engines.dividead;
+import cpp.Utf8;
+import engines.brave.formats.Decrypt;
 import engines.dividead.AB;
+import haxe.Log;
+import haxe.Timer;
+import nme.display.BitmapData;
+import nme.errors.Error;
+import nme.geom.Matrix;
 
 class AB_OP
 {
-	static margin = { x = 108, y = 400, h = 12 };
+	//static var margin = { x = 108, y = 400, h = 12 };
 	
 	var ab:AB;
 	
@@ -12,9 +19,10 @@ class AB_OP
 		this.ab = ab;
 	}
 
-	@Opcode({ id:0x00, format:"T", description:"Prints a text on the screen", savepoint:1 })
-	function TEXT(done:Void -> Void, text:String):Void
+	@Opcode({ id:0x00, format:"<T", description:"Prints a text on the screen", savepoint:1 })
+	public function TEXT(done:Void -> Void, text:String):Void
 	{
+		/*
 		//printf("TEXT: '%s'\n", text);
 		local temp = Bitmap(::screen.w, ::screen.h);
 		::screen.draw(temp);
@@ -28,48 +36,55 @@ class AB_OP
 		}
 		temp.draw(::screen);
 		paint(1, 1);
+		*/
+		Log.trace("TEXT: " + text);
+		done();
 	}
 
 	@Opcode({ id:0x01, format:"PT", description:"Adds an option to the list of options" })
-	function OPTION_ADD(pointer:Int, text:String)
+	public function OPTION_ADD(pointer:Int, text:String)
 	{
-		this.options.push({pointer = pointer, text = text});
+		ab.game.state.options.push({ pointer : pointer, text : text });
 	}
 	
 	@Opcode({ id:0x02, format:"P", description:"Jumps unconditionally to a fixed adress" })
-	function JUMP(pointer:Int)
+	public function JUMP(offset:Int)
 	{
-		this.jump(pointer);
+		ab.jump(offset);
 	}
 
 	@Opcode({ id:0x03, format:"FF2", description:"Sets a range of flags to a value" })
-	function SET_RANGE(start:Int, end:Int, value:Int)
+	public function SET_RANGE(start:Int, end:Int, value:Int)
 	{
-		printf("FLAG[%d..%d] = %d\n", start, end, value);
-		for (n in start ... end + 1) this.ab.flags[n] = value;
+		Log.trace(Std.format("FLAG[$start..$end] = $value"));
+		for (n in start ... end + 1) ab.game.state.flags[n] = value;
 	}
 
 	@Opcode({ id:0x04, format:"Fc2", description:"Sets a flag with a value" })
-	function SET(flag:Int, op:Int, value:Int)
+	public function SET(flag:Int, opId:Int, value:Int)
 	{
-		printf("FLAG[%d] %c %d\n", flag, op, value);
-		switch (op.charCodeAt(0)) {
-			case '=': this.ab.flags[flag]  = value; break;
-			case '+': this.ab.flags[flag] += value; break;
-			case '-': this.ab.flags[flag] -= value; break;
-			default: throw(::format("Unknown SET operation '%c'", op));
+		var op:String = String.fromCharCode(opId);
+		Log.trace(Std.format("FLAG[$flag] $op $value"));
+		switch (op) {
+			case '=': ab.game.state.flags[flag]  = value;
+			case '+': ab.game.state.flags[flag] += value;
+			case '-': ab.game.state.flags[flag] -= value;
+			default: throw(Std.format("Unknown SET operation '$op'"));
 		}
 	}
 
 	@Opcode({ id:0x06, format:"", description:"Empties the option list", savepoint:1 })
-	function OPTION_RESET()
+	public function OPTION_RESET()
 	{
-		this.options = [];
+		ab.game.state.options = [];
 	}
 
-	@Opcode({ id:0x07, format:"", description:"Show the list of options" })
-	function OPTION_SHOW()
+	@Opcode({ id:0x07, format:"<", description:"Show the list of options" })
+	public function OPTION_SHOW(done:Void -> Void)
 	{
+		throw(new Error("error"));
+		//done();
+		/*
 		//::font.print(::screen, text, 108, 400);
 		local selected_option = 0;
 		local color_white = [1, 1, 1, 1];
@@ -100,122 +115,125 @@ class AB_OP
 		
 		local option = options[selected_option];
 		this.jump(option.pointer);
+		*/
 	}
 
-	@Opcode({ id:0x0A, format:"", description:"Shows again a list of options" })
-	function OPTION_RESHOW()
+	@Opcode({ id:0x0A, format:"<", description:"Shows again a list of options" })
+	public function OPTION_RESHOW(done:Void -> Void)
 	{
-		AB_OP.OPTION_SHOW();
+		OPTION_SHOW(done);
 	}
 
 	@Opcode({ id:0x10, format:"Fc2P", description:"Jumps if the condition is not true" })
-	function JUMP_IF_NOT(flag, op, value, pointer)
+	public function JUMP_IF_NOT(flag:Int, opId:Int, value:Int, pointer:Int):Void
 	{
+		var op:String = String.fromCharCode(opId);
 		//printf("JUMP_IF_NOT (%08X) FLAG[%d] %c %d\n", pointer, flag, op, value);
-		local result = 0;
+		var result:Bool = false;
 		switch (op)
 		{
-			case '=': result = (this.flags[flag] == value); break;
-			case '}': result = (this.flags[flag] >  value); break;
-			case '{': result = (this.flags[flag] <  value); break;
-			default:
-				throw(::format("Unknown JUMP_IF_NOT operation '%c'", op));
-			break;
+			case '=': result = (ab.game.state.flags[flag] == value);
+			case '}': result = (ab.game.state.flags[flag] >  value);
+			case '{': result = (ab.game.state.flags[flag] <  value);
+			default: throw(new Error(Std.format("Unknown JUMP_IF_NOT operation '$op'")));
 		}
-		if (!result) this.jump(pointer);
+		if (!result) ab.jump(pointer);
 	}
 
-	@Opcode({ id:0x11, format:"2", description:"Wait `time` milliseconds" })
-	function WAIT(time)
+	@Opcode({ id:0x11, format:"<2", description:"Wait `time` milliseconds" })
+	public function WAIT(done:Void -> Void, time:Int):Void
 	{
+		Timer.delay(done, time);
 	}
 
-	@Opcode({ id:0x14, format:"2", description:"Repaints the screen" })
-	function REPAINT(type)
+	@Opcode({ id:0x14, format:"<2", description:"Repaints the screen" })
+	public function REPAINT(done:Void -> Void, type:Int):Void
 	{
-		paint(0, type);
+		ab.paintAsync(0, type, done);
 	}
 
 	@Opcode({ id:0x16, format:"S", description:"Puts an image overlay on the screen" })
-	function IMAGE_OVERLAY(name)
+	public function IMAGE_OVERLAY(name:String)
 	{
 	}
 
-	@Opcode({ id:0x18, format:"S", description:"Loads and executes a script" })
-	function SCRIPT(name)
+	@Opcode({ id:0x18, format:"<S", description:"Loads and executes a script" })
+	public function SCRIPT(done:Void -> Void, name:String):Void
 	{
-		printf("SCRIPT('%s')\n", name);
-		this.set_script(name);
+		Log.trace(Std.format("SCRIPT('$name')"));
+		ab.loadScriptAsync(name, done);
 	}
 
 	@Opcode({ id:0x19, format:"", description:"Ends the game" })
-	function GAME_END()
+	public function GAME_END()
 	{
-		printf("GAME_END\n");
-		this.end();
+		Log.trace("GAME_END");
+		ab.end();
 	}
 
 	@Opcode({ id:0x1E, format:"", description:"Performs a fade out to color black" })
-	function FADE_OUT_BLACK()
+	public function FADE_OUT_BLACK()
 	{
-		paint_to_color([0, 0, 0], 1000);
+		ab.paint_to_color([0, 0, 0], 1000);
 	}
 
 	@Opcode({ id:0x1F, format:"", description:"Performs a fade out to color white" })
-	function FADE_OUT_WHITE()
+	public function FADE_OUT_WHITE()
 	{
 	}
 
 	@Opcode({ id:0x26, format:"S", description:"Starts a music" })
-	function MUSIC_PLAY(name)
+	public function MUSIC_PLAY(name)
 	{
 	}
 
 	@Opcode({ id:0x28, format:"", description:"Stops the currently playing music" })
-	function MUSIC_STOP()
+	public function MUSIC_STOP()
 	{
 	}
 
 	@Opcode({ id:0x2B, format:"S", description:"Plays a sound in the voice channel" })
-	function VOICE_PLAY(name)
+	public function VOICE_PLAY(name)
 	{
 	}
 
 	@Opcode({ id:0x30, format:"2222", description:"Sets a clipping for the screen" })
-	function CLIP(x1, y1, x2, y2)
+	public function CLIP(x1, y1, x2, y2)
 	{
 	}
 
 	@Opcode({ id:0x35, format:"S", description:"Plays a sound in the effect channel" })
-	function EFFECT_PLAY(name)
+	public function EFFECT_PLAY(name)
 	{
 	}
 
 	@Opcode({ id:0x36, format:"", description:"Stops the sound playing in the effect channgel" })
-	function EFFECT_STOP()
+	public function EFFECT_STOP()
 	{
 	}
 
 	@Opcode({ id:0x37, format:"SS", description:"Sets the images that will be used in the map overlay" })
-	function MAP_IMAGES(name1, name2)
+	public function MAP_IMAGES(name1, name2)
 	{
 	}
 
 	@Opcode({ id:0x38, format:"", description:"Empties the map_option list", savepoint:1 })
-	function MAP_OPTION_RESET()
+	public function MAP_OPTION_RESET():Void
 	{
-		this.map_options = [];
+		ab.game.state.optionsMap = [];
 	}
 
 	@Opcode({ id:0x40, format:"P2222", description:"Adds an option to the map_option list" })
-	function MAP_OPTION_ADD(pointer, x1, y1, x2, y2)
+	public function MAP_OPTION_ADD(pointer:Int, x1:Int, y1:Int, x2:Int, y2:Int):Void
 	{
-		this.map_options.push({pointer=pointer, x1=x1, y1=y1, x2=x2, y2=y2});
+		ab.game.state.optionsMap.push({pointer: pointer, x1: x1, y1: y1, x2: x2, y2: y2});
 	}
 
-	@Opcode({ id:0x41, format:"", description:"Shows the map and waits for selecting an option" })
-	function MAP_OPTION_SHOW()
+	@Opcode({ id:0x41, format:"<", description:"Shows the map and waits for selecting an option" })
+	public function MAP_OPTION_SHOW(done:Void -> Void):Void
 	{
+		throw(new Error());
+		/*
 		printf("MAP_OPTIONS:\n");
 		for (local n = 0; n < map_options.len(); n++) {
 			local option = map_options[n];
@@ -225,65 +243,81 @@ class AB_OP
 		printf("* %08X\n", option.pointer);
 
 		jump(option.pointer);
+		*/
+		done();
 	}
 
-	@Opcode({ id:0x46, format:"S", description:"Sets an image as the foreground" })
-	function FOREGROUND(name)
+	@Opcode({ id:0x46, format:"<S", description:"Sets an image as the foreground" })
+	public function FOREGROUND(done:Void -> Void, name:String):Void
 	{
-		//name = getNameExt(name, "BMP");
-		get_image(name).draw(::screen);
+		ab.game.getImageCachedAsync(name, function(bitmapData:BitmapData):Void {
+			var matrix:Matrix = new Matrix();
+			matrix.translate(0, 0);
+			ab.game.back.draw(bitmapData, matrix);
+			done();
+		});
 	}
 
-	@Opcode({ id:0x47, format:"s", description:"Sets an image as the background" })
-	function BACKGROUND(name)
+	@Opcode({ id:0x47, format:"<s", description:"Sets an image as the background" })
+	public function BACKGROUND(done:Void -> Void, name:String):Void
 	{
-		//name = getNameExt(name, "BMP");
-		get_image(name).draw(::screen, 32, 8);
+		ab.game.getImageCachedAsync(name, function(bitmapData:BitmapData):Void {
+			var matrix:Matrix = new Matrix();
+			matrix.translate(32, 8);
+			ab.game.back.draw(bitmapData, matrix);
+			done();
+		});
 	}
 	
-	@Opcode({ id:0x4A, format:"2", description:"Repaints the inner part of the screen" })
-	function REPAINT_IN(type)
+	@Opcode({ id:0x4A, format:"<2", description:"Repaints the inner part of the screen" })
+	public function REPAINT_IN(done:Void -> Void, type:Int):Void
 	{
-		paint(1, type);
+		ab.paintAsync(1, type, done);
 	}
 
-	@Opcode({ id:0x4B, format:"S", description:"Puts a character in the middle of the screen" })
-	function CHARA1(name)
+	@Opcode({ id:0x4B, format:"<S", description:"Puts a character in the middle of the screen" })
+	public function CHARA1(done:Void -> Void, name:String):Void
 	{
+		/*
 		// b09_2a
 		local image1 = get_image(name);
 		local image1_mask = get_image(split(name, "_")[0] + "_0");
 		//image1 = image1_mask;
 		image1.copyChannel(image1_mask, "red", "alpha", 1);
 		image1.draw(::screen, 640 * 1 / 2 - image1.w / 2, 385 - image1.h);
+		*/
+		done();
 	}
 
-	@Opcode({ id:0x4C, format:"SS", description:"Puts two characters in the screen" })
-	function CHARA2(name1, name2)
+	@Opcode({ id:0x4C, format:"<SS", description:"Puts two characters in the screen" })
+	public function CHARA2(done:Void -> Void, name1:String, name2:String):Void
 	{
+		/*
 		local image1 = get_image(name1), image2 = get_image(name2);
 		image1.draw(::screen, 640 * 1 / 3 - image1.w / 2, 385 - image1.h);
 		image2.draw(::screen, 640 * 2 / 3 - image2.w / 2, 385 - image2.h);
+		*/
+		done();
 	}
 
 	@Opcode({ id:0x4D, format:"", description:"Performs an animation with the current background (ABCDEF)" })
-	function ANIMATION()
+	public function ANIMATION()
 	{
 	}
 
 	@Opcode({ id:0x4E, format:"", description:"Makes an scroll to the bottom with the current image" })
-	function SCROLL_DOWN()
+	public function SCROLL_DOWN()
 	{
 	}
 
 	@Opcode({ id:0x4F, format:"", description:"Makes an scroll to the top with the current image" })
-	function SCROLL_UP()
+	public function SCROLL_UP()
 	{
 	}
 
 	@Opcode({ id:0x50, format:"T", description:"Sets the title for the save" })
-	function TITLE(text)
+	public function TITLE(title:String):Void
 	{
-		this.title = text;
+		ab.game.state.title = title;
 	}
 }

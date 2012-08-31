@@ -1,10 +1,10 @@
 package engines.brave.sprites.map;
-import engines.brave.Animation;
+import common.Animation;
+import common.LangUtils;
+import common.MathEx;
+import common.SpriteUtils;
 import engines.brave.GameInput;
-import engines.brave.LangUtils;
 import engines.brave.map.Map;
-import engines.brave.MathEx;
-import engines.brave.SpriteUtils;
 import haxe.Log;
 import nme.display.BitmapData;
 import nme.display.Sprite;
