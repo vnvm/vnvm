@@ -1,4 +1,4 @@
-package engines.brave.script;
+package common.script;
 import haxe.Log;
 import nme.errors.Error;
 
@@ -20,9 +20,9 @@ class Instruction {
 	
 	public function call(object:Dynamic):Dynamic {
 		if (opcode.unimplemented) {
-			BraveLog.trace(Std.format("Unimplemented: $this"));
+			Log.trace(Std.format("Unimplemented: $this"));
 		} else {
-			BraveLog.trace(Std.format("Executing... $this"));
+			Log.trace(Std.format("Executing... $this"));
 		}
 		return Reflect.callMethod(object, Reflect.field(object, opcode.methodName), parameters);
 	}

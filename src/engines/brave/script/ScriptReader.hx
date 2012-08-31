@@ -1,4 +1,7 @@
 package engines.brave.script;
+import common.script.Instruction;
+import common.script.Opcode;
+import common.script.ScriptOpcodes;
 import engines.brave.ByteArrayUtils;
 import haxe.Log;
 import nme.errors.Error;
@@ -12,11 +15,13 @@ class ScriptReader
 {
 	public var position:Int;
 	public var script:Script;
+	private var scriptOpcodes:ScriptOpcodes;
 
-	public function new(script:Script) 
+	public function new(script:Script, scriptOpcodes:ScriptOpcodes) 
 	{
 		this.script = script;
 		this.position = 8;
+		this.scriptOpcodes = scriptOpcodes;
 	}
 	
 	public function readAllInstructions():Void {
@@ -34,7 +39,7 @@ class ScriptReader
 	public function readInstruction(scriptThread:IScriptThread):Instruction {
 		script.data.position = position;
 		var opcodeId:Int = read2();
-		var opcode:Opcode = ScriptOpcodes.getOpcodeWithId(opcodeId);
+		var opcode:Opcode = scriptOpcodes.getOpcodeWithId(opcodeId);
 		var parameters:Array<Dynamic> = readFormat(opcode.format, scriptThread);
 		var async:Bool = (opcode.format.indexOf("<") != -1);
 		position = script.data.position;

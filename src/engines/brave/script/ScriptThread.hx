@@ -1,4 +1,5 @@
 package engines.brave.script;
+import common.script.Instruction;
 import engines.brave.GameState;
 import engines.brave.GameThreadState;
 import haxe.Log;
@@ -26,7 +27,7 @@ class ScriptThread implements IScriptThread
 	
 	public function setScript(script:Script):Void {
 		clearStack();
-		this.scriptReader = new ScriptReader(script);
+		this.scriptReader = new ScriptReader(script, this.gameState.scriptOpcodes);
 		this.scriptReader.position = 8;
 		this.gameThreadState.eventId = 0;
 		executing = false;

@@ -1,9 +1,15 @@
 package ;
 
+import common.AssetsFileSystem;
 import common.imaging.BMP;
 import common.io.FileStream;
+import common.io.LocalFileSystem;
+import common.io.SubVirtualFileSystem;
+import common.io.VirtualFileSystem;
 import engines.dividead.DL1;
+import engines.dividead.GameState;
 import engines.dividead.LZ;
+import engines.dividead.SG;
 import nme.display.Bitmap;
 import nme.display.BitmapData;
 import nme.display.Loader;
@@ -35,15 +41,13 @@ class Main extends Sprite
 	{
 		// entry point
 
-		/*
-		var dl1:DL1 = new DL1();
-		var byteArray:ByteArray;
+		var fs:VirtualFileSystem = AssetsFileSystem.getAssetsFileSystem();
+		var gameState:GameState;
 		
-		dl1.loadAsync(new FileStream("H:/SG.DL1"), function() {
-			dl1.openAndReadAllAsync("I_98.BMP", function(byteArray:ByteArray) {
-				var decodedByteArray:ByteArray = LZ.decode(byteArray);
-				//File.saveBytes("c:/temp/test.bmp", decodedByteArray);
-				addChild(new Bitmap(BMP.decode(decodedByteArray)));
+		/*
+		GameState.newAsync(SubVirtualFileSystem.fromSubPath(fs, "dividead"), function(gameState:GameState) {
+			gameState.sg.openAndReadAllAsync("I_98.BMP", function(byteArray:ByteArray) {
+				addChild(new Bitmap(SG.getImage(byteArray)));
 			});
 		});
 		*/

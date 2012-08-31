@@ -1,11 +1,13 @@
 package engines.dividead;
+import nme.display.BitmapInt32;
+import nme.utils.ByteArray;
 
-/*
 class AB
 {
 	static ops = { };
 
-	var script = null;
+	var gameState:GameState;
+	var script:ByteArray = null;
 	var flags:Array = [];
 	var options:Array = [];
 	var map_options:Array = [];
@@ -15,34 +17,44 @@ class AB
 	var title:String = "";
 	var throttle:Bool = false;
 	
-	public function new()
+	public function new(gameState:GameState)
 	{
+		this.gameState = gameState;
 		this.flags = [];
 		for (n in 0 ... 1000) flags.push(0);
 		this.script = null;
 	}
+	
+	public function loadScriptAsync(scriptName:String, done:Void -> Void):Void {
+		gameState.sg.openAndReadAllAsync(scriptName, function(script:ByteArray):Void {
+			this.script = script;
+			done();
+		});
+	}
 		
-	function parse_params(format)
+	private function parseParams(continueCallback:Void -> Void, format:String):Array<Dynamic>
 	{
-		local l = [];
-		foreach (type in format) {
+		var params:Array<Dynamic> = [];
+		for (m in 0 ... format.length) {
+			var type:String = format.charAt(n);
 			switch (type) {
-				case 'F': case '2': l.push(script.readn('w')); break;
-				case 'T': case 'S': case 's': l.push(script.readstringz(-1)); break;
-				case 'P': l.push(script.readn('i')); break;
-				case 'c': l.push(script.readn('c')); break;
-				default: throw(::format("Invalid format type '%c'", type)); break;
+				case '<': params.push(continueCallback);
+				case 'F': case '2': params.push(script.readn('w'));
+				case 'T': case 'S': case 's': params.push(script.readstringz(-1));
+				case 'P': params.push(script.readn('i'));
+				case 'c': params.push(script.readn('c'));
+				default: throw(Std.format("Invalid format type '$type'"));
 			}
 		}
-		return l;
+		return params;
 	}
 	
-	function parse_op()
+	private function executeSingle(continueCallback:Void -> Void):Bool
 	{
-		local op = script.readn('w');
+		var op:Int = script.readUnsignedShort();
 		if (!(op in AB.ops)) throw(::format("Unknown OP 0x%02X", op));
 		local cop = AB.ops[op];
-		local params = parse_params(cop.format);
+		local params = parseParams(continueCallback, cop.format);
 		//printf("Executing... %s\n", cop.name);
 		if (cop.name in AB_OP) {
 			params.insert(0, this);
@@ -52,11 +64,15 @@ class AB
 		}
 	}
 	
-	function execute()
+	private function hasMore():Bool {
+		return script.position < script.length;
+	}
+	
+	public function execute()
 	{
-		while (running && !script.eos())
+		while (hasMore())
 		{
-			parse_op();
+			if (!executeSingle(execute)) return;
 		}
 	}
 	
@@ -64,22 +80,17 @@ class AB
 		return (split(name, ".")[0] + "." + ext).toupper();
 	}
 	
-	function set_script(name)
+	public function jump(offset:Int)
 	{
-		this.script = vfs[this.name = getNameExt(name, "AB")];
-	}
-
-	function jump(pointer)
-	{
-		this.script.seek(pointer);
+		this.script.position = offset;
 	}
 	
-	function end()
+	public function end()
 	{
 		running = false;
 	}
 	
-	function paint_to_color(color, time)
+	public function paint_to_color(color, time)
 	{
 		if (throttle) return;
 
@@ -99,7 +110,7 @@ class AB
 		Screen.frame(60);
 	}
 	
-	function paint(pos, type)
+	public function paint(pos, type)
 	{
 		if (throttle) type = 0;
 		
@@ -140,26 +151,4 @@ class AB
 			break;
 		}
 	}
-	
-	cache = {};
-	
-	function get_image(name)
-	{
-		name = getNameExt(name, "BMP");
-		if (!(name in cache)) {
-			cache[name] <- vfs.get_image(name);
-		} else {
-			//printf("cached!\n");
-		}
-		return cache[name];
-	}
 }
-
-foreach (name, v in AB_OP) {
-	local attr = AB_OP.getattributes(name);
-	if ("id" in attr) {
-		attr.name <- name;
-		AB.ops[attr.id] <- attr;
-	}
-}
-*/

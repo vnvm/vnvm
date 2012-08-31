@@ -5,7 +5,7 @@ import nme.utils.ByteArray;
 
 class SG
 {
-	static public function get(data:ByteArray):BitmapData
+	static public function getImage(data:ByteArray):BitmapData
 	{
 		return BMP.decode(LZ.decode(data));
 	}

@@ -1,7 +1,9 @@
 package engines.brave;
 
+import common.script.ScriptOpcodes;
 import engines.brave.map.Map;
 import engines.brave.script.Script;
+import engines.brave.script.ScriptInstructions;
 import engines.brave.script.ScriptThread;
 import engines.brave.script.Variable;
 import engines.brave.sprites.GameSprite;
@@ -32,9 +34,11 @@ class GameState
 	public var variables:Array<Variable>;
 	public var rootClip:GameSprite;
 	public var musicChannel:SoundChannel;
+	public var scriptOpcodes:ScriptOpcodes;
 	
 	public function new(rootClip:GameSprite) 
 	{
+		this.scriptOpcodes = ScriptOpcodes.createWithClass(ScriptInstructions);
 		this.rootClip = rootClip;
 		this.rootClip.mapSprite.visible = false;
 		this.variables = new Array<Variable>();

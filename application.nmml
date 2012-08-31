@@ -6,10 +6,15 @@
 	<meta title="VNVM" package="com.soywiz.vnvm" version="1.0.0" company="" />
 	
 	<!-- output -->
-	<app main="Main" file="VNVM" path="bin" />
+	<app main="Main" file="Brave" path="bin" swf-version="11" />
 	
 	<window background="#000000" fps="60" />
-	<window width="800" height="480" unless="mobile" />
+	
+	<!--<window width="1280" height="960" unless="mobile" />-->
+	<!--<window width="800" height="600" unless="mobile" />-->
+	<!--<window width="640" height="480" unless="mobile" />-->
+	<window width="960" height="640" unless="mobile" />
+	
 	<window orientation="landscape" vsync="true" antialiasing="0" if="cpp" />
 	
 	<!-- classpath, haxe libs -->
@@ -21,6 +26,10 @@
 	<!--
 	<assets path="assets/img" rename="img" />
 	-->
+	
+	<section if="ios">
+		<assets path="assets" rename="assets" include="*" exclude="nme.svg" />
+	</section>
 	
 	<!-- DLLs -->
 	<ndll name="std" />

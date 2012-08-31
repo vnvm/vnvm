@@ -10,13 +10,14 @@ class DL1 extends VirtualFileSystem
 {
 	private var entries:Hash<Stream>;
 	
-	public function new() {
+	private function new() {
 		this.entries = new Hash<Stream>();
 	}
 	
-	public function loadAsync(stream:Stream, done:Void -> Void):Void {
+	static public function loadAsync(stream:Stream, done:DL1 -> Void):Void {
 		var header:ByteArray;
 		var entriesByteArray:ByteArray;
+		var dl1:DL1 = new DL1();
 
 		// Read header
 		stream.readBytesAsync(0x10, function(header:ByteArray) {
@@ -37,12 +38,12 @@ class DL1 extends VirtualFileSystem
 					var size:Int = entriesByteArray.readUnsignedInt();
 					
 					//Log.trace(name);
-					entries.set(name.toUpperCase(), SliceStream.fromLength(stream, pos, size));
+					dl1.entries.set(name.toUpperCase(), SliceStream.fromLength(stream, pos, size));
 					
 					pos += size;
 				}
 				
-				done();
+				done(dl1);
 			});
 		});
 	}
