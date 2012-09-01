@@ -1,3 +1,5 @@
+package engines.hanabira;
+
 class MGD
 {
 	image = null;

@@ -26,8 +26,8 @@ class Main extends Sprite
 	{
 		GameInput.init();
 		
-		//addChild(new engines.dividead.EngineMain());
-		addChild(new engines.brave.EngineMain());
+		addChild(new engines.dividead.EngineMain());
+		//addChild(new engines.brave.EngineMain());
 	}
 	
 	static public function main() 

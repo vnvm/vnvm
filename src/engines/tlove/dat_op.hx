@@ -13,7 +13,7 @@ class DATOP // T_LOVE95.EXE:00409430
 
 	// TODO.
 	</ id=0x17, format="1", description="Unknown??" />
-	function UNKNOWN_17(v) {
+	function WAIT_MOUSE_EVENT(v) {
 		Screen.frame(60);
 		mouse_update();
 	}
@@ -32,13 +32,13 @@ class DATOP // T_LOVE95.EXE:00409430
 
 	// TODO.
 	</ id=0x23, format="111", description="??" />
-	function UNKNOWN_23(a, b, c) {
+	function GAME_SAVE(a, b, c) {
 		printf("TODO: 23 (%d, %d, %d)\n", a, b, c);
 	}
 
 	// TODO.
 	</ id=0x24, format="111", description="??" />
-	function UNKNOWN_24(a, b, c) {
+	function GAME_LOAD(a, b, c) {
 		printf("TODO: 24 (%d, %d, %d)\n", a, b, c);
 	}
 
@@ -60,19 +60,19 @@ class DATOP // T_LOVE95.EXE:00409430
 
 	// TODO.
 	</ id=0x30, format="", description="???" />
-	function UNKNOWN_30() {
+	function CLEAR_IMAGE_SCREEN() {
 		printf("TODO: 30\n");
 	}
 
 	// TODO.
 	</ id=0x31, format="", description="???" />
-	function UNKNOWN_31() {
+	function COPY_PALETTE() {
 		printf("TODO: 31\n");
 	}
 
 	// TODO.
 	</ id=0x32, format="", description="???" />
-	function UNKNOWN_32() {
+	function FADE_IN() {
 		printf("TODO: 32\n");
 	}
 
@@ -95,7 +95,7 @@ class DATOP // T_LOVE95.EXE:00409430
 
 	// TODO.
 	</ id=0x35, format="", description="???" />
-	function UNKNOWN_35() {
+	function FADE_OUT() {
 		printf("TODO: 35\n");
 	}
 
@@ -115,7 +115,7 @@ class DATOP // T_LOVE95.EXE:00409430
 	}
 
 	</ id=0x38, format="s1", description="Load an animation" />
-	function ANI_LOAD(name, n) {
+	function ANIMATION_START(name, n) {
 		printf("ANI_LOAD(%s)(%d)\n", name, n);
 		local mrs = ::MRS(::pak_mrs[name + ".MRS"]);
 		current_ani = mrs.anims[n];
@@ -123,7 +123,7 @@ class DATOP // T_LOVE95.EXE:00409430
 
 	// TODO.
 	</ id=0x39, format="", description="???" />
-	function UNKNOWN_39() {
+	function ANIMATION_STOP() {
 		printf("TODO: 39\n");
 	}
 
@@ -136,13 +136,13 @@ class DATOP // T_LOVE95.EXE:00409430
 
 	// TODO.
 	</ id=0x3C, format="122", description="???" />
-	function UNKNOWN_3C(a, b, c) {
+	function PALETTE_WORK(a, b, c) {
 		printf("TODO: 3C (%d, %d, %d)\n", a, b, c);
 	}
 	
 	// TODO.
 	</ id=0x40, format="", description="???" />
-	function UNKNOWN_40() {
+	function JUMP_IF_MENU_VAR() {
 		printf("TODO: 40\n");
 	}
 
@@ -154,12 +154,18 @@ class DATOP // T_LOVE95.EXE:00409430
 
 	// TODO.
 	</ id=0x42, format="12", description="????" />
-	function UNKNOWN_42(a, b) {
+	function JUMP_CHAIN(a, b) {
+		printf("TODO: 42 (%d, %d)\n", a, b);
+	}
+	
+	// TODO.
+	</ id=0x43, format="", description="????" />
+	function JUMP_IF_LSB(a, b) {
 		printf("TODO: 42 (%d, %d)\n", a, b);
 	}
 
 	</ id=0x44, format="1122", description="Jumps conditionally" />
-	function JUMP_IF(flag, op, imm, label) {
+	function JUMP_IF_LSW(flag, op, imm, label) {
 		local result = false;
 		switch (op) {
 			case 0: result = (flag_get(2, flag) <= imm); break;
@@ -169,10 +175,46 @@ class DATOP // T_LOVE95.EXE:00409430
 		}
 		if (result) jump_label(label);
 	}
+	
+	// TODO.
+	</ id=0x45, format="", description="????" />
+	function JUMP_SETTINGS() {
+		printf("TODO: 42 (%d, %d)\n", a, b);
+	}
+
+	// TODO.
+	</ id=0x48, format="21", description="???" />
+	function SET_MENU_VAR_BITS(a, b) {
+		printf("TODO: UNKNOWN_49: (%d, %d)\n", a, b);
+	}
 
 	// TODO.
 	</ id=0x49, format="21", description="???" />
-	function UNKNOWN_49(a, b) {
+	function SET_FLAG_BITS(a, b) {
+		printf("TODO: UNKNOWN_49: (%d, %d)\n", a, b);
+	}
+	
+	// TODO.
+	</ id=0x4A, format="21", description="???" />
+	function SET_SEQUENCE(a, b) {
+		printf("TODO: UNKNOWN_49: (%d, %d)\n", a, b);
+	}
+	
+	// TODO.
+	</ id=0x4B, format="21", description="???" />
+	function ADD_OR_RESET_LSB(a, b) {
+		printf("TODO: UNKNOWN_49: (%d, %d)\n", a, b);
+	}
+
+	// TODO.
+	</ id=0x4C, format="21", description="???" />
+	function ADD_OR_RESET_LSW(a, b) {
+		printf("TODO: UNKNOWN_49: (%d, %d)\n", a, b);
+	}
+	
+	// TODO.
+	</ id=0x4D, format="21", description="???" />
+	function SET_SET(a, b) {
 		printf("TODO: UNKNOWN_49: (%d, %d)\n", a, b);
 	}
 

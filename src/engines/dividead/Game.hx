@@ -105,6 +105,9 @@ class Game
 		this.state = new GameState();
 		this.back = new BitmapData(640, 480, false, 0xFF000000);
 		this.front = new BitmapData(640, 480, false, 0xFF000000);
+		#if cpp
+			this.front.createHardwareSurface();
+		#end
 		this.textField = new TextField();
 		textField.defaultTextFormat = new TextFormat("Arial", 12, 0xFFFFFF);
 		textField.selectable = false;

@@ -17,5 +17,7 @@ class TestSuite extends massive.munit.TestSuite
 		add(engines.tlove.PAKTest);
 		add(engines.tlove.LZTest);
 		add(extra.ByteArrayTest);
+		add(extra.MacroTest);
+		add(common.MathExTest);
 	}
 }

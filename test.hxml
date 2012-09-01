@@ -14,5 +14,6 @@
 -lib nme
 -lib hamcrest
 -cp src
--cp  test
+-cp test
 -neko test.n
+#-cpp bin\test_cpp

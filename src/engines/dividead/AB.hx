@@ -184,6 +184,11 @@ class AB
 				
 				game.front.lock();
 				for (rectangle in rectangles) {
+					/*
+					var pixels:ByteArray = game.back.getPixels(rectangle);
+					pixels.position = 0;
+					game.front.setPixels(rectangle, pixels);
+					*/
 					game.front.copyPixels(game.back, rectangle, rectangle.topLeft);
 				}
 				game.front.unlock();

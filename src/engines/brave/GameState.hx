@@ -1,6 +1,7 @@
 package engines.brave;
 
 import common.Animation;
+import common.MathEx;
 import common.script.ScriptOpcodes;
 import common.SpriteUtils;
 import engines.brave.map.Map;
@@ -145,12 +146,18 @@ class GameState
 		
 		for (n in 0 ... Std.int(pixels.length / 4)) {
 			var offset:Int = n * 4;
-			var grey:Int = Std.int((pixels[offset + 1] + pixels[offset + 2] + pixels[offset + 3]) / (3));
+			var grey:Int = MathEx.fastUintConstDiv16((pixels[offset + 1] + pixels[offset + 2] + pixels[offset + 3]), 3);
 			
+			pixels[offset + 0] = 0xFF;
+			pixels[offset + 1] = MathEx.fastUintConstDiv16(grey * 100, 100);
+			pixels[offset + 2] = MathEx.fastUintConstDiv16(grey * 80, 100);
+			pixels[offset + 3] = MathEx.fastUintConstDiv16(grey * 60, 100);
+			/*
 			pixels[offset + 0] = 0xFF;
 			pixels[offset + 1] = Std.int(grey * 1.0);
 			pixels[offset + 2] = Std.int(grey * 0.8);
 			pixels[offset + 3] = Std.int(grey * 0.6);
+			*/
 		}
 		
 		out.setPixels(out.rect, pixels);
