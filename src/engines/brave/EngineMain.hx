@@ -40,12 +40,14 @@ class EngineMain extends Sprite
 	{
 		super();
 		
-		Lib.current.stage.addEventListener(Event.RESIZE, resize);
+		Lib.stage.addEventListener(Event.RESIZE, resize);
 		init0(null);
 	}
 
 	private function resize(e) 
 	{
+		var stage:Stage = Lib.stage;
+		
 		var propX = stage.stageWidth / 640;
 		var propY = stage.stageHeight / 480;
 		var usedWidth, usedHeight;
