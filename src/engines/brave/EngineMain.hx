@@ -40,13 +40,8 @@ class EngineMain extends Sprite
 	{
 		super();
 		
-		#if iphone
-		Stage.setFixedOrientation(Stage.OrientationLandscapeRight);
-		Lib.current.stage.addEventListener(Event.RESIZE, init0);
-		#else
-		addEventListener(Event.ADDED_TO_STAGE, init0);
 		Lib.current.stage.addEventListener(Event.RESIZE, resize);
-		#end
+		init0(null);
 	}
 
 	private function resize(e) 

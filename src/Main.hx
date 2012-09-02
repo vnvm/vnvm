@@ -3,6 +3,7 @@ import common.AssetsFileSystem;
 import common.GameInput;
 import common.io.VirtualFileSystem;
 import nme.display.Sprite;
+import nme.display.Stage;
 import nme.errors.Error;
 import nme.events.Event;
 import nme.Lib;
@@ -22,6 +23,7 @@ class Main extends Sprite
 	{
 		super();
 		
+		Stage.setFixedOrientation(Stage.OrientationLandscapeRight);
 		#if iphone
 		Lib.current.stage.addEventListener(Event.RESIZE, initOnce);
 		#else
