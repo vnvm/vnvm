@@ -25,7 +25,7 @@ import nme.utils.Endian;
 import sys.FileSystem;
 import nme.filesystem.File;
 
-#if cpp
+#if (cpp || neko)
 import sys.io.FileInput;
 #end
 
@@ -153,7 +153,7 @@ class BraveAssets
 		#end
 	}
 
-	#if !cpp && !nme
+	#if (!cpp && !nme)
 		static public function getBytesAsync(name:String, done:ByteArray -> Void):Void {
 			var loader:URLLoader = new URLLoader();
 			loader.addEventListener(Event.COMPLETE, function(e) {

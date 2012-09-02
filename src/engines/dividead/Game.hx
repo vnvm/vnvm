@@ -105,6 +105,8 @@ class Game
 		this.state = new GameState();
 		this.back = new BitmapData(640, 480, false, 0xFF000000);
 		this.front = new BitmapData(640, 480, false, 0xFF000000);
+		//this.back = new BitmapData(640, 480);
+		//this.front = new BitmapData(640, 480);
 		#if cpp
 			this.front.createHardwareSurface();
 		#end
@@ -159,7 +161,7 @@ class Game
 	 * @param	soundName
 	 * @param	done
 	 */
-	public function getSound(soundName:String, done:Sound -> Void):Void {
+	public function getSoundAsync(soundName:String, done:Sound -> Void):Void {
 		soundName = addExtensionsWhenRequired(soundName, "wav").toUpperCase();
 
 		var byteArray:ByteArray;
@@ -170,7 +172,7 @@ class Game
 		});
 	}
 	
-	public function getMusic(musicName:String, done:Sound -> Void):Void {
+	public function getMusicAsync(musicName:String, done:Sound -> Void):Void {
 		musicName = addExtensionsWhenRequired(musicName, "mid").toUpperCase();
 		
 		var byteArray:ByteArray;

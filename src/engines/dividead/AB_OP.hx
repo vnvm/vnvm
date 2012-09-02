@@ -2,7 +2,6 @@ package engines.dividead;
 import common.Event2;
 import common.GameInput;
 import common.Keys;
-import cpp.Utf8;
 import engines.brave.formats.Decrypt;
 import engines.dividead.AB;
 import haxe.Log;
@@ -187,9 +186,11 @@ class AB_OP
 	@Opcode({ id:0x26, format:"<S", description:"Starts a music" })
 	public function MUSIC_PLAY(done:Void -> Void, name:String):Void
 	{
+		var sound:Sound;
+		
 		MUSIC_STOP();
-		ab.game.getMusic(name, function(sound:Sound) {
-			ab.game.musicChannel = sound.play(0, 0, new SoundTransform(1, 0));
+		ab.game.getMusicAsync(name, function(sound:Sound) {
+			ab.game.musicChannel = sound.play(0, -1, new SoundTransform(1, 0));
 			done();
 		});
 	}
@@ -207,7 +208,7 @@ class AB_OP
 	public function VOICE_PLAY(done:Void -> Void, name:String):Void
 	{
 		var sound:Sound;
-		ab.game.getSound(name, function(sound:Sound):Void {
+		ab.game.getSoundAsync(name, function(sound:Sound):Void {
 			ab.game.voiceChannel = sound.play(0, 0, new SoundTransform(1, 0));
 			done();
 		});
@@ -223,7 +224,7 @@ class AB_OP
 	{
 		var sound:Sound;
 		EFFECT_STOP();
-		ab.game.getSound(name, function(sound:Sound):Void {
+		ab.game.getSoundAsync(name, function(sound:Sound):Void {
 			ab.game.effectChannel = sound.play(0, 0, new SoundTransform(1, 0));
 			done();
 		});

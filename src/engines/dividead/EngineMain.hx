@@ -13,17 +13,19 @@ import nme.display.Sprite;
 
 class EngineMain extends Sprite
 {
+	var fs:VirtualFileSystem;
 
-	public function new() 
+	public function new(fs:VirtualFileSystem) 
 	{
 		super();
+		
+		this.fs = fs;
 		
 		init();
 	}
 	
 	private function init():Void 
 	{
-		var fs:VirtualFileSystem = AssetsFileSystem.getAssetsFileSystem();
 		var game:Game;
 		
 		Game.newAsync(SubVirtualFileSystem.fromSubPath(fs, "dividead"), function(game:Game) {

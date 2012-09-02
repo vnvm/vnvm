@@ -1,6 +1,6 @@
 class LZ
 {
-	static function decode(s)
+	static public function decode(s)
 	{
 		local h = {
 			magic = s.readstringz(4),

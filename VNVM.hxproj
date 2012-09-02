@@ -11,7 +11,7 @@
     <movie version="3" />
     <movie minorVersion="0" />
     <movie platform="NME" />
-    <movie background="000000" />
+    <movie background="#000000" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
@@ -30,6 +30,7 @@
   <!-- haxelib libraries -->
   <haxelib>
     <library name="nme" />
+    <library name="format" />
     <library name="munit" />
   </haxelib>
   <!-- Class files to compile (other referenced classes will automatically be included) -->

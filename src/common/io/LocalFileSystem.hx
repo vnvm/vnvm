@@ -1,4 +1,6 @@
 package common.io;
+import haxe.Log;
+import sys.FileSystem;
 
 /**
  * ...
@@ -17,5 +19,10 @@ class LocalFileSystem extends VirtualFileSystem
 	override public function openAsync(name:String, done:Stream -> Void):Void 
 	{
 		done(new FileStream(this.path + "/" + name));
+	}
+	
+	override public function existsAsync(name:String, done:Bool -> Void):Void 
+	{
+		done(FileSystem.exists(this.path + "/" +name));
 	}
 }

@@ -9,6 +9,7 @@ import haxe.Timer;
 import nme.errors.Error;
 import nme.media.Sound;
 import nme.media.SoundChannel;
+import nme.media.SoundTransform;
 
 /**
  * ...
@@ -241,11 +242,12 @@ class ScriptInstructions
 	@Opcode(0x17, "<P")
 	@Unimplemented(1)
 	public function MUSIC_PLAY(done:Void -> Void, index:Int) {
+		var music:Sound;
 		MUSIC_STOP();
 		var fileName:String = StringEx.sprintf('bgm%02dgm', [index]);
 		BraveAssets.getMusicAsync(fileName, function(music:Sound) {
 			BraveLog.trace("MUSIC_PLAY:" + fileName);
-			scriptThread.gameState.musicChannel = music.play();
+			scriptThread.gameState.musicChannel = music.play(0, -1, new SoundTransform(1, 0));
 			done();
 		});
 	}

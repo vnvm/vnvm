@@ -1,6 +1,7 @@
 package common;
 
 import nme.utils.ByteArray;
+import nme.utils.Endian;
 
 /**
  * ...
@@ -9,6 +10,19 @@ import nme.utils.ByteArray;
 
 class ByteArrayUtils 
 {
+	static public function newByteArray(endian:String):ByteArray {
+		var byteArray:ByteArray = new ByteArray();
+		byteArray.endian = endian;
+		return byteArray;
+	}
+
+	static public function readByteArray(src:ByteArray, count:Int):ByteArray {
+		var dst:ByteArray = newByteArray(Endian.LITTLE_ENDIAN);
+		src.readBytes(dst, 0, count);
+		dst.position = 0;
+		return dst;
+	}
+
 	static public function readStringz(data:ByteArray, ?count:Int):String {
 		if (count == null) {
 			var v:Int;

@@ -21,6 +21,7 @@
 	<source path="src" />
 
 	<haxelib name="nme" />
+	<haxelib name="format" />
 	
 	<!-- TEST Libraries -->
 	<haxelib name="munit" />

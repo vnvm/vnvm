@@ -47,7 +47,7 @@ class PAK
 				}
 				
 				for (n in 0 ... names.length - 1) {
-					pak.items.set(names[n], SliceStream.fromBounds(pakStream, offsets[n], offsets[n + 1] - 1));
+					pak.items.set(names[n], SliceStream.fromBounds(pakStream, offsets[n], offsets[n + 1]));
 				}
 				
 				done(pak);
