@@ -1,11 +1,26 @@
 package engines.tlove.script;
+import common.imaging.BitmapData8;
+import common.imaging.BmpColor;
+import common.imaging.Palette;
+import engines.tlove.Game;
+import engines.tlove.GameState;
+import engines.tlove.mrs.MRS;
+import haxe.Timer;
+import nme.errors.Error;
+import nme.geom.Point;
+import nme.geom.Rectangle;
+import nme.utils.ByteArray;
 
 class DAT_OP // T_LOVE95.EXE:00409430
 {
 	var dat:DAT;
+	var game:Game;
+	var state:GameState;
 	
 	public function new(dat:DAT) {
 		this.dat = dat;
+		this.game = dat.game;
+		this.state = dat.game.state;
 	}
 	
 	@Opcode({ id:0x00, format:"", description:"End of file" })
@@ -42,12 +57,14 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	function GAME_LOAD(a, b, c) {
 	}
 
-	@Opcode({ id:0x28, format:"2", description:"Jumps to an adress" })
-	function JUMP(label) {
+	@Opcode({ id:0x28, format:"2", description:"Jumps to an address" })
+	function JUMP(label:Int):Void {
+		dat.jumpLabel(label);
 	}
 	
-	@Opcode({ id:0x2B, format:"2", description:"Jumps to an adress" })
-	function CALL(label) {
+	@Opcode({ id:0x2B, format:"2", description:"Jumps to an address" })
+	function CALL_LOCAL(label:Int):Void {
+		dat.callLabel(label);
 	}
 
 	// TODO.
@@ -65,8 +82,14 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	function FADE_IN() {
 	}
 
-	@Opcode({ id:0x33, format:"s1", description:"Loads an image in a buffer" })
-	function IMG_LOAD(name, layer_dst) {
+	@Opcode({ id:0x33, format:"<s1", description:"Loads an image in a buffer" })
+	function IMG_LOAD(done:Void -> Void, name:String, layer_dst:Int):Void {
+		var mrs:MRS;
+		game.getMrsAsync(name, function(mrs:MRS) {
+			Palette.copy(mrs.image.palette, game.lastLoadedPalette);
+			mrs.image.drawToBitmapData8(game.layers[layer_dst], 0, 0);
+			done();
+		});
 	}
 
 	// TODO.
@@ -79,9 +102,28 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	function FADE_OUT() {
 	}
 
-	// PUT IMAGE ?, ?, ?, slice_x, slice_y, slice_w, slice_h, ?, put_x, put_y, ?, ?, ?
-	@Opcode({ id:0x36, format:"1112222122222", description:"Copy an slice of buffer into another" })
-	function IMG_PUT(time, color_key, layer_src, slice_x, slice_y, slice_w, slice_h, layer_dst, put_x = 0, put_y = 0, u1 = 0, u2 = 0, u3 = 0) {
+	/**
+	 * Copy a rect from one layer to other
+	 * 
+	 * @param	done
+	 * @param	time
+	 * @param	transparentColor
+	 * @param	srcLayer
+	 * @param	srcX
+	 * @param	srcY
+	 * @param	srcWidth
+	 * @param	srcHeight
+	 * @param	dstLayer
+	 * @param	dstX
+	 * @param	dstY
+	 */
+	@Opcode( { id:0x36, format:"<1112222122", description:"Copy an slice of buffer into another" } )
+	function COPY_RECT(done:Void -> Void, time:Int, transparentColor:Int, srcLayer:Int, srcX:Int, srcY:Int, srcWidth:Int, srcHeight:Int, dstLayer:Int, dstX:Int = 0, dstY:Int = 0):Void {
+		var src:BitmapData8 = dat.game.layers[srcLayer];
+		var dst:BitmapData8 = dat.game.layers[dstLayer];
+		BitmapData8.copyRect(src, new Rectangle(srcX, srcY, srcWidth, srcHeight), dst, new Point(dstX, dstY));
+		dat.game.updateImage();
+		Timer.delay(done, 0);
 	}
 
 	@Opcode({ id:0x38, format:"s1", description:"Load an animation" })
@@ -94,13 +136,42 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	}
 
 	// (4039) 3A: 0A : 0000 0010 0148 01F0 0040(
-	@Opcode({ id:0x3A, format:"22222", description:"Fills a rect" })
-	function FILL_RECT(_0, x, y, w, h) {
+	@Opcode({ id:0x3A, format:"112222", description:"Fills a rect" })
+	function FILL_RECT(color:Int, unk:Int, x:Int, y:Int, w:Int, h:Int):Void {
+		game.layers[0].fillRect(color, new Rectangle(x, y, w, h));
+		game.updateImage();
 	}
 
 	// TODO.
-	@Opcode({ id:0x3C, format:"122", description:"???" })
-	function PALETTE_WORK(a, b, c) {
+	@Opcode({ id:0x3C, format:"<11111", description:"???" })
+	function PALETTE_ACTION(done:Void -> Void, mode:Int, index:Int, b:Int, r:Int, g:Int) {
+		switch (mode) {
+			case 0:
+				// SET_WORK_PALETTE_COLOR
+				dat.game.workPalette.colors[index] = { r : r, g : g, b : b, a : 0xFF };
+			case 1:
+				// APPLY_PALETTE
+				Palette.copy(dat.game.workPalette, dat.game.currentPalette);
+			case 2:
+				// BACKUP_PALETTE
+				Palette.copy(dat.game.workPalette, dat.game.backupPalette);
+			case 3:
+				// RESTORE_PALETTE
+				Palette.copy(dat.game.backupPalette, dat.game.workPalette);
+			case 4:
+				// ANIMATE_PALETTE
+				throw(new Error("ANIMATE_PALETTE"));
+			case 5:
+				// COPY_PALETTE
+				Palette.copy(dat.game.lastLoadedPalette, dat.game.workPalette);
+			case 6:
+				// FADE_PALETTE
+				throw(new Error("FADE_PALETTE"));
+			default:
+				throw(new Error("PALETTE_ACTION"));
+		}
+		
+		Timer.delay(done, 0);
 	}
 	
 	// TODO.
@@ -166,7 +237,7 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	function SCRIPT(name, _always_0) {
 	}
 
-	@Opcode({ id:0x53 format="111", description:"Ani play" })
+	@Opcode({ id:0x53, format:"111", description:"Ani play" })
 	function SAVE_SYS_FLAG(y, x, _ff) {
 	}
 
@@ -198,7 +269,10 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	}
 
 	@Opcode({ id:0x70, format:"?", description:"Put text (dialog)" })
-	function PUT_TEXT_DIALOG(s) {
+	function PUT_TEXT_DIALOG(textBA:ByteArray) {
+		if (state.textVisible) {
+			
+		}
 	}
 
 	@Opcode({ id:0x71, format:"221s", description:"Put text (y, x, ?color?, text, ??)" })
@@ -206,8 +280,9 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	}
 
 	// TODO.
-	@Opcode({ id:0x72, format:"1", description:"???" })
-	function SET_TEXT_MODE(v) {
+	@Opcode({ id:0x72, format:"b", description:"???" })
+	function SET_DIALOG_TEXT_VISIBLE(visible:Bool):Void {
+		state.textVisible = visible;
 	}
 
 	// TODO.
@@ -226,18 +301,24 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	}
 
 	// TODO.
-	@Opcode({ id:0x83, format:"2", description:"????" })
-	function PAUSE_83(v) {
+	@Opcode({ id:0x83, format:"<2", description:"????" })
+	function DELAY_83(done:Void -> Void, time:Int) {
+		Timer.delay(done, time * 10);
 	}
 
 	// TODO.
 	@Opcode({ id:0x84, format:"s1", description:"Interface (0x84)" })
 	function INTERFACE2(file, _0) {
 	}
+	
+	// TODO.
+	@Opcode({ id:0x85, format:"", description:"" })
+	function UNKNOWN_85() {
+	}
 
 	// TODO.
-	@Opcode({ id:0x86, format:"", description:"" })
-	function SET_PUSH_BUTTON_POSITION(file, _0) {
+	@Opcode({ id:0x86, format:"22", description:"" })
+	function SET_PUSH_BUTTON_POSITION(x:Int, y:Int) {
 	}
 
 	// TODO.
@@ -245,8 +326,9 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	function INTERFACE3(file, _0) {
 	}
 
-	@Opcode({ id:0x89, format:"2", description:"Delay" })
-	function DELAY(time) {
+	@Opcode({ id:0x89, format:"<2", description:"Delay" })
+	function DELAY_89(done:Void -> Void, time:Int) {
+		Timer.delay(done, time * 10);
 	}
 
 	@Opcode({ id:0x8A, format:"", description:"Updates" })
@@ -255,6 +337,7 @@ class DAT_OP // T_LOVE95.EXE:00409430
 
 	@Opcode({ id:0x91, format:"", description:"Return from a CALL" })
 	function RETURN_LOCAL() {
+		dat.returnLabel();
 	}
 
 	// TODO.
@@ -266,8 +349,19 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	function SET_LS_RAND() {
 	}
 
-	@Opcode({ id:0x95, format:"1221", description:"Sets a range of flags" })
-	function FLAG_SET_RANGE(flag_type, flag, count, value) {
+	@Opcode({ id:0x95, format:"122?", description:"Sets a range of flags" })
+	function FLAG_SET_RANGE(type:Int, start:Int, count:Int, left:ByteArray) {
+		var value:Int = 0;
+		
+		if (type == 3) {
+			value = left.readUnsignedShort();
+		} else {
+			value = left.readUnsignedByte();
+		}
+		
+		for (flag in start ... start + count) {
+			state.setFlag(type, flag, value);
+		}
 	}
 
 	@Opcode({ id:0x98, format:"?", description:"Sets a flag" })

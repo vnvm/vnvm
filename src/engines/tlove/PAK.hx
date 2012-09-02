@@ -13,7 +13,12 @@ class PAK
 	private function new() {
 		this.items = new Hash<SliceStream>();
 	}
-	
+
+	public function getBytesAsync(name:String, done:ByteArray -> Void):Void {
+		var stream:Stream = get(name);
+		stream.readAllBytesAsync(done);
+	}
+
 	public function get(name:String):Stream {
 		var item:SliceStream = items.get(name);
 		if (item == null) throw(new Error(Std.format("Can't find '$name'")));

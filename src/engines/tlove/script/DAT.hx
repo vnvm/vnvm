@@ -1,41 +1,75 @@
 package engines.tlove.script;
+import common.ByteArrayUtils;
+import common.script.Instruction;
+import common.script.Opcode;
+import engines.tlove.Game;
+import haxe.Log;
+import nme.errors.Error;
+import nme.utils.ByteArray;
+import nme.utils.Endian;
+
+typedef StackItem = { script:String, position:Int };
 
 class DAT
 {
-	public function new()
+	public var game:Game;
+	public var scriptName:String;
+	public var script:ByteArray;
+	public var datOp:DAT_OP;
+	public var labels:Array<Int>;
+	public var callStack:Array<StackItem>;
+	
+	public function new(game:Game)
 	{
-	}
-
-	function parse_params(params, format)
-	{
-		local l = [];
-		foreach (type in format) {
-			switch (type) {
-				case '1': try { l.push(params.readn('b')); } catch (e) { } break;
-				case '2': try { l.push(params.readn('b') << 8 | params.readn('b')); } catch (e) { } break;
-				case 's': l.push(params.readstringz(-1)); break;
-				case '?': l.push(params); break;
-				default: throw(::format("Invalid format type '%c'", type)); break;
-			}
-		}
-		return l;
+		this.game = game;
+		this.datOp = new DAT_OP(this);
+		this.script = ByteArrayUtils.newByteArray(Endian.BIG_ENDIAN);
+		this.callStack = [];
 	}
 	
-	function jump(to)
-	{
-		if (log_ins) printf("Jump to pos(%08X)\n", to);
-		script.seek(to);
-		return;
-	}
-	
-	function jump_label(label)
-	{
-		script.seek(labels[label]);
-		if (log_ins) printf("Jump to label(%d) pos(%08X)\n", label, script.tell());
+	public function loadAsync(name:String, done:Void -> Void):Void {
+		var data:ByteArray;
+		game.date.getBytesAsync(Std.format("$name.DAT"), function(data:ByteArray):Void {
+			this.scriptName = name;
+			data.endian = Endian.BIG_ENDIAN;
+			var scriptStart:Int = data.readUnsignedShort();
+			var labelCount:Int = Std.int((scriptStart - 2) / 2);
+			
+			this.labels = [];
+			for (n in 0 ... labelCount) this.labels.push(data.readUnsignedShort());
+
+			data.position = scriptStart;
+			this.script = ByteArrayUtils.readByteArray(data, data.length - scriptStart);
+			this.script.endian = Endian.BIG_ENDIAN;
+			
+			done();
+		});
 	}
 
-	function set_script(name)
+	public function callLabel(label:Int):Void
 	{
+		callStack.push({ script: scriptName, position : script.position });
+		jumpLabel(label);
+	}
+	
+	public function returnLabel():Void {
+		var item:StackItem = callStack.pop();
+		jumpLabel(item.position);
+	}
+
+	public function jump(to)
+	{
+		script.position = to;
+	}
+	
+	public function jumpLabel(label)
+	{
+		script.position = labels[label];
+	}
+
+	public function set_script(name:String)
+	{
+		/*
 		printf("SCRIPT: '%s'\n", name);
 		if (script_name != name) {
 			stream = ::pak_dat[script_name = name];
@@ -48,40 +82,62 @@ class DAT
 			script = stream.readslice(stream.len() - stream.tell());
 		}
 		jump(0);
+		*/
 	}
 	
-	function execute_single()
+	public function execute():Void
 	{
-		local op  = script.readn('b');
-		local len = script.readn('b');
-		if (len & 0x80) len = script.readn('b') | ((len & 0x7F) << 8);
-		local params = script.readslice(len);
-	
-		if ((op in DAT.ops)) {
-			local cop = DAT.ops[op];
-			//printf("OP:%08X: %02X (%d) - %s\n", script.tell(), op, len, cop.name);
-			local vpar = parse_params(params, cop.format);
-			if (cop.name in DATOP) {
-				vpar.insert(0, this);
-				try {
-					DATOP[cop.name].acall(vpar);
-				} catch (e) {
-					printf("ERROR(%02X:%s):%d: %s\n", op, cop.name, script.tell(), e);
-					throw(e);
-				}
-			} else {
-				printf("Not implemented DATOP.'%s'\n", cop.name);
-			}
-		} else {
-			printf("Not implemented OP(%02X) - %d\n", op, len);
-		}
-	}
-	
-	function execute(label = 0)
-	{
-		while (!script.eos())
+		while (script.position < script.length)
 		{
-			execute_single();
+			if (executeSingle(execute)) {
+				Log.trace("Script.waitAsync");
+				return;
+			}
 		}
+		
+		Log.trace("Script.done");
+	}
+
+	private function executeSingle(done:Void -> Void):Bool
+	{
+		var instruction:Instruction = readInstruction(done);
+		instruction.call(this.datOp);
+		return instruction.async;
+	}
+
+	private function readInstruction(done:Void -> Void):Instruction
+	{
+		var opcodeId:Int = script.readUnsignedByte();
+		var instructionDataLength:Int = script.readUnsignedByte();
+		if ((instructionDataLength & 0x80) != 0) {
+			var newByte:Int = script.readUnsignedByte();
+			instructionDataLength = newByte | ((instructionDataLength & 0x7F) << 8);
+		}
+		var params:ByteArray = ByteArrayUtils.readByteArray(script, instructionDataLength);
+		var opcode:Opcode = game.scriptOpcodes.getOpcodeWithId(opcodeId);
+		var parameters:Array<Dynamic> = readParameters(params, opcode.format, done);
+		var async:Bool = (opcode.format.indexOf('<') >= 0);
+		return new Instruction(opcode, parameters, async);
+	}
+	
+	private function readParameters(paramsByteArray:ByteArray, format:String, done:Void -> Void):Array<Dynamic>
+	{
+		var params:Array<Dynamic> = [];
+		for (n in 0 ... format.length) {
+			var type:String = format.charAt(n);
+			
+			if (paramsByteArray.position >= paramsByteArray.length) throw(new Error("No more parameters! '" + format + "'"));
+			
+			switch (type) {
+				case '<': params.push(done);
+				case 'b': params.push(paramsByteArray.readUnsignedByte() != 0);
+				case '1': params.push(paramsByteArray.readUnsignedByte());
+				case '2': params.push((paramsByteArray.readUnsignedByte() << 8) | paramsByteArray.readUnsignedByte());
+				case 's': params.push(ByteArrayUtils.readStringz(paramsByteArray));
+				case '?': params.push(paramsByteArray);
+				default: throw(new Error(Std.format("Invalid format type '$type'")));
+			}
+		}
+		return params;
 	}
 }

@@ -3,6 +3,7 @@ package engines.tlove.mrs;
 import common.ByteArrayUtils;
 import common.imaging.BitmapData8;
 import common.imaging.BmpColor;
+import common.imaging.Palette;
 import nme.errors.Error;
 import nme.utils.ByteArray;
 import nme.utils.Endian;
@@ -10,16 +11,16 @@ import nme.utils.Endian;
 class MRS
 {
 	var animations:Array<ANI>;
-	var palette:Array<BmpColor>;
+	var palette:Palette;
 	var file:ByteArray;
-	public var bitsPerPixel:Int;
-	public var width:Int;
-	public var height:Int;
+	private var bitsPerPixel:Int;
+	private var width:Int;
+	private var height:Int;
 	public var image:BitmapData8;
 	
 	public function new(file:ByteArray) {
 		this.file = file;
-		this.palette = [];
+		this.palette = new Palette();
 
 		parseHeader();
 		parsePalette();
@@ -47,7 +48,7 @@ class MRS
 			var r:Int = file.readByte();
 			var g:Int = file.readByte();
 			
-			this.palette.push({ r : r, g : g, b : b, a : 0xFF });
+			this.palette.colors[n] = { r : r, g : g, b : b, a : 0xFF };
 		}
 	}
 	

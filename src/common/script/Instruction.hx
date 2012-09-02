@@ -1,4 +1,5 @@
 package common.script;
+import common.StringEx;
 import haxe.Log;
 import nme.errors.Error;
 
@@ -28,6 +29,6 @@ class Instruction {
 	}
 	
 	public function toString():String {
-		return Std.format("${opcode.opcodeId}.${opcode.methodName} ${parameters.join(', ')}");
+		return StringEx.sprintf("%04X.%s %s", [opcode.opcodeId, opcode.methodName, parameters.join(', ')]);
 	}
 }
