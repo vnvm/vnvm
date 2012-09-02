@@ -1,5 +1,6 @@
 package engines.brave;
 
+import common.GameScalerSprite;
 import common.GraphicUtils;
 import engines.brave.BraveAssets;
 import engines.brave.formats.BraveImage;
@@ -40,43 +41,7 @@ class EngineMain extends Sprite
 	{
 		super();
 		
-		Lib.stage.addEventListener(Event.RESIZE, resize);
 		init0(null);
-	}
-
-	private function resize(e) 
-	{
-		var stage:Stage = Lib.stage;
-		
-		var propX = stage.stageWidth / 640;
-		var propY = stage.stageHeight / 480;
-		var usedWidth, usedHeight;
-		
-		if (propX < propY) {
-			gameSprite.scaleY = gameSprite.scaleX = propX;
-		} else {
-			gameSprite.scaleY = gameSprite.scaleX = propY;
-		}
-		
-		usedWidth = 640 * gameSprite.scaleX;
-		usedHeight = 480 * gameSprite.scaleY;
-
-		gameSprite.x = Std.int((stage.stageWidth - usedWidth) / 2);
-		gameSprite.y = Std.int((stage.stageHeight - usedHeight) / 2);
-		
-		gameSpriteRectangle = new Rectangle(gameSprite.x, gameSprite.y, usedWidth, usedHeight);
-		
-		{
-			blackBorder.graphics.clear();
-			GraphicUtils.drawSolidFilledRectWithBounds(blackBorder.graphics, 0, 0, gameSpriteRectangle.left, stage.stageHeight);
-			GraphicUtils.drawSolidFilledRectWithBounds(blackBorder.graphics, gameSpriteRectangle.right, 0, stage.stageWidth, stage.stageHeight);
-
-			GraphicUtils.drawSolidFilledRectWithBounds(blackBorder.graphics, 0, 0, stage.stageWidth, gameSpriteRectangle.top);
-			GraphicUtils.drawSolidFilledRectWithBounds(blackBorder.graphics, 0, gameSpriteRectangle.bottom, stage.stageWidth, stage.stageHeight);
-
-			//GraphicUtils.drawSolidFilledRect(blackBorder.graphics, 0, -this.y, 640, this.y / scaleY);
-			//GraphicUtils.drawSolidFilledRect(blackBorder.graphics, 0, 480, 640, this.y / scaleY);
-		}
 	}
 	
 	var gameSpriteRectangle:Rectangle;
@@ -89,11 +54,10 @@ class EngineMain extends Sprite
 		if (!initialized) {
 			gameSprite = new GameSprite();
 			blackBorder = new Sprite();
-			addChild(gameSprite);
+			addChild(new GameScalerSprite(640, 480, gameSprite));
 			addChild(blackBorder);
 
 		}
-		resize(e);
 		if (!initialized) {
 			initialized = true;
 			init(e);
@@ -102,8 +66,6 @@ class EngineMain extends Sprite
 	
 	private function init(e) 
 	{
-		resize(e);
-
 #if flash
 		Log.setColor(0xFF0000);
 #end

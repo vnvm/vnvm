@@ -7,7 +7,9 @@ import nme.display.BitmapData;
 import nme.errors.Error;
 import nme.geom.Point;
 import nme.geom.Rectangle;
+import nme.Memory;
 import nme.utils.ByteArray;
+import nme.utils.Endian;
 
 /**
  * ...
@@ -47,21 +49,35 @@ class BitmapData8 {
 	}
 
 	@:noStack public function drawToBitmapData(bmp:BitmapData):Void {
+		var length:Int = 4 * width * height;
+		#if cpp
+		var ba:ByteArray = new ByteArray(length);
+		#else
 		var ba:ByteArray = new ByteArray();
+		ba.length = 4 * width * height;
+		#end
+		ba.endian = Endian.LITTLE_ENDIAN;
 		ba.position = 0;
 		data.position = 0;
 		var colorsPalette:Array<Int> = [];
 		for (n in 0 ... palette.colors.length) {
 			var color:BmpColor = palette.colors[n];
 			colorsPalette.push(
-				(color.b <<  0) |
-				(color.g <<  8) |
-				(color.r << 16) |
-				(color.a << 24)
+				(color.b << 24) |
+				(color.g << 16) |
+				(color.r <<  8) |
+				(color.a <<  0)
 			);
-			
 		}
-		for (n in 0 ... width * height) ba.writeInt(colorsPalette[data.readUnsignedByte()]);
+		
+		Memory.select(ba);
+		
+		var m:Int = 0;
+		for (n in 0 ... width * height) {
+			//ba.writeInt(colorsPalette[data.readUnsignedByte()]);
+			Memory.setI32(m, colorsPalette[data.readUnsignedByte()]);
+			m += 4;
+		}
 		ba.position = 0;
 		data.position = 0;
 		bmp.setPixels(bmp.rect, ba);
@@ -89,13 +105,17 @@ class BitmapData8 {
 		var rectW:Int = Std.int(rect.width);
 		var rectH:Int = Std.int(rect.height);
 
+		var color1:Int = color & 0xFF;
+		var color2:Int = (color1 << 0) | (color1 << 8);
+		var color4:Int = (color2 << 0) | (color2 << 16);
+		var rectDiv4:Int = Std.int(rectW / 4);
+		var rectMod4:Int = rectW % 4;
+
+		Memory.select(data);
 		for (y in 0 ... rectH) {
 			var n:Int = getIndex(rectX + 0, rectY + y);
-			for (x in 0 ... rectW) {
-				data[n] = color;
-				n++;
-				//this.setPixel(, color);
-			}
+			for (x in 0 ... rectDiv4) { Memory.setI32(n, color4); n += 4; }
+			for (x in 0 ... rectMod4) { Memory.setByte(n, color1); n++; }
 		}
 	}
 	
