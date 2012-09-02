@@ -11,6 +11,7 @@ import engines.tlove.mrs.MRS;
 import engines.tlove.script.DAT;
 import engines.tlove.script.DAT_OP;
 import haxe.Log;
+import haxe.Timer;
 import nme.display.Bitmap;
 import nme.display.BitmapData;
 import nme.display.PixelSnapping;
@@ -38,6 +39,7 @@ class Game
 	public var sprite:Sprite;
 	private var updatedBitmap:BitmapData;
 	public var state:GameState;
+	static inline public var fps:Int = 60;
 
 	private function new() 
 	{
@@ -71,6 +73,11 @@ class Game
 			Log.trace('loaded');
 			dat.execute();
 		});
+	}
+	
+	public function delay(done:Void -> Void, timeInFrames:Int):Void {
+		//Timer.delay(done, Std.int(timeInFrames * 1000 / Game.fps));
+		Timer.delay(done, Std.int(timeInFrames * 10));
 	}
 	
 	static public function initFromFileSystemAsync(fs:VirtualFileSystem, done:Game -> Void):Void {

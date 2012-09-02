@@ -18,7 +18,9 @@ class ByteArrayUtils
 
 	static public function readByteArray(src:ByteArray, count:Int):ByteArray {
 		var dst:ByteArray = newByteArray(Endian.LITTLE_ENDIAN);
-		src.readBytes(dst, 0, count);
+		if (count > 0) {
+			src.readBytes(dst, 0, count);
+		}
 		dst.position = 0;
 		return dst;
 	}

@@ -10,7 +10,7 @@ import nme.utils.Endian;
 
 class ByteUtils 
 {
-	@:nostack static public function BytesToByteArray(bytes:Bytes):ByteArray {
+	@:noStack static public function BytesToByteArray(bytes:Bytes):ByteArray {
 		//return bytes.getData();
 		var byteArray:ByteArray = new ByteArray();
 		byteArray.endian = Endian.LITTLE_ENDIAN;
@@ -19,20 +19,20 @@ class ByteUtils
 		return byteArray;
 	}
 	
-	@:nostack static public function ArrayToByteArray(array:Array<Int>):ByteArray {
+	@:noStack static public function ArrayToByteArray(array:Array<Int>):ByteArray {
 		var byteArray:ByteArray = new ByteArray();
 		byteArray.position = 0;
 		for (n in 0 ... array.length) byteArray.writeByte(array[n]);
 		return byteArray;
 	}
 
-	@:nostack static public function ArrayToBytes(array:Array<Int>):Bytes {
+	@:noStack static public function ArrayToBytes(array:Array<Int>):Bytes {
 		var bytes:Bytes = Bytes.alloc(array.length);
 		for (n in 0 ... bytes.length) bytes.set(n, array[n]);
 		return bytes;
 	}
 
-	@:nostack static public function ByteArrayToBytes(byteArray:ByteArray):Bytes {
+	@:noStack static public function ByteArrayToBytes(byteArray:ByteArray):Bytes {
 		var bytes:Bytes = Bytes.alloc(byteArray.length);
 		byteArray.position = 0;
 		for (n in 0 ... bytes.length) bytes.set(n, byteArray.readUnsignedByte());

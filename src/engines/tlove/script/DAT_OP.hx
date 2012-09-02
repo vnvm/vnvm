@@ -2,13 +2,16 @@ package engines.tlove.script;
 import common.imaging.BitmapData8;
 import common.imaging.BmpColor;
 import common.imaging.Palette;
+import common.PathUtils;
 import engines.tlove.Game;
 import engines.tlove.GameState;
 import engines.tlove.mrs.MRS;
+import haxe.Log;
 import haxe.Timer;
 import nme.errors.Error;
 import nme.geom.Point;
 import nme.geom.Rectangle;
+import nme.media.Sound;
 import nme.utils.ByteArray;
 
 class DAT_OP // T_LOVE95.EXE:00409430
@@ -23,57 +26,101 @@ class DAT_OP // T_LOVE95.EXE:00409430
 		this.state = dat.game.state;
 	}
 	
+	/**
+	 * 
+	 */
 	@Opcode({ id:0x00, format:"", description:"End of file" })
-	function EOF() {
+	function EOF():Void
+	{
+		throw(new Error("Reached End Of File"));
 	}
 
-	// TODO.
-	@Opcode({ id:0x16, format:"s1", description:"Interface (0x16)" })
-	function INTERFACE1(file, _0) {
+	/**
+	 * 
+	 * @param	file
+	 * @param	_0
+	 */
+	@Opcode( { id:0x16, format:"s1", description:"Interface (0x16)" } )
+	function INTERFACE1(file:String, unk:Int):Void {
 	}
 
-	// TODO.
-	@Opcode({ id:0x17, format:"1", description:"Unknown??" })
-	function WAIT_MOUSE_EVENT(v) {
+	/**
+	 * 
+	 * @param	v
+	 */
+	@Opcode( { id:0x17, format:"1", description:"Unknown??" } )
+	function WAIT_MOUSE_EVENT(v:Int):Void {
 	}
 
-	// TODO.
-	@Opcode({ id:0x19, format:"1s1", description:"Set NAME_L" })
-	function NAME_L(v, s, _0) {
+	/**
+	 * 
+	 * @param	v
+	 * @param	s
+	 * @param	unk
+	 */
+	@Opcode( { id:0x19, format:"1s1", description:"Set NAME_L" } )
+	function NAME_L(v:Int, s:String, unk:Int):Void {
 	}
 
-	// TODO.
+	/**
+	 * 
+	 * @param	a
+	 * @param	b
+	 */
 	@Opcode({ id:0x1B, format:"12", description:"??" })
-	function UNKNOWN_1B(a, b) {
+	function UNKNOWN_1B(a:Int, b:Int):Void {
 	}
 
-	// TODO.
-	@Opcode({ id:0x23, format:"111", description:"??" })
-	function GAME_SAVE(a, b, c) {
+	/**
+	 * 
+	 * @param	a
+	 * @param	b
+	 * @param	c
+	 */
+	@Opcode( { id:0x23, format:"111", description:"??" } )
+	function GAME_SAVE(a:Int, b:Int, c:Int):Void {
 	}
 
-	// TODO.
-	@Opcode({ id:0x24, format:"111", description:"??" })
-	function GAME_LOAD(a, b, c) {
+	/**
+	 * 
+	 * @param	a
+	 * @param	b
+	 * @param	c
+	 */
+	@Opcode( { id:0x24, format:"111", description:"??" } )
+	function GAME_LOAD(a:Int, b:Int, c:Int):Void {
 	}
 
-	@Opcode({ id:0x28, format:"2", description:"Jumps to an address" })
+	/**
+	 * 
+	 * @param	done
+	 * @param	label
+	 */
+	@Opcode( { id:0x28, format:"2", description:"Jumps to an address" } )
 	function JUMP(label:Int):Void {
 		dat.jumpLabel(label);
 	}
 	
-	@Opcode({ id:0x2B, format:"2", description:"Jumps to an address" })
+	/**
+	 * 
+	 * @param	label
+	 */
+	@Opcode( { id:0x2B, format:"2", description:"Jumps to an address" } )
 	function CALL_LOCAL(label:Int):Void {
 		dat.callLabel(label);
 	}
 
-	// TODO.
-	@Opcode({ id:0x30, format:"", description:"???" })
+	/**
+	 * 
+	 */
+	@Opcode( { id:0x30, format:"", description:"???" } )
 	function CLEAR_IMAGE_SCREEN() {
 	}
 
-	// TODO.
-	@Opcode({ id:0x31, format:"", description:"???" })
+	/**
+	 * 
+	 */
+	@Opcode( { id:0x31, format:"", description:"???" } )
 	function COPY_PALETTE() {
 	}
 
@@ -126,44 +173,68 @@ class DAT_OP // T_LOVE95.EXE:00409430
 		Timer.delay(done, 0);
 	}
 
-	@Opcode({ id:0x38, format:"s1", description:"Load an animation" })
+	/**
+	 * 
+	 * @param	name
+	 * @param	n
+	 */
+	@Opcode( { id:0x38, format:"s1", description:"Load an animation" } )
 	function ANIMATION_START(name, n) {
 	}
 
-	// TODO.
-	@Opcode({ id:0x39, format:"", description:"???" })
+	/**
+	 * 
+	 */
+	@Opcode( { id:0x39, format:"", description:"???" } )
 	function ANIMATION_STOP() {
 	}
 
-	// (4039) 3A: 0A : 0000 0010 0148 01F0 0040(
-	@Opcode({ id:0x3A, format:"112222", description:"Fills a rect" })
+	/**
+	 * 
+	 * @param	color
+	 * @param	unk
+	 * @param	x
+	 * @param	y
+	 * @param	w
+	 * @param	h
+	 */
+	@Opcode( { id:0x3A, format:"112222", description:"Fills a rect" } )
 	function FILL_RECT(color:Int, unk:Int, x:Int, y:Int, w:Int, h:Int):Void {
 		game.layers[0].fillRect(color, new Rectangle(x, y, w, h));
 		game.updateImage();
 	}
 
-	// TODO.
-	@Opcode({ id:0x3C, format:"<11111", description:"???" })
+	/**
+	 * 
+	 * @param	done
+	 * @param	mode
+	 * @param	index
+	 * @param	b
+	 * @param	r
+	 * @param	g
+	 */
+	@Opcode( { id:0x3C, format:"<11111", description:"???" } )
 	function PALETTE_ACTION(done:Void -> Void, mode:Int, index:Int, b:Int, r:Int, g:Int) {
 		switch (mode) {
 			case 0:
 				// SET_WORK_PALETTE_COLOR
-				dat.game.workPalette.colors[index] = { r : r, g : g, b : b, a : 0xFF };
+				game.workPalette.colors[index] = { r : r, g : g, b : b, a : 0xFF };
 			case 1:
 				// APPLY_PALETTE
-				Palette.copy(dat.game.workPalette, dat.game.currentPalette);
+				Palette.copy(game.workPalette, game.currentPalette);
 			case 2:
 				// BACKUP_PALETTE
-				Palette.copy(dat.game.workPalette, dat.game.backupPalette);
+				Palette.copy(game.workPalette, game.backupPalette);
 			case 3:
 				// RESTORE_PALETTE
-				Palette.copy(dat.game.backupPalette, dat.game.workPalette);
+				Palette.copy(game.backupPalette, game.workPalette);
 			case 4:
 				// ANIMATE_PALETTE
-				throw(new Error("ANIMATE_PALETTE"));
+				Log.trace("Not implemented ANIMATE_PALETTE");
+				game.updateImage();
 			case 5:
 				// COPY_PALETTE
-				Palette.copy(dat.game.lastLoadedPalette, dat.game.workPalette);
+				Palette.copy(game.lastLoadedPalette, game.workPalette);
 			case 6:
 				// FADE_PALETTE
 				throw(new Error("FADE_PALETTE"));
@@ -175,7 +246,7 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	}
 	
 	// TODO.
-	@Opcode({ id:0x40, format:"", description:"???" })
+	@Opcode( { id:0x40, format:"", description:"???" } )
 	function JUMP_IF_MENU_VAR() {
 	}
 
@@ -223,18 +294,35 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	function ADD_OR_RESET_LSB(a, b) {
 	}
 
-	// TODO.
-	@Opcode({ id:0x4C, format:"21", description:"???" })
+	/**
+	 * 
+	 * @param	a
+	 * @param	b
+	 */
+	@Opcode( { id:0x4C, format:"21", description:"???" } )
 	function ADD_OR_RESET_LSW(a, b) {
 	}
 	
-	// TODO.
-	@Opcode({ id:0x4D, format:"21", description:"???" })
-	function SET_SET(a, b) {
+	/**
+	 * 
+	 * @param	a
+	 * @param	b
+	 */
+	@Opcode( { id:0x4D, format:"11", description:"???" } )
+	function SET_SET(a:Int, b:Int):Void {
 	}
 
-	@Opcode({ id:0x52, format:"s1", description:"Loads a script and starts executing it" })
-	function SCRIPT(name, _always_0) {
+	/**
+	 * 
+	 * @param	done
+	 * @param	name
+	 * @param	_always_0
+	 */
+	@Opcode( { id:0x52, format:"<s1", description:"Loads a script and starts executing it" } )
+	function SCRIPT(done:Void -> Void, name:String, _always_0:Int) {
+		dat.loadAsync(name, function():Void {
+			done();
+		});
 	}
 
 	@Opcode({ id:0x53, format:"111", description:"Ani play" })
@@ -246,8 +334,14 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	function JUMP_COND_SYS_FLAG(a, b, c) {
 	}
 
-	@Opcode({ id:0x61, format:"s2", description:"Plays a midi file" })
-	function MUSIC_PLAY(name, loop) {
+	@Opcode({ id:0x61, format:"<s2", description:"Plays a midi file" })
+	function MUSIC_PLAY(done:Void -> Void, name:String, loop:Int):Void {
+		game.midi.getBytesAsync(PathUtils.addExtensionIfMissing(name, "mid").toUpperCase(), function(bytes:ByteArray) {
+			var sound:Sound = new Sound();
+			sound.loadCompressedDataFromByteArray(bytes, bytes.length);
+			sound.play();
+			done();
+		});
 	}
 
 	// TODO.
@@ -255,19 +349,32 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	function UNKNOWN_62() {
 	}
 
-	@Opcode({ id:0x63, format:"", description:"Music stop" })
+	/**
+	 * 
+	 */
+	@Opcode( { id:0x63, format:"", description:"Music stop" } )
 	function MUSIC_STOP() {
 	}
 	
-	@Opcode({ id:0x66, format:"s", description:"Plays a sound" })
+	/**
+	 * 
+	 * @param	name
+	 */
+	@Opcode( { id:0x66, format:"s", description:"Plays a sound" } )
 	function SOUND_PLAY(name) {
 	}
 
-	// TODO.
-	@Opcode({ id:0x67, format:"", description:"???" })
+	/**
+	 * 
+	 */
+	@Opcode( { id:0x67, format:"", description:"???" } )
 	function SOUND_STOP() {
 	}
 
+	/**
+	 * 
+	 * @param	textBA
+	 */
 	@Opcode({ id:0x70, format:"?", description:"Put text (dialog)" })
 	function PUT_TEXT_DIALOG(textBA:ByteArray) {
 		if (state.textVisible) {
@@ -275,8 +382,15 @@ class DAT_OP // T_LOVE95.EXE:00409430
 		}
 	}
 
-	@Opcode({ id:0x71, format:"221s", description:"Put text (y, x, ?color?, text, ??)" })
-	function PUT_TEXT_AT_POSITION(x, y, color, text) {
+	/**
+	 * 
+	 * @param	x
+	 * @param	y
+	 * @param	color
+	 * @param	text
+	 */
+	@Opcode( { id:0x71, format:"221s", description:"Put text (y, x, ?color?, text, ??)" } )
+	function PUT_TEXT_AT_POSITION(x:Int, y:Int, color:Int, text:String) {
 	}
 
 	// TODO.
@@ -299,11 +413,11 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	@Opcode({ id:0x82, format:"22221", description:"????" })
 	function TEXT_WND_SET(a, b, c, d, e) {
 	}
-
+	
 	// TODO.
 	@Opcode({ id:0x83, format:"<2", description:"????" })
 	function DELAY_83(done:Void -> Void, time:Int) {
-		Timer.delay(done, time * 10);
+		game.delay(done, time);
 	}
 
 	// TODO.
@@ -321,14 +435,23 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	function SET_PUSH_BUTTON_POSITION(x:Int, y:Int) {
 	}
 
-	// TODO.
+	/**
+	 * 
+	 * @param	file
+	 * @param	_0
+	 */
 	@Opcode({ id:0x87, format:"s1", description:"Interface (0x87)" })
 	function INTERFACE3(file, _0) {
 	}
 
-	@Opcode({ id:0x89, format:"<2", description:"Delay" })
+	/**
+	 * 
+	 * @param	done
+	 * @param	time
+	 */
+	@Opcode( { id:0x89, format:"<2", description:"Delay" } )
 	function DELAY_89(done:Void -> Void, time:Int) {
-		Timer.delay(done, time * 10);
+		game.delay(done, time * 1);
 	}
 
 	@Opcode({ id:0x8A, format:"", description:"Updates" })
@@ -349,23 +472,44 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	function SET_LS_RAND() {
 	}
 
-	@Opcode({ id:0x95, format:"122?", description:"Sets a range of flags" })
-	function FLAG_SET_RANGE(type:Int, start:Int, count:Int, left:ByteArray) {
-		var value:Int = 0;
-		
-		if (type == 3) {
-			value = left.readUnsignedShort();
-		} else {
-			value = left.readUnsignedByte();
-		}
-		
+	@Opcode({ id:0x95, format:"1221", description:"Sets a range of flags" })
+	function FLAG_SET_RANGE(type:Int, start:Int, count:Int, value:Int) {
 		for (flag in start ... start + count) {
 			state.setFlag(type, flag, value);
 		}
 	}
 
 	@Opcode({ id:0x98, format:"?", description:"Sets a flag" })
-	function FLAG_SET(s) {
+	function FLAG_SET(s:ByteArray):Void {
+		var flag:Int = s.readUnsignedShort();
+		var v1:Int = 0;
+		var v2:Int = 0;
+		while (s.bytesAvailable > 0) {
+			var op:Int = s.readUnsignedByte();
+			if (op == 4) break;
+			var value:Int = s.readUnsignedShort();
+			if (op == 8) value = state.getValR(value);
+			if ((s[s.position] & 2) != 0) {
+				v1 = switch (op & 7) {
+					case 0: value;
+					case 1: v1 + value;
+					case 2: v1 + value;
+					case 3: Std.int(v1 / value);
+					case 4: v1;
+					default: throw(new Error());
+				}
+			} else {
+				v2 = switch (op & 7) {
+					case 0: v2 + value;
+					case 1: v2 - value;
+					case 2: v2 + v1 * value;
+					case 3: v2 + Std.int(v1 / value);
+					case 4: v2;
+					default: throw(new Error());
+				}
+			}
+		}
+		state.setLSW(flag & 0x7FFF, v1 + v2);
 	}
 
 	// TODO.

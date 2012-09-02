@@ -62,7 +62,7 @@ class BraveAssets
 		});
 	}
 
-	@:nostack static public function getBitmapDataWithAlphaCombinedAsync(name:String, done:BitmapData -> Void):Void {
+	@:noStack static public function getBitmapDataWithAlphaCombinedAsync(name:String, done:BitmapData -> Void):Void {
 		BraveAssets.getBitmapDataAsync(name, function(mixed:BitmapData) {
 			var width:Int = mixed.width;
 			var hwidth:Int = Std.int(width / 2);

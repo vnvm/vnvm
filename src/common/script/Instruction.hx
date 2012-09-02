@@ -12,11 +12,15 @@ class Instruction {
 	public var opcode:Opcode;
 	public var parameters:Array<Dynamic>;
 	public var async:Bool;
+	public var position:Int;
+	public var size:Int;
 	
-	public function new(opcode:Opcode, parameters:Array<Dynamic>, async:Bool) {
+	public function new(opcode:Opcode, parameters:Array<Dynamic>, async:Bool, position:Int = 0, size:Int = -1) {
 		this.opcode = opcode;
 		this.parameters = parameters;
 		this.async = async;
+		this.position = position;
+		this.size = size;
 	}
 	
 	public function call(object:Dynamic):Dynamic {
@@ -29,6 +33,6 @@ class Instruction {
 	}
 	
 	public function toString():String {
-		return StringEx.sprintf("%04X.%s %s", [opcode.opcodeId, opcode.methodName, parameters.join(', ')]);
+		return StringEx.sprintf("%04X(%d): %04X.%s %s", [position, size, opcode.opcodeId, opcode.methodName, parameters.join(', ')]);
 	}
 }

@@ -13,7 +13,7 @@ import nme.utils.Endian;
 
 class LZ 
 {
-	@:nostack
+	@:noStack
 	static public function decode(input:ByteArray, outputSize:Int, debug:Bool = false):ByteArray
 	{
 		var output:ByteArray = new ByteArray();

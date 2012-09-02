@@ -79,7 +79,7 @@ class BMP
 		return bitmapData;
 	}
 
-	@:nostack static private function decodeRows8(bytes:ByteArray, bitmapData:BitmapData, palette:Array<BmpColor>):Void {
+	@:noStack static private function decodeRows8(bytes:ByteArray, bitmapData:BitmapData, palette:Array<BmpColor>):Void {
 		var width:Int = bitmapData.width, height:Int = bitmapData.height;
 
 		var bmpData:ByteArray = new ByteArray();
@@ -99,7 +99,7 @@ class BMP
 		}
 	}
 	
-	@:nostack static private function decodeRows24(bytes:ByteArray, bitmapData:BitmapData):Void {
+	@:noStack static private function decodeRows24(bytes:ByteArray, bitmapData:BitmapData):Void {
 		var width:Int = bitmapData.width, height:Int = bitmapData.height;
 
 		var bmpData:ByteArray = new ByteArray();

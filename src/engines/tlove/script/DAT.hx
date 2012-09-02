@@ -2,6 +2,7 @@ package engines.tlove.script;
 import common.ByteArrayUtils;
 import common.script.Instruction;
 import common.script.Opcode;
+import common.StringEx;
 import engines.tlove.Game;
 import haxe.Log;
 import nme.errors.Error;
@@ -54,7 +55,7 @@ class DAT
 	
 	public function returnLabel():Void {
 		var item:StackItem = callStack.pop();
-		jumpLabel(item.position);
+		jump(item.position);
 	}
 
 	public function jump(to)
@@ -93,9 +94,10 @@ class DAT
 				Log.trace("Script.waitAsync");
 				return;
 			}
+			Log.trace(StringEx.sprintf("Script.single : %08X, %08X", [script.position, script.length]));
 		}
 		
-		Log.trace("Script.done");
+		Log.trace(StringEx.sprintf("Script.done : %08X, %08X", [script.position, script.length]));
 	}
 
 	private function executeSingle(done:Void -> Void):Bool
@@ -107,6 +109,7 @@ class DAT
 
 	private function readInstruction(done:Void -> Void):Instruction
 	{
+		var instructionPosition:Int = script.position;
 		var opcodeId:Int = script.readUnsignedByte();
 		var instructionDataLength:Int = script.readUnsignedByte();
 		if ((instructionDataLength & 0x80) != 0) {
@@ -115,18 +118,19 @@ class DAT
 		}
 		var params:ByteArray = ByteArrayUtils.readByteArray(script, instructionDataLength);
 		var opcode:Opcode = game.scriptOpcodes.getOpcodeWithId(opcodeId);
-		var parameters:Array<Dynamic> = readParameters(params, opcode.format, done);
+		var parameters:Array<Dynamic> = readParameters(params, opcode, done);
 		var async:Bool = (opcode.format.indexOf('<') >= 0);
-		return new Instruction(opcode, parameters, async);
+		return new Instruction(opcode, parameters, async, instructionPosition, params.length + 1);
 	}
 	
-	private function readParameters(paramsByteArray:ByteArray, format:String, done:Void -> Void):Array<Dynamic>
+	private function readParameters(paramsByteArray:ByteArray, opcode:Opcode, done:Void -> Void):Array<Dynamic>
 	{
+		var format:String = opcode.format;
 		var params:Array<Dynamic> = [];
 		for (n in 0 ... format.length) {
 			var type:String = format.charAt(n);
 			
-			if (paramsByteArray.position >= paramsByteArray.length) throw(new Error("No more parameters! '" + format + "'"));
+			if (paramsByteArray.position >= paramsByteArray.length) throw(new Error("No more parameters! '" + opcode + "'"));
 			
 			switch (type) {
 				case '<': params.push(done);
