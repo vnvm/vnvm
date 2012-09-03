@@ -36,14 +36,15 @@ class EngineMain extends Sprite
 		var game:Game;
 
 		Game.initFromFileSystemAsync(fs, function(game:Game) {
-			gameSprite.addChild(game.sprite);
-			game.run();
-			/*
-			game.mrs.getBytesAsync(function("SLIDE_1.MRS", ba:ByteArray):Void {
-				var mrs:MRS = new MRS(ba);
-				gameSprite.addChild(new Bitmap(mrs.image.getBimapData32(), PixelSnapping.AUTO, true));
-			});
-			*/
+			#if (true)
+				gameSprite.addChild(game.sprite);
+				game.run();
+			#else
+				game.mrs.getBytesAsync("WINDOW.MRS", function(ba:ByteArray):Void {
+					var mrs:MRS = new MRS(ba);
+					gameSprite.addChild(new Bitmap(mrs.image.getBimapData32(), PixelSnapping.AUTO, true));
+				});
+			#end
 		});
 	}
 }

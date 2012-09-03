@@ -1,6 +1,7 @@
 package common.imaging;
 import common.LangUtils;
 import common.MathEx;
+import cpp.Random;
 import haxe.io.Bytes;
 import haxe.Log;
 import nme.display.BitmapData;
@@ -21,7 +22,9 @@ class BitmapData8 {
 	public var data:ByteArray;
 	public var width:Int;
 	public var height:Int;
-	
+
+	static private var random:Array<Float>;
+
 	private function new(width:Int, height:Int) {
 		this.width = width;
 		this.height = height;
@@ -124,6 +127,10 @@ class BitmapData8 {
 	}
 	
 	@:noStack static public function copyRect(src:BitmapData8, srcRect:Rectangle, dst:BitmapData8, dstPoint:Point):Void {
+		copyRectTransition(src, srcRect, dst, dstPoint, 1.0, 0);
+	}
+	
+	@:noStack static public function copyRectTransition(src:BitmapData8, srcRect:Rectangle, dst:BitmapData8, dstPoint:Point, step:Float, effect:Int):Void {
 		dst.palette = src.palette;
 		
 		var srcX:Int = Std.int(srcRect.x);
@@ -137,7 +144,7 @@ class BitmapData8 {
 		var srcData:ByteArray = src.data;
 		var dstData:ByteArray = dst.data;
 		
-		Log.trace(Std.format("SRC($srcX, $srcY), DST($dstX, $dstY) | SIZE($width, $height)"));
+		//Log.trace(Std.format("SRC($srcX, $srcY), DST($dstX, $dstY) | SIZE($width, $height)"));
 		
 		if (!src.inBounds(srcX, srcY)) Log.trace("BitmapData8.copyRect.Error [1]");
 		if (!src.inBounds(srcX + width - 1, srcY + height - 1)) Log.trace("BitmapData8.copyRect.Error [2]");
@@ -150,20 +157,36 @@ class BitmapData8 {
 		height = Std.int(MathEx.clamp(height, 0, dst.height - dstY));
 		height = Std.int(MathEx.clamp(height, 0, src.height - srcY));
 
-		//if (dstY + height >= dst.height) 
-
-		for (y in 0 ... height) {
-			/*
-			src.data.position = src.getIndex(srcX + 0, srcY + y);
-			dst.data.position = dst.getIndex(dstX + 0, dstY + y);
-			dst.data.writeBytes(src.data, dst.data.position, srcWidth);
-			*/
+		step = MathEx.clamp(step, 0, 1);
+		
+		if (step >= 1) {
+			for (y in 0 ... height) {
+				var srcN:Int = src.getIndex(srcX + 0, srcY + y);
+				var dstN:Int = dst.getIndex(dstX + 0, dstY + y);
+				
+				dstData.blit(dstN, srcData, srcN, width);
+			}
+		} else {
+			if (random == null) {
+				random = [];
+				for (n in 0 ... 1000) random.push(Math.random());
+			}
 			
-			var srcN:Int = src.getIndex(srcX + 0, srcY + y);
-			var dstN:Int = dst.getIndex(dstX + 0, dstY + y);
-			
-			dstData.blit(dstN, srcData, srcN, width);
-			//for (x in 0 ... srcWidth) dstData[dstN + x] = srcData[srcN + x];
+			var n:Int = 0;
+			for (y in 0 ... height) {
+				var srcN:Int = src.getIndex(srcX + 0, srcY + y);
+				var dstN:Int = dst.getIndex(dstX + 0, dstY + y);
+				
+				for (x in 0 ... width) {
+					if (step >= random[n % random.length]) {
+						dstData[dstN] = srcData[srcN];
+					}
+					
+					dstN++;
+					srcN++;
+					n++;
+				}
+			}
 		}
 	}
 }

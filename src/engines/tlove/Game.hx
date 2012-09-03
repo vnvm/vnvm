@@ -1,5 +1,6 @@
 package engines.tlove;
 
+import common.Event2;
 import common.imaging.BitmapData8;
 import common.imaging.Palette;
 import common.io.Stream;
@@ -16,6 +17,8 @@ import nme.display.Bitmap;
 import nme.display.BitmapData;
 import nme.display.PixelSnapping;
 import nme.display.Sprite;
+import nme.events.MouseEvent;
+import nme.geom.Point;
 import nme.utils.ByteArray;
 
 /**
@@ -40,6 +43,12 @@ class Game
 	private var updatedBitmap:BitmapData;
 	public var state:GameState;
 	static inline public var fps:Int = 60;
+	
+	public var onMouseClick:Event2<MouseEvent>;
+	public var onMouseMove:Event2<MouseEvent>;
+	public var onMouseDown:Event2<MouseEvent>;
+	public var onMouseUp:Event2<MouseEvent>;
+	public var mousePosition:Point;
 
 	private function new() 
 	{
@@ -53,7 +62,38 @@ class Game
 		this.lastLoadedPalette = new Palette();
 		this.updatedBitmap = new BitmapData(640, 400);
 		this.sprite = new Sprite();
+		
+		this.onMouseClick = new Event2<MouseEvent>();
+		this.onMouseMove = new Event2<MouseEvent>();
+		this.onMouseDown = new Event2<MouseEvent>();
+		this.onMouseUp = new Event2<MouseEvent>();
+		this.mousePosition = new Point(-1, -1);
+		
 		this.sprite.addChild(new Bitmap(updatedBitmap, PixelSnapping.AUTO, true));
+		
+		
+		var e:MouseEvent;
+		
+		function updateMousePos(e:MouseEvent) {
+			mousePosition = new Point(Math.round(e.localX), Math.round(e.localY));
+		}
+		
+		this.sprite.addEventListener(MouseEvent.CLICK, function(e:MouseEvent) {
+			updateMousePos(e);
+			this.onMouseClick.trigger(e);
+		});
+		this.sprite.addEventListener(MouseEvent.MOUSE_MOVE, function(e:MouseEvent) {
+			updateMousePos(e);
+			this.onMouseMove.trigger(e);
+		});
+		this.sprite.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent) {
+			updateMousePos(e);
+			this.onMouseDown.trigger(e);
+		});
+		this.sprite.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent) {
+			updateMousePos(e);
+			this.onMouseUp.trigger(e);
+		});
 	}
 	
 	public function updateImage():Void {
@@ -69,7 +109,9 @@ class Game
 	
 	public function run():Void {
 		Log.trace('run');
+		
 		dat.loadAsync("MAIN", function() {
+		//dat.loadAsync("TITLE", function() {
 			Log.trace('loaded');
 			dat.execute();
 		});

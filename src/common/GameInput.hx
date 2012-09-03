@@ -6,6 +6,7 @@ import nme.events.KeyboardEvent;
 import nme.events.MouseEvent;
 import nme.geom.Point;
 import nme.Lib;
+import common.Event2;
 
 /**
  * ...
@@ -35,6 +36,9 @@ class GameInput
 			onClick.trigger(e);
 		});
 		
+		mouseCurrent = new Point(-1, -1);
+		mouseCurrentClick = new Point( -1, -1);
+		mouseStart = new Point(-1, -1);
 		onClick = new Event2<MouseEvent>();
 		onKeyPress = new Event2<KeyboardEvent>();
 	}
@@ -65,8 +69,9 @@ class GameInput
 		setKey(e.keyCode, false);
 	}
 	
-	static private var mouseCurrent:Point;
-	static private var mouseStart:Point;
+	static public var mouseCurrent:Point;
+	static public var mouseCurrentClick:Point;
+	static public var mouseStart:Point;
 	
 	static private function onMouseDown(e:MouseEvent):Void {
 		if (e.buttonDown) {
@@ -87,10 +92,11 @@ class GameInput
 	static private inline var deltaThresold:Int = 40;
 
 	static private function onMouseMove(e:MouseEvent):Void {
+		mouseCurrent = new Point(e.stageX, e.stageY);
 		if (e.buttonDown) {
 			//Log.trace(Std.format("onMouseMove : ${e.stageX}, ${e.stageY}"));
-			mouseCurrent = new Point(e.stageX, e.stageY);
-			var offset:Point = mouseCurrent.subtract(mouseStart);
+			mouseCurrentClick = new Point(e.stageX, e.stageY);
+			var offset:Point = mouseCurrentClick.subtract(mouseStart);
 			
 			//Log.trace(Std.format("--> ${offset.x}, ${offset.y}"));
 			

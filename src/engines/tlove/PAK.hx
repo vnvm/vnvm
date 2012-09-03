@@ -22,7 +22,7 @@ class PAK
 	public function get(name:String):Stream {
 		var item:SliceStream = items.get(name);
 		if (item == null) throw(new Error(Std.format("Can't find '$name'")));
-		return item;
+		return SliceStream.fromAll(item);
 	}
 	
 	public function getNames():Array<String> {

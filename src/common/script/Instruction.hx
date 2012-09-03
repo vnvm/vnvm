@@ -27,7 +27,7 @@ class Instruction {
 		if (opcode.unimplemented) {
 			Log.trace(Std.format("Unimplemented: $this"));
 		} else {
-			Log.trace(Std.format("Executing... $this"));
+			//Log.trace(Std.format("Executing... $this"));
 		}
 		return Reflect.callMethod(object, Reflect.field(object, opcode.methodName), parameters);
 	}

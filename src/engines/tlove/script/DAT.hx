@@ -55,12 +55,7 @@ class DAT
 	
 	public function returnLabel():Void {
 		var item:StackItem = callStack.pop();
-		jump(item.position);
-	}
-
-	public function jump(to)
-	{
-		script.position = to;
+		script.position = item.position;
 	}
 	
 	public function jumpLabel(label)
@@ -90,14 +85,14 @@ class DAT
 	{
 		while (script.position < script.length)
 		{
+			//Log.trace(StringEx.sprintf("Script.single : %08X, %08X", [script.position, script.length]));
 			if (executeSingle(execute)) {
-				Log.trace("Script.waitAsync");
+				//Log.trace("Script.waitAsync");
 				return;
 			}
-			Log.trace(StringEx.sprintf("Script.single : %08X, %08X", [script.position, script.length]));
 		}
 		
-		Log.trace(StringEx.sprintf("Script.done : %08X, %08X", [script.position, script.length]));
+		//Log.trace(StringEx.sprintf("Script.done : %08X, %08X", [script.position, script.length]));
 	}
 
 	private function executeSingle(done:Void -> Void):Bool

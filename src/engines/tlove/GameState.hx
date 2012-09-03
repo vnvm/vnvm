@@ -29,7 +29,16 @@ class GameState
 			case 3: LSW[index] = value;
 		}
 	}
-	
+
+	public function getFlag(type:Int, index:Int):Int {
+		return switch (type) {
+			case 0: flags[index] ? 1 : 0;
+			case 1: MV[index] ? 1 : 0;
+			case 2: LSB[index];
+			case 3: LSW[index];
+		};
+	}
+
     public function getVal(index:Int) {
         if ((index & 0x8000) == 0x8000) {
             return this.getLSW(index & 0x7FFF);

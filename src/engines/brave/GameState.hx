@@ -11,20 +11,16 @@ import engines.brave.script.ScriptThread;
 import engines.brave.script.Variable;
 import engines.brave.sprites.GameSprite;
 import engines.brave.sprites.map.Character;
-import haxe.Log;
 import haxe.Timer;
 import nme.display.Bitmap;
 import nme.display.BitmapData;
 import nme.display.PixelSnapping;
-import nme.display.DisplayObject;
-import nme.display.Sprite;
-import nme.display.Stage;
 import nme.errors.Error;
 import nme.events.KeyboardEvent;
 import nme.events.MouseEvent;
-import nme.geom.ColorTransform;
 import nme.Lib;
 import nme.media.SoundChannel;
+import nme.Memory;
 import nme.utils.ByteArray;
 
 /**
@@ -144,20 +140,18 @@ class GameState
 		
 		pixels.position = 0;
 		
+		Memory.select(pixels);
+		
+		var offset:Int = 0;
 		for (n in 0 ... Std.int(pixels.length / 4)) {
-			var offset:Int = n * 4;
-			var grey:Int = MathEx.fastUintConstDiv16((pixels[offset + 1] + pixels[offset + 2] + pixels[offset + 3]), 3);
+			var grey:Int = MathEx.fastUintConstDivShort((pixels[offset + 1] + pixels[offset + 2] + pixels[offset + 3]), 3);
 			
-			pixels[offset + 0] = 0xFF;
-			pixels[offset + 1] = MathEx.fastUintConstDiv16(grey * 100, 100);
-			pixels[offset + 2] = MathEx.fastUintConstDiv16(grey * 80, 100);
-			pixels[offset + 3] = MathEx.fastUintConstDiv16(grey * 60, 100);
-			/*
-			pixels[offset + 0] = 0xFF;
-			pixels[offset + 1] = Std.int(grey * 1.0);
-			pixels[offset + 2] = Std.int(grey * 0.8);
-			pixels[offset + 3] = Std.int(grey * 0.6);
-			*/
+			Memory.setByte(offset + 0, 0xFF);
+			Memory.setByte(offset + 1, MathEx.fastUintConstDivShort(grey * 100, 100));
+			Memory.setByte(offset + 2, MathEx.fastUintConstDivShort(grey * 80, 100));
+			Memory.setByte(offset + 3, MathEx.fastUintConstDivShort(grey * 60, 100));
+			
+			offset += 4;
 		}
 		
 		out.setPixels(out.rect, pixels);

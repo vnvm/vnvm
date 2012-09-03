@@ -1,6 +1,8 @@
 package common.io;
 import common.ByteUtils;
+import common.StringEx;
 import haxe.io.Bytes;
+import haxe.Log;
 import nme.errors.Error;
 import nme.utils.ByteArray;
 import sys.FileStat;
@@ -18,10 +20,12 @@ class FileStream extends Stream
 {
 	var fileStat:FileStat;
 	var fileInput:FileInput;
+	var fileName:String;
 
 	public function new(name:String) 
 	{
 		if (!FileSystem.exists(name)) throw(new Error(Std.format("File '$name' doesn't exist")));
+		this.fileName = name;
 		this.fileInput = File.read(name);
 		this.position = 0;
 		this.fileStat = FileSystem.stat(name);
@@ -30,12 +34,25 @@ class FileStream extends Stream
 	
 	override public function readBytesAsync(length:Int, done:ByteArray -> Void):Void 
 	{
-		fileInput.seek(position, FileSeek.SeekBegin);
+		var bytes:Bytes = null;
 		
-		var bytes:Bytes = fileInput.read(length);
+		Log.trace(StringEx.sprintf("Reading '%s'(0x%08X:0x%08X)", [this.fileName, this.position, this.position + length]));
 		
-		position += bytes.length;
-		
+		try {
+			fileInput.seek(position, FileSeek.SeekBegin);
+			
+			var currentPosition:Int = fileInput.tell();
+			if (currentPosition + length > this.length) {
+				throw(new Error(Std.format("Trying to read more bytes than available.\nTotal=${this.length}\nCurrentPosition=${currentPosition}\nToRead=${length}")));
+			}
+			
+			bytes = fileInput.read(length);
+			
+			position += bytes.length;
+		} catch (e:Dynamic) {
+			Log.trace("Error in readBytesAsync: " + e);
+		}
+			
 		done(ByteUtils.BytesToByteArray(bytes));
 	}
 	
