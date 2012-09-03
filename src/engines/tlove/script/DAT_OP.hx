@@ -1,9 +1,7 @@
 package engines.tlove.script;
 import common.Animation;
 import common.Event2;
-import common.GameInput;
 import common.imaging.BitmapData8;
-import common.imaging.BmpColor;
 import common.imaging.Palette;
 import common.PathUtils;
 import engines.tlove.Game;
@@ -18,12 +16,21 @@ import nme.geom.Rectangle;
 import nme.media.Sound;
 import nme.utils.ByteArray;
 
-class DAT_OP // T_LOVE95.EXE:00409430
+/**
+ * XYZ Script Engine
+ * 
+ * @see T_LOVE95.EXE:00409430
+ */
+class DAT_OP
 {
 	var dat:DAT;
 	var game:Game;
 	var state:GameState;
 	
+	/**
+	 * 
+	 * @param	dat
+	 */
 	public function new(dat:DAT) {
 		this.dat = dat;
 		this.game = dat.game;
@@ -52,16 +59,114 @@ class DAT_OP // T_LOVE95.EXE:00409430
 
 	/**
 	 * 
+	 * @param	done
+	 * @param	leftClickLabel
+	 * @param	rightClickLabel
+	 */
+	@Opcode({ id:0xA6, format:"<22", description:"Wait?" })
+	@Unimplemented
+	function MOUSE_WAIT_CLICK_EVERYWHERE(done:Void -> Void, leftClickLabel:Int, rightClickLabel:Int):Void {
+		var e:MouseEvent;
+		
+		Event2.registerOnceAny([game.onMouseLeftClick, game.onMouseRightClick], function(e:MouseEvent):Void {
+			//e.type = MouseEvent.CLICK;
+			if (e.type == MouseEvent.CLICK) {
+				dat.jumpLabel(leftClickLabel);
+			} else if (e.type == MouseEvent.RIGHT_CLICK) {
+				dat.jumpLabel(rightClickLabel);
+			} else {
+				throw(new Error(Std.format("Invalid event for MOUSE_WAIT_CLICK_EVERYWHERE $e")));
+			}
+			done();
+		});
+	}
+	
+	/**
+	 * 
 	 * @param	v
 	 */
 	@Opcode( { id:0x17, format:"<1", description:"Unknown??" } )
 	@Unimplemented
-	function WAIT_MOUSE_EVENT(done:Void -> Void, v:Int):Void {
+	function MOUSE_WAIT_EVENT(done:Void -> Void, v:Int):Void {
 		var e:MouseEvent;
-		Event2.registerOnceAny([game.onMouseDown, game.onMouseMove], function(e:MouseEvent) {
-			Log.trace(Std.format("Mouse(${e.localX}, ${e.localY}):${e.buttonDown}"));
+
+		Event2.registerOnceAny([game.onMouseLeftClick, game.onMouseRightClick, game.onMouseMove], function(e:MouseEvent) {
+			game.lastMouseEvent = e;
+			
 			done();
 		});
+	}
+	
+	/**
+	 * 
+	 * @param	leftClickLabel
+	 * @param	rightClickLabel
+	 * @param	movementLabel
+	 * @param	rectCount
+	 */
+	@Opcode({ id:0xAD, format:"2221", description:"" })
+	//@Unimplemented
+	function MOUSE_JUMP_IF_EVENT(leftClickLabel:Int, rightClickLabel:Int, missLabel:Int, rectCount:Int):Void {
+		if (game.lastMouseEvent.type == MouseEvent.CLICK) {
+			dat.jumpLabel(leftClickLabel);
+		} else if (game.lastMouseEvent.type == MouseEvent.RIGHT_CLICK) {
+			dat.jumpLabel(rightClickLabel);
+		} else {
+			dat.jumpLabel(missLabel);
+		}
+		/*
+		if (game.mouseRects.length == 0) {
+			//done();
+			dat.jumpLabel(missLabel);
+			done();
+		} else {
+			done();
+		}
+		*/
+	}
+	
+	/**
+	 * 
+	 * @param	x1
+	 * @param	y1
+	 * @param	x2
+	 * @param	y2
+	 * @param	label
+	 */
+	@Opcode({ id:0xA7, format:"22222", description:"" })
+	@Unimplemented
+	function MOUSE_JUMP_IF_IN(x1:Int, y1:Int, x2:Int, y2:Int, label:Int):Void {
+	}
+
+	/**
+	 * 
+	 * @param	x1
+	 * @param	y1
+	 * @param	x2
+	 * @param	y2
+	 * @param	label
+	 * @param	flagType
+	 * @param	flagIndex
+	 */
+	@Opcode({ id:0xAE, format:"2222212", description:"" })
+	//@Unimplemented
+	function MOUSE_JUMP_IF_CLICK_IN_AND_FLAG(x1:Int, y1:Int, x2:Int, y2:Int, label:Int, flagType:Int, flagIndex:Int):Void {
+		var rect:Rectangle = new Rectangle(x1, y1, x2 - x1, y2 - y1);
+		
+		//game.mouseRects.push({ rect: rect, label : label, flagType : flagType, flagIndex : flagIndex });
+		
+		var pos:Point = new Point(game.lastMouseEvent.localX, game.lastMouseEvent.localY);
+		//Log.trace(Std.format("(${rect.x},${rect.y},${rect.width},${rect.height}) // ${pos.x},${pos.y}"));
+		if (rect.containsPoint(pos))
+		{
+			if (game.lastMouseEvent.type == MouseEvent.CLICK)
+			{
+				//if (state.getFlag(flagType, flagIndex) != 0)
+				{
+					dat.jumpLabel(label);
+				}
+		}
+		}
 	}
 
 	/**
@@ -145,18 +250,26 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	function COPY_PALETTE() {
 	}
 
+	/**
+	 * 
+	 * @param	done
+	 * @param	name
+	 * @param	layer
+	 */
 	@Opcode({ id:0x33, format:"<s1", description:"Loads an image in a buffer" })
-	//@Unimplemented
-	function IMG_LOAD(done:Void -> Void, name:String, layer_dst:Int):Void {
+	function IMG_LOAD(done:Void -> Void, name:String, layer:Int):Void {
 		var mrs:MRS;
 		game.getMrsAsync(name, function(mrs:MRS) {
 			Palette.copy(mrs.image.palette, game.lastLoadedPalette);
-			mrs.image.drawToBitmapData8(game.layers[layer_dst], 0, 0);
+			mrs.image.drawToBitmapData8(game.layers[layer], 0, 0);
+			if (layer == 0) game.updateImage();
 			done();
 		});
 	}
 
-	// TODO.
+	/**
+	 * 
+	 */
 	@Opcode({ id:0x34, format:"", description:"???" })
 	@Unimplemented
 	function UNKNOWN_34() {
@@ -211,13 +324,13 @@ class DAT_OP // T_LOVE95.EXE:00409430
 		switch (effect) {
 			case 0:
 				BitmapData8.copyRect(src, new Rectangle(srcX, srcY, srcWidth, srcHeight), dst, new Point(dstX, dstY));
-				dat.game.updateImage();
+				if (dstLayer == 0) dat.game.updateImage(new Rectangle(dstX, dstY, srcWidth, srcHeight));
 				Timer.delay(done, 0);
 			//case 29:
 			default:
 				Animation.animate(done, 0.4, { }, { }, Animation.Linear, function(step:Float):Void {
 					BitmapData8.copyRectTransition(src, new Rectangle(srcX, srcY, srcWidth, srcHeight), dst, new Point(dstX, dstY), step, effect, transparentColor);
-					dat.game.updateImage();
+					if (dstLayer == 0) dat.game.updateImage(new Rectangle(dstX, dstY, srcWidth, srcHeight));
 				});
 		}
 	}
@@ -252,8 +365,9 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	@Opcode( { id:0x3A, format:"112222", description:"Fills a rect" } )
 	//@Unimplemented
 	function FILL_RECT(color:Int, unk:Int, x:Int, y:Int, w:Int, h:Int):Void {
-		game.layers[0].fillRect(color, new Rectangle(x, y, w, h));
-		game.updateImage();
+		var rect:Rectangle = new Rectangle(x, y, w, h);
+		game.layers[0].fillRect(color, rect);
+		game.updateImage(rect);
 	}
 
 	/**
@@ -275,6 +389,7 @@ class DAT_OP // T_LOVE95.EXE:00409430
 			case 1:
 				// APPLY_PALETTE
 				Palette.copy(game.workPalette, game.currentPalette);
+				game.updateImage();
 			case 2:
 				// BACKUP_PALETTE
 				Palette.copy(game.workPalette, game.backupPalette);
@@ -298,60 +413,108 @@ class DAT_OP // T_LOVE95.EXE:00409430
 		Timer.delay(done, 0);
 	}
 	
-	// TODO.
+	/**
+	 * 
+	 */
 	@Opcode( { id:0x40, format:"", description:"???" } )
 	@Unimplemented
 	function JUMP_IF_MENU_VAR() {
 	}
 
-	// TODO.
+	/**
+	 * 
+	 * @param	a
+	 * @param	b
+	 * @param	c
+	 */
 	@Opcode({ id:0x41, format:"221", description:"???" })
 	@Unimplemented
 	function JUMP_IF_REL(a, b, c) {
 	}
 
-	// TODO.
+	/**
+	 * 
+	 * @param	a
+	 * @param	b
+	 */
 	@Opcode({ id:0x42, format:"12", description:"????" })
 	@Unimplemented
 	function JUMP_CHAIN(a, b) {
 	}
 	
-	// TODO.
+	/**
+	 * 
+	 * @param	a
+	 * @param	b
+	 */
 	@Opcode({ id:0x43, format:"", description:"????" })
 	@Unimplemented
 	function JUMP_IF_LSB(a, b) {
 	}
 
+	/**
+	 * 
+	 * @param	flag
+	 * @param	op
+	 * @param	imm
+	 * @param	label
+	 */
 	@Opcode({ id:0x44, format:"1122", description:"Jumps conditionally" })
 	@Unimplemented
 	function JUMP_IF_LSW(flag, op, imm, label) {
 	}
 	
-	// TODO.
+	/**
+	 * 
+	 */
 	@Opcode({ id:0x45, format:"", description:"????" })
 	@Unimplemented
 	function JUMP_SETTINGS() {
 	}
 
-	// TODO.
-	@Opcode({ id:0x48, format:"21", description:"???" })
+	/**
+	 * 
+	 * @param	index
+	 * @param	value
+	 */
+	@Opcode({ id:0x48, format:"11", description:"???" })
 	@Unimplemented
-	function SET_MENU_VAR_BITS(a, b) {
+	function SET_MENU_VAR_BITS(index:Int, value:Int) {
+		state.menuFlags[index] |= value;
 	}
 
-	// TODO.
+	/**
+	 * 
+	 * @param	index
+	 * @param	value
+	 */
 	@Opcode({ id:0x49, format:"21", description:"???" })
 	@Unimplemented
-	function SET_FLAG_BITS(a, b) {
+	function FLAG_SET_BITS(index:Int, value:Int) {
+		var byteIndex:Int = Std.int(index / 8);
+		var bitIndex:Int = Std.int(index % 8);
+		if (value != 0) {
+			state.flags[byteIndex] |= (1 << bitIndex);
+		} else {
+			state.flags[byteIndex] &= ~(1 << bitIndex);
+		}
 	}
 	
-	// TODO.
+	/**
+	 * 
+	 * @param	a
+	 * @param	b
+	 */
 	@Opcode({ id:0x4A, format:"21", description:"???" })
 	@Unimplemented
 	function SET_SEQUENCE(a, b) {
 	}
 	
-	// TODO.
+	/**
+	 * 
+	 * @param	a
+	 * @param	b
+	 */
 	@Opcode({ id:0x4B, format:"21", description:"???" })
 	@Unimplemented
 	function ADD_OR_RESET_LSB(a, b) {
@@ -392,17 +555,34 @@ class DAT_OP // T_LOVE95.EXE:00409430
 		});
 	}
 
+	/**
+	 * 
+	 * @param	y
+	 * @param	x
+	 * @param	_ff
+	 */
 	@Opcode({ id:0x53, format:"111", description:"Ani play" })
 	@Unimplemented
 	function SAVE_SYS_FLAG(y, x, _ff) {
 	}
 
-	// TODO.
+	/**
+	 * 
+	 * @param	a
+	 * @param	b
+	 * @param	c
+	 */
 	@Opcode({ id:0x54, format:"212", description:"???" })
 	@Unimplemented
 	function JUMP_COND_SYS_FLAG(a, b, c) {
 	}
 
+	/**
+	 * 
+	 * @param	done
+	 * @param	name
+	 * @param	loop
+	 */
 	@Opcode({ id:0x61, format:"<s2", description:"Plays a midi file" })
 	@Unimplemented
 	function MUSIC_PLAY(done:Void -> Void, name:String, loop:Int):Void {
@@ -416,7 +596,9 @@ class DAT_OP // T_LOVE95.EXE:00409430
 		});
 	}
 
-	// TODO.
+	/**
+	 * 
+	 */
 	@Opcode({ id:0x62, format:"", description:"???" })
 	@Unimplemented
 	function UNKNOWN_62() {
@@ -441,7 +623,7 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	 */
 	@Opcode( { id:0x66, format:"s", description:"Plays a sound" } )
 	@Unimplemented
-	function SOUND_PLAY(name) {
+	function SOUND_PLAY(name:String):Void {
 	}
 
 	/**
@@ -449,7 +631,7 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	 */
 	@Opcode( { id:0x67, format:"", description:"???" } )
 	@Unimplemented
-	function SOUND_STOP() {
+	function SOUND_STOP():Void {
 	}
 
 	/**
@@ -476,54 +658,87 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	function PUT_TEXT_AT_POSITION(x:Int, y:Int, color:Int, text:String) {
 	}
 
-	// TODO.
+	/**
+	 * 
+	 * @param	visible
+	 */
 	@Opcode({ id:0x72, format:"b", description:"???" })
 	@Unimplemented
 	function SET_DIALOG_TEXT_VISIBLE(visible:Bool):Void {
 		state.textVisible = visible;
 	}
 
-	// TODO.
+	/**
+	 * 
+	 * @param	v
+	 */
 	@Opcode({ id:0x73, format:"1", description:"???" })
 	@Unimplemented
 	function UNKNOWN_73(v) {
 	}
 
-	// TODO.
+	/**
+	 * 
+	 * @param	a
+	 * @param	b
+	 * @param	c
+	 */
 	@Opcode({ id:0x75, format:"111", description:"???" })
 	@Unimplemented
 	function UNKNOWN_75(a, b, c) {
 	}
 
-	// TODO.
+	/**
+	 * 
+	 * @param	a
+	 * @param	b
+	 * @param	c
+	 * @param	d
+	 * @param	e
+	 */
 	@Opcode({ id:0x82, format:"22221", description:"????" })
 	@Unimplemented
-	function TEXT_WND_SET(a, b, c, d, e) {
+	function SET_TEXT_WINDOW_RECTANGLE(x1:Int, y1:Int, x2:Int, y2:Int, _unk:Int):Void {
+		var rect:Rectangle = new Rectangle(x1, y1, x2 - x1, y2 - y1);
 	}
 	
-	// TODO.
+	/**
+	 * 
+	 * @param	done
+	 * @param	time
+	 */
 	@Opcode({ id:0x83, format:"<2", description:"????" })
 	@Unimplemented
-	function DELAY_83(done:Void -> Void, time:Int) {
+	function DELAY_83(done:Void -> Void, time:Int):Void {
 		game.delay(done, time);
 	}
 
-	// TODO.
+	/**
+	 * 
+	 * @param	file
+	 * @param	_0
+	 */
 	@Opcode({ id:0x84, format:"s1", description:"Interface (0x84)" })
 	@Unimplemented
-	function INTERFACE2(file, _0) {
+	function INTERFACE2(file:String, _0:Int):Void {
 	}
 	
-	// TODO.
+	/**
+	 * 
+	 */
 	@Opcode({ id:0x85, format:"", description:"" })
 	@Unimplemented
-	function UNKNOWN_85() {
+	function UNKNOWN_85():Void {
 	}
 
-	// TODO.
+	/**
+	 * 
+	 * @param	x
+	 * @param	y
+	 */
 	@Opcode({ id:0x86, format:"22", description:"" })
 	@Unimplemented
-	function SET_PUSH_BUTTON_POSITION(x:Int, y:Int) {
+	function SET_PUSH_BUTTON_POSITION(x:Int, y:Int):Void {
 	}
 
 	/**
@@ -533,7 +748,7 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	 */
 	@Opcode({ id:0x87, format:"s1", description:"Interface (0x87)" })
 	@Unimplemented
-	function INTERFACE3(file, _0) {
+	function INTERFACE3(file:String, _0:Int):Void {
 	}
 
 	/**
@@ -543,52 +758,74 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	 */
 	@Opcode( { id:0x89, format:"<2", description:"Delay" } )
 	@Unimplemented
-	function DELAY_89(done:Void -> Void, time:Int) {
+	function DELAY_89(done:Void -> Void, time:Int):Void {
 		game.delay(done, time * 1);
 	}
 
+	/**
+	 * 
+	 */
 	@Opcode({ id:0x8A, format:"", description:"Updates" })
 	@Unimplemented
-	function UPDATE() {
+	function UPDATE():Void {
 	}
 
+	/**
+	 * 
+	 */
 	@Opcode({ id:0x91, format:"", description:"Return from a CALL" })
-	@Unimplemented
-	function RETURN_LOCAL() {
+	//@Unimplemented
+	function RETURN_LOCAL():Void {
 		dat.returnLabel();
 	}
 
-	// TODO.
+	/**
+	 * 
+	 */
 	@Opcode({ id:0x92, format:"", description:"???" })
 	@Unimplemented
-	function RETURN_SCRIPT() {
+	function RETURN_SCRIPT():Void {
 	}
 
+	/**
+	 * 
+	 */
 	@Opcode({ id:0x94, format:"", description:"???" })
 	@Unimplemented
-	function SET_LS_RAND() {
+	function SET_LS_RAND():Void {
 	}
 
+	/**
+	 * 
+	 * @param	type
+	 * @param	start
+	 * @param	count
+	 * @param	value
+	 */
 	@Opcode({ id:0x95, format:"1221", description:"Sets a range of flags" })
 	@Unimplemented
-	function FLAG_SET_RANGE(type:Int, start:Int, count:Int, value:Int) {
+	function FLAG_SET_RANGE(type:Int, start:Int, count:Int, value:Int):Void {
 		for (flag in start ... start + count) {
 			state.setFlag(type, flag, value);
 		}
 	}
 
+	/**
+	 * 
+	 * @param	params
+	 */
 	@Opcode({ id:0x98, format:"?", description:"Sets a flag" })
 	//@Unimplemented
-	function FLAG_SET(s:ByteArray):Void {
-		var flag:Int = s.readUnsignedShort();
+	function FLAG_SET(params:ByteArray):Void {
+		var flag:Int = params.readUnsignedShort();
 		var v1:Int = 0;
 		var v2:Int = 0;
-		while (s.bytesAvailable > 0) {
-			var op:Int = s.readUnsignedByte();
+		while (params.bytesAvailable > 0) {
+			var op:Int = params.readUnsignedByte();
 			if (op == 4) break;
-			var value:Int = s.readUnsignedShort();
+			var value:Int = params.readUnsignedShort();
 			if (op == 8) value = state.getValR(value);
-			if ((s[s.position] & 2) != 0) {
+			if ((params[params.position] & 2) != 0) {
 				v1 = switch (op & 7) {
 					case 0: value;
 					case 1: v1 + value;
@@ -611,77 +848,58 @@ class DAT_OP // T_LOVE95.EXE:00409430
 		state.setLSW(flag & 0x7FFF, v1 + v2);
 	}
 
-	// TODO.
+	/**
+	 * 
+	 * @param	s
+	 */
 	@Opcode({ id:0x99, format:"?", description:"Sets a flag (related)" })
 	@Unimplemented
-	function JUMP_SET_LSW_ROUTINE(s) {
+	function JUMP_SET_LSW_ROUTINE(s:ByteArray):Void {
 	}
 
-	// TODO.
+	/**
+	 * 
+	 * @param	v
+	 */
 	@Opcode({ id:0x9D, format:"2", description:"????" })
 	@Unimplemented
-	function UNKNOWN_9D(v) {
+	function UNKNOWN_9D(v:Int):Void {
 	}
 
-	@Opcode({ id:0xA6, format:"<22", description:"Wait?" })
-	@Unimplemented
-	function WAIT_MOUSE_CLICK(done:Void -> Void, leftClickLabel:Int, rightClickLabel:Int):Void {
-		var e:MouseEvent;
-		GameInput.onClick.registerOnce(function(e:MouseEvent):Void {
-			//e.type = MouseEvent.CLICK;
-			if (e.type == MouseEvent.CLICK) {
-				dat.jumpLabel(leftClickLabel);
-			} else {
-				dat.jumpLabel(rightClickLabel);
-			}
-			done();
-		});
-	}
-
-	@Opcode({ id:0xA7, format:"22222", description:"" })
-	@Unimplemented
-	function JUMP_IF_MOUSE_CLICK(x1, y1, x2, y2, label) {
-	}
-
-	// TODO.
+	/**
+	 * 
+	 * @param	x1
+	 * @param	y1
+	 * @param	x2
+	 * @param	y2
+	 */
 	@Opcode({ id:0xAA, format:"2222", description:"????" })
 	@Unimplemented
-	function DISABLED_SET_AREA_HEIGHT(x1, y1, x2, y2) {
+	function DISABLED_SET_AREA_HEIGHT(x1, y1, x2, y2):Void {
 	}
 
-	@Opcode({ id:0xAD, format:"2221", description:"" })
-	@Unimplemented
-	function JUMP_IF_MOUSE_CLICK_ADV(label_l, label_r, label_miss, count) {
-	}
-	
-	@Opcode({ id:0xAE, format:"2222212", description:"" })
-	//@Unimplemented
-	function JUMP_IF_MOUSE_IN(x1:Int, y1:Int, x2:Int, y2:Int, label:Int, flagType:Int, flagIndex:Int) {
-		var rect:Rectangle = new Rectangle(x1, y1, x2 - x1, y2 - y1);
-		var pos:Point = game.mousePosition;
-		//Log.trace(Std.format("(${rect.x},${rect.y},${rect.width},${rect.height}) // ${pos.x},${pos.y}"));
-		if (rect.containsPoint(pos))
-		{
-			if (state.getFlag(flagType, flagIndex) != 0)
-			{
-				dat.jumpLabel(label);
-			}
-		}
-	}
-
+	/**
+	 * 
+	 */
 	@Opcode({ id:0xF0, format:"", description:"" })
 	@Unimplemented
-	function FLASH_IN() {
+	function FLASH_IN():Void {
 	}
 
+	/**
+	 * 
+	 */
 	@Opcode({ id:0xF1, format:"", description:"" })
 	@Unimplemented
-	function FLASH_OUT() {
+	function FLASH_OUT():Void {
 	}
 
+	/**
+	 * 
+	 */
 	@Opcode({ id:0xFF, format:"", description:"Exits the game" })
 	@Unimplemented
-	function GAME_END() {
+	function GAME_END():Void {
 		throw("GAME_END");
 	}
 }

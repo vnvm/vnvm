@@ -20,6 +20,7 @@ import nme.display.PixelSnapping;
 import nme.display.Sprite;
 import nme.events.MouseEvent;
 import nme.geom.Point;
+import nme.geom.Rectangle;
 import nme.media.SoundChannel;
 import nme.utils.ByteArray;
 
@@ -46,17 +47,24 @@ class Game
 	public var state:GameState;
 	static inline public var fps:Int = 60;
 	
-	public var onMouseClick:Event2<MouseEvent>;
+	public var onMouseLeftClick:Event2<MouseEvent>;
+	public var onMouseRightClick:Event2<MouseEvent>;
 	public var onMouseMove:Event2<MouseEvent>;
 	public var onMouseDown:Event2<MouseEvent>;
 	public var onMouseUp:Event2<MouseEvent>;
 	public var mousePosition:Point;
 	public var blackOverlay:Sprite;
+	public var uiSprite:Sprite;
 	
 	public var musicChannel:SoundChannel;
+	
+	public var mouseRects:Array<Dynamic>;
+	public var mouseSelectedRect:Dynamic;
+	public var lastMouseEvent:MouseEvent;
 
 	private function new() 
 	{
+		this.mouseRects = [];
 		this.scriptOpcodes = ScriptOpcodes.createWithClass(DAT_OP);
 		this.state = new GameState();
 		this.dat = new DAT(this);
@@ -68,12 +76,14 @@ class Game
 		this.updatedBitmap = new BitmapData(640, 400);
 		this.sprite = new Sprite();
 		
-		this.onMouseClick = new Event2<MouseEvent>();
+		this.onMouseLeftClick = new Event2<MouseEvent>();
+		this.onMouseRightClick = new Event2<MouseEvent>();
 		this.onMouseMove = new Event2<MouseEvent>();
 		this.onMouseDown = new Event2<MouseEvent>();
 		this.onMouseUp = new Event2<MouseEvent>();
 		this.mousePosition = new Point( -1, -1);
 		
+		this.uiSprite = new Sprite();
 		this.blackOverlay = new Sprite();
 		//this.blackOverlay.graphics
 		GraphicUtils.drawSolidFilledRectWithBounds(this.blackOverlay.graphics, 0, 0, 640, 400, 0x000000, 1.0);
@@ -81,6 +91,7 @@ class Game
 		
 		this.sprite.addChild(new Bitmap(updatedBitmap, PixelSnapping.AUTO, true));
 		this.sprite.addChild(this.blackOverlay);
+		this.sprite.addChild(this.uiSprite);
 		
 		
 		var e:MouseEvent;
@@ -91,7 +102,11 @@ class Game
 		
 		this.sprite.addEventListener(MouseEvent.CLICK, function(e:MouseEvent) {
 			updateMousePos(e);
-			this.onMouseClick.trigger(e);
+			this.onMouseLeftClick.trigger(e);
+		});
+		this.sprite.addEventListener(MouseEvent.RIGHT_CLICK, function(e:MouseEvent) {
+			updateMousePos(e);
+			this.onMouseRightClick.trigger(e);
 		});
 		this.sprite.addEventListener(MouseEvent.MOUSE_MOVE, function(e:MouseEvent) {
 			updateMousePos(e);
@@ -107,8 +122,9 @@ class Game
 		});
 	}
 	
-	public function updateImage():Void {
-		this.layers[0].drawToBitmapData(updatedBitmap);
+	public function updateImage(?rect:Rectangle):Void {
+		if (rect == null) rect = this.layers[0].rect;
+		this.layers[0].drawToBitmapData(updatedBitmap, rect);
 	}
 	
 	public function getMrsAsync(name:String, done:MRS -> Void):Void {

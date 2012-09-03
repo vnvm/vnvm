@@ -1,4 +1,5 @@
 package common.imaging;
+import common.ByteArrayUtils;
 import common.LangUtils;
 import common.MathEx;
 import cpp.Random;
@@ -22,19 +23,20 @@ class BitmapData8 {
 	public var data:ByteArray;
 	public var width:Int;
 	public var height:Int;
+	public var rect(default, null) : Rectangle;
 
 	static private var __randomData:Array<Float>;
 
 	private function new(width:Int, height:Int) {
 		this.width = width;
 		this.height = height;
+		this.rect = new Rectangle(0, 0, width, height);
 	}
 	
 	static public function createNewWithSize(width:Int, height:Int):BitmapData8 {
 		var bitmapData:BitmapData8 = new BitmapData8(width, height);
 		bitmapData.palette = new Palette();
-		bitmapData.data = new ByteArray();
-		for (n in 0 ... width * height) bitmapData.data.writeByte(0);
+		bitmapData.data = ByteArrayUtils.newByteArrayWithLength(width * height, Endian.LITTLE_ENDIAN);
 		return bitmapData;
 	}
 
@@ -47,22 +49,20 @@ class BitmapData8 {
 	
 	public function getBimapData32():BitmapData {
 		var bmp:BitmapData = new BitmapData(width, height);
-		drawToBitmapData(bmp);
+		drawToBitmapData(bmp, bmp.rect);
 		return bmp;
 	}
 
-	@:noStack public function drawToBitmapData(bmp:BitmapData):Void {
-		var length:Int = 4 * width * height;
-		#if cpp
-		var ba:ByteArray = new ByteArray(length);
-		#else
-		var ba:ByteArray = new ByteArray();
-		ba.length = 4 * width * height;
-		#end
-		ba.endian = Endian.LITTLE_ENDIAN;
+	@:noStack public function drawToBitmapData(bmp:BitmapData, rect:Rectangle):Void {
+		var rectX:Int = Std.int(rect.x);
+		var rectY:Int = Std.int(rect.y);
+		var rectW:Int = Std.int(rect.width);
+		var rectH:Int = Std.int(rect.height);
+		var ba:ByteArray = ByteArrayUtils.newByteArrayWithLength(Std.int(rectW * rectH * 4), Endian.LITTLE_ENDIAN);
 		ba.position = 0;
 		data.position = 0;
 		var colorsPalette:Array<Int> = [];
+		
 		for (n in 0 ... palette.colors.length) {
 			var color:BmpColor = palette.colors[n];
 			colorsPalette.push(
@@ -75,15 +75,23 @@ class BitmapData8 {
 		
 		Memory.select(ba);
 		
-		var m:Int = 0;
-		for (n in 0 ... width * height) {
-			//ba.writeInt(colorsPalette[data.readUnsignedByte()]);
-			Memory.setI32(m, colorsPalette[data.readUnsignedByte()]);
-			m += 4;
+		var dstPos:Int;
+		var srcPos:Int;
+		for (y in 0 ... rectH) {
+			dstPos = y * rectW * 4;
+			srcPos = getIndex(rectX + 0, rectY + y);
+			
+			//Log.trace(Std.format("($srcPos, $dstPos) :: ($rectX, $rectY, $rectW, $rectH)"));
+		
+			for (x in 0 ... rectW) {
+				Memory.setI32(dstPos, colorsPalette[data[srcPos]]);
+				dstPos += 4;
+				srcPos += 1;
+			}
 		}
 		ba.position = 0;
 		data.position = 0;
-		bmp.setPixels(bmp.rect, ba);
+		bmp.setPixels(rect, ba);
 	}
 
 	@:noStack public inline function getIndex(x:Int, y:Int):Int {

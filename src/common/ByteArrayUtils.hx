@@ -15,6 +15,17 @@ class ByteArrayUtils
 		byteArray.endian = endian;
 		return byteArray;
 	}
+	
+	static public function newByteArrayWithLength(length:Int, endian:String):ByteArray {
+		#if cpp
+		var byteArray:ByteArray = new ByteArray(length);
+		#else
+		var byteArray:ByteArray = new ByteArray();
+		byteArray.length = length;
+		#end
+		byteArray.endian = Endian.LITTLE_ENDIAN;
+		return byteArray;
+	}
 
 	static public function readByteArray(src:ByteArray, count:Int):ByteArray {
 		var dst:ByteArray = newByteArray(Endian.LITTLE_ENDIAN);
