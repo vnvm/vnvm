@@ -125,7 +125,9 @@ class DAT
 		for (n in 0 ... format.length) {
 			var type:String = format.charAt(n);
 			
-			if (paramsByteArray.position >= paramsByteArray.length) throw(new Error("No more parameters! '" + opcode + "'"));
+			if (type != '<' && type != '?') {
+				if (paramsByteArray.position >= paramsByteArray.length) throw(new Error("No more parameters! '" + opcode + "'"));
+			}
 			
 			switch (type) {
 				case '<': params.push(done);

@@ -2,6 +2,7 @@ package engines.brave;
 
 import common.GameScalerSprite;
 import common.GraphicUtils;
+import common.io.VirtualFileSystem;
 import engines.brave.BraveAssets;
 import engines.brave.formats.BraveImage;
 import common.GameInput;
@@ -37,11 +38,11 @@ import nme.media.SoundTransform;
 class EngineMain extends Sprite 
 {
 	
-	public function new() 
+	public function new(fs:VirtualFileSystem, script:String) 
 	{
 		super();
 		
-		init0(null);
+		init0(script);
 	}
 	
 	var gameSpriteRectangle:Rectangle;
@@ -50,7 +51,7 @@ class EngineMain extends Sprite
 	
 	var initialized:Bool = false;
 	
-	private function init0(e) {
+	private function init0(script:String) {
 		if (!initialized) {
 			gameSprite = new GameSprite();
 			blackBorder = new Sprite();
@@ -60,12 +61,14 @@ class EngineMain extends Sprite
 		}
 		if (!initialized) {
 			initialized = true;
-			init(e);
+			init(script);
 		}
 	}
 	
-	private function init(e) 
+	private function init(script:String):Void
 	{
+		if (script == null) script = 'start';
+		
 #if flash
 		Log.setColor(0xFF0000);
 #end
@@ -88,7 +91,7 @@ class EngineMain extends Sprite
 				});
 			});
 		} else {
-			var startScriptName:String = "start";
+			var startScriptName:String = script;
 			//var startScriptName:String = "op";
 			//var startScriptName:String = "op_2";
 			//var startScriptName:String = "a_bar";

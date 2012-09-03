@@ -130,7 +130,19 @@ class BitmapData8 {
 		copyRectTransition(src, srcRect, dst, dstPoint, 1.0, 0);
 	}
 	
-	@:noStack static public function copyRectTransition(src:BitmapData8, srcRect:Rectangle, dst:BitmapData8, dstPoint:Point, step:Float, effect:Int):Void {
+	static private function getMask(x:Int, y:Int, n:Int, effect:Int, step:Float):Bool {
+		return true;
+	}
+	
+	@:noStack static private function getMaskRandomPixels(x:Int, y:Int, n:Int, effect:Int, step:Float):Bool {
+		return (step >= random[n % random.length]);
+	}
+
+	@:noStack static private function getMaskRandomRows(x:Int, y:Int, n:Int, effect:Int, step:Float):Bool {
+		return (step >= random[y % random.length]);
+	}
+
+	@:noStack static public function copyRectTransition(src:BitmapData8, srcRect:Rectangle, dst:BitmapData8, dstPoint:Point, step:Float, effect:Int, transparentColor:Int = -1):Void {
 		dst.palette = src.palette;
 		
 		var srcX:Int = Std.int(srcRect.x);
@@ -159,12 +171,20 @@ class BitmapData8 {
 
 		step = MathEx.clamp(step, 0, 1);
 		
-		if (step >= 1) {
+		if ((step >= 1) || (effect == 0)) {
 			for (y in 0 ... height) {
 				var srcN:Int = src.getIndex(srcX + 0, srcY + y);
 				var dstN:Int = dst.getIndex(dstX + 0, dstY + y);
 				
-				dstData.blit(dstN, srcData, srcN, width);
+				for (x in 0 ... width) {
+					var c:Int = srcData[srcN];
+					if (c != transparentColor) {
+						dstData[dstN] = c;
+					}
+					dstN++;
+					srcN++;
+				}
+				//dstData.blit(dstN, srcData, srcN, width);
 			}
 		} else {
 			if (random == null) {
@@ -172,14 +192,22 @@ class BitmapData8 {
 				for (n in 0 ... 1000) random.push(Math.random());
 			}
 			
+			var checker:Int -> Int -> Int -> Int -> Float -> Bool;
+			
+			checker = getMaskRandomPixels;
+			//checker = getMaskRandomRows;
+			
 			var n:Int = 0;
 			for (y in 0 ... height) {
 				var srcN:Int = src.getIndex(srcX + 0, srcY + y);
 				var dstN:Int = dst.getIndex(dstX + 0, dstY + y);
 				
 				for (x in 0 ... width) {
-					if (step >= random[n % random.length]) {
-						dstData[dstN] = srcData[srcN];
+					if (checker(x, y, n, effect, step)) {
+						var c:Int = srcData[srcN];
+						if (c != transparentColor) {
+							dstData[dstN] = c;
+						}
 					}
 					
 					dstN++;

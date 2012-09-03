@@ -48,21 +48,25 @@ class Main extends Sprite
 		var loadByteArray:ByteArray;
 		fs.tryOpenAndReadAllAsync("load.txt", function(loadByteArray:ByteArray) {
 			if (loadByteArray == null) {
-				loadEngine("dividead");
+				loadEngine("dividead", null);
 			} else {
-				var name:String = loadByteArray.readUTFBytes(loadByteArray.length);
-				name = StringTools.trim(name);
-				loadEngine(name);
+				var text:String = StringTools.trim(loadByteArray.readUTFBytes(loadByteArray.length));
+				var parts:Array<String> = text.split(':');
+				var name:String;
+				var script:String = null;
+				name = parts[0];
+				if (parts.length > 0) script = parts[1];
+				loadEngine(name, script);
 			}
 		});
 	}
 	
-	private function loadEngine(name:String):Void
+	private function loadEngine(name:String, script:String):Void
 	{
 		switch (name) {
-			case "tlove": addChild(new engines.tlove.EngineMain(fs));
-			case "dividead": addChild(new engines.dividead.EngineMain(fs));
-			case "brave": addChild(new engines.brave.EngineMain());
+			case "tlove": addChild(new engines.tlove.EngineMain(fs, script));
+			case "dividead": addChild(new engines.dividead.EngineMain(fs, script));
+			case "brave": addChild(new engines.brave.EngineMain(fs, script));
 			default: throw(new Error(Std.format("Invalid engine '$name'")));
 		}
 	}

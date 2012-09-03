@@ -1,6 +1,7 @@
 package engines.tlove;
 
 import common.Event2;
+import common.GraphicUtils;
 import common.imaging.BitmapData8;
 import common.imaging.Palette;
 import common.io.Stream;
@@ -19,6 +20,7 @@ import nme.display.PixelSnapping;
 import nme.display.Sprite;
 import nme.events.MouseEvent;
 import nme.geom.Point;
+import nme.media.SoundChannel;
 import nme.utils.ByteArray;
 
 /**
@@ -49,6 +51,9 @@ class Game
 	public var onMouseDown:Event2<MouseEvent>;
 	public var onMouseUp:Event2<MouseEvent>;
 	public var mousePosition:Point;
+	public var blackOverlay:Sprite;
+	
+	public var musicChannel:SoundChannel;
 
 	private function new() 
 	{
@@ -67,9 +72,15 @@ class Game
 		this.onMouseMove = new Event2<MouseEvent>();
 		this.onMouseDown = new Event2<MouseEvent>();
 		this.onMouseUp = new Event2<MouseEvent>();
-		this.mousePosition = new Point(-1, -1);
+		this.mousePosition = new Point( -1, -1);
+		
+		this.blackOverlay = new Sprite();
+		//this.blackOverlay.graphics
+		GraphicUtils.drawSolidFilledRectWithBounds(this.blackOverlay.graphics, 0, 0, 640, 400, 0x000000, 1.0);
+		this.blackOverlay.alpha = 0;
 		
 		this.sprite.addChild(new Bitmap(updatedBitmap, PixelSnapping.AUTO, true));
+		this.sprite.addChild(this.blackOverlay);
 		
 		
 		var e:MouseEvent;
@@ -107,12 +118,12 @@ class Game
 		});
 	}
 	
-	public function run():Void {
+	public function run(script:String):Void {
+		if (script == null) script = "MAIN";
 		Log.trace('run');
 		
-		dat.loadAsync("MAIN", function() {
-		//dat.loadAsync("TITLE", function() {
-			Log.trace('loaded');
+		dat.loadAsync(script, function() {
+			Log.trace('loaded : ' + script);
 			dat.execute();
 		});
 	}

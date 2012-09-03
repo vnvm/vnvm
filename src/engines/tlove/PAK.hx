@@ -20,7 +20,7 @@ class PAK
 	}
 
 	public function get(name:String):Stream {
-		var item:SliceStream = items.get(name);
+		var item:SliceStream = items.get(name.toUpperCase());
 		if (item == null) throw(new Error(Std.format("Can't find '$name'")));
 		return SliceStream.fromAll(item);
 	}
@@ -47,7 +47,7 @@ class PAK
 				while (headerByteArray.position < headerByteArray.length) {
 					var name:String = ByteArrayUtils.readStringz(headerByteArray, 0xC);
 					var offset:Int = headerByteArray.readUnsignedInt();
-					names.push(name);
+					names.push(name.toUpperCase());
 					offsets.push(offset);
 				}
 				

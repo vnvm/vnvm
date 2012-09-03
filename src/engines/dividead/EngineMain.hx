@@ -15,23 +15,25 @@ class EngineMain extends Sprite
 {
 	var fs:VirtualFileSystem;
 
-	public function new(fs:VirtualFileSystem) 
+	public function new(fs:VirtualFileSystem, script:String) 
 	{
 		super();
 		
 		this.fs = fs;
 		
-		init();
+		init(script);
 	}
 	
-	private function init():Void 
+	private function init(script:String):Void 
 	{
+		if (script == null) script = 'aastart';
+		
 		var game:Game;
 		
 		Game.newAsync(SubVirtualFileSystem.fromSubPath(fs, "dividead"), function(game:Game) {
 			var ab:AB = new AB(game);
 			addChild(new GameScalerSprite(640, 480, game.gameSprite));
-			ab.loadScriptAsync("aastart", function():Void {
+			ab.loadScriptAsync(script, function():Void {
 				ab.execute();
 			});
 			/*

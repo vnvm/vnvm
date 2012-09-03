@@ -19,7 +19,7 @@ class EngineMain extends Sprite
 	var fs:VirtualFileSystem;
 	var gameSprite:Sprite;
 
-	public function new(fs:VirtualFileSystem) 
+	public function new(fs:VirtualFileSystem, script:String) 
 	{
 		super();
 		
@@ -28,17 +28,17 @@ class EngineMain extends Sprite
 		gameSprite = new Sprite();
 		addChild(new GameScalerSprite(640, 400, gameSprite));
 		
-		init();
+		init(script);
 	}
 	
-	private function init():Void 
+	private function init(script:String):Void 
 	{
 		var game:Game;
 
 		Game.initFromFileSystemAsync(fs, function(game:Game) {
 			#if (true)
 				gameSprite.addChild(game.sprite);
-				game.run();
+				game.run(script);
 			#else
 				game.mrs.getBytesAsync("WINDOW.MRS", function(ba:ByteArray):Void {
 					var mrs:MRS = new MRS(ba);

@@ -57,7 +57,9 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	@Opcode( { id:0x17, format:"<1", description:"Unknown??" } )
 	@Unimplemented
 	function WAIT_MOUSE_EVENT(done:Void -> Void, v:Int):Void {
+		var e:MouseEvent;
 		Event2.registerOnceAny([game.onMouseDown, game.onMouseMove], function(e:MouseEvent) {
+			Log.trace(Std.format("Mouse(${e.localX}, ${e.localY}):${e.buttonDown}"));
 			done();
 		});
 	}
@@ -111,7 +113,7 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	 * @param	label
 	 */
 	@Opcode( { id:0x28, format:"<2", description:"Jumps to an address" } )
-	@Unimplemented
+	//@Unimplemented
 	function JUMP(done:Void -> Void, label:Int):Void {
 		dat.jumpLabel(label);
 		Timer.delay(done, 0);
@@ -122,7 +124,7 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	 * @param	label
 	 */
 	@Opcode( { id:0x2B, format:"2", description:"Jumps to an address" } )
-	@Unimplemented
+	//@Unimplemented
 	function CALL_LOCAL(label:Int):Void {
 		dat.callLabel(label);
 	}
@@ -143,14 +145,8 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	function COPY_PALETTE() {
 	}
 
-	// TODO.
-	@Opcode({ id:0x32, format:"", description:"???" })
-	@Unimplemented
-	function FADE_IN() {
-	}
-
 	@Opcode({ id:0x33, format:"<s1", description:"Loads an image in a buffer" })
-	@Unimplemented
+	//@Unimplemented
 	function IMG_LOAD(done:Void -> Void, name:String, layer_dst:Int):Void {
 		var mrs:MRS;
 		game.getMrsAsync(name, function(mrs:MRS) {
@@ -166,10 +162,30 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	function UNKNOWN_34() {
 	}
 
-	// TODO.
-	@Opcode({ id:0x35, format:"", description:"???" })
-	@Unimplemented
-	function FADE_OUT() {
+	/**
+	 * 
+	 * @param	done
+	 */
+	@Opcode({ id:0x32, format:"<", description:"???" })
+	//@Unimplemented
+	function FADE_IN(done:Void -> Void):Void {
+		// TODO: Perform the fading changing the palette?
+		Animation.animate(done, 0.5, { }, { }, Animation.Linear, function(step:Float) {
+			game.blackOverlay.alpha = 1 - step;
+		});
+	}
+
+	/**
+	 * 
+	 * @param	done
+	 */
+	@Opcode({ id:0x35, format:"<", description:"???" })
+	//@Unimplemented
+	function FADE_OUT(done:Void -> Void):Void {
+		// TODO: Perform the fading changing the palette?
+		Animation.animate(done, 0.5, { }, { }, Animation.Linear, function(step:Float) {
+			game.blackOverlay.alpha = step;
+		});
 	}
 
 	/**
@@ -188,7 +204,7 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	 * @param	dstY
 	 */
 	@Opcode( { id:0x36, format:"<1112222122", description:"Copy an slice of buffer into another" } )
-	@Unimplemented
+	//@Unimplemented
 	function COPY_RECT(done:Void -> Void, effect:Int, transparentColor:Int, srcLayer:Int, srcX:Int, srcY:Int, srcWidth:Int, srcHeight:Int, dstLayer:Int, dstX:Int = 0, dstY:Int = 0):Void {
 		var src:BitmapData8 = dat.game.layers[srcLayer];
 		var dst:BitmapData8 = dat.game.layers[dstLayer];
@@ -200,7 +216,7 @@ class DAT_OP // T_LOVE95.EXE:00409430
 			//case 29:
 			default:
 				Animation.animate(done, 0.4, { }, { }, Animation.Linear, function(step:Float):Void {
-					BitmapData8.copyRectTransition(src, new Rectangle(srcX, srcY, srcWidth, srcHeight), dst, new Point(dstX, dstY), step, effect);
+					BitmapData8.copyRectTransition(src, new Rectangle(srcX, srcY, srcWidth, srcHeight), dst, new Point(dstX, dstY), step, effect, transparentColor);
 					dat.game.updateImage();
 				});
 		}
@@ -234,7 +250,7 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	 * @param	h
 	 */
 	@Opcode( { id:0x3A, format:"112222", description:"Fills a rect" } )
-	@Unimplemented
+	//@Unimplemented
 	function FILL_RECT(color:Int, unk:Int, x:Int, y:Int, w:Int, h:Int):Void {
 		game.layers[0].fillRect(color, new Rectangle(x, y, w, h));
 		game.updateImage();
@@ -250,7 +266,7 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	 * @param	g
 	 */
 	@Opcode( { id:0x3C, format:"<11111", description:"???" } )
-	@Unimplemented
+	//@Unimplemented
 	function PALETTE_ACTION(done:Void -> Void, mode:Int, index:Int, b:Int, r:Int, g:Int) {
 		switch (mode) {
 			case 0:
@@ -370,6 +386,7 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	@Opcode( { id:0x52, format:"<s1", description:"Loads a script and starts executing it" } )
 	@Unimplemented
 	function SCRIPT(done:Void -> Void, name:String, _always_0:Int) {
+		Log.trace("-----------------------------------------------------------------------------");
 		dat.loadAsync(name, function():Void {
 			done();
 		});
@@ -389,11 +406,13 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	@Opcode({ id:0x61, format:"<s2", description:"Plays a midi file" })
 	@Unimplemented
 	function MUSIC_PLAY(done:Void -> Void, name:String, loop:Int):Void {
-		game.midi.getBytesAsync(PathUtils.addExtensionIfMissing(name, "mid").toUpperCase(), function(bytes:ByteArray) {
-			var sound:Sound = new Sound();
-			sound.loadCompressedDataFromByteArray(bytes, bytes.length);
-			sound.play();
-			done();
+		MUSIC_STOP(function():Void {
+			game.midi.getBytesAsync(PathUtils.addExtensionIfMissing(name, "mid").toUpperCase(), function(bytes:ByteArray) {
+				var sound:Sound = new Sound();
+				sound.loadCompressedDataFromByteArray(bytes, bytes.length);
+				game.musicChannel = sound.play();
+				done();
+			});
 		});
 	}
 
@@ -406,9 +425,14 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	/**
 	 * 
 	 */
-	@Opcode( { id:0x63, format:"", description:"Music stop" } )
+	@Opcode( { id:0x63, format:"<", description:"Music stop" } )
 	@Unimplemented
-	function MUSIC_STOP() {
+	function MUSIC_STOP(done:Void -> Void) {
+		if (game.musicChannel != null) {
+			game.musicChannel.stop();
+			game.musicChannel = null;
+		}
+		Timer.delay(done, 10);
 	}
 	
 	/**
@@ -554,7 +578,7 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	}
 
 	@Opcode({ id:0x98, format:"?", description:"Sets a flag" })
-	@Unimplemented
+	//@Unimplemented
 	function FLAG_SET(s:ByteArray):Void {
 		var flag:Int = s.readUnsignedShort();
 		var v1:Int = 0;
@@ -631,10 +655,11 @@ class DAT_OP // T_LOVE95.EXE:00409430
 	}
 	
 	@Opcode({ id:0xAE, format:"2222212", description:"" })
+	//@Unimplemented
 	function JUMP_IF_MOUSE_IN(x1:Int, y1:Int, x2:Int, y2:Int, label:Int, flagType:Int, flagIndex:Int) {
 		var rect:Rectangle = new Rectangle(x1, y1, x2 - x1, y2 - y1);
 		var pos:Point = game.mousePosition;
-		Log.trace(Std.format("(${rect.x},${rect.y},${rect.width},${rect.height}) // ${pos.x},${pos.y}"));
+		//Log.trace(Std.format("(${rect.x},${rect.y},${rect.width},${rect.height}) // ${pos.x},${pos.y}"));
 		if (rect.containsPoint(pos))
 		{
 			if (state.getFlag(flagType, flagIndex) != 0)
