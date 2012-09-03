@@ -2,6 +2,7 @@ package engines.tlove.script;
 import common.Animation;
 import common.Event2;
 import common.imaging.BitmapData8;
+import common.imaging.BmpColor;
 import common.imaging.Palette;
 import common.PathUtils;
 import engines.tlove.Game;
@@ -381,7 +382,7 @@ class DAT_OP
 		switch (mode) {
 			case 0:
 				// SET_WORK_PALETTE_COLOR
-				game.workPalette.colors[index] = { r : r, g : g, b : b, a : 0xFF };
+				game.workPalette.colors[index] = new BmpColor(r, g, b, 0xFF);
 			case 1:
 				// APPLY_PALETTE
 				Palette.copy(game.workPalette, game.currentPalette);

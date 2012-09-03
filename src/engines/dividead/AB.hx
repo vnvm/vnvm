@@ -3,6 +3,8 @@ import common.Animation;
 import common.ByteArrayUtils;
 import common.GraphicUtils;
 import common.IteratorUtilities;
+import common.Log2;
+import common.MathEx;
 import common.script.Instruction;
 import common.script.Opcode;
 import common.StringEx;
@@ -41,7 +43,8 @@ class AB
 	private function parseParam(continueCallback:Void -> Void, type:String):Dynamic {
 		switch (type) {
 			case '<': return continueCallback;
-			case 'F', '2': return script.readShort();
+			case 'F': return Std.int(MathEx.clamp(script.readShort(), 0, 999));
+			case '2': return script.readShort();
 			case 'T', 'S', 's': return ByteArrayUtils.readStringz(script);
 			case 'P': return script.readUnsignedInt();
 			case 'c': return script.readUnsignedByte();
@@ -62,12 +65,13 @@ class AB
 	
 	private function executeSingle(continueCallback:Void -> Void):Bool
 	{
+		var opcodePosition:Int = script.position;
 		var opcodeId:Int = script.readUnsignedShort();
 		var opcode:Opcode = game.scriptOpcodes.getOpcodeWithId(opcodeId);
 		
 		var params:Array<Dynamic> = parseParams(continueCallback, opcode.format);
 		var isAsync:Bool = (opcode.format.indexOf("<") != -1);
-		var instruction:Instruction = new Instruction(opcode, params, isAsync);
+		var instruction:Instruction = new Instruction(opcode, params, isAsync, opcodePosition, script.position - opcodePosition);
 		instruction.call(this.abOp);
 		return isAsync;
 	}
@@ -133,6 +137,12 @@ class AB
 	public function paintAsync(pos:Int, type:Int, done:Void -> Void):Void
 	{
 		var allRects:Array<Array<Rectangle>> = [];
+		
+		if (type == 0) {
+			game.front.copyPixels(game.back, new Rectangle(0, 0, 640, 480), new Point(0, 0));
+			Timer.delay(done, 4);
+			return;
+		}
 
 		function addFlipSet(action:Array<Rectangle> -> Void):Void {
 			var rects:Array<Rectangle> = [];
@@ -189,6 +199,7 @@ class AB
 					pixels.position = 0;
 					game.front.setPixels(rectangle, pixels);
 					*/
+					//Log.trace(Std.format("(${rectangle.x},${rectangle.y})-(${rectangle.width},${rectangle.height})"));
 					game.front.copyPixels(game.back, rectangle, rectangle.topLeft);
 				}
 				game.front.unlock();

@@ -21,7 +21,9 @@ private class XRange {
     }
 
     public function next() {
-        return min += step;
+		var ret:Int = min;
+        min += step;
+		return ret;
     }
 	
 }

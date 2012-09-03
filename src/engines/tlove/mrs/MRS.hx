@@ -48,7 +48,7 @@ class MRS
 			var r:Int = file.readByte();
 			var g:Int = file.readByte();
 			
-			this.palette.colors[n] = { r : r, g : g, b : b, a : 0xFF };
+			this.palette.colors[n] = new BmpColor(r, g, b, 0xFF);
 		}
 	}
 	

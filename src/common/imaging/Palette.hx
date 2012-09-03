@@ -11,7 +11,7 @@ class Palette
 	public var colors:Array<BmpColor>;
 	
 	public function new() {
-		this.colors = LangUtils.createArray(function():BmpColor { return { r : 0, g : 0, b : 0, a : 0 }; }, 256);
+		this.colors = LangUtils.createArray(function():BmpColor { return new BmpColor(0x00, 0x00, 0x00, 0xFF); }, 256);
 	}
 
 	static public function equals(src:Palette, dst:Palette):Bool {

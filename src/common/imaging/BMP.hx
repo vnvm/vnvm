@@ -1,9 +1,11 @@
 package common.imaging;
+import common.ByteArrayUtils;
 import haxe.Log;
 import nme.display.BitmapData;
 import nme.errors.Error;
 import nme.geom.ColorTransform;
 import nme.geom.Rectangle;
+import nme.Memory;
 import nme.utils.ByteArray;
 import nme.utils.Endian;
 import sys.io.File;
@@ -58,7 +60,7 @@ class BMP
 				var g:Int = bytes.readUnsignedByte();
 				var b:Int = bytes.readUnsignedByte();
 				var reserved:Int = bytes.readUnsignedByte();
-				palette.push({ r : r, g : g, b : b, a : 0xFF });
+				palette.push(new BmpColor(r, g, b, 0xFF));
 			}
 		}
 		
@@ -82,21 +84,27 @@ class BMP
 	@:noStack static private function decodeRows8(bytes:ByteArray, bitmapData:BitmapData, palette:Array<BmpColor>):Void {
 		var width:Int = bitmapData.width, height:Int = bitmapData.height;
 
-		var bmpData:ByteArray = new ByteArray();
+		var bmpData:ByteArray = ByteArrayUtils.newByteArrayWithLength(width * height * 4, Endian.LITTLE_ENDIAN);
+		var stride:Int = width * 4;
+		
+		Memory.select(bmpData);
 		for (y in 0 ... height) {
-			bmpData.position = 0;
+			var n:Int = (height - y - 1) * stride;
 			for (x in 0 ... width) {
 				var index:Int = bytes.readUnsignedByte();
 				//Log.trace(Std.format("INDEX: $index, ${palette.length}"));
 				var color:BmpColor = palette[index];
-				bmpData.writeByte(0xFF);
-				bmpData.writeByte(color.b);
-				bmpData.writeByte(color.g);
-				bmpData.writeByte(color.r);
+				Memory.setByte(n + 0, 0xFF);
+				Memory.setByte(n + 1, color.b);
+				Memory.setByte(n + 2, color.g);
+				Memory.setByte(n + 3, color.r);
+				n += 4;
 			}
-			bmpData.position = 0;
-			bitmapData.setPixels(new Rectangle(0, height - y - 1, width, 1), bmpData);
 		}
+		bitmapData.setPixels(new Rectangle(0, 0, width, height), bmpData);
+		
+		// Free memory
+		bmpData.setLength(0);
 	}
 	
 	@:noStack static private function decodeRows24(bytes:ByteArray, bitmapData:BitmapData):Void {

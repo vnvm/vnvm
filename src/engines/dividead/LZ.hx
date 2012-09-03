@@ -17,7 +17,7 @@ class LZ
 		return _decode(data);
 	}
 	
-	@:nostack static private function _decode(input:ByteArray):ByteArray {
+	@:noStack static private function _decode(input:ByteArray):ByteArray {
 		var output:ByteArray = new ByteArray();
 		var ring:RingBuffer = new RingBuffer(0x1000, 0xFEE);
 

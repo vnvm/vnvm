@@ -1,7 +1,9 @@
 package engines.dividead;
+import common.GameInput;
 import common.GraphicUtils;
 import common.io.Stream;
 import common.io.VirtualFileSystem;
+import common.Keys;
 import common.script.ScriptOpcodes;
 import nme.display.Bitmap;
 import nme.display.BitmapData;
@@ -89,6 +91,10 @@ class Game
 	 * 
 	 */
 	//public var blackSprite:Sprite;
+	
+	public function isSkipping():Bool {
+		return GameInput.isPressing(Keys.Control);
+	}
 
 	/**
 	 * 
