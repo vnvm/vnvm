@@ -24,11 +24,12 @@ class Main extends Sprite
 		super();
 		
 		Stage.setFixedOrientation(Stage.OrientationLandscapeRight);
+		/*
 		#if iphone
 		Lib.current.stage.addEventListener(Event.RESIZE, initOnce);
-		#else
-		addEventListener(Event.ADDED_TO_STAGE, initOnce);
 		#end
+		*/
+		addEventListener(Event.ADDED_TO_STAGE, initOnce);
 	}
 	
 	private function initOnce(e) 

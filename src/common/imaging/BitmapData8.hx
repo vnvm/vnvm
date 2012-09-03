@@ -23,7 +23,7 @@ class BitmapData8 {
 	public var width:Int;
 	public var height:Int;
 
-	static private var random:Array<Float>;
+	static private var __randomData:Array<Float>;
 
 	private function new(width:Int, height:Int) {
 		this.width = width;
@@ -133,13 +133,25 @@ class BitmapData8 {
 	static private function getMask(x:Int, y:Int, n:Int, effect:Int, step:Float):Bool {
 		return true;
 	}
-	
-	@:noStack static private function getMaskRandomPixels(x:Int, y:Int, n:Int, effect:Int, step:Float):Bool {
-		return (step >= random[n % random.length]);
+
+	@:noStack static private function getRandomData():Array<Float> {
+		if (__randomData == null) {
+			__randomData = [];
+			for (n in 0 ... 1000) __randomData.push(Math.random());
+		}
+		return __randomData;
 	}
 
-	@:noStack static private function getMaskRandomRows(x:Int, y:Int, n:Int, effect:Int, step:Float):Bool {
-		return (step >= random[y % random.length]);
+	@:noStack static private function getMaskRandomPixels(mask:ByteArray, random:Array<Float>, w:Int, h:Int, step:Float):Void {
+		var n = 0; for (x in 0 ... w) for (y in 0 ... h) { mask.writeByte((step >= random[n % random.length]) ? 1 : 0); n++; }
+	}
+
+	@:noStack static private function getMaskRandomRows(mask:ByteArray, random:Array<Float>, w:Int, h:Int, step:Float):Void {
+		var n = 0; for (x in 0 ... w) for (y in 0 ... h) { mask.writeByte((step >= random[y % random.length]) ? 1 : 0); n++; }
+	}
+
+	@:noStack static private function getMaskRandomColumns(mask:ByteArray, random:Array<Float>, w:Int, h:Int, step:Float):Void {
+		var n = 0; for (x in 0 ... w) for (y in 0 ... h) { mask.writeByte((step >= random[x % random.length]) ? 1 : 0); n++; }
 	}
 
 	@:noStack static public function copyRectTransition(src:BitmapData8, srcRect:Rectangle, dst:BitmapData8, dstPoint:Point, step:Float, effect:Int, transparentColor:Int = -1):Void {
@@ -187,15 +199,11 @@ class BitmapData8 {
 				//dstData.blit(dstN, srcData, srcN, width);
 			}
 		} else {
-			if (random == null) {
-				random = [];
-				for (n in 0 ... 1000) random.push(Math.random());
-			}
-			
 			var checker:Int -> Int -> Int -> Int -> Float -> Bool;
+			var mask:ByteArray = new ByteArray();
+			var random:Array<Float> = getRandomData();
 			
-			checker = getMaskRandomPixels;
-			//checker = getMaskRandomRows;
+			getMaskRandomPixels(mask, random, width, height, step);
 			
 			var n:Int = 0;
 			for (y in 0 ... height) {
@@ -203,7 +211,7 @@ class BitmapData8 {
 				var dstN:Int = dst.getIndex(dstX + 0, dstY + y);
 				
 				for (x in 0 ... width) {
-					if (checker(x, y, n, effect, step)) {
+					if (mask[n] != 0) {
 						var c:Int = srcData[srcN];
 						if (c != transparentColor) {
 							dstData[dstN] = c;
