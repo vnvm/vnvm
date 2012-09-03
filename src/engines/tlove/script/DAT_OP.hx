@@ -283,9 +283,7 @@ class DAT_OP
 	//@Unimplemented
 	function FADE_IN(done:Void -> Void):Void {
 		// TODO: Perform the fading changing the palette?
-		Animation.animate(done, 0.5, { }, { }, Animation.Linear, function(step:Float) {
-			game.blackOverlay.alpha = 1 - step;
-		});
+		Animation.animate(done, 0.5, game.blackOverlay, { alpha : 0 }, Animation.Linear);
 	}
 
 	/**
@@ -296,9 +294,7 @@ class DAT_OP
 	//@Unimplemented
 	function FADE_OUT(done:Void -> Void):Void {
 		// TODO: Perform the fading changing the palette?
-		Animation.animate(done, 0.5, { }, { }, Animation.Linear, function(step:Float) {
-			game.blackOverlay.alpha = step;
-		});
+		Animation.animate(done, 0.5, game.blackOverlay, { alpha : 1 }, Animation.Linear);
 	}
 
 	/**

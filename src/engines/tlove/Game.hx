@@ -42,6 +42,7 @@ class Game
 	public var workPalette:Palette;
 	public var backupPalette:Palette;
 	public var lastLoadedPalette:Palette;
+	private var _lastUpdatedPalette:Palette;
 	public var sprite:Sprite;
 	private var updatedBitmap:BitmapData;
 	public var state:GameState;
@@ -73,6 +74,7 @@ class Game
 		this.workPalette = new Palette();
 		this.backupPalette = new Palette();
 		this.lastLoadedPalette = new Palette();
+		this._lastUpdatedPalette = new Palette();
 		this.updatedBitmap = new BitmapData(640, 400);
 		this.sprite = new Sprite();
 		
@@ -124,7 +126,11 @@ class Game
 	
 	public function updateImage(?rect:Rectangle):Void {
 		if (rect == null) rect = this.layers[0].rect;
+		if (!Palette.equals(this.layers[0].palette, _lastUpdatedPalette)) {
+			rect = this.layers[0].rect;
+		}
 		this.layers[0].drawToBitmapData(updatedBitmap, rect);
+		Palette.copy(this.layers[0].palette, _lastUpdatedPalette);
 	}
 	
 	public function getMrsAsync(name:String, done:MRS -> Void):Void {
