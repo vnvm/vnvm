@@ -2,6 +2,7 @@ package ;
 import common.AssetsFileSystem;
 import common.GameInput;
 import common.io.VirtualFileSystem;
+import common.StringEx;
 import nme.display.Sprite;
 import nme.display.Stage;
 import nme.errors.Error;
@@ -52,20 +53,23 @@ class Main extends Sprite
 				var text:String = StringTools.trim(loadByteArray.readUTFBytes(loadByteArray.length));
 				var parts:Array<String> = text.split(':');
 				var name:String;
-				var script:String = null;
+				var scriptName:String = null;
+				var scriptPos:Int = 0;
+				
 				name = parts[0];
-				if (parts.length > 0) script = parts[1];
-				loadEngine(name, script);
+				if (parts.length >= 1) scriptName = parts[1];
+				if (parts.length >= 2) scriptPos = StringEx.parseInt(parts[2], 16);
+				loadEngine(name, scriptName, scriptPos);
 			}
 		});
 	}
 	
-	private function loadEngine(name:String, script:String):Void
+	private function loadEngine(name:String, ?scriptName:String, ?scriptPos:Int):Void
 	{
 		switch (name) {
-			case "tlove": addChild(new engines.tlove.EngineMain(fs, script));
-			case "dividead": addChild(new engines.dividead.EngineMain(fs, script));
-			case "brave": addChild(new engines.brave.EngineMain(fs, script));
+			case "tlove": addChild(new engines.tlove.EngineMain(fs, scriptName));
+			case "dividead": addChild(new engines.dividead.EngineMain(fs, scriptName, scriptPos));
+			case "brave": addChild(new engines.brave.EngineMain(fs, scriptName));
 			default: throw(new Error(Std.format("Invalid engine '$name'")));
 		}
 	}

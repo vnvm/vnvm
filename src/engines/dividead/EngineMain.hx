@@ -3,6 +3,7 @@ import common.AssetsFileSystem;
 import common.GameScalerSprite;
 import common.io.SubVirtualFileSystem;
 import common.io.VirtualFileSystem;
+import common.StringEx;
 import nme.display.Bitmap;
 import nme.display.Sprite;
 
@@ -15,25 +16,26 @@ class EngineMain extends Sprite
 {
 	var fs:VirtualFileSystem;
 
-	public function new(fs:VirtualFileSystem, script:String) 
+	public function new(fs:VirtualFileSystem, ?scriptName:String, ?scriptPos:Int)
 	{
 		super();
 		
 		this.fs = fs;
 		
-		init(script);
+		init(scriptName, scriptPos);
 	}
 	
-	private function init(script:String):Void 
+	private function init(?scriptName:String, ?scriptPos:Int):Void 
 	{
-		if (script == null) script = 'aastart';
+		if (scriptName == null) scriptName = 'aastart';
+		if (scriptPos == null) scriptPos = 0;
 		
 		var game:Game;
 		
 		Game.newAsync(SubVirtualFileSystem.fromSubPath(fs, "dividead"), function(game:Game) {
 			var ab:AB = new AB(game);
 			addChild(new GameScalerSprite(640, 480, game.gameSprite));
-			ab.loadScriptAsync(script, function():Void {
+			ab.loadScriptAsync(scriptName, scriptPos, function():Void {
 				ab.execute();
 			});
 			/*

@@ -36,22 +36,28 @@ class ScriptThread implements IScriptThread
 	
 	public function execute():Void {
 		//if (!executing || waitingAsync)
-		BraveLog.trace(Std.format("execute at ${scriptReader.position}"));
+		//BraveLog.trace(Std.format("execute at ${scriptReader.position}"));
 		{
 			while (scriptReader.hasMoreInstructions()) {
 				executing = true;
 				waitingAsync = false;
 				
 				switch (executeNextInstruction()) {
-					case -2: executing = false; BraveLog.trace("/execute(-2)"); return;
-					case -3: waitingAsync = true; BraveLog.trace("/execute(-3)"); return;
+					case -2:
+						executing = false;
+						//BraveLog.trace("/execute(-2)");
+						return;
+					case -3:
+						waitingAsync = true;
+						//BraveLog.trace("/execute(-3)");
+						return;
 				}
 			}
 			
 			executing = false;
 			waitingAsync = false;
 		}
-		BraveLog.trace("/execute(0)");
+		//BraveLog.trace("/execute(0)");
 	}
 	
 	private function executeNextInstruction():Int {

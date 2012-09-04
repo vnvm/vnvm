@@ -39,7 +39,7 @@ class FileStream extends Stream
 	{
 		var bytes:Bytes = null;
 		
-		Log.trace(StringEx.sprintf("Reading '%s'(0x%08X:0x%08X)", [this.fileName, this.position, this.position + length]));
+		//Log.trace(StringEx.sprintf("Reading '%s'(0x%08X:0x%08X)", [this.fileName, this.position, this.position + length]));
 		
 		try {
 			fileInput.seek(position, FileSeek.SeekBegin);

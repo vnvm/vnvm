@@ -33,9 +33,10 @@ class AB
 		this.running = true;
 	}
 	
-	public function loadScriptAsync(scriptName:String, done:Void -> Void):Void {
+	public function loadScriptAsync(scriptName:String, scriptPos:Int = 0, done:Void -> Void):Void {
 		game.sg.openAndReadAllAsync(Std.format("${scriptName}.ab"), function(script:ByteArray):Void {
 			this.script = script;
+			this.script.position = scriptPos;
 			done();
 		});
 	}
@@ -138,7 +139,7 @@ class AB
 	{
 		var allRects:Array<Array<Rectangle>> = [];
 		
-		if (type == 0) {
+		if ((type == 0) || game.isSkipping()) {
 			game.front.copyPixels(game.back, new Rectangle(0, 0, 640, 480), new Point(0, 0));
 			Timer.delay(done, 4);
 			return;

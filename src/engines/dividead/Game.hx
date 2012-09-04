@@ -1,4 +1,6 @@
 package engines.dividead;
+import common.BitmapDataUtils;
+import common.display.OptionList;
 import common.GameInput;
 import common.GraphicUtils;
 import common.io.Stream;
@@ -86,6 +88,11 @@ class Game
 	 * 
 	 */
 	public var musicChannel:SoundChannel;
+	
+	/**
+	 * 
+	 */
+	public var optionList:OptionList;
 
 	/**
 	 * 
@@ -133,10 +140,15 @@ class Game
 		blackSprite.visible = 0;
 		*/
 		
+		optionList = new OptionList(428, 60, 3, 2, true);
+		optionList.sprite.x = 108;
+		optionList.sprite.y = 402;
 		gameSprite = new Sprite();
 		gameSprite.addChild(new Bitmap(front, PixelSnapping.AUTO, true));
 		gameSprite.addChild(textField);
-		//gameSprite.addChild(blackSprite);
+		gameSprite.addChild(optionList.sprite);
+		
+		optionList.visible = false;
 	}
 	
 	static private function addExtensionsWhenRequired(name:String, expectedExtension:String):String {
@@ -161,7 +173,22 @@ class Game
 			});
 		}
 	}
-	
+
+	public function getImageMaskCachedAsync(imageNameColor:String, imageNameMask:String, done:BitmapData -> Void):Void {
+		var imageName:String = Std.format("${imageNameColor}${imageNameMask}");
+		
+		if (imageCache.exists(imageName)) {
+			done(imageCache.get(imageName));
+		} else {
+			getImageCachedAsync(imageNameColor, function(color:BitmapData) {
+				getImageCachedAsync(imageNameMask, function(mask:BitmapData) {
+					imageCache.set(imageName, BitmapDataUtils.combineColorMask(color, mask));
+					done(imageCache.get(imageName));
+				});
+			});
+		}
+	}
+
 	/**
 	 * 
 	 * @param	soundName

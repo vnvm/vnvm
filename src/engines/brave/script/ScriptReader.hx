@@ -38,12 +38,13 @@ class ScriptReader
 	
 	public function readInstruction(scriptThread:IScriptThread):Instruction {
 		script.data.position = position;
+		var opcodePosition:Int = position;
 		var opcodeId:Int = read2();
 		var opcode:Opcode = scriptOpcodes.getOpcodeWithId(opcodeId);
 		var parameters:Array<Dynamic> = readFormat(opcode.format, scriptThread);
 		var async:Bool = (opcode.format.indexOf("<") != -1);
 		position = script.data.position;
-		return new Instruction(opcode, parameters, async);
+		return new Instruction(opcode, parameters, async, opcodePosition, opcodePosition - position);
 	}
 	
 	private function readFormat(format:String, scriptThread:IScriptThread):Array<Dynamic> {
