@@ -7,16 +7,8 @@ import nme.utils.ByteArray;
  * @author 
  */
 
-class Stream 
+class Stream extends StreamBase
 {
-	public var position:Int;
-	public var length:Int;
-	
-	public function readBytesAsync(length:Int, done:ByteArray -> Void):Void
-	{
-		throw(Std.format("Not implemented Stream.readBytesAsync : $this"));
-	}
-	
 	public function readAllBytesAsync(done:ByteArray -> Void):Void {
 		return readBytesAsync(length, done);
 	}

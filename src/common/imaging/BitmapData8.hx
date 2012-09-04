@@ -2,7 +2,6 @@ package common.imaging;
 import common.ByteArrayUtils;
 import common.LangUtils;
 import common.MathEx;
-import cpp.Random;
 import haxe.io.Bytes;
 import haxe.Log;
 import nme.display.BitmapData;
@@ -92,6 +91,8 @@ class BitmapData8 {
 		ba.position = 0;
 		data.position = 0;
 		bmp.setPixels(rect, ba);
+		
+		ByteArrayUtils.freeByteArray(ba);
 	}
 
 	@:noStack public inline function getIndex(x:Int, y:Int):Int {

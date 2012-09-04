@@ -10,13 +10,8 @@ import nme.utils.ByteArray;
  * @author 
  */
 
-class VirtualFileSystem 
+class VirtualFileSystem extends VirtualFileSystemBase
 {
-	public function openAsync(name:String, done:Stream -> Void):Void
-	{
-		throw(new Error("Not implemented VirtualFileSystem.openAsync"));
-	}
-
 	public function openBatchAsync(_names:Array<String>, done:Dynamic):Void
 	{
 		var count:Int = _names.length;
@@ -55,9 +50,5 @@ class VirtualFileSystem
 				openAndReadAllAsync(name, done);
 			}
 		});
-	}
-
-	public function existsAsync(name:String, done:Bool -> Void):Void {
-		throw(new Error("Not implemented"));
 	}
 }

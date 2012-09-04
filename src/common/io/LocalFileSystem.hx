@@ -1,5 +1,7 @@
 package common.io;
 import haxe.Log;
+
+#if (cpp || neko)
 import sys.FileSystem;
 
 /**
@@ -26,3 +28,4 @@ class LocalFileSystem extends VirtualFileSystem
 		done(FileSystem.exists(this.path + "/" +name));
 	}
 }
+#end

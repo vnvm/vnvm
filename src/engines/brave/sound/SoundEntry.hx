@@ -1,6 +1,7 @@
 package engines.brave.sound;
 import haxe.io.Bytes;
 import nme.media.Sound;
+import nme.utils.ByteArray;
 
 /**
  * ...
@@ -23,12 +24,15 @@ class SoundEntry
 		this.length = length;
 	}
 	
-	public function getSound():Sound {
+	public function getSoundAsync(done:Sound -> Void):Void {
 		if (bytes == null) {
-			soundPack.file.seek(this.offset, sys.io.FileSeek.SeekBegin);
-			bytes = soundPack.file.read(this.length);
+			soundPack.stream.position = this.offset;
+			soundPack.stream.readBytesAsync(this.length, function(_bytes:ByteArray):Void {
+				this.bytes = _bytes;
+				done((new SoundInstance(this)).getSound());
+			});
+		} else {
+			done((new SoundInstance(this)).getSound());
 		}
-		var soundInstance:SoundInstance = new SoundInstance(this);
-		return soundInstance.getSound();
 	}
 }

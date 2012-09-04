@@ -2,6 +2,7 @@ package engines.brave;
 
 import common.GameScalerSprite;
 import common.GraphicUtils;
+import common.io.SubVirtualFileSystem;
 import common.io.VirtualFileSystem;
 import engines.brave.BraveAssets;
 import engines.brave.formats.BraveImage;
@@ -41,6 +42,8 @@ class EngineMain extends Sprite
 	public function new(fs:VirtualFileSystem, script:String) 
 	{
 		super();
+		
+		BraveAssets.fs = SubVirtualFileSystem.fromSubPath(fs, "brave");
 		
 		init0(script);
 	}

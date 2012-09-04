@@ -1,8 +1,11 @@
 package engines.brave.sound;
 //import haxe.io.Input;
+import common.ByteArrayUtils;
+import common.io.Stream;
 import haxe.Log;
 import nme.errors.Error;
 import nme.media.Sound;
+import nme.utils.ByteArray;
 
 #if cpp
 
@@ -15,47 +18,63 @@ typedef Input = sys.io.FileInput;
 
 class SoundPack 
 {
-	public var file:Input;
+	public var stream:Stream;
 	private var startPosition:Int;
 	private var entries:Hash<SoundEntry>;
 	public var numberOfChannels:Int;
 
-	public function new(numberOfChannels:Int = 1, ?file:Input)
+	private function new(numberOfChannels:Int = 1)
 	{
 		this.entries = new Hash<SoundEntry>();
 		this.numberOfChannels = numberOfChannels;
-		if (file != null) load(file);
 	}
 	
-	public function getSound(soundFile:String):Sound {
+	static public function newAsync(numberOfChannels:Int = 1, stream:Stream, done:SoundPack -> Void):Void {
+		var soundPack:SoundPack = new SoundPack(numberOfChannels);
+		soundPack.loadAsync(stream, function():Void {
+			done(soundPack);
+		});
+	}
+	
+	public function getSoundAsync(soundFile:String, done:Sound-> Void):Void {
 		var entry:SoundEntry = entries.get(soundFile);
 		if (entry == null) throw(new Error(Std.format("Can't find sound '${soundFile}'")));
-		return entry.getSound();
+		entry.getSoundAsync(done);
 	}
 	
-	private function readEntry():SoundEntry {
-		var name:String = file.readString(10);
-		var length:Int = file.readUInt30();
-		var position:Int = file.readUInt30() + startPosition;
-		file.read(6);
+	private function readEntry(stream:ByteArray):SoundEntry {
+		// 24 bytes per entry
+		var name:String = ByteArrayUtils.readStringz(stream, 10);
+		var length:Int = stream.readInt();
+		var position:Int = stream.readInt() + startPosition;
+		stream.readUTFBytes(6);
 		return new SoundEntry(this, name, position, length);
 	}
 	
-	public function load(file:Input):Void {
-		this.file = file;
-		file.readInt32();
-		var headerBlocks:Int = file.readUInt16();
-		var entryCount:Int = file.readUInt16();
-		file.read(headerBlocks * 20);
-		file.readUInt16();
+	public function loadAsync(stream:Stream, done:Void -> Void):Void {
+		this.stream = stream;
 		
-		startPosition = 4 + 2 + 2 + (headerBlocks * 20) + 2 + (entryCount * 24);
+		var header1:ByteArray;
+		var header2:ByteArray;
 		
-		for (n in 0 ... entryCount) {
-			var entry:SoundEntry = readEntry();
-			entries.set(entry.name, entry);
-			//BraveLog.trace(entry.name);
-		}
+		stream.readBytesAsync(8, function(header1:ByteArray):Void {
+			header1.readInt();
+			var headerBlocks:Int = header1.readUnsignedShort();
+			var entryCount:Int = header1.readUnsignedShort();
+			
+			stream.position += headerBlocks * 20 +  2;
+			startPosition = 4 + 2 + 2 + (headerBlocks * 20) + 2 + (entryCount * 24);
+			
+			stream.readBytesAsync((entryCount * 24), function(header2:ByteArray):Void {
+				for (n in 0 ... entryCount) {
+					var entry:SoundEntry = readEntry(header2);
+					entries.set(entry.name, entry);
+					//BraveLog.trace(entry.name);
+				}
+				
+				done();
+			});
+		});
 	}
 }
 

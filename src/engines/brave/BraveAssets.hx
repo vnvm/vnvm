@@ -2,6 +2,10 @@ package engines.brave;
 
 import common.AssetsFileSystem;
 import common.ByteUtils;
+import common.io.FileStream;
+import common.io.HttpFileSystem;
+import common.io.Stream;
+import common.io.VirtualFileSystem;
 import engines.brave.cgdb.CgDb;
 import engines.brave.cgdb.CgDbEntry;
 import engines.brave.formats.BraveImage;
@@ -22,10 +26,10 @@ import nme.net.URLLoaderDataFormat;
 import nme.net.URLRequest;
 import nme.utils.ByteArray;
 import nme.utils.Endian;
-import sys.FileSystem;
-import nme.filesystem.File;
 
 #if (cpp || neko)
+import nme.filesystem.File;
+import sys.FileSystem;
 import sys.io.FileInput;
 #end
 
@@ -39,6 +43,7 @@ class BraveAssets
 	static var voicePack:SoundPack;
 	static var soundPack:SoundPack;
 	static var cgDb:CgDb;
+	public static var fs:VirtualFileSystem;
 
 	public function new() 
 	{
@@ -102,110 +107,50 @@ class BraveAssets
 		});
 	}
 	
-	static private function getDummySound():Sound {
-		var sound:Sound = new Sound();
-		var byteArray:ByteArray = new ByteArray();
-		byteArray.writeFloat(0);
-		byteArray.writeFloat(0);
-		byteArray.position = 0;
-		#if !ios
-		sound.loadPCMFromByteArray(byteArray, 1);
-		#end
-		return sound;
-	}
-
 	static public function getSoundAsync(name:String, done:Sound -> Void):Void {
-		#if !cpp
-			done(getDummySound());
-		#else
-			if (soundPack == null) {
-				soundPack = new SoundPack(2, getStream("sound.pck"));
-			}
-			done(soundPack.getSound(name));
-		#end
+		if (soundPack == null) {
+			getStreamAsync("sound.pck", function(stream:Stream):Void {
+				SoundPack.newAsync(1, stream, function(_soundPack:SoundPack):Void {
+					BraveAssets.soundPack = _soundPack;
+					BraveAssets.soundPack.getSoundAsync(name, done);
+				});
+			});
+		} else {
+			soundPack.getSoundAsync(name, done);
+		}
 	}
 
 	static public function getVoiceAsync(name:String, done:Sound -> Void):Void {
-		#if !cpp
-			done(getDummySound());
-		#else
-			if (voicePack == null) {
-				voicePack = new SoundPack(1, getStream("voice/voice.pck"));
-			}
-			done(voicePack.getSound(name));
-		#end
+		if (voicePack == null) {
+			getStreamAsync("voice/voice.pck", function(stream:Stream):Void {
+				SoundPack.newAsync(1, stream, function(_voicePack:SoundPack):Void {
+					BraveAssets.voicePack = _voicePack;
+					BraveAssets.voicePack.getSoundAsync(name, done);
+				});
+			});
+		} else {
+			voicePack.getSoundAsync(name, done);
+		}
 	}
 	
 	static public function getMusicAsync(name:String, done:Sound -> Void):Void {
-		#if !cpp
-			done(getDummySound());
-		#else
-			BraveAssets.getBytesAsync("midi/" + name + ".mid", function(bytes:ByteArray) {
-				var sound:Sound = new Sound();
-				//sound.loadPCMFromByteArray(
-				try {
-					sound.loadCompressedDataFromByteArray(bytes, bytes.length, true);
-				} catch (e:Error) {
-					BraveLog.trace(e);
-				}
-				done(sound);
-			});
-		#end
+		BraveAssets.getBytesAsync("midi/" + name + ".mid", function(bytes:ByteArray) {
+			var sound:Sound = new Sound();
+			//sound.loadPCMFromByteArray(
+			try {
+				sound.loadCompressedDataFromByteArray(bytes, bytes.length, true);
+			} catch (e:Error) {
+				BraveLog.trace(e);
+			}
+			done(sound);
+		});
 	}
 
-	#if (!cpp && !nme)
-		static public function getBytesAsync(name:String, done:ByteArray -> Void):Void {
-			var loader:URLLoader = new URLLoader();
-			loader.addEventListener(Event.COMPLETE, function(e) {
-				done(loader.data);
-			});
-			loader.addEventListener("ioError", function(e) {
-				throw(new Error(Std.format("Can't load asset '$name' : IO Error")));
-			});
-			loader.addEventListener("securityError", function(e) {
-				throw(new Error(Std.format("Can't load asset '$name' : Security Error")));
-			});
-			loader.dataFormat = URLLoaderDataFormat.BINARY;
-			loader.load(new URLRequest("assets/" + name));
-			/*
-			var bytes:ByteArray = Assets.getBytes("assets/" + name);
-			if (bytes == null) throw(new Error(Std.format("Can't load asset '$name'")));
-			done(bytes);
-			*/
-		}
-	#else
-		static private var cachedBasePath:String = null;
-	
-		static private function getBasePath():String
-		{
-			if (cachedBasePath == null) {
-				cachedBasePath = AssetsFileSystem.getAssetsLocalPath() + "/brave";
-			}
-			
-			if (cachedBasePath != null) {
-				return cachedBasePath;
-			} else {
-				
-				BraveLog.trace(FileSystem.fullPath('.'));
-				BraveLog.trace(File.applicationDirectory.nativePath);
-				BraveLog.trace(File.applicationStorageDirectory.nativePath);
-				BraveLog.trace(File.desktopDirectory.nativePath);
-				BraveLog.trace(File.documentsDirectory.nativePath);
-				BraveLog.trace(File.userDirectory.nativePath);
-				throw(new Error("Can't find assets path"));
-			}
-		}
+	static public function getBytesAsync(name:String, done:ByteArray -> Void):Void {
+		fs.openAndReadAllAsync(name, done);
+	}
 
-		static public function getBytesAsync(name:String, done:ByteArray -> Void):Void {
-			var filePath:String = getBasePath() + "/" + name;
-			var filePath2:String = getBasePath() + ("/assets_" + StringTools.replace(StringTools.replace(name, '/', '_'), '.', '_')).toLowerCase();
-			if (!sys.FileSystem.exists(filePath)) filePath = filePath2;
-			var bytes:ByteArray = ByteUtils.BytesToByteArray(sys.io.File.getBytes(filePath));
-			done(bytes);
-		}
-
-		static private function getStream(name:String):FileInput {
-			return sys.io.File.read(getBasePath() + "/" + name);
-		}
-	#end
+	static private function getStreamAsync(name:String, done:Stream -> Void):Void {
+		fs.openAsync(name, done);
+	}
 }

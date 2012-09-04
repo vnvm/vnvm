@@ -23,12 +23,10 @@ class Main extends Sprite
 	{
 		super();
 		
+		#if (cpp || neko)
 		Stage.setFixedOrientation(Stage.OrientationLandscapeRight);
-		/*
-		#if iphone
-		Lib.current.stage.addEventListener(Event.RESIZE, initOnce);
 		#end
-		*/
+
 		addEventListener(Event.ADDED_TO_STAGE, initOnce);
 	}
 	

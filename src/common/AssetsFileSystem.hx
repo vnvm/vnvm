@@ -1,9 +1,12 @@
 package common;
-import common.io.LocalFileSystem;
+import common.io.HttpFileSystem;
 import common.io.VirtualFileSystem;
 import haxe.Log;
 import nme.errors.Error;
+
+#if (cpp || neko)
 import sys.FileSystem;
+import common.io.LocalFileSystem;
 
 /**
  * ...
@@ -32,3 +35,17 @@ class AssetsFileSystem
 		return new LocalFileSystem(getAssetsLocalPath());
 	}
 }
+#else
+
+class AssetsFileSystem 
+{
+	static public function getAssetsLocalPath():String {
+		return "assets";
+	}
+
+	static public function getAssetsFileSystem():VirtualFileSystem {
+		return new HttpFileSystem(getAssetsLocalPath());
+	}
+}
+
+#end

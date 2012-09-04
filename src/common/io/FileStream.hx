@@ -5,6 +5,9 @@ import haxe.io.Bytes;
 import haxe.Log;
 import nme.errors.Error;
 import nme.utils.ByteArray;
+
+#if (cpp || neko)
+
 import sys.FileStat;
 import sys.FileSystem;
 import sys.io.File;
@@ -57,3 +60,5 @@ class FileStream extends Stream
 	}
 	
 }
+
+#end

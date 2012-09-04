@@ -26,6 +26,14 @@ class ByteArrayUtils
 		byteArray.endian = Endian.LITTLE_ENDIAN;
 		return byteArray;
 	}
+	
+	static public function freeByteArray(byteArray:ByteArray):Void {
+		#if flash
+		byteArray.length = 0;
+		#else
+		byteArray.setLength(0);
+		#end
+	}
 
 	static public function readByteArray(src:ByteArray, count:Int):ByteArray {
 		var dst:ByteArray = newByteArray(Endian.LITTLE_ENDIAN);
