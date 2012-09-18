@@ -32,6 +32,15 @@ class MathEx
 		var v0:Float = (v - aMin) / aDist;
 		return (v0 * bDist) + bMin;
 	}
+
+	#if cpp
+	@:functionCode("
+		return numerator / denominator;
+	")
+	#end
+	static inline public function int_div(numerator:Int, denominator:Int):Int {
+		return Std.int(numerator / denominator);
+	}
 	
 	/**
 	 * Divide the first integer expression by the second constant integer value.

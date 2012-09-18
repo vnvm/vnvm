@@ -50,8 +50,8 @@ class GameScalerSprite extends Sprite
 		usedWidth = scalerWidth * gameSprite.scaleX;
 		usedHeight = scalerHeight * gameSprite.scaleY;
 
-		gameSprite.x = Std.int((stage.stageWidth - usedWidth) / 2);
-		gameSprite.y = Std.int((stage.stageHeight - usedHeight) / 2);
+		gameSprite.x = MathEx.int_div(Std.int(stage.stageWidth - usedWidth), 2);
+		gameSprite.y = MathEx.int_div(Std.int(stage.stageHeight - usedHeight), 2);
 		
 		gameSpriteRectangle = new Rectangle(gameSprite.x, gameSprite.y, usedWidth, usedHeight);
 		

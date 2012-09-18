@@ -61,7 +61,7 @@ class Option
 			
 			this.textField.defaultTextFormat = new TextFormat("Arial", 12, selected ? 0x000000 : 0xFFFFFF);
 			this.textField.text = this.textField.text;
-			this.textField.background = true;
+			this.textField.background = selected ? true : false;
 			//this.textField.opaqueBackground
 			this.textField.backgroundColor = selected ? 0xFFFFFFFF : 0xFF000000;
 		}

@@ -187,7 +187,7 @@ class AB
 		
 		var step = null;
 		
-		var frameTime:Int = Std.int(300 / allRects.length);
+		var frameTime:Int = MathEx.int_div(300, allRects.length);
 		
 		step = function() {
 			if (allRects.length > 0) {
