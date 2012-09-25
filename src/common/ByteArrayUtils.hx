@@ -17,7 +17,7 @@ class ByteArrayUtils
 	}
 	
 	static public function newByteArrayWithLength(length:Int, endian:String):ByteArray {
-		#if cpp
+		#if (cpp || neko)
 		var byteArray:ByteArray = new ByteArray(length);
 		#else
 		var byteArray:ByteArray = new ByteArray();

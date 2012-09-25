@@ -12,8 +12,8 @@ class MNode {
 	}
 	int level;
 	uint encode;
-	MNode parent;
-	MNode childs[2];
+	var parent:MNode;
+	var childs[2]:MNode;
 	int opCmp(Object o) { MNode that = cast(MNode)o;
 		//return this.freq_value - that.freq_value;
 		int r = this.freq - that.freq;

@@ -63,6 +63,14 @@ class ARC {
 			table[n].arc = this;
 		}
 	}
+	
+	private function this() {
+		
+	}
+	
+	static public function createFromStream():ARC {
+		
+	}
 
 	// Open an ARC using a file name.
 	this(char[] name) { this(new BufferedFile(name), name); }

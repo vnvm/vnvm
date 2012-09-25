@@ -166,7 +166,7 @@ class AB_OP
 
 	@Opcode({ id:0x37, format:"SS", description:"Sets the images that will be used in the map overlay" })
 	@Unimplemented
-	public function MAP_IMAGES(name1, name2)
+	public function MAP_IMAGES(name1:String, name2:String):Void
 	{
 	}
 

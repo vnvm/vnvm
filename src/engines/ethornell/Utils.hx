@@ -10,9 +10,9 @@ class Utils
 	// Utility macros.
 	static int max(int a, int b) { return (a > b) ? a : b; }
 	static int min(int a, int b) { return (a < b) ? a : b; }
-	static ushort HIWORD(uint   v) { return (v >> 16); }
+	static ushort HIWORD(uint   v) { return (v >>> 16); }
 	static ushort LOWORD(uint   v) { return (v & 0xFFFF); }
-	static ubyte  HIBYTE(ushort v) { return (v >> 8); }
+	static ubyte  HIBYTE(ushort v) { return (v >>> 8); }
 	static ubyte  LOBYTE(ushort v) { return (v & 0xFFFF); }
 
 	// Utility functin for the decrypting.
