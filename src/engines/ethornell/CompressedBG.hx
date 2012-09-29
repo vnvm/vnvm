@@ -5,6 +5,7 @@ import common.LangUtils;
 import common.Reference;
 import common.StringEx;
 import common.Timer2;
+import haxe.io.Bytes;
 import neash.geom.Rectangle;
 import nme.display.BitmapData;
 import nme.errors.Error;
@@ -34,8 +35,14 @@ class CompressedBG
 	 * 
 	 * @param	s
 	 */
-	public function new(s:ByteArray)
+	public function new(?s:ByteArray)
 	{
+		if (s != null) load(s);
+	}
+	
+	public function load(s:ByteArray):Void {
+		var start:Float = haxe.Timer.stamp();
+		
 		table = LangUtils.createArray(function():Int { return 0; }, 0x100);
 		table2 = LangUtils.createArray(function():Node { return new Node(); }, 0x1FF);
 
@@ -60,6 +67,8 @@ class CompressedBG
 		uncompress_rle(data1, data3);
 		
 		data = unpack_real(data3);
+		
+		trace("Load: " + (haxe.Timer.stamp() - start));
 	}
 
 	/**
@@ -69,6 +78,8 @@ class CompressedBG
 	 */
 	static public function decode_chunk0(data:ByteArray, hash_val:Int):Void
 	{
+		var start:Float = haxe.Timer.stamp();
+		
 		var hash_val_ref:Reference<Int> = new Reference<Int>(hash_val);
 		
 		//trace(StringEx.sprintf("%08X", [hash_val]));
@@ -81,6 +92,8 @@ class CompressedBG
 			data[n] = next;
 			//trace(StringEx.sprintf("%02X-%02X -> %02X", [prev, hash, next]));
 		}
+		
+		trace("decode_chunk0: " + (haxe.Timer.stamp() - start));
 	}
 	
 	/**
@@ -102,8 +115,8 @@ class CompressedBG
 			bl = (bl ^ c) & 0xFF;
 		}
 		
-		trace(StringEx.sprintf("DL: %08X, %08X", [dl, hash_dl]));
-		trace(StringEx.sprintf("BL: %08X, %08X", [bl, hash_bl]));
+		//trace(StringEx.sprintf("DL: %08X, %08X", [dl, hash_dl]));
+		//trace(StringEx.sprintf("BL: %08X, %08X", [bl, hash_bl]));
 		
 		return (dl == hash_dl) && (bl == hash_bl);
 	}
@@ -227,7 +240,7 @@ class CompressedBG
 			var iter:Int = 0;
 			var srcn:Int = 0;
 			var srcMax:Int = src.length;
-			
+
 			var v2List:Array<Bool> = [];
 			var v4List:Array<Int> = [];
 			var v5List:Array<Int> = [];
@@ -242,22 +255,32 @@ class CompressedBG
 			for (n in 0 ... dst.length)
 			{
 				var cvalue:Int = method2_res;
-
+				
+				#if cpp
+				while (untyped v2List.__unsafe_get(cvalue))
+				#else
 				while (v2List[cvalue])
+				#end
 				{
 					if (mask == 0)
 					{
 						if (srcn >= srcMax) break;
 
-						currentByte = src[srcn++];
+						#if cpp
+							currentByte = untyped src.b.__unsafe_get(srcn++);
+						#else
+							currentByte = src[srcn++];
+						#end
 						//trace(currentByte);
 						mask = 0x80;
 					}
 					
-					var bit:Bool = ((currentByte & mask) != 0);
-					mask >>= 1;
-
-					cvalue = bit ? v5List[cvalue] : v4List[cvalue];
+					#if cpp
+						cvalue = untyped ((currentByte & mask) != 0) ? v5List.__unsafe_get(cvalue) : v4List.__unsafe_get(cvalue);
+					#else
+						cvalue = ((currentByte & mask) != 0) ? v5List[cvalue] : v4List[cvalue];
+					#end
+					mask >>>= 1;
 				}
 
 				Memory.setByte(n, cvalue);
@@ -318,90 +341,94 @@ class CompressedBG
 	public function unpack_real(data0:ByteArray):BitmapData
 	{
 		return switch (header.bpp) {
-			case 24, 32: unpack_real_24_32(data0, header.bpp);
+			case 24: unpack_real_24_32(data0, 24);
+			case 32: unpack_real_24_32(data0, 32);
 			//case 8: break; // Not implemented yet.
 			default: throw(new Error(Std.format("Unimplemented BPP ${header.bpp}")));
 		};
 	}
 
-	@:noStack public function unpack_real_24_32(data0:ByteArray, bpp:Int = 32):BitmapData
+	@:noStack public inline function unpack_real_24_32(data0:ByteArray, bpp:Int = 32):BitmapData
 	{
+		var width:Int = header.w, height:Int = header.h;
 		var start:Float = haxe.Timer.stamp();
-		var bmp:BitmapData = new BitmapData(header.w, header.h);
-		
-		bmp.lock();
-		
-		//bmp.getPixels(new Rectangle(0, 0, bmp.width, bmp.height);
-		
-#if unpack_memory
-		var pixels:ByteArray = ByteArrayUtils.newByteArrayWithLength(bmp.width * bmp.height * 4, Endian.LITTLE_ENDIAN);
-		Memory.select(pixels);
-#end
+		var bmp:BitmapData = new BitmapData(width, height);
 		
 		//Timer2.measure(function()
-		{
-			var c:BmpColor = new BmpColor(0, 0, 0, ((bpp == 32) ? 0 : 0xFF));
-			// trace(header.w);
-			// trace(header.h);
-			// trace(bpp);
-			// trace(data0.length);
-			
-			var data0Pos:Int = 0;
-			
-			data0.position = 0;
-			
-			var rowLen:Int = bmp.width * 4;
-			for (y in 0 ... header.h) {
-#if unpack_memory
-					var currentRowOffset = y * rowLen;
-					var prevRowOffset = currentRowOffset - rowLen;
-#end
-					
-				var x4:Int = 0;
-				for (x in 0 ... header.w) {
-					var extract:BmpColor = new BmpColor(0, 0, 0, 0);
-					extract.r = data0[data0Pos++];
-					extract.g = data0[data0Pos++];
-					extract.b = data0[data0Pos++];
-					
-					if (bpp == 32) {
-						extract.a = data0[data0Pos++];
-					} else {
-						extract.a = 0xFF;
-					}
-					
-					if (y == 0) {
-						c = BmpColor.add(c, extract);
-					} else {
-#if unpack_memory
-						var prevPixel:Int = Memory.getI32(prevRowOffset + x4);
-						var extract_up:BmpColor = BmpColor.fromARGB(prevPixel);
-#else
-						var prevPixel:Int = bmp.getPixel(x, y - 1);
-						var extract_up:BmpColor = BmpColor.fromV(prevPixel);
-#end
-						if (x == 0) {
-							c = BmpColor.add(extract_up, extract);
-						} else {
-							c = BmpColor.add(BmpColor.avg(c, extract_up), extract);
-						}
-					}
-
-#if unpack_memory
-					Memory.setI32(currentRowOffset + x4, c.getARGB());
-#else
-					bmp.setPixel(x, y, c.getV());
-#end
-					x4 += 4;
-				}
-			}
-		}
-		//);
+	
+		// trace(header.w);
+		// trace(header.h);
+		// trace(bpp);
+		// trace(data0.length);
 		
-#if unpack_memory
-		bmp.setPixels(new Rectangle(0, 0, bmp.width, bmp.height), pixels);
-#end
+		var data0Pos:Int = 0;
+		
+		data0.position = 0;
+		
+		var rowLen:Int = width * 4;
+		
+		var prevRow:ByteArray = ByteArrayUtils.newByteArrayWithLength(rowLen, Endian.LITTLE_ENDIAN);
+		var currentRow:ByteArray = ByteArrayUtils.newByteArrayWithLength(rowLen, Endian.LITTLE_ENDIAN);
+		var _tempRow:ByteArray;
+		var pixels:ByteArray = ByteArrayUtils.newByteArrayWithLength(rowLen * height, Endian.LITTLE_ENDIAN);
+		
+		var accumR:Int = 0, accumG:Int = 0, accumB:Int = 0, accumA:Int = ((bpp == 32) ? 0 : 0xFF);
+		var extractR:Int = 0, extractG:Int = 0, extractB:Int = 0, extractA:Int = 0;
+		var extractUpR:Int = 0, extractUpG:Int = 0, extractUpB:Int = 0, extractUpA:Int = 0;
+		
+		bmp.lock();
+		for (y in 0 ... height) {
+			
+			var currentN:Int = 0;
+			
+			for (x in 0 ... width) {
+				extractB = (data0[data0Pos++] & 0xFF);
+				extractG = (data0[data0Pos++] & 0xFF);
+				extractR = (data0[data0Pos++] & 0xFF);
+				if (bpp == 32) extractA = (data0[data0Pos++] & 0xFF);
+				
+				if (y == 0) {
+					accumR = (accumR + extractR) & 0xFF;
+					accumG = (accumG + extractG) & 0xFF;
+					accumB = (accumB + extractB) & 0xFF;
+					if (bpp == 32) accumA = (accumA + extractA) & 0xFF;
+				} else {
+					if (bpp == 32) extractUpA = prevRow[currentN + 0]; // A
+					extractUpR = prevRow[currentN + 1]; // R
+					extractUpG = prevRow[currentN + 2]; // G
+					extractUpB = prevRow[currentN + 3]; // B
+					
+					if (x == 0) {
+						//c = BmpColor.add(extract_up, extract);
+						accumR = (extractUpR + extractR) & 0xFF;
+						accumG = (extractUpG + extractG) & 0xFF;
+						accumB = (extractUpB + extractB) & 0xFF;
+						if (bpp == 32) accumA = (extractUpA + extractA) & 0xFF;
+					} else {
+						//c = BmpColor.add(BmpColor.avg(c, extract_up), extract);
+						
+						accumR = (((accumR + extractUpR) >> 1) + extractR) & 0xFF;
+						accumG = (((accumG + extractUpG) >> 1) + extractG) & 0xFF;
+						accumB = (((accumB + extractUpB) >> 1) + extractB) & 0xFF;
+						if (bpp == 32) accumA = (((accumA + extractUpA) >> 1) + extractA) & 0xFF;
+					}
+				}
+				
+				currentRow[currentN + 0] = (bpp == 32) ? accumA : 0xFF; // A
+				currentRow[currentN + 1] = accumR; // R
+				currentRow[currentN + 2] = accumG; // G
+				currentRow[currentN + 3] = accumB; // B
+				
+				currentN += 4;
+			}
 
+			currentRow.position = 0;
+			bmp.setPixels(new Rectangle(0, y, width, 1), currentRow);
+
+			_tempRow = prevRow;
+			prevRow = currentRow;
+			currentRow = _tempRow;
+		}
 		bmp.unlock();
 		
 		trace("unpack_real_24_32: " + (haxe.Timer.stamp() - start));

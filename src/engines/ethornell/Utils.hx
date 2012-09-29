@@ -35,13 +35,13 @@ class Utils
 		edx = Int64.mul(Int64.ofInt(20021), Int64.ofInt(LOWORD(hash_val.value)));
 		eax = Int64.mul(Int64.ofInt(20021), Int64.ofInt(HIWORD(hash_val.value)));
 		eax = Int64.add(eax, Int64.mul(Int64.ofInt(346), Int64.ofInt(hash_val.value)));
-		eax = Int64.add(eax, Int64.ofInt(HIWORD(cast Int64.getLow(edx))));
-		hash_val.value = (LOWORD(cast Int64.getLow(eax)) << 16) + LOWORD(cast Int64.getLow(edx)) + 1;
+		eax = Int64.add(eax, Int64.ofInt(HIWORD(cast(Int64.getLow(edx), Int))));
+		hash_val.value = (LOWORD(cast(Int64.getLow(eax), Int)) << 16) + LOWORD(cast(Int64.getLow(edx), Int)) + 1;
 		
 		//trace(StringEx.sprintf("D:%08X", [cast Int64.getLow(edx)]));
 		//trace(StringEx.sprintf("A:%08X", [cast Int64.getLow(eax)]));
 		
-		return (cast Int64.getLow(eax)) & 0x7FFF;
+		return (cast(Int64.getLow(eax), Int)) & 0x7FFF;
 	}
 	
 	/**
