@@ -523,6 +523,9 @@ class CompressedBG
 					}
 				}
 				
+				//accumA = 0xFF;
+				//accumR = 0xFF;
+				
 				#if cpp
 				untyped currentRow.b.__unsafe_set(currentN + 0, (bpp == 32) ? accumA : 0xFF); // A
 				untyped currentRow.b.__unsafe_set(currentN + 1, accumR); // R

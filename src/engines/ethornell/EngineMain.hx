@@ -1,9 +1,12 @@
 package engines.ethornell;
 import common.BitmapDataUtils;
+import common.io.SubVirtualFileSystem;
 import common.io.VirtualFileSystem;
+import common.io.VirtualFileSystemBase;
 import nme.display.Bitmap;
 import nme.display.Sprite;
 import nme.utils.ByteArray;
+import sys.io.File;
 
 /**
  * ...
@@ -18,10 +21,18 @@ class EngineMain extends Sprite
 		super();
 		
 		var data:ByteArray;
-		fs.openAndReadAllAsync("edelweiss/housou_jikoa_n", function(data:ByteArray) {
-			data.position = 0;
-			var compressedBG:CompressedBG = new CompressedBG(data);
-			addChild(new Bitmap(compressedBG.data, null, true));
+		//01_dou_tuu_l
+		
+		var arc:ARC;
+		var data:ByteArray;
+		fs = SubVirtualFileSystem.fromSubPath(fs, "edelweiss");
+		ARC.openAsyncFromFileSystem(fs, "data02000.arc", function(arc:ARC):Void {
+			arc.tableLookup.get("tik_jik_sit").readAsync(function(data:ByteArray):Void {
+				//File.saveBytes("c:/temp/dump.bin", data);
+				data.position = 0;
+				var compressedBG:CompressedBG = new CompressedBG(data);
+				addChild(new Bitmap(compressedBG.data, null, true));
+			});
 		});
 	}
 	

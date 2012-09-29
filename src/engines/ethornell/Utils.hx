@@ -26,6 +26,24 @@ class Utils
 	 * @return
 	 */
 	@:noStack static public function hash_update(hash_val:Reference<Int>):Int {
+		#if neko
+		var eax:Int;
+		var ebx:Int;
+		var edx:Int;
+		
+		//trace(StringEx.sprintf("V:%08X", [hash_val.value]));
+		
+		edx = 20021 * LOWORD(hash_val.value);
+		eax = 20021 * HIWORD(hash_val.value);
+		eax += 346 * hash_val.value;
+		eax += HIWORD(edx);
+		hash_val.value = (LOWORD(eax) << 16) + LOWORD(edx) + 1;
+		
+		//trace(StringEx.sprintf("D:%08X", [cast Int64.getLow(edx)]));
+		//trace(StringEx.sprintf("A:%08X", [cast Int64.getLow(eax)]));
+		
+		return eax & 0x7FFF;
+		#else
 		var eax:Int64;
 		var ebx:Int64;
 		var edx:Int64;
@@ -42,6 +60,7 @@ class Utils
 		//trace(StringEx.sprintf("A:%08X", [cast Int64.getLow(eax)]));
 		
 		return (cast(Int64.getLow(eax), Int)) & 0x7FFF;
+		#end
 	}
 	
 	/**

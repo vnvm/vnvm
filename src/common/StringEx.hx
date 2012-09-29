@@ -58,6 +58,14 @@ class StringEx
 
 		return out;
 	}
+	
+	static public function trimEnd(string:String, characters:String):String {
+		var vector:IntHash<Bool> = new IntHash<Bool>();
+		for (n in 0 ... characters.length) vector.set(characters.charCodeAt(n), true);
+		var n:Int = string.length - 1;
+		while ((n > 0) && vector.exists(string.charCodeAt(n))) n--;
+		return string.substr(0, n + 1);
+	}
 
 	static public function sprintf(format:String, params: Array<Dynamic>):String {
 		var reg:EReg = ~/%(-)?(0)?(\d*)(d|x|X|s)/g;
