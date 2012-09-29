@@ -1,4 +1,5 @@
 package common;
+import nme.errors.Error;
 
 /**
  * ...
@@ -60,12 +61,14 @@ class StringEx
 			var out:String = "";
 			if (minus != null) direction = -1;
 			if (zero != null) padChar = zero;
-			switch (type) {
-				case 'd': out = intToString(params.shift(), 10);
-				case 'x': out = intToString(params.shift(), 16).toLowerCase();
-				case 'X': out = intToString(params.shift(), 16).toUpperCase();
-				case 's': out = params.shift();
-			}
+			out = switch (type) {
+				case 'b': intToString(params.shift(), 2);
+				case 'd': intToString(params.shift(), 10);
+				case 'x': intToString(params.shift(), 16).toLowerCase();
+				case 'X': intToString(params.shift(), 16).toUpperCase();
+				case 's': params.shift();
+				default: throw(new Error(Std.format("Format '%$type'")));
+			};
 			if (direction > 0) {
 				out = StringTools.lpad(out, padChar, padCount);
 			} else {

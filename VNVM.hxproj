@@ -6,12 +6,12 @@
     <movie input="" />
     <movie path="application.nmml" />
     <movie fps="60" />
-    <movie width="800" />
-    <movie height="480" />
+    <movie width="960" />
+    <movie height="640" />
     <movie version="3" />
     <movie minorVersion="0" />
     <movie platform="NME" />
-    <movie background="#000000" />
+    <movie background="000000" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>

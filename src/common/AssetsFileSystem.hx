@@ -22,9 +22,13 @@ class AssetsFileSystem
 			nme.filesystem.File.applicationDirectory.nativePath + "/assets",
 			"assets", "../assets", "../../assets", "../../../assets", "../../../../assets"
 		]) {
+			#if !neko
 			Log.trace(Std.format("Try path '$tryPath'"));
+			#end
 			if (FileSystem.exists(tryPath) && FileSystem.isDirectory(tryPath)) {
+				#if !neko
 				Log.trace(Std.format("Found assets at '$tryPath'"));
+				#end
 				return tryPath;
 			}
 		}

@@ -1,224 +1,335 @@
 package engines.ethornell;
+import common.ByteArrayUtils;
+import common.imaging.BmpColor;
+import common.LangUtils;
+import common.Reference;
+import common.StringEx;
+import nme.display.BitmapData;
+import nme.errors.Error;
+import nme.utils.ByteArray;
+import nme.utils.Endian;
+import nme.utils.Timer;
 
 /**
- * ...
+ * Class to uncompress "CompressedBG" files.
+ * 
  * @author soywiz
  */
-
-// Class to uncompress "CompressedBG" files.
-class CompressedBG {
-	// Header for the CompressedBG.
-	struct Header {
-		char[0x10] magic;
-		ushort w, h;
-		uint bpp;
-		uint[2] _pad0;
-		uint data1_len;
-		uint data0_val;
-		uint data0_len;
-		ubyte hash0, hash1;
-		ubyte _unknown;
-	}
-	// Node for the Huffman decompression.
-	struct Node {
-		uint[6] vv;
-		char[] toString() { return format("(%d, %d, %d, %d, %d, %d)", vv[0], vv[1], vv[2], vv[3], vv[4], vv[5]); }
-	}
+class CompressedBG
+{
+	//static assert(Header.sizeof == 0x30, "Invalid size for CompressedBG.Header");
+	//static assert(Node.sizeof   == 24  , "Invalid size for CompressedBG.Node");
 	
-	static assert(Header.sizeof == 0x30, "Invalid size for CompressedBG.Header");
-	static assert(Node.sizeof   == 24  , "Invalid size for CompressedBG.Node");
-	
-	Header header;
-	ubyte[] data0;
-	uint[0x100] table;
-	Node[0x1FF] table2;
-	ubyte[] data1;
-	uint[] data;
+	var header:Header;
+	var data0:ByteArray;
+	var table:Array<Int>; // 0x100
+	var table2:Array<Node>; // 0x1FF
+	var data1:ByteArray;
+	public var data:BitmapData;
 
-	this(char[] name) { this(new BufferedFile(name)); }
-	this(Stream s) {
-		s.readExact(&header, header.sizeof);
-		assert(header.magic == "CompressedBG___\0");
-		data0 = cast(ubyte[])s.readString(header.data0_len);
-		auto datahf = cast(ubyte[])s.readString(s.size - s.position);
+	/**
+	 * 
+	 * @param	s
+	 */
+	public function new(s:ByteArray)
+	{
+		table = LangUtils.createArray(function():Int { return 0; }, 0x100);
+		table2 = LangUtils.createArray(function():Node { return new Node(); }, 0x1FF);
+
+		header = new Header();
+		header.readFrom(s);
+		//trace(s.bytesAvailable);
+		data0 = ByteArrayUtils.readByteArray(s, header.data0_len);
+		//trace(s.bytesAvailable);
+		var datahf:ByteArray = ByteArrayUtils.readByteArray(s, s.bytesAvailable);
 
 		decode_chunk0(data0, header.data0_val);
+		
 		// Check the decoded chunk with a hash.
-		assert(check_chunk0(data0, header.hash0, header.hash1));
+		if (!check_chunk0(data0, header.hash0, header.hash1)) throw(new Error("Invalid chunk0"));
 	
 		process_chunk0(data0, table, 0x100);
-		int method2_res = method2(table, table2);
-		data = new uint[header.w * header.h];
-		auto data3 = new ubyte[header.w * header.h * 4];
+		var method2_res:Int = method2(table, table2);
+		var data3:ByteArray = ByteArrayUtils.newByteArrayWithLength(header.w * header.h * 4, Endian.LITTLE_ENDIAN);
 		
-		data1.length = header.data1_len;
+		data1 = ByteArrayUtils.newByteArrayWithLength(header.data1_len, Endian.LITTLE_ENDIAN);
 		uncompress_huffman(datahf, data1, table2, method2_res);
 		uncompress_rle(data1, data3);
 		
-		unpack_real(data, data3);
+		data = unpack_real(data3);
 	}
 
-	static void decode_chunk0(ubyte[] data, uint hash_val) {
-		for (int n = 0; n < data.length; n++) data[n] -= hash_update(hash_val) & 0xFF;
+	/**
+	 * 
+	 * @param	data
+	 * @param	hash_val
+	 */
+	static public function decode_chunk0(data:ByteArray, hash_val:Int):Void
+	{
+		var hash_val_ref:Reference<Int> = new Reference<Int>(hash_val);
+		
+		for (n in 0 ... data.length)
+		{
+			var prev:Int = data[n];
+			var next:Int = (data[n] - (Utils.hash_update(hash_val_ref) & 0xFF)) & 0xFF;
+			data[n] = next;
+			//trace(StringEx.sprintf("%02X -> %02X", [prev, next]));
+		}
 	}
 	
-	static bool check_chunk0(ubyte[] data, ubyte hash_dl, ubyte hash_bl) {
-		ubyte dl = 0, bl = 0;
-		foreach (c; data) { dl += c; bl ^= c; }
+	/**
+	 * 
+	 * @param	data
+	 * @param	hash_dl
+	 * @param	hash_bl
+	 * @return
+	 */
+	static public function check_chunk0(data:ByteArray, hash_dl:Int, hash_bl:Int):Bool
+	{
+		var dl:Int = 0;
+		var bl:Int = 0;
+		
+		for (n in 0 ... data.length)
+		{
+			var c:Int = data[n];
+			dl = (dl + c) & 0xFF;
+			bl = (bl ^ c) & 0xFF;
+		}
+		
+		//trace(StringEx.sprintf("DL: %08X, %08X", [dl, hash_dl]));
+		//trace(StringEx.sprintf("BL: %08X, %08X", [bl, hash_bl]));
+		
 		return (dl == hash_dl) && (bl == hash_bl);
 	}
 
-	static void process_chunk0(ubyte[] data0, uint[] table, int count = 0x100) {
-		ubyte *ptr = data0.ptr;
-		for (int n = 0; n < count; n++) table[n] = readVariable(ptr);
+	/**
+	 * 
+	 * @param	data0
+	 * @param	table
+	 * @param	count
+	 */
+	static public function process_chunk0(data0:ByteArray, table:Array<Int>, count:Int = 0x100)
+	{
+		for (n in 0 ... count) table[n] = Utils.readVariable(data0);
 	}
 
-	static int method2(uint[] table1, Node[] table2) {
-		uint sum_of_values = 0;
-		Node node;
+	/**
+	 * 
+	 * @param	table1
+	 * @param	table2
+	 * @return
+	 */
+	static public function method2(table1:Array<Int>, table2:Array<Node>):Int 
+	{
+		var sum_of_values:Int = 0;
+		var node:Node;
 		
 		{ // Verified.
-			for (uint n = 0; n < 0x100; n++) {
-				with (table2[n]) {
-					vv[0] = table1[n] > 0;
-					vv[1] = table1[n];
-					vv[2] = 0;
-					vv[3] =-1;
-					vv[4] = n;
-					vv[5] = n;
-				}
+			for (n in 0 ... 0x100)
+			{
+				var node:Node = table2[n];
+				node.v0 = (table1[n] > 0) ? 1 : 0;
+				node.v1 = table1[n];
+				node.v2 = 0;
+				node.v3 =-1;
+				node.v4 = n;
+				node.v5 = n;
 				sum_of_values += table1[n];
 				//writefln(table2[n]);
 			}
 			//writefln(sum_of_values);
 			if (sum_of_values == 0) return -1;
-			assert(sum_of_values != 0);
 		}
 
 		{ // Verified.
-			with (node) {
-				vv[0] = 0;
-				vv[1] = 0;
-				vv[2] = 1;
-				vv[3] =-1;
-				vv[4] =-1;
-				vv[5] =-1;
+			for (n in 0 ... 0x100 - 1) {
+				table2[0x100 + n] = new Node(0, 0, 1, -1, -1, -1);
 			}
-			for (uint n = 0; n < 0x100 - 1; n++) table2[0x100 + n] = node;
 			
 			//std.file.write("table_out", cast(ubyte[])cast(void[])*(&table2[0..table2.length]));
 		}
 
-		uint cnodes = 0x100;
-		uint vinfo[2];
+		var cnodes:Int = 0x100;
+		var vinfo:Array<Int> = [0, 0];
 
-		while (1) {
-			for (uint m = 0; m < 2; m++) {
+		while (true)
+		{
+			for (m in 0 ... 2)
+			{
 				vinfo[m] = -1;
 
 				// Find the node with min_value.
-				uint min_value = 0xFFFFFFFF;
-				for (uint n = 0; n < cnodes; n++) {
-					auto cnode = &table2[n];
+				var min_value:Int = 0x3FFFFFFF;
+				
+				for (n in 0 ... cnodes)
+				{
+					var cnode:Node = table2[n];
 
-					if (cnode.vv[0] && (cnode.vv[1] < min_value)) {
+					if ((cnode.v0 != 0) && (cnode.v1 < min_value))
+					{
 						vinfo[m] = n;
-						min_value = cnode.vv[1];
+						min_value = cnode.v1;
 					}
 				}
 
-				if (vinfo[m] != -1) {
-					with (table2[vinfo[m]]) {
-						vv[0] = 0;
-						vv[3] = cnodes;
-					}
+				if (vinfo[m] != -1)
+				{
+					var _node:Node = table2[vinfo[m]];
+					
+					_node.v0 = 0;
+					_node.v3 = cnodes;
 				}
 			}
 			
 			//assert(0 == 1);
 			
-			with (node) {
-				vv[0] = 1;
-				vv[1] = ((vinfo[1] != 0xFFFFFFFF) ? table2[vinfo[1]].vv[1] : 0) + table2[vinfo[0]].vv[1];
-				vv[2] = 1;
-				vv[3] =-1;
-				vv[4] = vinfo[0];
-				vv[5] = vinfo[1];
-			}
+			node = new Node();
+			node.v0 = 1;
+			//node.v1 = ((vinfo[1] != 0xFFFFFFFF) ? table2[vinfo[1]].v1 : 0) + table2[vinfo[0]].v1;
+			node.v1 = ((vinfo[1] != -1) ? table2[vinfo[1]].v1 : 0) + table2[vinfo[0]].v1;
+			node.v2 = 1;
+			node.v3 =-1;
+			node.v4 = vinfo[0];
+			node.v5 = vinfo[1];
 
 			//writefln("node(%03x): ", cnodes, node);
 			table2[cnodes++] = node;
 			
-			if (node.vv[1] == sum_of_values) break;
+			if (node.v1 == sum_of_values) break;
 		}
 		
 		return cnodes - 1;
 	}
 
-	static void uncompress_huffman(ubyte[] src, ubyte[] dst, Node[] nodes, uint method2_res) {
-		uint mask = 0x80;
-		ubyte *psrc = src.ptr;
-		int iter = 0;
+	/**
+	 * 
+	 * @param	src
+	 * @param	dst
+	 * @param	nodes
+	 * @param	method2_res
+	 */
+	static public function uncompress_huffman(src:ByteArray, dst:ByteArray, nodes:Array<Node>, method2_res:Int):Void
+	{
+		var mask:Int = 0x80;
+		var currentByte:Int = src.readUnsignedByte();
+		var iter:Int = 0;
 		
-		for (int n = 0; n < dst.length; n++) {
-			uint cvalue = method2_res;
+		
+		var start:Float = haxe.Timer.stamp();
+		for (n in 0 ... dst.length)
+		{
+			var cvalue:Int = method2_res;
 
-			if (nodes[method2_res].vv[2] == 1) {
-				do {
-					int bit = !!(*psrc & mask);
+			if (nodes[method2_res].v2 == 1)
+			{
+				do
+				{
+					var bit:Bool = ((currentByte & mask) != 0);
 					mask >>= 1;
 
-					cvalue = nodes[cvalue].vv[4 + bit];
+					cvalue = bit ? nodes[cvalue].v5 : nodes[cvalue].v4;
 
-					if (!mask) {
-						psrc++;
+					if (mask == 0)
+					{
+						if (src.bytesAvailable == 0) {
+							break;
+						}
+						currentByte = src.readUnsignedByte();
+						//trace(currentByte);
 						mask = 0x80;
 					}
-				} while (nodes[cvalue].vv[2] == 1);
+				}
+				while (nodes[cvalue].v2 == 1);
 			}
 
 			dst[n] = cvalue;
 		}
+		var end:Float = haxe.Timer.stamp();
+		trace(end - start);
 	}
 
-	static void uncompress_rle(ubyte[] src, ref ubyte[] dst) {
-		ubyte *psrc = src.ptr;
-		ubyte *pdst = dst.ptr;
-		ubyte *pslide = src.ptr;
-		bool type = false;
+	/**
+	 * 
+	 * @param	src
+	 * @param	dst
+	 */
+	static public function uncompress_rle(src:ByteArray, dst:ByteArray):Void
+	{
+		dst.position = 0;
+		var type:Bool = false;
 
-		try {
-			while (psrc < src.ptr + src.length) {
-				uint len = readVariable(psrc);
-				// RLE (for byte 00).
-				if (type) {
-					pdst[0..len] = 0;
-				}
-				// Copy from stream.
-				else {
-					pdst[0..len] = psrc[0..len];
-					psrc += len;
-				}
-				pdst += len;
-				type = !type;
+		while (src.bytesAvailable > 0)
+		{
+			var len:Int = Utils.readVariable(src);
+			
+			// RLE (for byte 00).
+			if (type)
+			{
+				for (n in 0 ... len) dst.writeByte(0);
 			}
-			dst.length = pdst - dst.ptr;
-		} catch (Exception e) {
-			throw(e);
+			// Copy from stream.
+			else
+			{
+				for (n in 0 ... len) dst.writeByte(src.readByte());
+			}
+			
+			type = !type;
 		}
 	}
 
-	void unpack_real(uint[] output, ubyte[] data0) {
-		switch (header.bpp) {
-			case 24, 32: unpack_real_24_32(output, data0, header.bpp); break;
+	/**
+	 * 
+	 * @param	output
+	 * @param	data0
+	 */
+	public function unpack_real(data0:ByteArray):BitmapData
+	{
+		return switch (header.bpp) {
+			case 24, 32: unpack_real_24_32(data0, header.bpp);
 			//case 8: break; // Not implemented yet.
-			default:
-				assert(0, format("Unimplemented BPP %d", header.bpp));
-			break;
-		}
+			default: throw(new Error(Std.format("Unimplemented BPP ${header.bpp}")));
+		};
 	}
 
-	void unpack_real_24_32(uint[] output, ubyte[] data0, int bpp = 32) {
+	public function unpack_real_24_32(data0:ByteArray, bpp:Int = 32):BitmapData
+	{
+		var bmp:BitmapData = new BitmapData(header.w, header.h);
+		var c:BmpColor = new BmpColor(0, 0, 0, ((bpp == 32) ? 0 : 0xFF));
+		trace(header.w);
+		trace(header.h);
+		trace(bpp);
+		trace(data0.length);
+		
+		data0.position = 0;
+		for (y in 0 ... header.h) {
+			for (x in 0 ... header.w) {
+				var extract:BmpColor = new BmpColor(0, 0, 0, 0);
+				extract.r = data0.readUnsignedByte();
+				extract.g = data0.readUnsignedByte();
+				extract.b = data0.readUnsignedByte();
+				
+				if (bpp == 32) {
+					extract.a = data0.readUnsignedByte();
+				} else {
+					extract.a = 0xFF;
+				}
+				
+				if (y == 0) {
+					c = BmpColor.add(c, extract);
+				} else {
+					var extract_up:BmpColor = BmpColor.fromV(bmp.getPixel(x, y - 1));
+					if (x == 0) {
+						c = BmpColor.add(extract_up, extract);
+					} else {
+						c = BmpColor.add(BmpColor.avg(c, extract_up), extract);
+					}
+				}
+				
+				bmp.setPixel(x, y, c.getV());
+			}
+		}
+		return bmp;
+		/*
 		auto out_ptr = output.ptr;
 		Color c = Color(0, 0, 0, (bpp == 32) ? 0 : 0xFF);
 		ubyte* src = data0.ptr;
@@ -239,7 +350,72 @@ class CompressedBG {
 				*dst++ = (c = (Color.avg([c, extract_up]) + extract())).v;
 			}
 		}
+		*/
 	}
+}
 
-	void write_tga(char[] name) { TGA.write32(name, header.w, header.h, data); }
+// Header for the CompressedBG.
+class Header
+{
+	public var magic:String;
+	public var w:Int;
+	public var h:Int;
+	public var bpp:Int;
+	public var _pad0:Int;
+	public var _pad1:Int;
+	public var data1_len:Int;
+	public var data0_val:Int;
+	public var data0_len:Int;
+	public var hash0:Int;
+	public var hash1:Int;
+	public var _unknown0:Int;
+	public var _pad2:Int;
+	
+	public function new() {
+		
+	}
+	
+	public function readFrom(ba:ByteArray)
+	{
+		
+		magic = ba.readMultiByte(0x10, "iso-8859-1");
+		if (magic != ("CompressedBG___" + String.fromCharCode(0))) throw(new Error("Invalid CompressedBG"));
+
+		w = ba.readUnsignedShort();
+		h = ba.readUnsignedShort();
+		bpp = ba.readUnsignedInt();
+		_pad0 = ba.readUnsignedInt();
+		_pad1 = ba.readUnsignedInt();
+		data1_len = ba.readUnsignedInt();
+		data0_val = ba.readUnsignedInt();
+		data0_len = ba.readUnsignedInt();
+		hash0 = ba.readUnsignedByte();
+		hash1 = ba.readUnsignedByte();
+		_unknown0 = ba.readUnsignedByte();
+		_pad2 = ba.readUnsignedByte();
+	}
+}
+
+// Node for the Huffman decompression.
+class Node
+{
+	public var v0:Int;
+	public var v1:Int;
+	public var v2:Int;
+	public var v3:Int;
+	public var v4:Int;
+	public var v5:Int;
+	
+	//public var vv:Array<Int>;
+	public function new(v0:Int = 0, v1:Int = 0, v2:Int = 0, v3:Int = 0, v4:Int = 0, v5:Int = 0)
+	{
+		this.v0 = v0;
+		this.v1 = v1;
+		this.v2 = v2;
+		this.v3 = v3;
+		this.v4 = v4;
+		this.v5 = v5;
+	}
+	
+	public function toString():String { return StringEx.sprintf("(%d, %d, %d, %d, %d, %d)", [v0, v1, v2, v3, v4, v5]); }
 }
