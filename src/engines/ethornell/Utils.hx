@@ -50,7 +50,7 @@ class Utils
 	 * @param	ptr
 	 * @return
 	 */
-	static public inline function readVariable(ptr:ByteArray):Int {
+	static public function readVariable(ptr:ByteArray):Int {
 		var c:Int;
 		var v:Int = 0;
 		var shift:Int = 0;

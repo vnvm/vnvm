@@ -230,8 +230,57 @@ class CompressedBG
 	 * @param	nodes
 	 * @param	method2_res
 	 */
+	#if cpp
+	@:functionCode("
+		Float start = ::haxe::Timer_obj::stamp();
+		{
+			int mask = (int)0;
+			int currentByte = (int)0;
+			int iter = (int)0;
+			int srcMax = src->length;
+			Array< bool > v2List = Array_obj< bool >::__new();
+			Array< int > v4List = Array_obj< int >::__new();
+			Array< int > v5List = Array_obj< int >::__new();
+			{
+				int _g1 = (int)0;
+				int _g = nodes->length;
+				while(((_g1 < _g))){
+					int n = (_g1)++;
+					v2List->push(nodes->__get(n)->v2);
+					v4List->push(nodes->__get(n)->v4);
+					v5List->push(nodes->__get(n)->v5);
+				}
+			}
+			bool * v2ListPtr = v2List->Pointer();
+			int * v4ListPtr = v4List->Pointer();
+			int * v5ListPtr = v5List->Pointer();
+			unsigned char * srcPtr = src->b->Pointer();
+			unsigned char * srcEnd = srcPtr + src->length;
+			
+			unsigned char * dstPtr = dst->b->Pointer();
+			unsigned char * dstEnd = dstPtr + dst->length;
+			{
+				while (dstPtr < dstEnd){
+					int cvalue = method2_res;
+					while (v2ListPtr[cvalue]) {
+						if (!mask) {
+							if (srcPtr >= srcEnd) break;
+							currentByte = *(srcPtr++);
+							mask = 0x80;
+						}
+						cvalue = (currentByte & mask) ? v5ListPtr[cvalue] : v4ListPtr[cvalue];
+						mask >>= 1;
+					}
+					*(dstPtr++) = (unsigned char)cvalue;
+				}
+			}
+		}
+		::haxe::Log_obj::trace((HX_CSTRING(\"huffman: \") + ((::haxe::Timer_obj::stamp() - start))),hx::SourceInfo(HX_CSTRING(\"CompressedBG.hx\"),291,HX_CSTRING(\"engines.ethornell.CompressedBG\"),HX_CSTRING(\"uncompress_huffman\")));
+	")
+	#end
 	@:noStack static public function uncompress_huffman(src:ByteArray, dst:ByteArray, nodes:Array<Node>, method2_res:Int):Void
 	{
+		#if !cpp
 		var start:Float = haxe.Timer.stamp();
 		//Timer2.measure(function()
 		{
@@ -290,6 +339,7 @@ class CompressedBG
 		
 		trace("huffman: " + (haxe.Timer.stamp() - start));
 		//);
+		#end
 	}
 
 	/**
@@ -297,8 +347,52 @@ class CompressedBG
 	 * @param	src
 	 * @param	dst
 	 */
+	#if cpp
+	@:functionCode("
+		Float start = ::haxe::Timer_obj::stamp();
+		{
+			bool type = false;
+			
+			unsigned char * srcPtr = src->b->Pointer();
+			unsigned char * srcEnd = srcPtr + src->b->length;
+
+			unsigned char * dstPtr = dst->b->Pointer();
+			unsigned char * dstEnd = dstPtr + dst->b->length;
+
+			while (srcPtr < srcEnd) {
+				int len;
+				{
+					int c;
+					int v = 0;
+					int shift = 0;
+					
+					do {
+						c = *(srcPtr++);
+						v |= (c & 0x7F) << shift;
+						shift += 7;
+					} while ((c & 0x80) != 0);
+					
+					len = v;
+				}
+				
+				if (type) {
+					memset(dstPtr, 0, len);
+					dstPtr += len;
+				}
+				else {
+					memcpy(dstPtr, srcPtr, len);
+					dstPtr += len;
+					srcPtr += len;
+				}
+				type = !(type);
+			}
+		}
+		::haxe::Log_obj::trace((HX_CSTRING(\"rle: \") + ((::haxe::Timer_obj::stamp() - start))),hx::SourceInfo(HX_CSTRING(\"CompressedBG.hx\"),383,HX_CSTRING(\"engines.ethornell.CompressedBG\"),HX_CSTRING(\"uncompress_rle\")));
+	")
+	#end
 	@:noStack static public function uncompress_rle(src:ByteArray, dst:ByteArray):Void
 	{
+		#if !cpp
 		var start:Float = haxe.Timer.stamp();
 		//Timer2.measure(function()
 		{
@@ -331,6 +425,7 @@ class CompressedBG
 		//);
 		
 		trace("rle: " + (haxe.Timer.stamp() - start));
+		#end
 	}
 
 	/**
@@ -382,10 +477,17 @@ class CompressedBG
 			var currentN:Int = 0;
 			
 			for (x in 0 ... width) {
+				#if cpp
+				extractB = untyped (data0.b.__unsafe_get(data0Pos++) & 0xFF);
+				extractG = untyped (data0.b.__unsafe_get(data0Pos++) & 0xFF);
+				extractR = untyped (data0.b.__unsafe_get(data0Pos++) & 0xFF);
+				if (bpp == 32) extractA = untyped (data0.b.__unsafe_get(data0Pos++) & 0xFF);
+				#else
 				extractB = (data0[data0Pos++] & 0xFF);
 				extractG = (data0[data0Pos++] & 0xFF);
 				extractR = (data0[data0Pos++] & 0xFF);
 				if (bpp == 32) extractA = (data0[data0Pos++] & 0xFF);
+				#end
 				
 				if (y == 0) {
 					accumR = (accumR + extractR) & 0xFF;
@@ -393,10 +495,17 @@ class CompressedBG
 					accumB = (accumB + extractB) & 0xFF;
 					if (bpp == 32) accumA = (accumA + extractA) & 0xFF;
 				} else {
+					#if cpp
+					if (bpp == 32) extractUpA = untyped prevRow.b.__unsafe_get(currentN + 0); // A
+					extractUpR = untyped prevRow.b.__unsafe_get(currentN + 1); // R
+					extractUpG = untyped prevRow.b.__unsafe_get(currentN + 2); // G
+					extractUpB = untyped prevRow.b.__unsafe_get(currentN + 3); // B
+					#else
 					if (bpp == 32) extractUpA = prevRow[currentN + 0]; // A
 					extractUpR = prevRow[currentN + 1]; // R
 					extractUpG = prevRow[currentN + 2]; // G
 					extractUpB = prevRow[currentN + 3]; // B
+					#end
 					
 					if (x == 0) {
 						//c = BmpColor.add(extract_up, extract);
@@ -414,10 +523,17 @@ class CompressedBG
 					}
 				}
 				
+				#if cpp
+				untyped currentRow.b.__unsafe_set(currentN + 0, (bpp == 32) ? accumA : 0xFF); // A
+				untyped currentRow.b.__unsafe_set(currentN + 1, accumR); // R
+				untyped currentRow.b.__unsafe_set(currentN + 2, accumG); // G
+				untyped currentRow.b.__unsafe_set(currentN + 3, accumB); // B
+				#else
 				currentRow[currentN + 0] = (bpp == 32) ? accumA : 0xFF; // A
 				currentRow[currentN + 1] = accumR; // R
 				currentRow[currentN + 2] = accumG; // G
 				currentRow[currentN + 3] = accumB; // B
+				#end
 				
 				currentN += 4;
 			}
