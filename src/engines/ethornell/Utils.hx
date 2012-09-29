@@ -1,5 +1,6 @@
 package engines.ethornell;
 import common.Reference;
+import common.StringEx;
 import haxe.Int32;
 import haxe.Int64;
 import nme.errors.Error;
@@ -13,19 +14,10 @@ import nme.utils.ByteArray;
 class Utils 
 {
 	// Utility macros.
-	static public function HIWORD(v:Int):Int
-	{
-		return (v >>> 16) & 0xFFFF;
-	}
-	static public function LOWORD(v:Int):Int {
-		return (v >>> 0) & 0xFFFF;
-	}
-	static public function HIBYTE(v:Int):Int {
-		return (v >>> 8) & 0xFF;
-	}
-	static public function LOBYTE(v:Int):Int {
-		return (v >>> 0) & 0xFF;
-	}
+	static public inline function HIWORD(v:Int):Int { return (v >>> 16) & 0xFFFF; }
+	static public inline function LOWORD(v:Int):Int { return (v >>> 0) & 0xFFFF;  }
+	static public inline function HIBYTE(v:Int):Int { return (v >>> 8) & 0xFF; }
+	static public inline function LOBYTE(v:Int):Int { return (v >>> 0) & 0xFF; }
 
 	/**
 	 * Utility function for the decrypting.
@@ -33,16 +25,23 @@ class Utils
 	 * @param	hash_val
 	 * @return
 	 */
-	static public function hash_update(hash_val:Reference<Int>):Int {
-		var eax:Int;
-		var ebx:Int;
-		var edx:Int;
-		var esi:Int;
-		var edi:Int;
-		edx = (20021 * LOWORD(hash_val.value));
-		eax = (20021 * HIWORD(hash_val.value)) + (346 * hash_val.value) + HIWORD(edx);
-		hash_val.value = (LOWORD(eax) << 16) + LOWORD(edx) + 1;
-		return eax & 0x7FFF;
+	@:noStack static public function hash_update(hash_val:Reference<Int>):Int {
+		var eax:Int64;
+		var ebx:Int64;
+		var edx:Int64;
+		
+		//trace(StringEx.sprintf("V:%08X", [hash_val.value]));
+		
+		edx = Int64.mul(Int64.ofInt(20021), Int64.ofInt(LOWORD(hash_val.value)));
+		eax = Int64.mul(Int64.ofInt(20021), Int64.ofInt(HIWORD(hash_val.value)));
+		eax = Int64.add(eax, Int64.mul(Int64.ofInt(346), Int64.ofInt(hash_val.value)));
+		eax = Int64.add(eax, Int64.ofInt(HIWORD(cast Int64.getLow(edx))));
+		hash_val.value = (LOWORD(cast Int64.getLow(eax)) << 16) + LOWORD(cast Int64.getLow(edx)) + 1;
+		
+		//trace(StringEx.sprintf("D:%08X", [cast Int64.getLow(edx)]));
+		//trace(StringEx.sprintf("A:%08X", [cast Int64.getLow(eax)]));
+		
+		return (cast Int64.getLow(eax)) & 0x7FFF;
 	}
 	
 	/**
@@ -51,7 +50,7 @@ class Utils
 	 * @param	ptr
 	 * @return
 	 */
-	static public function readVariable(ptr:ByteArray):Int {
+	static public inline function readVariable(ptr:ByteArray):Int {
 		var c:Int;
 		var v:Int = 0;
 		var shift:Int = 0;

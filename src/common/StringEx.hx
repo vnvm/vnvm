@@ -32,6 +32,19 @@ class StringEx
 		return value;
 	}
 
+	static public function uintToStringHex(value:Int):String {
+		if (value == 0) return "0";
+
+		var out:String = "";
+		while (value != 0) {
+			var digit:Int = Std.int(value & 0xF);
+			out = parts.charAt(digit) + out;
+			value = ((value >> 4) & 0x0FFFFFFF);
+		}
+
+		return out;
+	}
+	
 	static public function intToString(value:Int, radix:Int):String {
 		if (value < 0) return "-" + intToString(-value, radix);
 		if (value == 0) return "0";
@@ -64,8 +77,8 @@ class StringEx
 			out = switch (type) {
 				case 'b': intToString(params.shift(), 2);
 				case 'd': intToString(params.shift(), 10);
-				case 'x': intToString(params.shift(), 16).toLowerCase();
-				case 'X': intToString(params.shift(), 16).toUpperCase();
+				case 'x': uintToStringHex(params.shift()).toLowerCase();
+				case 'X': uintToStringHex(params.shift()).toUpperCase();
 				case 's': params.shift();
 				default: throw(new Error(Std.format("Format '%$type'")));
 			};

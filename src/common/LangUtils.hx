@@ -24,6 +24,12 @@ class LangUtils
         return ret; 
     } 
 
+	public static function createArrayV2<T>(len:Int, init:Int->T):Array<T> { 
+        var ret = new Array<T>(); 
+        for (n in 0 ... len) ret.push(init(n));
+        return ret; 
+    } 
+
 	public static function createArray2D<T>(init:Void->T, w:Int, ?h:Int):Array<Array<T>> { 
         if (h == null) h = w; 
         var ret = []; 

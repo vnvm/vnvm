@@ -1,4 +1,6 @@
 package common;
+import haxe.Log;
+import haxe.PosInfos;
 import haxe.Timer;
 import nme.events.Event;
 
@@ -22,5 +24,12 @@ class Timer2
 	
 	static public function createAndStart(seconds:Float):Timer2 {
 		return new Timer2(seconds);
+	}
+	
+	static public function measure(func:Void -> Void, ?pos:PosInfos) {
+		var start:Float = Timer.stamp();
+		func();
+		var end:Float = Timer.stamp();
+		trace(pos.className + "." + pos.methodName + ": " + (end - start));
 	}
 }

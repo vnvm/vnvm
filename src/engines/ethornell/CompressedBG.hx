@@ -4,8 +4,11 @@ import common.imaging.BmpColor;
 import common.LangUtils;
 import common.Reference;
 import common.StringEx;
+import common.Timer2;
+import neash.geom.Rectangle;
 import nme.display.BitmapData;
 import nme.errors.Error;
+import nme.Memory;
 import nme.utils.ByteArray;
 import nme.utils.Endian;
 import nme.utils.Timer;
@@ -68,12 +71,15 @@ class CompressedBG
 	{
 		var hash_val_ref:Reference<Int> = new Reference<Int>(hash_val);
 		
+		//trace(StringEx.sprintf("%08X", [hash_val]));
+		
 		for (n in 0 ... data.length)
 		{
 			var prev:Int = data[n];
-			var next:Int = (data[n] - (Utils.hash_update(hash_val_ref) & 0xFF)) & 0xFF;
+			var hash:Int = (Utils.hash_update(hash_val_ref) & 0xFF);
+			var next:Int = (data[n] - hash) & 0xFF;
 			data[n] = next;
-			//trace(StringEx.sprintf("%02X -> %02X", [prev, next]));
+			//trace(StringEx.sprintf("%02X-%02X -> %02X", [prev, hash, next]));
 		}
 	}
 	
@@ -96,8 +102,8 @@ class CompressedBG
 			bl = (bl ^ c) & 0xFF;
 		}
 		
-		//trace(StringEx.sprintf("DL: %08X, %08X", [dl, hash_dl]));
-		//trace(StringEx.sprintf("BL: %08X, %08X", [bl, hash_bl]));
+		trace(StringEx.sprintf("DL: %08X, %08X", [dl, hash_dl]));
+		trace(StringEx.sprintf("BL: %08X, %08X", [bl, hash_bl]));
 		
 		return (dl == hash_dl) && (bl == hash_bl);
 	}
@@ -121,6 +127,7 @@ class CompressedBG
 	 */
 	static public function method2(table1:Array<Int>, table2:Array<Node>):Int 
 	{
+		var start:Float = haxe.Timer.stamp();
 		var sum_of_values:Int = 0;
 		var node:Node;
 		
@@ -128,9 +135,9 @@ class CompressedBG
 			for (n in 0 ... 0x100)
 			{
 				var node:Node = table2[n];
-				node.v0 = (table1[n] > 0) ? 1 : 0;
+				node.v0 = (table1[n] > 0);
 				node.v1 = table1[n];
-				node.v2 = 0;
+				node.v2 = false;
 				node.v3 =-1;
 				node.v4 = n;
 				node.v5 = n;
@@ -142,8 +149,9 @@ class CompressedBG
 		}
 
 		{ // Verified.
-			for (n in 0 ... 0x100 - 1) {
-				table2[0x100 + n] = new Node(0, 0, 1, -1, -1, -1);
+			for (n in 0 ... 0x100 - 1)
+			{
+				table2[0x100 + n] = new Node(false, 0, true, -1, -1, -1);
 			}
 			
 			//std.file.write("table_out", cast(ubyte[])cast(void[])*(&table2[0..table2.length]));
@@ -165,7 +173,7 @@ class CompressedBG
 				{
 					var cnode:Node = table2[n];
 
-					if ((cnode.v0 != 0) && (cnode.v1 < min_value))
+					if ((cnode.v0) && (cnode.v1 < min_value))
 					{
 						vinfo[m] = n;
 						min_value = cnode.v1;
@@ -176,7 +184,7 @@ class CompressedBG
 				{
 					var _node:Node = table2[vinfo[m]];
 					
-					_node.v0 = 0;
+					_node.v0 = false;
 					_node.v3 = cnodes;
 				}
 			}
@@ -184,10 +192,9 @@ class CompressedBG
 			//assert(0 == 1);
 			
 			node = new Node();
-			node.v0 = 1;
-			//node.v1 = ((vinfo[1] != 0xFFFFFFFF) ? table2[vinfo[1]].v1 : 0) + table2[vinfo[0]].v1;
+			node.v0 = true;
 			node.v1 = ((vinfo[1] != -1) ? table2[vinfo[1]].v1 : 0) + table2[vinfo[0]].v1;
-			node.v2 = 1;
+			node.v2 = true;
 			node.v3 =-1;
 			node.v4 = vinfo[0];
 			node.v5 = vinfo[1];
@@ -197,6 +204,8 @@ class CompressedBG
 			
 			if (node.v1 == sum_of_values) break;
 		}
+		
+		trace("method2: " + (haxe.Timer.stamp() - start));
 		
 		return cnodes - 1;
 	}
@@ -208,44 +217,56 @@ class CompressedBG
 	 * @param	nodes
 	 * @param	method2_res
 	 */
-	static public function uncompress_huffman(src:ByteArray, dst:ByteArray, nodes:Array<Node>, method2_res:Int):Void
+	@:noStack static public function uncompress_huffman(src:ByteArray, dst:ByteArray, nodes:Array<Node>, method2_res:Int):Void
 	{
-		var mask:Int = 0x80;
-		var currentByte:Int = src.readUnsignedByte();
-		var iter:Int = 0;
-		
-		
 		var start:Float = haxe.Timer.stamp();
-		for (n in 0 ... dst.length)
+		//Timer2.measure(function()
 		{
-			var cvalue:Int = method2_res;
+			var mask:Int = 0;
+			var currentByte:Int = 0;
+			var iter:Int = 0;
+			var srcn:Int = 0;
+			var srcMax:Int = src.length;
+			
+			var v2List:Array<Bool> = [];
+			var v4List:Array<Int> = [];
+			var v5List:Array<Int> = [];
+			for (n in 0 ... nodes.length) {
+				v2List.push(nodes[n].v2);
+				v4List.push(nodes[n].v4);
+				v5List.push(nodes[n].v5);
+			}
+			
+			Memory.select(dst);
 
-			if (nodes[method2_res].v2 == 1)
+			for (n in 0 ... dst.length)
 			{
-				do
+				var cvalue:Int = method2_res;
+
+				while (v2List[cvalue])
 				{
-					var bit:Bool = ((currentByte & mask) != 0);
-					mask >>= 1;
-
-					cvalue = bit ? nodes[cvalue].v5 : nodes[cvalue].v4;
-
 					if (mask == 0)
 					{
-						if (src.bytesAvailable == 0) {
-							break;
-						}
-						currentByte = src.readUnsignedByte();
+						if (srcn >= srcMax) break;
+
+						currentByte = src[srcn++];
 						//trace(currentByte);
 						mask = 0x80;
 					}
-				}
-				while (nodes[cvalue].v2 == 1);
-			}
+					
+					var bit:Bool = ((currentByte & mask) != 0);
+					mask >>= 1;
 
-			dst[n] = cvalue;
+					cvalue = bit ? v5List[cvalue] : v4List[cvalue];
+				}
+
+				Memory.setByte(n, cvalue);
+				//dst[n] = cvalue;
+			}
 		}
-		var end:Float = haxe.Timer.stamp();
-		trace(end - start);
+		
+		trace("huffman: " + (haxe.Timer.stamp() - start));
+		//);
 	}
 
 	/**
@@ -253,28 +274,40 @@ class CompressedBG
 	 * @param	src
 	 * @param	dst
 	 */
-	static public function uncompress_rle(src:ByteArray, dst:ByteArray):Void
+	@:noStack static public function uncompress_rle(src:ByteArray, dst:ByteArray):Void
 	{
-		dst.position = 0;
-		var type:Bool = false;
-
-		while (src.bytesAvailable > 0)
+		var start:Float = haxe.Timer.stamp();
+		//Timer2.measure(function()
 		{
-			var len:Int = Utils.readVariable(src);
+			dst.position = 0;
+			var type:Bool = false;
 			
-			// RLE (for byte 00).
-			if (type)
-			{
-				for (n in 0 ... len) dst.writeByte(0);
-			}
-			// Copy from stream.
-			else
-			{
-				for (n in 0 ... len) dst.writeByte(src.readByte());
-			}
+			Memory.select(dst);
+			var dstPos:Int = 0;
 			
-			type = !type;
+			while (src.bytesAvailable > 0)
+			{
+				var len:Int = Utils.readVariable(src);
+				
+				// RLE (for byte 00).
+				if (type)
+				{
+					while (len >= 4) { Memory.setI32(dstPos, 0); dstPos += 4; len -= 4; }
+					while (len >= 1) { Memory.setByte(dstPos, 0); dstPos += 1; len -= 1; }
+				}
+				// Copy from stream.
+				else
+				{
+					while (len >= 4) { Memory.setI32(dstPos, src.readUnsignedInt()); dstPos += 4; len -= 4; }
+					while (len >= 1) { Memory.setByte(dstPos, src.readUnsignedByte()); dstPos += 1; len -= 1; }
+				}
+				
+				type = !type;
+			}
 		}
+		//);
+		
+		trace("rle: " + (haxe.Timer.stamp() - start));
 	}
 
 	/**
@@ -291,66 +324,88 @@ class CompressedBG
 		};
 	}
 
-	public function unpack_real_24_32(data0:ByteArray, bpp:Int = 32):BitmapData
+	@:noStack public function unpack_real_24_32(data0:ByteArray, bpp:Int = 32):BitmapData
 	{
+		var start:Float = haxe.Timer.stamp();
 		var bmp:BitmapData = new BitmapData(header.w, header.h);
-		var c:BmpColor = new BmpColor(0, 0, 0, ((bpp == 32) ? 0 : 0xFF));
-		trace(header.w);
-		trace(header.h);
-		trace(bpp);
-		trace(data0.length);
 		
-		data0.position = 0;
-		for (y in 0 ... header.h) {
-			for (x in 0 ... header.w) {
-				var extract:BmpColor = new BmpColor(0, 0, 0, 0);
-				extract.r = data0.readUnsignedByte();
-				extract.g = data0.readUnsignedByte();
-				extract.b = data0.readUnsignedByte();
-				
-				if (bpp == 32) {
-					extract.a = data0.readUnsignedByte();
-				} else {
-					extract.a = 0xFF;
-				}
-				
-				if (y == 0) {
-					c = BmpColor.add(c, extract);
-				} else {
-					var extract_up:BmpColor = BmpColor.fromV(bmp.getPixel(x, y - 1));
-					if (x == 0) {
-						c = BmpColor.add(extract_up, extract);
+		bmp.lock();
+		
+		//bmp.getPixels(new Rectangle(0, 0, bmp.width, bmp.height);
+		
+#if unpack_memory
+		var pixels:ByteArray = ByteArrayUtils.newByteArrayWithLength(bmp.width * bmp.height * 4, Endian.LITTLE_ENDIAN);
+		Memory.select(pixels);
+#end
+		
+		//Timer2.measure(function()
+		{
+			var c:BmpColor = new BmpColor(0, 0, 0, ((bpp == 32) ? 0 : 0xFF));
+			// trace(header.w);
+			// trace(header.h);
+			// trace(bpp);
+			// trace(data0.length);
+			
+			var data0Pos:Int = 0;
+			
+			data0.position = 0;
+			
+			var rowLen:Int = bmp.width * 4;
+			for (y in 0 ... header.h) {
+#if unpack_memory
+					var currentRowOffset = y * rowLen;
+					var prevRowOffset = currentRowOffset - rowLen;
+#end
+					
+				var x4:Int = 0;
+				for (x in 0 ... header.w) {
+					var extract:BmpColor = new BmpColor(0, 0, 0, 0);
+					extract.r = data0[data0Pos++];
+					extract.g = data0[data0Pos++];
+					extract.b = data0[data0Pos++];
+					
+					if (bpp == 32) {
+						extract.a = data0[data0Pos++];
 					} else {
-						c = BmpColor.add(BmpColor.avg(c, extract_up), extract);
+						extract.a = 0xFF;
 					}
-				}
-				
-				bmp.setPixel(x, y, c.getV());
-			}
-		}
-		return bmp;
-		/*
-		auto out_ptr = output.ptr;
-		Color c = Color(0, 0, 0, (bpp == 32) ? 0 : 0xFF);
-		ubyte* src = data0.ptr;
-		uint*  dst = output.ptr;
-		
-		Color extract_32() { scope (exit) src += 4; return Color(src[0], src[1], src[2], src[3]); }
-		Color extract_24() { scope (exit) src += 3; return Color(src[0], src[1], src[2], 0); }
-		
-		auto extract = (bpp == 32) ? &extract_32 : &extract_24;
-		Color extract_up() { return Color(*(dst - header.w)); }
+					
+					if (y == 0) {
+						c = BmpColor.add(c, extract);
+					} else {
+#if unpack_memory
+						var prevPixel:Int = Memory.getI32(prevRowOffset + x4);
+						var extract_up:BmpColor = BmpColor.fromARGB(prevPixel);
+#else
+						var prevPixel:Int = bmp.getPixel(x, y - 1);
+						var extract_up:BmpColor = BmpColor.fromV(prevPixel);
+#end
+						if (x == 0) {
+							c = BmpColor.add(extract_up, extract);
+						} else {
+							c = BmpColor.add(BmpColor.avg(c, extract_up), extract);
+						}
+					}
 
-		for (int x = 0; x < header.w; x++) {
-			*dst++ = (c += extract()).v;
-		}
-		for (int y = 1; y < header.h; y++) {
-			*dst++ = (c = (extract_up + extract())).v;
-			for (int x = 1; x < header.w; x++) {
-				*dst++ = (c = (Color.avg([c, extract_up]) + extract())).v;
+#if unpack_memory
+					Memory.setI32(currentRowOffset + x4, c.getARGB());
+#else
+					bmp.setPixel(x, y, c.getV());
+#end
+					x4 += 4;
+				}
 			}
 		}
-		*/
+		//);
+		
+#if unpack_memory
+		bmp.setPixels(new Rectangle(0, 0, bmp.width, bmp.height), pixels);
+#end
+
+		bmp.unlock();
+		
+		trace("unpack_real_24_32: " + (haxe.Timer.stamp() - start));
+		return bmp;
 	}
 }
 
@@ -396,18 +451,43 @@ class Header
 	}
 }
 
-// Node for the Huffman decompression.
+/**
+ * Node for the Huffman decompression.
+ */
 class Node
 {
-	public var v0:Int;
+	/**
+	 * 
+	 */
+	public var v0:Bool;
+	
+	/**
+	 * Value?
+	 */
 	public var v1:Int;
-	public var v2:Int;
+	
+	/**
+	 * Is leaf
+	 */
+	public var v2:Bool;
+	
+	/**
+	 * Number of nodes/levels? Something like that.
+	 */
 	public var v3:Int;
+	
+	/**
+	 * Left index
+	 */
 	public var v4:Int;
+	
+	/**
+	 * Right index.
+	 */
 	public var v5:Int;
 	
 	//public var vv:Array<Int>;
-	public function new(v0:Int = 0, v1:Int = 0, v2:Int = 0, v3:Int = 0, v4:Int = 0, v5:Int = 0)
+	public function new(v0:Bool = false, v1:Int = 0, v2:Bool = false, v3:Int = 0, v4:Int = 0, v5:Int = 0)
 	{
 		this.v0 = v0;
 		this.v1 = v1;
@@ -417,5 +497,5 @@ class Node
 		this.v5 = v5;
 	}
 	
-	public function toString():String { return StringEx.sprintf("(%d, %d, %d, %d, %d, %d)", [v0, v1, v2, v3, v4, v5]); }
+	public function toString():String { return Std.format("($v0, $v1, $v2, $v3, $v4, $v5)"); }
 }
