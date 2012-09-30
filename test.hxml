@@ -9,6 +9,7 @@
 
 #--next
 
+-D release
 -main TestMain
 -lib munit
 -lib nme

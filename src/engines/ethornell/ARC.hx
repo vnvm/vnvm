@@ -1,96 +1,139 @@
 package engines.ethornell;
+import common.io.SliceStream;
+import common.io.Stream;
+import common.io.VirtualFileSystem;
+import common.StringEx;
+import engines.brave.cgdb.CgDbEntry;
+import nme.errors.Error;
+import nme.utils.ByteArray;
 
 /**
- * ...
+ * Class to have read access to ARC files.
+ * 
  * @author soywiz
  */
+class ARC
+{
+	public var baseStream:Stream;
+	public var fileStream:Stream;
+	public var table:Array<Entry>;
+	public var tableLookup:Hash<Entry>;
 
-// Class to have read access to ARC files.
-class ARC {
-	Stream s;
-	Stream sd;
-	Entry[] table;
-	Entry*[char[]] table_lookup;
-	
-	// Entry for the header.
-	struct Entry {
-		ubyte[0x10] _name; // Stringz with the name of the file.
-		uint start, len;   // Slice of the file.
-		ARC arc;           // Use a slice of the unused area to save a reference to the ARC parent.
-		ubyte[8 - arc.sizeof] __pad; // Unused area.
+	private function new(s:Stream)
+	{
+		this.baseStream = s;
+		this.table = new Array<Entry>();
+		this.tableLookup = new Hash<Entry>();
+	}
 
-		// Obtaining the processed name as a char[].
-		char[] name() { return cast(char[])_name[0..strlen(cast(char *)_name.ptr)]; }
-		char[] toString() { return format("%-16s (%08X-%08X)", name, start, len); }
+	static public function openAsyncFromFileSystem(fs:VirtualFileSystem, fileName:String, done:ARC -> Void):Void
+	{
+		var stream:Stream;
+		fs.openAsync(fileName, function(stream:Stream):Void {
+			openAsync(stream, done, fileName);
+		});
+	}
 
-		// Open a read-only stream for the file.
-		Stream open() { return arc.open(*this); }
+	/**
+	 * Open a ARC using an stream.
+	 * 
+	 * @param	s
+	 * @param	name
+	 */
+	static public function openAsync(stream:Stream, done:ARC -> Void, name:String = "unknwon")
+	{
+		var arc:ARC = new ARC(stream);
+		var ba:ByteArray;
+		// 12 + 4
 		
-		// Method to save this entry to a file.
-		void save(char[] name = null) {
-			if (name == null) name = this.name;
-			scope s = new BufferedFile(name, FileMode.OutNew);
-			s.copyFrom(open);
-			s.close();
-		}
-
-		// Defines the explicit cast to Stream.
-		Stream opCast() { return open; }
-	}
-
-	// Check the struct to have the expected size.
-	static assert(Entry.sizeof == 0x20, "Invalid size for ARC.Entry");
-
-	// Open a ARC using an stream.
-	this(Stream s, char[] name = "unknwon") {
-		this.s = s;
-
-		// Check the magic.
-		assert(s.readString(12) == "PackFile    ", format("It doesn't seems to be an ARC file ('%s')", name));
-
-		// Read the size.
-		uint table_length; s.read(table_length);
+		stream.position = 0;
+		stream.readBytesAsync(12 + 4, function(ba:ByteArray):Void {
+			var magic:String = ba.readUTFBytes(12);
+			var tableLength:Int = ba.readUnsignedInt();
+			if (magic != "PackFile    ") throw(new Error(Std.format("It doesn't seems to be an ARC file ('$name')")));
 		
-		// Read the table itself.
-		table.length = table_length; s.readExact(table.ptr, table.length * table[0].sizeof);
+			arc.fileStream = SliceStream.fromBounds(
+				arc.baseStream,
+				arc.baseStream.position + (0x20 * tableLength),
+				arc.baseStream.length
+			);
+			
+			stream.readBytesAsync(0x20 * tableLength, function(ba:ByteArray):Void {
+				for (n in 0 ... tableLength) {
+					var entry:Entry = Entry.createFromArcAndByteArray(arc, ba);
+					arc.table.push(entry);
+					arc.tableLookup.set(entry.name, entry);
+				}
+				done(arc);
+			});
+		});
+	}
+}
 
-		// Stre a SliceStream starting with the data part.
-		sd = new SliceStream(s, s.position);
-
-		// Iterates over all the entries, creating references to this class, and creating a lookup table.
-		for (int n = 0; n < table.length; n++) {
-			table_lookup[table[n].name] = &table[n];
-			table[n].arc = this;
-		}
+private class Entry {
+	/**
+	 * Stringz with the name of the file.
+	 */
+	public var name:String;
+	
+	/**
+	 * Start position of the content. (Slice of the file).
+	 */
+	public var offset:Int;
+	
+	/**
+	 * Length of the file contents. (Slice of the file).
+	 */
+	public var length:Int;
+	
+	/**
+	 * Unused area 0
+	 */
+	public var _pad0:Int;
+	
+	/**
+	 * Unused area 1
+	 */
+	public var _pad1:Int;
+	
+	/**
+	 * 
+	 */
+	public var arc:ARC;
+	
+	/**
+	 * 
+	 * @param	arc
+	 */
+	private function new(arc:ARC) {
+		this.arc = arc;
 	}
 	
-	private function this() {
-		
+	static public function createFromArcAndByteArray(arc:ARC, data:ByteArray):Entry {
+		var entry:Entry = new Entry(arc);
+		entry.readFromByteArray(data);
+		return entry;
 	}
 	
-	static public function createFromStream():ARC {
-		
+	/**
+	 * 
+	 * @param	ba
+	 */
+	private function readFromByteArray(data:ByteArray):Void {
+		name = StringEx.trimEnd(data.readUTFBytes(0x10), String.fromCharCode(0));
+		offset = data.readUnsignedInt();
+		length = data.readUnsignedInt();
+		_pad0 = data.readUnsignedInt();
+		_pad1 = data.readUnsignedInt();
 	}
-
-	// Open an ARC using a file name.
-	this(char[] name) { this(new BufferedFile(name), name); }
 	
-	// Shortcut for instantiating the class.
-	static ARC opCall(Stream s   ) { return new ARC(s   ); }
-	static ARC opCall(char[] name) { return new ARC(name); }
-
-	// Gets a read-only stream for a entry.
-	Stream open(Entry e) { return new SliceStream(sd, e.start, e.start + e.len); }
-
-	// Defines an iterator for this class.
-	int opApply(int delegate(ref Entry) dg) {
-		for (int i = 0, result = void; i < table.length; i++) if ((result = dg(table[i])) != 0) return result;
-		return 0;
+	public function toString():String {
+		return StringEx.sprintf("'%s' (%08X-%08X)", [name, offset, length]);
 	}
-
-	// Defines an array accessor to obtain an entry file.
-	Entry opIndex(char[] name) {
-		if ((name in table_lookup) is null) throw(new Exception(format("Unknown index '%s'", name)));
-		return *table_lookup[name];
-	}
+	
+	public function readAsync(done:ByteArray -> Void):Void {
+		//throw(new Error("Not implemented ARC.Entry.readAsync"));
+		SliceStream.fromLength(arc.fileStream, this.offset, this.length
+		).readAllBytesAsync(done);
+	}	
 }

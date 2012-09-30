@@ -3,6 +3,7 @@ import common.AssetsFileSystem;
 import common.io.Stream;
 import common.io.SubVirtualFileSystem;
 import common.io.VirtualFileSystem;
+import engines.tlove.PAK;
 import haxe.Log;
 import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
@@ -29,8 +30,8 @@ class LZTest
 				var mrsStream:Stream = pak.get('SLIDE_2.MRS');
 				mrsStream.readAllBytesAsync(function(compressed:ByteArray):Void {
 					compressed.position = 12 + 0x300;
-					var uncompressed:ByteArray = LZ.decode(compressed);
-					File.saveBytes("c:/temp/temp.bin", uncompressed);
+					var uncompressed:ByteArray = LZ.decode(compressed, 0x1000);
+					//File.saveBytes("c:/temp/temp.bin", uncompressed);
 					testDone();
 				});
 			});

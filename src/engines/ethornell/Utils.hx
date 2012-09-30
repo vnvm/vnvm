@@ -1,4 +1,10 @@
 package engines.ethornell;
+import common.Reference;
+import common.StringEx;
+import haxe.Int32;
+import haxe.Int64;
+import nme.errors.Error;
+import nme.utils.ByteArray;
 
 /**
  * ...
@@ -8,59 +14,111 @@ package engines.ethornell;
 class Utils 
 {
 	// Utility macros.
-	static int max(int a, int b) { return (a > b) ? a : b; }
-	static int min(int a, int b) { return (a < b) ? a : b; }
-	static ushort HIWORD(uint   v) { return (v >>> 16); }
-	static ushort LOWORD(uint   v) { return (v & 0xFFFF); }
-	static ubyte  HIBYTE(ushort v) { return (v >>> 8); }
-	static ubyte  LOBYTE(ushort v) { return (v & 0xFFFF); }
+	static public inline function HIWORD(v:Int):Int { return (v >>> 16) & 0xFFFF; }
+	static public inline function LOWORD(v:Int):Int { return (v >>> 0) & 0xFFFF;  }
+	static public inline function HIBYTE(v:Int):Int { return (v >>> 8) & 0xFF; }
+	static public inline function LOBYTE(v:Int):Int { return (v >>> 0) & 0xFF; }
 
-	// Utility functin for the decrypting.
-	static uint hash_update(ref uint hash_val) {
-		uint eax, ebx, edx, esi, edi;
-		edx = (20021 * LOWORD(hash_val));
-		eax = (20021 * HIWORD(hash_val)) + (346 * hash_val) + HIWORD(edx);
-		hash_val = (LOWORD(eax) << 16) + LOWORD(edx) + 1;
+	/**
+	 * Utility function for the decrypting.
+	 * 
+	 * @param	hash_val
+	 * @return
+	 */
+	@:noStack static public function hash_update(hash_val:Reference<Int>):Int {
+		#if neko
+		var eax:Int;
+		var ebx:Int;
+		var edx:Int;
+		
+		//trace(StringEx.sprintf("V:%08X", [hash_val.value]));
+		
+		edx = 20021 * LOWORD(hash_val.value);
+		eax = 20021 * HIWORD(hash_val.value);
+		eax += 346 * hash_val.value;
+		eax += HIWORD(edx);
+		hash_val.value = (LOWORD(eax) << 16) + LOWORD(edx) + 1;
+		
+		//trace(StringEx.sprintf("D:%08X", [cast Int64.getLow(edx)]));
+		//trace(StringEx.sprintf("A:%08X", [cast Int64.getLow(eax)]));
+		
 		return eax & 0x7FFF;
+		#else
+		var eax:Int64;
+		var ebx:Int64;
+		var edx:Int64;
+		
+		//trace(StringEx.sprintf("V:%08X", [hash_val.value]));
+		
+		edx = Int64.mul(Int64.ofInt(20021), Int64.ofInt(LOWORD(hash_val.value)));
+		eax = Int64.mul(Int64.ofInt(20021), Int64.ofInt(HIWORD(hash_val.value)));
+		eax = Int64.add(eax, Int64.mul(Int64.ofInt(346), Int64.ofInt(hash_val.value)));
+		eax = Int64.add(eax, Int64.ofInt(HIWORD(cast(Int64.getLow(edx), Int))));
+		hash_val.value = (LOWORD(cast(Int64.getLow(eax), Int)) << 16) + LOWORD(cast(Int64.getLow(edx), Int)) + 1;
+		
+		//trace(StringEx.sprintf("D:%08X", [cast Int64.getLow(edx)]));
+		//trace(StringEx.sprintf("A:%08X", [cast Int64.getLow(eax)]));
+		
+		return (cast(Int64.getLow(eax), Int)) & 0x7FFF;
+		#end
 	}
 	
-
-	// Read a variable value from a pointer.
-	static uint readVariable(ref ubyte *ptr) {
-		ubyte c; uint v;
-		int shift = 0;
+	/**
+	 * Read a variable value from a pointer.
+	 * 
+	 * @param	ptr
+	 * @return
+	 */
+	static public function readVariable(ptr:ByteArray):Int {
+		var c:Int;
+		var v:Int = 0;
+		var shift:Int = 0;
+		
 		do {
-			c = *ptr++;
+			c = ptr.readUnsignedByte();
 			v |= (c & 0x7F) << shift;
 			shift += 7;
-		} while (c & 0x80);
+		} while ((c & 0x80) != 0);
+		
 		return v;
 	}
 
-
-	void find_variable_match(ubyte[] s, ubyte[] match, out int pos, out int len, int min_dist = 0) {
-		pos = len = 0;
-		if (match.length > s.length) match.length = s.length;
-		if ((s.length > 0) && (match.length > 0)) {
-			int iter_len = s.length - match.length - min_dist;
-			for (int n = 0, m = 0; n < iter_len; n++) {
-				for (m = 0; m < match.length; m++) {
+	static public function find_variable_match(s:ByteArray, match:ByteArray, min_dist:Int = 0):PosLen {
+		var pos:Int = 0;
+		var len:Int = 0;
+		var matchLength:Int = match.length;
+		
+		if (matchLength > s.length) matchLength = s.length;
+		
+		if ((s.length > 0) && (matchLength > 0))
+		{
+			var iter_len:Int = s.length - matchLength - min_dist;
+			
+			for (n in 0 ... iter_len) {
+				var foundM:Int = 0;
+				
+				for (m in 0 ... matchLength) {
 					//writefln("%d, %d", n, m);
-					if (match[m] != s[n + m]) break;
+					if (match[m] != s[n + m]) { foundM = m;  break; }
 				}
-				if (len < m) {
-					len = m;
+				
+				if (len < foundM) {
+					len = foundM;
 					pos = n;
 				}
 			}
 			pos = iter_len - pos;
 		}
+		
+		return new PosLen(pos, len);
 	}
 
-	char[] varbits(ulong v, uint bits) {
+	static public function varbits(v:Int64, bits:Int):String {
+		throw(new Error("varbits not implemented"));
+		return "";
+		/*
 		if (bits == 0) return "";
 		return format(format("%%0%db", bits), v);
+		*/
 	}
-
-
 }

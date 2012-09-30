@@ -1,4 +1,5 @@
 package common;
+import nme.errors.Error;
 
 /**
  * ...
@@ -31,6 +32,19 @@ class StringEx
 		return value;
 	}
 
+	static public function uintToStringHex(value:Int):String {
+		if (value == 0) return "0";
+
+		var out:String = "";
+		while (value != 0) {
+			var digit:Int = Std.int(value & 0xF);
+			out = parts.charAt(digit) + out;
+			value = ((value >> 4) & 0x0FFFFFFF);
+		}
+
+		return out;
+	}
+	
 	static public function intToString(value:Int, radix:Int):String {
 		if (value < 0) return "-" + intToString(-value, radix);
 		if (value == 0) return "0";
@@ -43,6 +57,14 @@ class StringEx
 		}
 
 		return out;
+	}
+	
+	static public function trimEnd(string:String, characters:String):String {
+		var vector:IntHash<Bool> = new IntHash<Bool>();
+		for (n in 0 ... characters.length) vector.set(characters.charCodeAt(n), true);
+		var n:Int = string.length - 1;
+		while ((n > 0) && vector.exists(string.charCodeAt(n))) n--;
+		return string.substr(0, n + 1);
 	}
 
 	static public function sprintf(format:String, params: Array<Dynamic>):String {
@@ -60,12 +82,14 @@ class StringEx
 			var out:String = "";
 			if (minus != null) direction = -1;
 			if (zero != null) padChar = zero;
-			switch (type) {
-				case 'd': out = intToString(params.shift(), 10);
-				case 'x': out = intToString(params.shift(), 16).toLowerCase();
-				case 'X': out = intToString(params.shift(), 16).toUpperCase();
-				case 's': out = params.shift();
-			}
+			out = switch (type) {
+				case 'b': intToString(params.shift(), 2);
+				case 'd': intToString(params.shift(), 10);
+				case 'x': uintToStringHex(params.shift()).toLowerCase();
+				case 'X': uintToStringHex(params.shift()).toUpperCase();
+				case 's': params.shift();
+				default: throw(new Error(Std.format("Format '%$type'")));
+			};
 			if (direction > 0) {
 				out = StringTools.lpad(out, padChar, padCount);
 			} else {
