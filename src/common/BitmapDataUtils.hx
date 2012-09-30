@@ -2,6 +2,7 @@ package common;
 import nme.display.BitmapData;
 import nme.display.BitmapDataChannel;
 import nme.geom.Point;
+import nme.geom.Rectangle;
 
 /**
  * ...
@@ -10,6 +11,12 @@ import nme.geom.Point;
 
 class BitmapDataUtils 
 {
+	static public function slice(source:BitmapData, rect:Rectangle):BitmapData {
+		var destination:BitmapData = new BitmapData(Std.int(rect.width), Std.int(rect.height));
+		destination.copyPixels(source, rect, new Point(0, 0));
+		return destination;
+	}
+	
 	static public function combineColorMask(color:BitmapData, mask:BitmapData):BitmapData {
 		var newBitmap:BitmapData = new BitmapData(color.width, color.height, true, 0x00000000);
 		//newBitmap.copyPixels(color, color.rect, new Point(0, 0), mask, new Point(0, 0), false);
