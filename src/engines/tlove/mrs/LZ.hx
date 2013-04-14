@@ -29,8 +29,11 @@ class LZ
 		
 		//if (params.debug) printf("IN(%08X), OUT(%08X) {\n", vsrc.len, vdst.len);
 		
-		while ((input.position < input.length) && (output.position < outputSize))
+		while (true)
 		{
+			if (input.position >= input.length) break;
+			if (cast(output.position, Int) >= outputSize) break;
+			
 			var c:Int = (input.readUnsignedByte() & 0xFF);
 			
 			//if (output.position >= outputSize) break;
@@ -59,7 +62,7 @@ class LZ
 				if (debug) Log.trace(StringEx.sprintf("  %06X | %06X: PATTERN OFFSET(%d) LENGTH(%d)", [output.position, input.position, offset, c3]));
 				#end
 				
-				if (offset > output.length) throw(new Error("Invalid LZ. Require more data."));
+				if (offset > cast output.length) throw(new Error("Invalid LZ. Require more data."));
 				
 				while (c3-- > 0) {
 					var b:Int = output[output.length - offset - 1];

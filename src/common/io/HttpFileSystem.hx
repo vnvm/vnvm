@@ -27,17 +27,19 @@ class HttpFileSystem extends VirtualFileSystem
 		loader.dataFormat = URLLoaderDataFormat.BINARY;
 		
 		loader.addEventListener(Event.COMPLETE, function(e:Event):Void {
-			done(cast(loader.data));
+			done(new BytesStream(loader.data));
 		});
 		loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, function(e:Event):Void {
+			throw(new Error("SECURITY_ERROR: " + name + " # " + baseUrl));
 			done(null);
 		});
 		loader.addEventListener(IOErrorEvent.IO_ERROR, function(e:Event):Void {
+			throw(new Error("IO_ERROR: " + name + " # " + baseUrl));
 			done(null);
 		});
 		
 		loader.load(new URLRequest(baseUrl + '/' + name));
-		throw(new Error("Not implemented VirtualFileSystem.openAsync"));
+		//throw(new Error("Not implemented VirtualFileSystem.openAsync"));
 	}
 	
 	override public function existsAsync(name:String, done:Bool -> Void):Void {

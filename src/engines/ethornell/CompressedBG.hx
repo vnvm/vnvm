@@ -6,7 +6,7 @@ import common.Reference;
 import common.StringEx;
 import common.Timer2;
 import haxe.io.Bytes;
-import neash.geom.Rectangle;
+import nme.geom.Rectangle;
 import nme.display.BitmapData;
 import nme.errors.Error;
 import nme.Memory;

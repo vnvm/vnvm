@@ -8,7 +8,7 @@ import nme.geom.Rectangle;
 import nme.Memory;
 import nme.utils.ByteArray;
 import nme.utils.Endian;
-import sys.io.File;
+//import sys.io.File;
 
 /**
  * ...
@@ -56,9 +56,9 @@ class BMP
 			// RGBQUAD - Palette
 			//for (n in 0 ... colorsUsed) {
 			for (n in 0 ... colorsUsed) {
-				var r:Int = bytes.readUnsignedByte();
-				var g:Int = bytes.readUnsignedByte();
 				var b:Int = bytes.readUnsignedByte();
+				var g:Int = bytes.readUnsignedByte();
+				var r:Int = bytes.readUnsignedByte();
 				var reserved:Int = bytes.readUnsignedByte();
 				palette.push(new BmpColor(r, g, b, 0xFF));
 			}
@@ -85,7 +85,10 @@ class BMP
 		var width:Int = bitmapData.width, height:Int = bitmapData.height;
 
 		var bmpData:ByteArray = ByteArrayUtils.newByteArrayWithLength(width * height * 4, Endian.LITTLE_ENDIAN);
+		var paletteInt:Array<Int> = [];
 		var stride:Int = width * 4;
+		
+		for (n in 0 ... palette.length) paletteInt.push(palette[n].getPixel32());
 		
 		Memory.select(bmpData);
 		for (y in 0 ... height) {
@@ -93,18 +96,15 @@ class BMP
 			for (x in 0 ... width) {
 				var index:Int = bytes.readUnsignedByte();
 				//Log.trace(Std.format("INDEX: $index, ${palette.length}"));
-				var color:BmpColor = palette[index];
-				Memory.setByte(n + 0, 0xFF);
-				Memory.setByte(n + 1, color.b);
-				Memory.setByte(n + 2, color.g);
-				Memory.setByte(n + 3, color.r);
+				Memory.setI32(n, paletteInt[index]);
 				n += 4;
 			}
 		}
 		bitmapData.setPixels(new Rectangle(0, 0, width, height), bmpData);
+		Memory.select(null);
 		
 		// Free memory
-		bmpData.setLength(0);
+		ByteArrayUtils.freeByteArray(bmpData);
 	}
 	
 	@:noStack static private function decodeRows24(bytes:ByteArray, bitmapData:BitmapData):Void {

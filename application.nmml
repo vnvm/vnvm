@@ -6,7 +6,7 @@
 	<meta title="VNVM" package="com.soywiz.vnvm" version="1.0.0" company="" />
 	
 	<!-- output -->
-	<app main="Main" file="VNVM" path="bin" swf-version="11" />
+	<app main="Main" file="VNVM" path="bin" swf-version="11.2" />
 	
 	<window background="#000000" fps="60" />
 	

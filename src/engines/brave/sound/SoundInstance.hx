@@ -9,7 +9,7 @@ import nme.events.Event;
 import nme.media.Sound;
 import nme.utils.ByteArray;
 import nme.utils.Endian;
-import sys.io.File;
+//import sys.io.File;
 
 /**
  * ...
@@ -95,7 +95,7 @@ class SoundInstance
 	*/
 	
 	private function loadData():Void  {
-		sound.loadPCMFromByteArray(ByteArray.fromBytes(soundEntry.bytes), Std.int(soundEntry.bytes.length / 2 / fromChannels), "short", (fromChannels == 2) ? true : false, FromRate);
+		sound.loadPCMFromByteArray(ByteUtils.BytesToByteArray(soundEntry.bytes), Std.int(soundEntry.bytes.length / 2 / fromChannels), "short", (fromChannels == 2) ? true : false, FromRate);
 	}
 	
 	/*

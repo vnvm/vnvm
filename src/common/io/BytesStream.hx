@@ -1,5 +1,6 @@
 package common.io;
 import common.ByteArrayUtils;
+import nme.errors.Error;
 import nme.utils.ByteArray;
 
 /**
@@ -13,14 +14,17 @@ class BytesStream extends Stream
 	
 	public function new(byteArray:ByteArray) {
 		this.byteArray = byteArray;
+		this.position = 0;
+		this.length = byteArray.length;
 	}
 	
-	public function readBytesAsync(length:Int, done:ByteArray -> Void):Void
+	override public function readBytesAsync(length:Int, done:ByteArray -> Void):Void
 	{
 		var data:ByteArray;
 		byteArray.position = this.position;
 		data = ByteArrayUtils.readByteArray(byteArray, length);
+		data.position = 0;
 		this.position += length;
-		return data;
+		done(data);
 	}
 }

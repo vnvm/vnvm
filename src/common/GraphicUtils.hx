@@ -31,7 +31,7 @@ class GraphicUtils
 		var indices:Array<Int> = [0, 1, 2, 1, 3, 2];
 		 
 		graphics.beginBitmapFill(bitmapData, null, false, true);
-		graphics.drawTriangles(verticies, indices, uvtData);
+		graphics.drawTriangles(cast verticies, cast indices, cast uvtData);
 		graphics.endFill();
 	}
 

@@ -138,7 +138,7 @@ class BraveAssets
 			var sound:Sound = new Sound();
 			//sound.loadPCMFromByteArray(
 			try {
-				sound.loadCompressedDataFromByteArray(bytes, bytes.length, true);
+				sound.loadCompressedDataFromByteArray(bytes, bytes.length);
 			} catch (e:Error) {
 				BraveLog.trace(e);
 			}

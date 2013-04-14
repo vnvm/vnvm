@@ -19,7 +19,10 @@ class ByteUtils
 		byteArray.position = 0;
 		return byteArray;
 	}
-	
+
+	//@:noStack static public function ToByteArray(array:Array<Int>):ByteArray { return ArrayToByteArray(array); }
+	//@:noStack static public function ToByteArray(array:Bytes):ByteArray { return BytesToByteArray(array); }
+
 	@:noStack static public function ArrayToByteArray(array:Array<Int>):ByteArray {
 		if (array == null) return null;
 		var byteArray:ByteArray = new ByteArray();

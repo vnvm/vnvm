@@ -29,6 +29,24 @@ class BmpColor
 			(b << 24)
 		);
 	}
+	
+	public function getPixel32():Int {
+		#if flash
+		return (
+			((a & 0xFF) << 24) |
+			((r & 0xFF) << 16) |
+			((g & 0xFF) <<  8) |
+			((b & 0xFF) <<  0)
+		);
+		#else
+		return (
+			((b & 0xFF) << 24) |
+			((g & 0xFF) << 16) |
+			((r & 0xFF) <<  8) |
+			((a & 0xFF) <<  0)
+		);
+		#end
+	}
 
 	static public function add(left:BmpColor, right:BmpColor):BmpColor {
 		return new BmpColor(
@@ -48,11 +66,25 @@ class BmpColor
 		);
 	}
 	
+	static private function clamp(v:Int, min:Int, max:Int):Int {
+		if (v < min) return min;
+		if (v > max) return max;
+		return v;
+	}
+	
+	static private function clamp_0_255(v:Int):Int {
+		return clamp(v, 0, 255);
+	}
+	
 	public function new(r:Int, g:Int, b:Int, a:Int) {
-		this.r = r;
-		this.g = g;
-		this.b = b;
-		this.a = a;
+		//this.r = clamp_0_255(r);
+		//this.g = clamp_0_255(g);
+		//this.b = clamp_0_255(b);
+		//this.a = clamp_0_255(a);
+		this.r = r & 0xFF;
+		this.g = g & 0xFF;
+		this.b = b & 0xFF;
+		this.a = a & 0xFF;
 	}
 	
 	static public function fromV(v:Int):BmpColor {

@@ -88,7 +88,7 @@ class Utils
 		var len:Int = 0;
 		var matchLength:Int = match.length;
 		
-		if (matchLength > s.length) matchLength = s.length;
+		if (matchLength > cast s.length) matchLength = s.length;
 		
 		if ((s.length > 0) && (matchLength > 0))
 		{

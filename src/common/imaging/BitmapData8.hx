@@ -63,13 +63,7 @@ class BitmapData8 {
 		var colorsPalette:Array<Int> = [];
 		
 		for (n in 0 ... palette.colors.length) {
-			var color:BmpColor = palette.colors[n];
-			colorsPalette.push(
-				(color.b << 24) |
-				(color.g << 16) |
-				(color.r <<  8) |
-				(color.a <<  0)
-			);
+			colorsPalette.push(palette.colors[n].getPixel32());
 		}
 		
 		Memory.select(ba);
@@ -91,6 +85,8 @@ class BitmapData8 {
 		ba.position = 0;
 		data.position = 0;
 		bmp.setPixels(rect, ba);
+		
+		Memory.select(null);
 		
 		ByteArrayUtils.freeByteArray(ba);
 	}

@@ -6,7 +6,7 @@ import common.io.VirtualFileSystemBase;
 import nme.display.Bitmap;
 import nme.display.Sprite;
 import nme.utils.ByteArray;
-import sys.io.File;
+//import sys.io.File;
 
 /**
  * ...

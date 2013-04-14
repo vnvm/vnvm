@@ -1,4 +1,5 @@
 package engines.brave.sound;
+import common.ByteUtils;
 import haxe.io.Bytes;
 import nme.media.Sound;
 import nme.utils.ByteArray;
@@ -28,7 +29,7 @@ class SoundEntry
 		if (bytes == null) {
 			soundPack.stream.position = this.offset;
 			soundPack.stream.readBytesAsync(this.length, function(_bytes:ByteArray):Void {
-				this.bytes = _bytes;
+				this.bytes = ByteUtils.ByteArrayToBytes(_bytes);
 				done((new SoundInstance(this)).getSound());
 			});
 		} else {

@@ -8,15 +8,21 @@ import nme.utils.Endian;
  * @author 
  */
 
+#if cpp
+typedef EndianType = String;
+#else
+typedef EndianType = nme.utils.Endian;
+#end
+
 class ByteArrayUtils 
 {
-	static public function newByteArray(endian:String):ByteArray {
+	static public function newByteArray(endian:EndianType):ByteArray {
 		var byteArray:ByteArray = new ByteArray();
 		byteArray.endian = endian;
 		return byteArray;
 	}
 	
-	static public function newByteArrayWithLength(length:Int, endian:String):ByteArray {
+	static public function newByteArrayWithLength(length:Int, endian:EndianType):ByteArray {
 		#if (cpp || neko)
 		var byteArray:ByteArray = new ByteArray(length);
 		#else
@@ -28,11 +34,7 @@ class ByteArrayUtils
 	}
 	
 	static public function freeByteArray(byteArray:ByteArray):Void {
-		#if flash
-		byteArray.length = 0;
-		#else
-		byteArray.setLength(0);
-		#end
+		byteArray.clear();
 	}
 
 	static public function readByteArray(src:ByteArray, count:Int):ByteArray {
