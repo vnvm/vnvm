@@ -1,14 +1,19 @@
+package engines.will.formats;
+
+import common.ByteArrayUtils;
+import nme.utils.ByteArray;
+
 class WIP
 {
-	name = "";
-	data = null;
-	infos = null;
-	count = 0;
-	bpp = 0;
-	images = null;
-	memory_size = 0;
+	private var name:String;
+	private var data:ByteArray;
+	private var infos:Array<Int>;
+	private var count = 0;
+	private var bpp = 0;
+	private var images = [];
+	private var memory_size = 0;
 	
-	constructor(data, name)
+	public function new(data: ByteArray, name: String)
 	{
 		if (data == null) throw("Invalid WIP");
 		this.name = name;
@@ -36,27 +41,27 @@ class WIP
 	
 	function parse_header()
 	{
-		if (data.readstringz(4) != "WIPF") throw("Not a WIP File.");
-		count = data.readn('w');
-		bpp   = data.readn('w');
-		for (local n = 0; n < count; n++) infos.push(parse_entry());
+		if (ByteArrayUtils.readStringz(data, 4); != "WIPF") throw("Not a WIP File.");
+		count = data.readUnsignedShort();
+		bpp   = data.readUnsignedShort();
+		for (n in 0 ... count) infos.push(parse_entry());
 	}
 
 	function parse_entry()
 	{
 		return {
-			w     = data.readn('i'),
-			h     = data.readn('i'),
-			x     = data.readn('i'),
-			y     = data.readn('i'),
-			unk   = data.readn('i'),
-			csize = data.readn('i'),
+			w     = data.readUnsignedInt(),
+			h     = data.readUnsignedInt(),
+			x     = data.readUnsignedInt(),
+			y     = data.readUnsignedInt(),
+			unk   = data.readUnsignedInt(),
+			csize = data.readUnsignedInt(),
 		};
 	}
 	
 	function parse_image(info)
 	{
-		local pal = null;
+		var pal = null;
 		// has palette
 		if (bpp == 8) pal = data.readslice(4 * 0x100);
 		

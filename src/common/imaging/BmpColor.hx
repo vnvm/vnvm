@@ -1,4 +1,5 @@
 package common.imaging;
+import common.MathEx;
 
 /**
  * ...
@@ -57,6 +58,17 @@ class BmpColor
 		);
 	}
 	
+	static public function interpolate(left:BmpColor, right:BmpColor, step:Float):BmpColor {
+		var step_l = MathEx.clamp(step, 0, 1);
+		var step_r = 1.0 - step_l;
+		return new BmpColor(
+			(Std.int(left.r * step_l + right.r * step_r)) & 0xFF,
+			(Std.int(left.g * step_l + right.g * step_r)) & 0xFF,
+			(Std.int(left.b * step_l + right.b * step_r)) & 0xFF,
+			(Std.int(left.a * step_l + right.a * step_r)) & 0xFF
+		);
+	}
+	
 	static public function avg(left:BmpColor, right:BmpColor):BmpColor {
 		return new BmpColor(
 			((left.r + right.r) >> 1) & 0xFF,
@@ -66,21 +78,7 @@ class BmpColor
 		);
 	}
 	
-	static private function clamp(v:Int, min:Int, max:Int):Int {
-		if (v < min) return min;
-		if (v > max) return max;
-		return v;
-	}
-	
-	static private function clamp_0_255(v:Int):Int {
-		return clamp(v, 0, 255);
-	}
-	
 	public function new(r:Int, g:Int, b:Int, a:Int) {
-		//this.r = clamp_0_255(r);
-		//this.g = clamp_0_255(g);
-		//this.b = clamp_0_255(b);
-		//this.a = clamp_0_255(a);
 		this.r = r & 0xFF;
 		this.g = g & 0xFF;
 		this.b = b & 0xFF;
@@ -107,5 +105,9 @@ class BmpColor
 	
 	static public function fromARGB(v:Int):BmpColor {
 		return fromColors(v, 8, 16, 24, 0);
+	}
+	
+	public function toString():String {
+		return "BmpColor(" + r + "," + g + "," + b + "," + a + ")";
 	}
 }

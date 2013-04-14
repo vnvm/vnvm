@@ -383,31 +383,46 @@ class DAT_OP
 			case 0:
 				// SET_WORK_PALETTE_COLOR
 				game.workPalette.colors[index] = new BmpColor(r, g, b, 0xFF);
+				done();
 			case 1:
 				// APPLY_PALETTE
 				Palette.copy(game.workPalette, game.currentPalette);
 				game.updateImage();
+				done();
 			case 2:
 				// BACKUP_PALETTE
 				Palette.copy(game.workPalette, game.backupPalette);
+				done();
 			case 3:
 				// RESTORE_PALETTE
 				Palette.copy(game.backupPalette, game.workPalette);
+				done();
 			case 4:
 				// ANIMATE_PALETTE
-				Log.trace("Not implemented ANIMATE_PALETTE");
-				game.updateImage();
+				//for (n in 0 ... 256) {
+				//	Log.trace("Color[" + n + "]: " + game.backupPalette.colors[n] + ": " + game.workPalette.colors[n] + ": " + game.currentPalette.colors[n] + ": " + BmpColor.interpolate(game.backupPalette.colors[n], game.workPalette.colors[n], 0.5));
+				//	//game.currentPalette.colors[n] = game.workPalette.colors[n];
+				//	
+				//	this.game.layers[0].palette.colors[n] = BmpColor.interpolate(this.game.layers[0].palette.colors[n], new BmpColor(0, 0, 0, 255), 0.5);
+				//	//game.workPalette.colors[n] = BmpColor.interpolate(this.game.layers[0].palette.colors[n], new BmpColor(0, 0, 0, 255), 0.5);
+				//}
+				//Log.trace("Not implemented ANIMATE_PALETTE");
+				Animation.animate(function() {
+					done();
+				}, 1, { }, { }, Animation.Linear, function(step:Float) {
+					game.currentPalette.interpolate(game.workPalette, game.backupPalette, step);
+					game.updateImage();
+				});
 			case 5:
 				// COPY_PALETTE
 				Palette.copy(game.lastLoadedPalette, game.workPalette);
+				done();
 			case 6:
 				// FADE_PALETTE
 				throw(new Error("FADE_PALETTE"));
 			default:
 				throw(new Error("PALETTE_ACTION"));
 		}
-		
-		Timer.delay(done, 0);
 	}
 	
 	/**

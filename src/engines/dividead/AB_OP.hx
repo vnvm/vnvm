@@ -331,34 +331,54 @@ class AB_OP
 	@Unimplemented
 	public function CHARA2(done:Void -> Void, name1:String, name2:String):Void
 	{
-		/*
-		local image1 = get_image(name1), image2 = get_image(name2);
-		image1.draw(::screen, 640 * 1 / 3 - image1.w / 2, 385 - image1.h);
-		image2.draw(::screen, 640 * 2 / 3 - image2.w / 2, 385 - image2.h);
-		*/
-		done();
+		var bitmapData1:BitmapData;
+		var bitmapData2:BitmapData;
+		
+		var name1Color = name1;
+		var name1Mask = name1.split('_')[0] + '_0' ;
+		
+		var name2Color = name2;
+		var name2Mask = name2.split('_')[0] + '_0' ;
+
+		game.getImageMaskCachedAsync(name1Color, name1Mask, function(bitmapData1:BitmapData):Void {
+		game.getImageMaskCachedAsync(name2Color, name2Mask, function(bitmapData2:BitmapData):Void {
+			var matrix:Matrix;
+			matrix = new Matrix();
+			matrix.translate(Std.int(640 * 1 / 3 - bitmapData1.width / 2), Std.int(385 - bitmapData1.height));
+			game.back.draw(bitmapData1, matrix);
+
+			matrix = new Matrix();
+			matrix.translate(Std.int(640 * 2 / 3 - bitmapData2.width / 2), Std.int(385 - bitmapData2.height));
+			game.back.draw(bitmapData2, matrix);
+
+			done();
+		});
+		});
 	}
 
 	// ----------------------
 	//  IMAGE/EFFECT RELATED
 	// ----------------------
 
-	@Opcode({ id:0x4D, format:"", description:"Performs an animation with the current background (ABCDEF)" })
+	@Opcode({ id:0x4D, format:"<", description:"Performs an animation with the current background (ABCDEF)" })
 	@Unimplemented
-	public function ANIMATION()
+	public function ANIMATION(done:Void -> Void, type:Int)
 	{
+		done();
 	}
 
-	@Opcode({ id:0x4E, format:"", description:"Makes an scroll to the bottom with the current image" })
+	@Opcode({ id:0x4E, format:"<", description:"Makes an scroll to the bottom with the current image" })
 	@Unimplemented
-	public function SCROLL_DOWN()
+	public function SCROLL_DOWN(done:Void -> Void, type:Int)
 	{
+		done();
 	}
 
-	@Opcode({ id:0x4F, format:"", description:"Makes an scroll to the top with the current image" })
+	@Opcode({ id:0x4F, format:"<", description:"Makes an scroll to the top with the current image" })
 	@Unimplemented
-	public function SCROLL_UP()
+	public function SCROLL_UP(done:Void -> Void, type:Int)
 	{
+		done();
 	}
 
 	// ----------------------

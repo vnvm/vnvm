@@ -30,6 +30,12 @@ class Palette
 		return true;
 	}
 
+	public function interpolate(left:Palette, right:Palette, step:Float):Void {
+		for (n in 0 ... Std.int(Math.min(this.colors.length, Math.min(left.colors.length, right.colors.length)))) {
+			this.colors[n] = BmpColor.interpolate(left.colors[n], right.colors[n], step);
+		}
+	}
+
 	static public function copy(src:Palette, dst:Palette):Void {
 		for (n in 0 ... Std.int(Math.min(src.colors.length, dst.colors.length))) {
 			dst.colors[n] = src.colors[n];

@@ -53,6 +53,10 @@ class BitmapData8 {
 	}
 
 	@:noStack public function drawToBitmapData(bmp:BitmapData, rect:Rectangle):Void {
+		this.drawToBitmapDataWithPalette(bmp, this.palette, rect);
+	}
+
+	@:noStack public function drawToBitmapDataWithPalette(bmp:BitmapData, palette:Palette, rect:Rectangle):Void {
 		var rectX:Int = Std.int(rect.x);
 		var rectY:Int = Std.int(rect.y);
 		var rectW:Int = Std.int(rect.width);

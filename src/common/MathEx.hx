@@ -25,6 +25,12 @@ class MathEx
 		return v;
 	}
 
+	static public function clampInt(v:Int, min:Int, max:Int):Int {
+		if (v < min) return min;
+		if (v > max) return max;
+		return v;
+	}
+
 	static public function interpolate(v:Float, aMin:Float, aMax:Float, bMin:Float, bMax:Float):Float {
 		var aDist:Float = aMax - aMin;
 		var bDist:Float = bMax - bMin;
@@ -33,11 +39,7 @@ class MathEx
 		return (v0 * bDist) + bMin;
 	}
 
-	#if cpp
-	@:functionCode("
-		return numerator / denominator;
-	")
-	#end
+	#if cpp @:functionCode("return numerator / denominator;") #end
 	static inline public function int_div(numerator:Int, denominator:Int):Int {
 		return Std.int(numerator / denominator);
 	}

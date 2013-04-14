@@ -1,10 +1,12 @@
+package engines.will.formats;
+
 class ARC
 {
-	path = null;
-	file = null;
-	types = null;
-	
-	constructor(path)
+	var path = null;
+	var file = null;
+	var types = null;
+
+	public function new(path)
 	{
 		this.path = path;
 		::printf("ARC: '%s'\n", path);
@@ -12,17 +14,17 @@ class ARC
 		parse();
 	}
 	
-	function parse()
+	public function parse()
 	{
-		local types_count;
-		local type_list = [];
-		local type_name, type_start, type_count;
+		var types_count;
+		var type_list = [];
+		var type_name, type_start, type_count;
 
 		file.seek(0);
 		
 		types_count = file.readn('i');
 		
-		for (local n = 0; n < types_count; n++)
+		for (n in 0 ... types_count)
 		{
 			type_name  = file.readstringz(4);
 			type_count = file.readn('i');
@@ -35,7 +37,7 @@ class ARC
 		
 		types = {};
 
-		foreach (type in type_list)
+		for (type in type_list)
 		{
 			type_name  = type[0];
 			type_count = type[1];

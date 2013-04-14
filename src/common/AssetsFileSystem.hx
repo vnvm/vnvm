@@ -44,7 +44,8 @@ class AssetsFileSystem
 class AssetsFileSystem 
 {
 	static public function getAssetsLocalPath():String {
-		return "assets";
+		//return "assets";
+		return "../../../assets";
 	}
 
 	static public function getAssetsFileSystem():VirtualFileSystem {

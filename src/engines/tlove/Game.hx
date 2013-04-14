@@ -126,11 +126,11 @@ class Game
 	
 	public function updateImage(?rect:Rectangle):Void {
 		if (rect == null) rect = this.layers[0].rect;
-		if (!Palette.equals(this.layers[0].palette, _lastUpdatedPalette)) {
+		if (!Palette.equals(currentPalette, _lastUpdatedPalette)) {
 			rect = this.layers[0].rect;
 		}
-		this.layers[0].drawToBitmapData(updatedBitmap, rect);
-		Palette.copy(this.layers[0].palette, _lastUpdatedPalette);
+		this.layers[0].drawToBitmapDataWithPalette(updatedBitmap, currentPalette, rect);
+		Palette.copy(currentPalette, _lastUpdatedPalette);
 	}
 	
 	public function getMrsAsync(name:String, done:MRS -> Void):Void {

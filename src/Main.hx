@@ -71,6 +71,8 @@ class Main extends Sprite
 			case "dividead": addChild(new engines.dividead.EngineMain(fs, scriptName, scriptPos));
 			case "brave": addChild(new engines.brave.EngineMain(fs, scriptName));
 			case "edelweiss": addChild(new engines.ethornell.EngineMain(fs, scriptName));
+			case "yume":
+			case "pw": addChild(new engines.will.EngineMain(fs, name, scriptName));
 			default: throw(new Error(Std.format("Invalid engine '$name'")));
 		}
 	}
