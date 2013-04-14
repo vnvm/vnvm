@@ -19,6 +19,7 @@ import nme.utils.ByteArray;
 
 class AB
 {
+	public var scriptName:String;
 	public var abOp:AB_OP;
 	public var game:Game;
 	private var script:ByteArray = null;
@@ -35,6 +36,7 @@ class AB
 	
 	public function loadScriptAsync(scriptName:String, scriptPos:Int = 0, done:Void -> Void):Void {
 		game.sg.openAndReadAllAsync(Std.format("${scriptName}.ab"), function(script:ByteArray):Void {
+			this.scriptName = scriptName;
 			this.script = script;
 			this.script.position = scriptPos;
 			done();
@@ -72,7 +74,7 @@ class AB
 		
 		var params:Array<Dynamic> = parseParams(continueCallback, opcode.format);
 		var isAsync:Bool = (opcode.format.indexOf("<") != -1);
-		var instruction:Instruction = new Instruction(opcode, params, isAsync, opcodePosition, script.position - opcodePosition);
+		var instruction:Instruction = new Instruction(scriptName, opcode, params, isAsync, opcodePosition, script.position - opcodePosition);
 		instruction.call(this.abOp);
 		return isAsync;
 	}

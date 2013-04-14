@@ -67,7 +67,7 @@ class Main extends Sprite
 	private function loadEngine(name:String, ?scriptName:String, ?scriptPos:Int):Void
 	{
 		switch (name) {
-			case "tlove": addChild(new engines.tlove.EngineMain(fs, scriptName));
+			case "tlove": addChild(new engines.tlove.EngineMain(fs, scriptName, scriptPos));
 			case "dividead": addChild(new engines.dividead.EngineMain(fs, scriptName, scriptPos));
 			case "brave": addChild(new engines.brave.EngineMain(fs, scriptName));
 			case "edelweiss": addChild(new engines.ethornell.EngineMain(fs, scriptName));

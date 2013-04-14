@@ -32,6 +32,22 @@ class BitmapData8 {
 		this.rect = new Rectangle(0, 0, width, height);
 	}
 	
+	static public function createWithBitmapData(bitmapData32:BitmapData):BitmapData8 {
+		var bitmapData8:BitmapData8 = createNewWithSize(bitmapData32.width, bitmapData32.height);
+		bitmapData8.palette.colors[0] = new BmpColor(0xFF, 0xFF, 0xFF, 0x00);
+		bitmapData8.palette.colors[1] = new BmpColor(0xFF, 0xFF, 0xFF, 0xFF);
+		for (y in 0 ... bitmapData32.height) {
+			for (x in 0 ... bitmapData32.width) {
+				if (bitmapData32.getPixel32(x, y) != 0) {
+					bitmapData8.setPixel(x, y, 0);
+				} else {
+					bitmapData8.setPixel(x, y, 1);
+				}
+			}
+		}
+		return bitmapData8;
+	}
+	
 	static public function createNewWithSize(width:Int, height:Int):BitmapData8 {
 		var bitmapData:BitmapData8 = new BitmapData8(width, height);
 		bitmapData.palette = new Palette();
@@ -116,6 +132,11 @@ class BitmapData8 {
 		var rectY:Int = Std.int(rect.y);
 		var rectW:Int = Std.int(rect.width);
 		var rectH:Int = Std.int(rect.height);
+		rectX = MathEx.clampInt(rectX, 0, this.width - 1);
+		rectY = MathEx.clampInt(rectY, 0, this.height - 1);
+
+		rectW = MathEx.clampInt(rectW, 0, this.width - 1 - rectX);
+		rectH = MathEx.clampInt(rectH, 0, this.height - 1 - rectY);
 
 		var color1:Int = color & 0xFF;
 		var color2:Int = (color1 << 0) | (color1 << 8);
@@ -129,6 +150,7 @@ class BitmapData8 {
 			for (x in 0 ... rectDiv4) { Memory.setI32(n, color4); n += 4; }
 			for (x in 0 ... rectMod4) { Memory.setByte(n, color1); n++; }
 		}
+		Memory.select(null);
 	}
 	
 	public function inBounds(x:Int, y:Int):Bool {

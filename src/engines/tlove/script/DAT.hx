@@ -9,7 +9,34 @@ import nme.errors.Error;
 import nme.utils.ByteArray;
 import nme.utils.Endian;
 
-typedef StackItem = { script:String, position:Int };
+class StackItem
+{
+	public var script:String;
+	public var position:Int;
+	
+	public function new (script:String, position:Int) {
+		this.script = script;
+		this.position = position;
+	}
+}
+
+class CallStack 
+{
+	public var jumps:Array<StackItem> ;
+	
+	public function new() {
+		jumps = [];
+	}
+}
+
+class ScriptStack
+{
+	public var calls:Array<CallStack>;
+
+	public function new() {
+		calls = [];
+	}
+}
 
 class DAT
 {
@@ -18,21 +45,25 @@ class DAT
 	public var script:ByteArray;
 	public var datOp:DAT_OP;
 	public var labels:Array<Int>;
-	public var callStack:Array<StackItem>;
+	public var callStack:CallStack;
+	public var scriptStack:ScriptStack;
 	
 	public function new(game:Game)
 	{
 		this.game = game;
 		this.datOp = new DAT_OP(this);
 		this.script = ByteArrayUtils.newByteArray(Endian.BIG_ENDIAN);
-		this.callStack = [];
+		this.callStack = new CallStack();
+		this.scriptStack = new ScriptStack();
 	}
 	
 	public function loadAsync(name:String, done:Void -> Void):Void {
 		var data:ByteArray;
 		game.date.getBytesAsync(Std.format("$name.DAT"), function(data:ByteArray):Void {
+			data.position = 0;
 			this.scriptName = name;
 			data.endian = Endian.BIG_ENDIAN;
+			
 			var scriptStart:Int = data.readUnsignedShort();
 			var labelCount:Int = Std.int((scriptStart - 2) / 2);
 			
@@ -40,8 +71,9 @@ class DAT
 			for (n in 0 ... labelCount) this.labels.push(data.readUnsignedShort());
 
 			data.position = scriptStart;
-			this.script = ByteArrayUtils.readByteArray(data, data.length - scriptStart);
+			this.script = ByteArrayUtils.readByteArray(data, data.bytesAvailable);
 			this.script.endian = Endian.BIG_ENDIAN;
+			this.script.position = 0;
 			
 			done();
 		});
@@ -49,18 +81,44 @@ class DAT
 
 	public function callLabel(label:Int):Void
 	{
-		callStack.push({ script: scriptName, position : script.position });
+		callStack.jumps.push(new StackItem(scriptName, script.position));
 		jumpLabel(label);
 	}
 	
 	public function returnLabel():Void {
-		var item:StackItem = callStack.pop();
+		var item:StackItem = callStack.jumps.pop();
 		script.position = item.position;
 	}
-	
-	public function jumpLabel(label)
+
+	public function callScriptAsync(name:String, label:Int, done:Void -> Void):Void
 	{
-		script.position = labels[label];
+		callStack.jumps.push(new StackItem(scriptName, script.position));
+		scriptStack.calls.push(callStack);
+		callStack = new CallStack();
+		loadAsync(name, function():Void {
+			if (label >= 0) jumpLabel(label);
+			done();
+		});
+	}
+
+	public function returnScriptAsync(done:Void -> Void):Void {
+		callStack = scriptStack.calls.pop();
+		var item:StackItem = callStack.jumps.pop();
+
+		loadAsync(item.script, function():Void {
+			script.position = item.position;
+			done();
+		});
+	}
+
+	public function jumpRawAddress(address:Int)
+	{
+		script.position = address;
+	}
+
+	public function jumpLabel(label:Int)
+	{
+		jumpRawAddress(labels[label]);
 	}
 
 	public function set_script(name:String)
@@ -112,10 +170,11 @@ class DAT
 			instructionDataLength = newByte | ((instructionDataLength & 0x7F) << 8);
 		}
 		var params:ByteArray = ByteArrayUtils.readByteArray(script, instructionDataLength);
+		params.endian = Endian.BIG_ENDIAN;
 		var opcode:Opcode = game.scriptOpcodes.getOpcodeWithId(opcodeId);
 		var parameters:Array<Dynamic> = readParameters(params, opcode, done);
 		var async:Bool = (opcode.format.indexOf('<') >= 0);
-		return new Instruction(opcode, parameters, async, instructionPosition, params.length + 1);
+		return new Instruction(scriptName, opcode, parameters, async, instructionPosition, params.length + 1);
 	}
 	
 	private function readParameters(paramsByteArray:ByteArray, opcode:Opcode, done:Void -> Void):Array<Dynamic>
@@ -133,7 +192,7 @@ class DAT
 				case '<': params.push(done);
 				case 'b': params.push(paramsByteArray.readUnsignedByte() != 0);
 				case '1': params.push(paramsByteArray.readUnsignedByte());
-				case '2': params.push((paramsByteArray.readUnsignedByte() << 8) | paramsByteArray.readUnsignedByte());
+				case '2': params.push(paramsByteArray.readUnsignedShort());
 				case 's': params.push(ByteArrayUtils.readStringz(paramsByteArray));
 				case '?': params.push(paramsByteArray);
 				default: throw(new Error(Std.format("Invalid format type '$type'")));

@@ -22,6 +22,9 @@ import nme.events.MouseEvent;
 import nme.geom.Point;
 import nme.geom.Rectangle;
 import nme.media.SoundChannel;
+import nme.text.TextField;
+import nme.text.TextFieldAutoSize;
+import nme.text.TextFormat;
 import nme.utils.ByteArray;
 
 /**
@@ -62,7 +65,7 @@ class Game
 	public var mouseRects:Array<Dynamic>;
 	public var mouseSelectedRect:Dynamic;
 	public var lastMouseEvent:MouseEvent;
-
+	
 	private function new() 
 	{
 		this.mouseRects = [];
@@ -125,12 +128,15 @@ class Game
 	}
 	
 	public function updateImage(?rect:Rectangle):Void {
+		//var renderPalette = currentPalette;
+		var renderPalette = workPalette;
+		
 		if (rect == null) rect = this.layers[0].rect;
-		if (!Palette.equals(currentPalette, _lastUpdatedPalette)) {
+		if (!Palette.equals(renderPalette, _lastUpdatedPalette)) {
 			rect = this.layers[0].rect;
 		}
-		this.layers[0].drawToBitmapDataWithPalette(updatedBitmap, currentPalette, rect);
-		Palette.copy(currentPalette, _lastUpdatedPalette);
+		this.layers[0].drawToBitmapDataWithPalette(updatedBitmap, renderPalette, rect);
+		Palette.copy(renderPalette, _lastUpdatedPalette);
 	}
 	
 	public function getMrsAsync(name:String, done:MRS -> Void):Void {
@@ -140,12 +146,13 @@ class Game
 		});
 	}
 	
-	public function run(script:String):Void {
+	public function run(script:String, scriptPos:Int = 0):Void {
 		if (script == null) script = "MAIN";
 		Log.trace('run');
 		
 		dat.loadAsync(script, function() {
 			Log.trace('loaded : ' + script);
+			dat.jumpRawAddress(scriptPos);
 			dat.execute();
 		});
 	}
@@ -154,7 +161,45 @@ class Game
 		//Timer.delay(done, Std.int(timeInFrames * 1000 / Game.fps));
 		Timer.delay(done, Std.int(timeInFrames * 10));
 	}
+
+	public function putText(x:Int, y:Int, text: String) {
+		//Log.trace("printText: '" + text + "'");
+		var tf:TextField = new TextField();
+		tf.autoSize = TextFieldAutoSize.LEFT;
+		//tf.textColor = 0xFFFFFFFF;
+		tf.border = false;
+		//tf.condenseWhite = false;
+		tf.defaultTextFormat = new TextFormat("Lucida Console", 12, 0xFFFFFFFF, false, false, false);
+		tf.text = text;
+		
+		var testBitmap:BitmapData = new BitmapData(Std.int(tf.textWidth) + 2, Std.int(tf.textHeight) + 2, true, 0x00000000);
+		//uiSprite.addChild(new Bitmap(testBitmap));
+		testBitmap.draw(tf);
+		var bmp:BitmapData8 = BitmapData8.createWithBitmapData(testBitmap);
+		bmp.drawToBitmapData8(this.layers[0], x, y);
+		updateImage(new Rectangle(x, y, testBitmap.width, testBitmap.height));
+	}
+
+	public function printText(text: String) {
+		Log.trace("printText: '" + text + "'");
+	}
 	
+	public function clearText() {
+		Log.trace("clearText");
+	}
+
+	public function breakText() {
+		Log.trace("breakText");
+	}
+
+	public function pushButton() {
+		Log.trace("pushButton");
+	}
+	
+	public function outputName(nameIndex:Int) {
+		Log.trace("outputName:" + nameIndex);
+	}
+
 	static public function initFromFileSystemAsync(fs:VirtualFileSystem, done:Game -> Void):Void {
 		var game:Game = new Game();
 		

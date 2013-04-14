@@ -35,6 +35,12 @@ class Palette
 			this.colors[n] = BmpColor.interpolate(left.colors[n], right.colors[n], step);
 		}
 	}
+	
+	public function clone():Palette {
+		var that = new Palette();
+		copy(this, that);
+		return that;
+	}
 
 	static public function copy(src:Palette, dst:Palette):Void {
 		for (n in 0 ... Std.int(Math.min(src.colors.length, dst.colors.length))) {

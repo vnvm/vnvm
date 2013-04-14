@@ -44,7 +44,7 @@ class ScriptReader
 		var parameters:Array<Dynamic> = readFormat(opcode.format, scriptThread);
 		var async:Bool = (opcode.format.indexOf("<") != -1);
 		position = script.data.position;
-		return new Instruction(opcode, parameters, async, opcodePosition, opcodePosition - position);
+		return new Instruction(script.name, opcode, parameters, async, opcodePosition, opcodePosition - position);
 	}
 	
 	private function readFormat(format:String, scriptThread:IScriptThread):Array<Dynamic> {
