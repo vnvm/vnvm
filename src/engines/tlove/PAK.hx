@@ -1,8 +1,8 @@
 package engines.tlove;
 
 import common.ByteArrayUtils;
-import common.io.SliceStream;
-import common.io.Stream;
+import vfs.SliceStream;
+import vfs.Stream;
 import nme.errors.Error;
 import nme.utils.ByteArray;
 

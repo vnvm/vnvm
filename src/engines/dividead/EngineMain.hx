@@ -1,8 +1,8 @@
 package engines.dividead;
 import common.AssetsFileSystem;
 import common.GameScalerSprite;
-import common.io.SubVirtualFileSystem;
-import common.io.VirtualFileSystem;
+import vfs.SubVirtualFileSystem;
+import vfs.VirtualFileSystem;
 import common.StringEx;
 import nme.display.Bitmap;
 import nme.display.Sprite;

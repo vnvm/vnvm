@@ -2,10 +2,10 @@ package engines.brave;
 
 import common.AssetsFileSystem;
 import common.ByteUtils;
-import common.io.FileStream;
-import common.io.HttpFileSystem;
-import common.io.Stream;
-import common.io.VirtualFileSystem;
+import vfs.FileStream;
+import vfs.HttpFileSystem;
+import vfs.Stream;
+import vfs.VirtualFileSystem;
 import engines.brave.cgdb.CgDb;
 import engines.brave.cgdb.CgDbEntry;
 import engines.brave.formats.BraveImage;

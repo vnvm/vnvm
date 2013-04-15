@@ -1,8 +1,8 @@
 package engines.tlove;
 import common.GameScalerSprite;
-import common.io.Stream;
-import common.io.SubVirtualFileSystem;
-import common.io.VirtualFileSystem;
+import vfs.Stream;
+import vfs.SubVirtualFileSystem;
+import vfs.VirtualFileSystem;
 import engines.tlove.mrs.MRS;
 import nme.display.Bitmap;
 import nme.display.PixelSnapping;

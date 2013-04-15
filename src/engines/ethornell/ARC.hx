@@ -1,7 +1,7 @@
 package engines.ethornell;
-import common.io.SliceStream;
-import common.io.Stream;
-import common.io.VirtualFileSystem;
+import vfs.SliceStream;
+import vfs.Stream;
+import vfs.VirtualFileSystem;
 import common.StringEx;
 import engines.brave.cgdb.CgDbEntry;
 import nme.errors.Error;

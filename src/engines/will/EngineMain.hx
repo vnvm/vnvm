@@ -1,9 +1,9 @@
 package engines.will;
 
 import common.BitmapDataUtils;
-import common.io.SubVirtualFileSystem;
-import common.io.VirtualFileSystem;
-import common.io.VirtualFileSystemBase;
+import vfs.SubVirtualFileSystem;
+import vfs.VirtualFileSystem;
+import vfs.VirtualFileSystemBase;
 import nme.display.Bitmap;
 import nme.display.Sprite;
 import nme.utils.ByteArray;

@@ -493,9 +493,9 @@ class DAT_OP
 	 * @param	c
 	 */
 	@Opcode({ id:0x41, format:"221", description:"???" })
-	@Unimplemented
-	function JUMP_IF_FLAG(flagIndex, mask, label) {
-		if ((state.getFlag(0, flagIndex) & mask) != 0) {
+	//@Unimplemented
+	function JUMP_IF_FLAG(flagIndex:Int, mask:Int, label:Int) {
+		if ((state.getNormalFlag(flagIndex) & mask) != 0) {
 			dat.jumpLabel(label);
 		}
 	}
@@ -612,13 +612,13 @@ class DAT_OP
 	 * @param	a
 	 * @param	b
 	 */
-	@Opcode( { id:0x4C, format:"21", description:"???" } )
+	@Opcode( { id:0x4C, format:"11", description:"???" } )
 	//@Unimplemented
 	function ADD_OR_RESET_LSW(varIndex:Int, value:Int) {
         if (value == 0) {
 			state.setLSW(varIndex, 0);
         } else {
-			state.setLSW(varIndex, state.getLSW(value));
+			state.setLSW(varIndex, state.getLSW(varIndex) + value);
         }
 	}
 	
@@ -629,7 +629,8 @@ class DAT_OP
 	 */
 	@Opcode( { id:0x4D, format:"11", description:"???" } )
 	@Unimplemented
-	function SET_SET(a:Int, b:Int):Void {
+	function SET_SET(index:Int, value:Int):Void {
+		state.setSettings(index, value);
 	}
 
 	/**

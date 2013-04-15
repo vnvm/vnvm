@@ -1,8 +1,8 @@
 package engines.dividead;
 
-import common.io.SliceStream;
-import common.io.Stream;
-import common.io.VirtualFileSystem;
+import vfs.SliceStream;
+import vfs.Stream;
+import vfs.VirtualFileSystem;
 import haxe.Log;
 import nme.utils.ByteArray;
 

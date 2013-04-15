@@ -2,8 +2,8 @@ package engines.brave;
 
 import common.GameScalerSprite;
 import common.GraphicUtils;
-import common.io.SubVirtualFileSystem;
-import common.io.VirtualFileSystem;
+import vfs.SubVirtualFileSystem;
+import vfs.VirtualFileSystem;
 import engines.brave.BraveAssets;
 import engines.brave.formats.BraveImage;
 import common.GameInput;

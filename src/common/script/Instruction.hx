@@ -28,6 +28,8 @@ class Instruction {
 	public function call(object:Dynamic):Dynamic {
 		if (opcode.unimplemented) {
 			Log.trace(Std.format("Unimplemented: $this"));
+		} else if (opcode.untested) {
+			Log.trace(Std.format("Untested... $this"));
 		} else {
 			Log.trace(Std.format("Executing... $this"));
 		}

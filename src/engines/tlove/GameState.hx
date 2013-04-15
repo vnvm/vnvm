@@ -18,6 +18,7 @@ class GameState
 	private var menuFlags:Array<Int>;
 	private var LSB:Array<Int>;
 	private var LSW:Array<Int>;
+	private var settings:Array<Int>;
 	private var names:Array<String>;
 
 	public function new() {
@@ -26,6 +27,7 @@ class GameState
 		this.menuFlags = LangUtils.createArray(function() { return 0x00; }, 0x100);
 		this.LSB = LangUtils.createArray(function() { return 0; }, 0x8000);
 		this.LSW = LangUtils.createArray(function() { return 0; }, 0x8000);
+		this.settings = LangUtils.createArray(function() { return 0; }, 0x100);
 		this.names = LangUtils.createArray(function() { return ""; }, 0x100);
 		this.textRectangle = new Rectangle(0, 0, 640, 480);
 	}
@@ -38,6 +40,10 @@ class GameState
 	//(this.globalVar.settings, 'SETTINGS');
 	//(this.localVar.seq, 'CHAINS');
 	//(this.globalVar.calls, 'CALLS')
+	
+	public function setSettings(index:Int, value:Int) {
+		this.settings[index] = value & 0xFF;
+	}
 
 	public function getBitSet(flagType:Int, flagNum:Int):Bool {
 		if (flagType == 0) return getNormalFlagBit(flagNum);

@@ -22,6 +22,7 @@
 
 	<haxelib name="nme" />
 	<haxelib name="format" />
+	<haxelib name="nme-vfs" />
 	
 	<!-- TEST Libraries -->
 	<haxelib name="munit" />

@@ -1,7 +1,7 @@
 package engines.brave.sound;
 //import haxe.io.Input;
 import common.ByteArrayUtils;
-import common.io.Stream;
+import vfs.Stream;
 import haxe.Log;
 import nme.errors.Error;
 import nme.media.Sound;

@@ -1,7 +1,7 @@
 package ;
 import common.AssetsFileSystem;
 import common.GameInput;
-import common.io.VirtualFileSystem;
+import vfs.VirtualFileSystem;
 import common.StringEx;
 import nme.display.Sprite;
 import nme.display.Stage;

@@ -1,12 +1,12 @@
 package common;
-import common.io.HttpFileSystem;
-import common.io.VirtualFileSystem;
+import vfs.HttpFileSystem;
+import vfs.VirtualFileSystem;
 import haxe.Log;
 import nme.errors.Error;
 
 #if (cpp || neko)
 import sys.FileSystem;
-import common.io.LocalFileSystem;
+import vfs.LocalFileSystem;
 
 /**
  * ...
