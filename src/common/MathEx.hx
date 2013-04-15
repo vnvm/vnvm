@@ -31,6 +31,10 @@ class MathEx
 		return v;
 	}
 
+	static public function randomInt(min:Int, max:Int):Int {
+		return Std.int((Math.random() * (max - min)) + min);
+	}
+
 	static public function interpolate(v:Float, aMin:Float, aMax:Float, bMin:Float, bMax:Float):Float {
 		var aDist:Float = aMax - aMin;
 		var bDist:Float = bMax - bMin;

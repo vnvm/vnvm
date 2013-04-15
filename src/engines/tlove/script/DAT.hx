@@ -29,14 +29,14 @@ class CallStack
 	}
 }
 
-class ScriptStack
-{
-	public var calls:Array<CallStack>;
-
-	public function new() {
-		calls = [];
-	}
-}
+//class ScriptStack
+//{
+//	public var calls:Array<CallStack>;
+//
+//	public function new() {
+//		calls = [];
+//	}
+//}
 
 class DAT
 {
@@ -46,7 +46,7 @@ class DAT
 	public var datOp:DAT_OP;
 	public var labels:Array<Int>;
 	public var callStack:CallStack;
-	public var scriptStack:ScriptStack;
+	//public var scriptStack:ScriptStack;
 	
 	public function new(game:Game)
 	{
@@ -54,7 +54,7 @@ class DAT
 		this.datOp = new DAT_OP(this);
 		this.script = ByteArrayUtils.newByteArray(Endian.BIG_ENDIAN);
 		this.callStack = new CallStack();
-		this.scriptStack = new ScriptStack();
+		//this.scriptStack = new ScriptStack();
 	}
 	
 	public function loadAsync(name:String, done:Void -> Void):Void {
@@ -93,8 +93,8 @@ class DAT
 	public function callScriptAsync(name:String, label:Int, done:Void -> Void):Void
 	{
 		callStack.jumps.push(new StackItem(scriptName, script.position));
-		scriptStack.calls.push(callStack);
-		callStack = new CallStack();
+		//scriptStack.calls.push(callStack);
+		//callStack = new CallStack();
 		loadAsync(name, function():Void {
 			if (label >= 0) jumpLabel(label);
 			done();
@@ -102,8 +102,8 @@ class DAT
 	}
 
 	public function returnScriptAsync(done:Void -> Void):Void {
-		callStack = scriptStack.calls.pop();
 		var item:StackItem = callStack.jumps.pop();
+		callStack.jumps = [];
 
 		loadAsync(item.script, function():Void {
 			script.position = item.position;

@@ -5,6 +5,7 @@ import common.Event2;
 import common.imaging.BitmapData8;
 import common.imaging.BmpColor;
 import common.imaging.Palette;
+import common.MathEx;
 import common.PathUtils;
 import engines.tlove.Game;
 import engines.tlove.GameState;
@@ -28,8 +29,8 @@ class DAT_OP
 	var dat:DAT;
 	var game:Game;
 	var state:GameState;
-	var delayEnabled:Bool = false;
-	//var delayEnabled:Bool = true;
+	//var delayEnabled:Bool = false;
+	var delayEnabled:Bool = true;
 	
 	/**
 	 * 
@@ -176,11 +177,11 @@ class DAT_OP
 		{
 			if (game.lastMouseEvent.type == MouseEvent.CLICK)
 			{
-				//if (state.getFlag(flagType, flagIndex) != 0)
+				//if (state.getBitSet(flagType, flagIndex))
 				{
 					dat.jumpLabel(label);
 				}
-		}
+			}
 		}
 	}
 
@@ -480,7 +481,7 @@ class DAT_OP
 	@Opcode( { id:0x40, format:"112", description:"???" } )
 	@Unimplemented
 	function JUMP_IF_MENU_VAR(index:Int, value:Int, label:Int) {
-		if ((state.getMenuFlag(index) & value) != 0) {
+		if ((state.getMV(index) & value) != 0) {
 			dat.jumpLabel(label);
 		}
 	}
@@ -564,7 +565,7 @@ class DAT_OP
 	@Opcode({ id:0x48, format:"11", description:"???" })
 	@Unimplemented
 	function SET_MENU_VAR_BITS(index:Int, value:Int) {
-		state.setMenuFlag(index, state.getMenuFlag(index) | value);
+		state.setMV(index, state.getMV(index) | value);
 	}
 
 	/**
@@ -741,7 +742,9 @@ class DAT_OP
 	@Opcode({ id:0x70, format:"?", description:"Put text (dialog)" })
 	@Unimplemented
 	function PUT_TEXT_DIALOG(text:ByteArray) {
-		processText(text);
+		var outText = getProcessText(text);
+		Log.trace(outText);
+		game.putTextRectangle(state.textRectangle, outText);
 		//for (n in 0 ... textBA.length) {
 		//	Log.trace(textBA[n]);
 		//}
@@ -767,36 +770,36 @@ class DAT_OP
 				switch (op) {
 					case 5, 7, 13:
 					case 0:
-						Log.trace("text_op:0");
+						//Log.trace("text_op:0");
 						text.readUnsignedByte();
 					case 1:
-						Log.trace("text_op:1");
+						//Log.trace("text_op:1");
 						text.readUnsignedByte();
 					case 2:
-						Log.trace("text_op:2");
+						//Log.trace("text_op:2");
 						// Push Buttom
 						text.readUnsignedByte();
 						//game.pushButton();
 						parts.push("<push_button>");
 					case 3:
-						Log.trace("text_op:3");
+						//Log.trace("text_op:3");
 						// Clear text
 						//game.clearText();
 						parts.push("<clear>");
 					case 4:
-						Log.trace("text_op:4");
+						//Log.trace("text_op:4");
 						// Output Name
 						//game.outputName(text.readUnsignedByte());
 						parts.push("<name:" + text.readUnsignedByte() + ">");
 					case 6:
-						Log.trace("text_op:6");
+						//Log.trace("text_op:6");
 						if (text.readUnsignedByte() == 13) {
 							parts.push("<break>");
 							//game.breakText();
 							// textBreak
 						}
 					case 10:
-						Log.trace("text_op:10");
+						//Log.trace("text_op:10");
 						var flagIndex = text.readUnsignedByte();
 						parts.push('' + state.getLSW(flagIndex));
 					case 12:
@@ -804,11 +807,12 @@ class DAT_OP
 						var charCode0:Int = state.getLSW(flagIndex);
 						var charCode:Int = charCode0;
 						if ((charCode & 0xFF00) == 0x2000) charCode &= 0xFF;
-						Log.trace("text_op:12## " + flagIndex + ":" + charCode0 + ":" + charCode);
+						//Log.trace("text_op:12## " + flagIndex + ":" + charCode0 + ":" + charCode);
 						parts.push(String.fromCharCode(charCode));
 					case 255:
-						Log.trace("text_op:255");
-						parts.push(ByteArrayUtils.readStringz(text));
+						var text = ByteArrayUtils.readStringz(text);
+						//Log.trace("text_op:255:'" + text + "'");
+						parts.push(text);
 					default:
 						throw(new Error("PUT_TEXT_DIALOG: " + op));
 				}
@@ -876,8 +880,13 @@ class DAT_OP
 	 */
 	@Opcode({ id:0x82, format:"22221", description:"????" })
 	@Unimplemented
-	function SET_TEXT_WINDOW_RECTANGLE(x1:Int, y1:Int, x2:Int, y2:Int, _unk:Int):Void {
-		var rect:Rectangle = new Rectangle(x1, y1, x2 - x1, y2 - y1);
+	function SET_TEXT_WINDOW_RECTANGLE(x:Int, y:Int, width:Int, height:Int, _unk:Int):Void {
+		x = state.getVal(x) + 8;
+		y = state.getVal(y) + 8;
+		width = state.getVal(width) - 16;
+		height = state.getVal(height) - 16;
+		var rect:Rectangle = new Rectangle(x, y, width, height);
+		state.textRectangle = rect;
 		Log.trace("SET_TEXT_WINDOW_RECTANGLE: " + rect);
 		//throw(new Error("SET_TEXT_WINDOW_RECTANGLE"));
 	}
@@ -982,10 +991,14 @@ class DAT_OP
 	/**
 	 * 
 	 */
-	@Opcode({ id:0x94, format:"", description:"???" })
+	@Opcode({ id:0x94, format:"111", description:"???" })
 	@Unimplemented
-	function SET_LS_RAND():Void {
-		throw(new Error("SET_LS_RAND"));
+	function SET_LS_RAND(type:Int, index:Int, maxValue:Int):Void {
+		if (type > 0) {
+			state.setLSW(index, MathEx.randomInt(0, maxValue));
+		} else {
+			state.setLSB(index, MathEx.randomInt(0, maxValue));
+		}
 	}
 
 	/**
@@ -1017,12 +1030,12 @@ class DAT_OP
 			var op:Int = params.readUnsignedByte();
 			if (op == 4) break;
 			var value:Int = params.readUnsignedShort();
-			Log.trace("[1]:" + value);
+			//Log.trace("[1]:" + value);
 			if (op == 8) {
 				op = 0;
 			} else {
 				value = state.getValR(value);
-				Log.trace("[2]:" + value);
+				//Log.trace("[2]:" + value);
 			}
 
 			if ((params[params.position] & 2) != 0) {
@@ -1045,7 +1058,7 @@ class DAT_OP
 				}
 			}
 		}
-		Log.trace("FLAG_SET:" + flag + " :: " + edi + ", " + ebp + ": " + (edi + ebp));
+		//Log.trace("FLAG_SET:" + flag + " :: " + edi + ", " + ebp + ": " + (edi + ebp));
 		state.setLSW(flag, ebp + edi);
 	}
 

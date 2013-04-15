@@ -22,6 +22,7 @@ import nme.events.MouseEvent;
 import nme.geom.Point;
 import nme.geom.Rectangle;
 import nme.media.SoundChannel;
+import nme.text.AntiAliasType;
 import nme.text.TextField;
 import nme.text.TextFieldAutoSize;
 import nme.text.TextFormat;
@@ -162,22 +163,32 @@ class Game
 		Timer.delay(done, Std.int(timeInFrames * 10));
 	}
 
-	public function putText(x:Int, y:Int, text: String) {
+	public function putTextRectangle(rect:Rectangle, text: String) {
 		//Log.trace("printText: '" + text + "'");
 		var tf:TextField = new TextField();
-		tf.autoSize = TextFieldAutoSize.LEFT;
+		tf.autoSize = ((rect.width == 0) || (rect.height == 0)) ? TextFieldAutoSize.LEFT : TextFieldAutoSize.NONE;
+		tf.antiAliasType = AntiAliasType.NORMAL;
+		//tf.sharpness = 0;
+		tf.wordWrap = ((rect.width != 0) && (rect.height != 0));
+		tf.width = rect.width;
+		tf.height = rect.height;
 		//tf.textColor = 0xFFFFFFFF;
 		tf.border = false;
 		//tf.condenseWhite = false;
 		tf.defaultTextFormat = new TextFormat("Lucida Console", 12, 0xFFFFFFFF, false, false, false);
 		tf.text = text;
 		
-		var testBitmap:BitmapData = new BitmapData(Std.int(tf.textWidth) + 2, Std.int(tf.textHeight) + 2, true, 0x00000000);
+		Log.trace("putTextRectangle(" + rect.x + "," + rect.y + "," + rect.width + "," + rect.height + ")-(" + tf.width + "," + tf.height + ")");
+		var testBitmap:BitmapData = new BitmapData(Std.int(tf.width), Std.int(tf.height), true, 0x00000000);
 		//uiSprite.addChild(new Bitmap(testBitmap));
 		testBitmap.draw(tf);
 		var bmp:BitmapData8 = BitmapData8.createWithBitmapData(testBitmap);
-		bmp.drawToBitmapData8(this.layers[0], x, y);
-		updateImage(new Rectangle(x, y, testBitmap.width, testBitmap.height));
+		bmp.drawToBitmapData8(this.layers[0], cast rect.x, cast rect.y);
+		updateImage(new Rectangle(rect.x, rect.y, testBitmap.width, testBitmap.height));
+	}
+
+	public function putText(x:Int, y:Int, text: String) {
+		putTextRectangle(new Rectangle(x, y, 0, 0), text);
 	}
 
 	public function printText(text: String) {

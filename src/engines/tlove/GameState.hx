@@ -1,6 +1,7 @@
 package engines.tlove;
 import common.LangUtils;
 import haxe.Log;
+import nme.geom.Rectangle;
 
 /**
  * ...
@@ -10,6 +11,7 @@ import haxe.Log;
 class GameState 
 {
 	public var textVisible:Bool = true;
+	public var textRectangle:Rectangle;
 
 	private var flags:Array<Int>;
 	private var sysflags:Array<Int>;
@@ -25,12 +27,27 @@ class GameState
 		this.LSB = LangUtils.createArray(function() { return 0; }, 0x8000);
 		this.LSW = LangUtils.createArray(function() { return 0; }, 0x8000);
 		this.names = LangUtils.createArray(function() { return ""; }, 0x100);
+		this.textRectangle = new Rectangle(0, 0, 640, 480);
+	}
+	
+	//(this.sysflags, 'SYSFLAGS');
+	//(this.globalVar.flags, 'FLAGS');
+	//(this.globalVar.menuvar, 'MENUVAR');
+	//(this.globalVar.lsb, 'LSB');
+	//(this.globalVar.lsw, 'LSW');
+	//(this.globalVar.settings, 'SETTINGS');
+	//(this.localVar.seq, 'CHAINS');
+	//(this.globalVar.calls, 'CALLS')
+
+	public function getBitSet(flagType:Int, flagNum:Int):Bool {
+		if (flagType == 0) return getNormalFlagBit(flagNum);
+		return getMVBit(flagNum);
 	}
 
 	public function setFlag(type:Int, index:Int, value:Int):Void {
 		switch (type) {
 			case 0: setNormalFlag(index, value);
-			case 1: setMenuFlag(index, value);
+			case 1: setMV(index, value);
 			case 2: setLSB(index, value);
 			case 3: setLSW(index, value);
 		}
@@ -39,7 +56,7 @@ class GameState
 	public function getFlag(type:Int, index:Int):Int {
 		return switch (type) {
 			case 0: getNormalFlag(index);
-			case 1: getMenuFlag(index);
+			case 1: getMV(index);
 			case 2: getLSB(index);
 			case 3: getLSW(index);
 		};
@@ -73,6 +90,12 @@ class GameState
 		LSB[index & 0x7FFF] = (value & 0xFF);
 	}
 
+	public function getNormalFlagBit(index:Int):Bool {
+		var byteOffset:Int = index >> 3;
+		var bitOffset:Int = index & 7;
+		return (getNormalFlag(byteOffset) & (1 << bitOffset)) != 0;
+	}
+
 	public function getNormalFlag(index:Int):Int {
 		return flags[index & 0x7FF];
 	}
@@ -81,12 +104,18 @@ class GameState
 		if (value != 0) Log.trace("FLAG[" + index + "]=" + value);
 		flags[index & 0x7FF] = value;
 	}
+	
+	public function getMVBit(index:Int) {
+		var byteOffset:Int = index >> 3;
+		var bitOffset:Int = index & 7;
+		return (getMV(byteOffset) & (1 << bitOffset)) != 0;
+	}
 
-	public function getMenuFlag(index:Int):Int {
+	public function getMV(index:Int):Int {
 		return menuFlags[index & 0xFF];
 	}
 	
-	public function setMenuFlag(index:Int, value:Int):Void {
+	public function setMV(index:Int, value:Int):Void {
 		if (value != 0) Log.trace("MENUFLAG[" + index + "]=" + value);
 		menuFlags[index & 0xFF] = value;
 	}
