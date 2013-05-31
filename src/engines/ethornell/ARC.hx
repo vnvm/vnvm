@@ -17,13 +17,13 @@ class ARC
 	public var baseStream:Stream;
 	public var fileStream:Stream;
 	public var table:Array<Entry>;
-	public var tableLookup:Hash<Entry>;
+	public var tableLookup:Map<String, Entry>;
 
 	private function new(s:Stream)
 	{
 		this.baseStream = s;
 		this.table = new Array<Entry>();
-		this.tableLookup = new Hash<Entry>();
+		this.tableLookup = new Map<String, Entry>();
 	}
 
 	static public function openAsyncFromFileSystem(fs:VirtualFileSystem, fileName:String, done:ARC -> Void):Void
@@ -50,7 +50,7 @@ class ARC
 		stream.readBytesAsync(12 + 4, function(ba:ByteArray):Void {
 			var magic:String = ba.readUTFBytes(12);
 			var tableLength:Int = ba.readUnsignedInt();
-			if (magic != "PackFile    ") throw(new Error(Std.format("It doesn't seems to be an ARC file ('$name')")));
+			if (magic != "PackFile    ") throw(new Error('It doesn\'t seems to be an ARC file (\'$name\')'));
 		
 			arc.fileStream = SliceStream.fromBounds(
 				arc.baseStream,

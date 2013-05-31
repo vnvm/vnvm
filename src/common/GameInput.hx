@@ -15,7 +15,7 @@ import common.Event2;
 
 class GameInput 
 {
-	static var pressing:IntHash<Void>;
+	static var pressing:Map<Int,Void>;
 
 	private function new() 
 	{
@@ -25,7 +25,7 @@ class GameInput
 	static public var onKeyPress:Event2<KeyboardEvent>;
 	
 	static public function init() {
-		pressing = new IntHash<Void>();
+		pressing = new Map<Int,Void>();
 		Lib.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 		Lib.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 		Lib.stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);

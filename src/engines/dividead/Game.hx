@@ -42,7 +42,7 @@ class Game
 	/**
 	 * 
 	 */
-	private var imageCache:Hash<BitmapData>;
+	private var imageCache:Map<String, BitmapData>;
 	
 	/**
 	 * 
@@ -113,7 +113,7 @@ class Game
 		this.fileSystem = fileSystem;
 		this.sg = sg;
 		this.wv = wv;
-		this.imageCache = new Hash<BitmapData>();
+		this.imageCache = new Map<String, BitmapData>();
 		this.scriptOpcodes = ScriptOpcodes.createWithClass(AB_OP);
 		this.state = new GameState();
 		this.back = new BitmapData(640, 480, false, 0xFF000000);
@@ -175,7 +175,7 @@ class Game
 	}
 
 	public function getImageMaskCachedAsync(imageNameColor:String, imageNameMask:String, done:BitmapData -> Void):Void {
-		var imageName:String = Std.format("${imageNameColor}${imageNameMask}");
+		var imageName:String = '${imageNameColor}${imageNameMask}';
 		
 		if (imageCache.exists(imageName)) {
 			done(imageCache.get(imageName));
@@ -209,7 +209,7 @@ class Game
 		musicName = addExtensionsWhenRequired(musicName, "mid").toUpperCase();
 		
 		var byteArray:ByteArray;
-		fileSystem.openAndReadAllAsync(Std.format("MID/$musicName"), function(byteArray:ByteArray):Void {
+		fileSystem.openAndReadAllAsync('MID/$musicName', function(byteArray:ByteArray):Void {
 			var sound:Sound = new Sound();
 			sound.loadCompressedDataFromByteArray(byteArray, byteArray.length);
 			done(sound);

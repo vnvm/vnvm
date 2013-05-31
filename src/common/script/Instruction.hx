@@ -27,11 +27,11 @@ class Instruction {
 	
 	public function call(object:Dynamic):Dynamic {
 		if (opcode.unimplemented) {
-			Log.trace(Std.format("Unimplemented: $this"));
+			Log.trace('Unimplemented: $this');
 		} else if (opcode.untested) {
-			Log.trace(Std.format("Untested... $this"));
+			Log.trace('Untested... $this');
 		} else {
-			Log.trace(Std.format("Executing... $this"));
+			Log.trace('Executing... $this');
 		}
 		return Reflect.callMethod(object, Reflect.field(object, opcode.methodName), parameters);
 	}

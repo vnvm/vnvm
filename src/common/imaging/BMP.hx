@@ -28,11 +28,11 @@ class BMP
 		var reserved1:Int = bytes.readUnsignedShort();
 		var reserved2:Int = bytes.readUnsignedShort();
 		var dataOffset:Int = bytes.readUnsignedInt();
-		if (magic != "BM") throw(new Error(Std.format("Not a BMP")));
+		if (magic != "BM") throw(new Error('Not a BMP'));
 		
 		// BITMAPINFOHEADER
 		var biSize:Int = bytes.readUnsignedInt();
-		if (biSize != 40) throw(new Error(Std.format("Invalid BITMAPINFOHEADER $biSize")));
+		if (biSize != 40) throw(new Error('Invalid BITMAPINFOHEADER $biSize'));
 		var biData:ByteArray = new ByteArray();
 		bytes.readBytes(biData, 0, biSize - 4);
 		biData.endian = Endian.LITTLE_ENDIAN;
@@ -42,7 +42,7 @@ class BMP
 		var planes:Int = biData.readUnsignedShort();
 		var bitCount:Int = biData.readUnsignedShort();
 		var compression:Int = biData.readUnsignedInt();
-		if (compression != 0) throw(new Error(Std.format("Not supported compression $compression")));
+		if (compression != 0) throw(new Error('Not supported compression $compression'));
 		var sizeImage:Int = biData.readUnsignedInt();
 		var pixelsPerMeterX:Int = biData.readUnsignedInt();
 		var pixelsPerMeterY:Int = biData.readUnsignedInt();
@@ -75,7 +75,7 @@ class BMP
 		switch (bitCount) {
 			case 8: decodeRows8(bytes, bitmapData, palette);
 			case 24: decodeRows24(bytes, bitmapData);
-			default: throw(new Error(Std.format("Not implemented bitCount=$bitCount")));
+			default: throw(new Error('Not implemented bitCount=$bitCount'));
 		}
 		
 		return bitmapData;

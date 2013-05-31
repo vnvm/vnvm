@@ -100,7 +100,7 @@ class BraveAssets
 	static public function getBitmapDataAsync(name:String, done:BitmapData -> Void):Void {
 		name = name.toUpperCase();
 		
-		BraveAssets.getBytesAsync(Std.format("parts/${name}.CRP"), function(bytes:ByteArray) {
+		BraveAssets.getBytesAsync('parts/${name}.CRP', function(bytes:ByteArray) {
 			var braveImage:BraveImage = new BraveImage();
 			braveImage.load(bytes);
 			done(braveImage.bitmapData);

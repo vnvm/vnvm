@@ -111,7 +111,7 @@ class ScriptThread implements IScriptThread
 			//case 4: return 1;
 			case 4: return 0;
 			default:
-				BraveLog.trace(Std.format("getSpecial($index)"));
+				BraveLog.trace('getSpecial($index)');
 				return 0;
 		}
 	}

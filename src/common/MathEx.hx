@@ -56,7 +56,7 @@ class MathEx
 	 * @param	denominator   Constant denominator value
 	 * @return
 	 */
-	@:macro static public function fastUintConstDivShort(numerator:Expr, denominator:Int):Expr {
+	macro static public function fastUintConstDivShort(numerator:Expr, denominator:Int):Expr {
 		var result = _magicu2_bits(denominator, 16);
 		
 		var mult:Expr = { expr : EConst(CInt(Std.string(result.magic))), pos : Context.currentPos() };

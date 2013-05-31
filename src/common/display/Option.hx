@@ -15,7 +15,7 @@ class Option
 	public var index:Int;
 	public var sprite:Sprite;
 	public var data:Dynamic;
-	public var selected(_getSelected, _setSelected):Bool;
+	public var selected(get_selected, set_selected):Bool;
 
 	private var textField:TextField;
 	private var _selected:Bool = true;
@@ -51,11 +51,11 @@ class Option
 	}
 	*/
 	
-	private function _getSelected():Bool {
+	private function get_selected():Bool {
 		return this._selected;
 	}
 
-	private function _setSelected(value:Bool):Bool {
+	private function set_selected(value:Bool):Bool {
 		if (this._selected != value) {
 			this._selected = value;
 			

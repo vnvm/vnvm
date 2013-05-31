@@ -26,9 +26,9 @@ class OptionList
 	public var fillRowsThenColumns:Bool;
 	public var options:Array<Option>;
 	
-	public var visible(_getVisible, _setVisible):Bool;
-	private function _getVisible():Bool { return sprite.visible; }
-	private function _setVisible(value:Bool):Bool { return sprite.visible = value; }
+	public var visible(get_visible, set_visible):Bool;
+	private function get_visible():Bool { return sprite.visible; }
+	private function set_visible(value:Bool):Bool { return sprite.visible = value; }
 	
 	public var onSelected:Event2<OptionSelectedEvent>;
 	

@@ -73,7 +73,7 @@ class Main extends Sprite
 			case "edelweiss": addChild(new engines.ethornell.EngineMain(fs, scriptName));
 			case "yume":
 			case "pw": addChild(new engines.will.EngineMain(fs, name, scriptName));
-			default: throw(new Error(Std.format("Invalid engine '$name'")));
+			default: throw(new Error('Invalid engine \'$name\''));
 		}
 	}
 	

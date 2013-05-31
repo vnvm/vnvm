@@ -23,6 +23,6 @@ class CgDbEntry
 	}
 	
 	public function toString():String {
-		return Std.format("CgDbEntry(Type = ${type}, Name = '${name}', ImageId = ${imageId}, TileSize = ${tileWidth}x${tileHeight})");
+		return 'CgDbEntry(Type = ${type}, Name = \'${name}\', ImageId = ${imageId}, TileSize = ${tileWidth}x${tileHeight})';
 	}
 }

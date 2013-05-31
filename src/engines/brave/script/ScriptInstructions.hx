@@ -27,7 +27,7 @@ class ScriptInstructions
 
 	@Opcode(0x01, "SL")
 	public function FUNCTION_DEF(functionName:String, nextFunctionOffset:Int):Void {
-		BraveLog.trace(Std.format("FUNCTION_DEF: $functionName, $nextFunctionOffset"));
+		BraveLog.trace('FUNCTION_DEF: $functionName, $nextFunctionOffset');
 	}
 	
 	
@@ -312,7 +312,7 @@ class ScriptInstructions
 	@Opcode(0x1D, "s")
 	@Unimplemented(1)
 	public function COMMENT(text:String) {
-		BraveLog.trace(Std.format("COMMENT: '${text}'"));
+		BraveLog.trace('COMMENT: \'${text}\'');
 	}
 	
 	/**
@@ -330,7 +330,7 @@ class ScriptInstructions
 	// 20-33
 	@Opcode(0x21, "<s") // Delay?
 	public function SCRIPT(done:Void -> Void, scriptName:String) {
-		BraveLog.trace(Std.format("SCRIPT('${scriptName}')"));
+		BraveLog.trace('SCRIPT(\'${scriptName}\')');
 		Script.getScriptWithNameAsync(scriptName, function(script:Script) {
 			scriptThread.setScript(script);
 			done();

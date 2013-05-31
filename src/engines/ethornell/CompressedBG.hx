@@ -230,54 +230,54 @@ class CompressedBG
 	 * @param	nodes
 	 * @param	method2_res
 	 */
-	#if cpp
-	@:functionCode("
-		Float start = ::haxe::Timer_obj::stamp();
-		{
-			int mask = (int)0;
-			int currentByte = (int)0;
-			int iter = (int)0;
-			int srcMax = src->length;
-			Array< bool > v2List = Array_obj< bool >::__new();
-			Array< int > v4List = Array_obj< int >::__new();
-			Array< int > v5List = Array_obj< int >::__new();
-			{
-				int _g1 = (int)0;
-				int _g = nodes->length;
-				while(((_g1 < _g))){
-					int n = (_g1)++;
-					v2List->push(nodes->__get(n)->v2);
-					v4List->push(nodes->__get(n)->v4);
-					v5List->push(nodes->__get(n)->v5);
-				}
-			}
-			bool * v2ListPtr = v2List->Pointer();
-			int * v4ListPtr = v4List->Pointer();
-			int * v5ListPtr = v5List->Pointer();
-			unsigned char * srcPtr = src->b->Pointer();
-			unsigned char * srcEnd = srcPtr + src->length;
-			
-			unsigned char * dstPtr = dst->b->Pointer();
-			unsigned char * dstEnd = dstPtr + dst->length;
-			{
-				while (dstPtr < dstEnd){
-					int cvalue = method2_res;
-					while (v2ListPtr[cvalue]) {
-						if (!mask) {
-							if (srcPtr >= srcEnd) break;
-							currentByte = *(srcPtr++);
-							mask = 0x80;
-						}
-						cvalue = (currentByte & mask) ? v5ListPtr[cvalue] : v4ListPtr[cvalue];
-						mask >>= 1;
-					}
-					*(dstPtr++) = (unsigned char)cvalue;
-				}
-			}
-		}
-		::haxe::Log_obj::trace((HX_CSTRING(\"huffman: \") + ((::haxe::Timer_obj::stamp() - start))),hx::SourceInfo(HX_CSTRING(\"CompressedBG.hx\"),291,HX_CSTRING(\"engines.ethornell.CompressedBG\"),HX_CSTRING(\"uncompress_huffman\")));
-	")
-	#end
+	//#if cpp
+	//@:functionCode("
+	//	Float start = ::haxe::Timer_obj::stamp();
+	//	{
+	//		int mask = (int)0;
+	//		int currentByte = (int)0;
+	//		int iter = (int)0;
+	//		int srcMax = src->length;
+	//		Array< bool > v2List = Array_obj< bool >::__new();
+	//		Array< int > v4List = Array_obj< int >::__new();
+	//		Array< int > v5List = Array_obj< int >::__new();
+	//		{
+	//			int _g1 = (int)0;
+	//			int _g = nodes->length;
+	//			while(((_g1 < _g))){
+	//				int n = (_g1)++;
+	//				v2List->push(nodes->__get(n)->v2);
+	//				v4List->push(nodes->__get(n)->v4);
+	//				v5List->push(nodes->__get(n)->v5);
+	//			}
+	//		}
+	//		bool * v2ListPtr = v2List->Pointer();
+	//		int * v4ListPtr = v4List->Pointer();
+	//		int * v5ListPtr = v5List->Pointer();
+	//		unsigned char * srcPtr = src->b->Pointer();
+	//		unsigned char * srcEnd = srcPtr + src->length;
+	//		
+	//		unsigned char * dstPtr = dst->b->Pointer();
+	//		unsigned char * dstEnd = dstPtr + dst->length;
+	//		{
+	//			while (dstPtr < dstEnd){
+	//				int cvalue = method2_res;
+	//				while (v2ListPtr[cvalue]) {
+	//					if (!mask) {
+	//						if (srcPtr >= srcEnd) break;
+	//						currentByte = *(srcPtr++);
+	//						mask = 0x80;
+	//					}
+	//					cvalue = (currentByte & mask) ? v5ListPtr[cvalue] : v4ListPtr[cvalue];
+	//					mask >>= 1;
+	//				}
+	//				*(dstPtr++) = (unsigned char)cvalue;
+	//			}
+	//		}
+	//	}
+	//	::haxe::Log_obj::trace((HX_CSTRING(\"huffman: \") + ((::haxe::Timer_obj::stamp() - start))),hx::SourceInfo(HX_CSTRING(\"CompressedBG.hx\"),291,HX_CSTRING(\"engines.ethornell.CompressedBG\"),HX_CSTRING(\"uncompress_huffman\")));
+	//")
+	//#end
 	@:noStack static public function uncompress_huffman(src:ByteArray, dst:ByteArray, nodes:Array<Node>, method2_res:Int):Void
 	{
 		#if !cpp
@@ -439,7 +439,7 @@ class CompressedBG
 			case 24: unpack_real_24_32(data0, 24);
 			case 32: unpack_real_24_32(data0, 32);
 			//case 8: break; // Not implemented yet.
-			default: throw(new Error(Std.format("Unimplemented BPP ${header.bpp}")));
+			default: throw(new Error('Unimplemented BPP ${header.bpp}'));
 		};
 	}
 
@@ -643,5 +643,5 @@ class Node
 		this.v5 = v5;
 	}
 	
-	public function toString():String { return Std.format("($v0, $v1, $v2, $v3, $v4, $v5)"); }
+	public function toString():String { return '($v0, $v1, $v2, $v3, $v4, $v5)'; }
 }

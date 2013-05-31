@@ -73,14 +73,14 @@ class ScriptReader
 				if (scriptThread != null) {
 					return scriptThread.getVariable(index);
 				} else {
-					return Std.format("VARIABLE($index)");
+					return 'VARIABLE($index)';
 				}
 			}
 			case 'P': return readParam(scriptThread);
 			case '7': return read1();
 			case '9': return read1();
 			default: {
-				throw(new Error(Std.format("Invalid format '${char}'")));
+				throw(new Error('Invalid format \'${char}\''));
 			}
 		}
 	}
@@ -98,16 +98,16 @@ class ScriptReader
 				if (scriptThread != null) {
 					return scriptThread.getVariable(index).getValue();
 				} else {
-					return Std.format("VARIABLE($index)");
+					return 'VARIABLE($index)';
 				}
 			case 0x02:
 				var index = read2();
 				if (scriptThread != null) {
 					return scriptThread.getSpecial(index);
 				} else {
-					return Std.format("SPECIAL($index)");
+					return 'SPECIAL($index)';
 				}
-			default: throw(new Error(Std.format("Invalid format ${paramType}")));
+			default: throw(new Error('Invalid format ${paramType}'));
 		}
 	}
 

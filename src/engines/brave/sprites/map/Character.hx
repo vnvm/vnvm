@@ -8,7 +8,7 @@ import common.GameInput;
 import engines.brave.GameThreadState;
 import common.Keys;
 import engines.brave.map.Cell;
-import engines.brave.map.Map;
+import engines.brave.map.GameMap;
 import engines.brave.map.Tileset;
 import engines.brave.script.ScriptThread;
 import haxe.Log;
@@ -52,7 +52,7 @@ class Character
 		this.frameNums = [0, 1, 0, 2];
 		
 		this.actions = new AsyncList();
-		this.events = new IntHash<Dynamic>();
+		this.events = new Map<Int, Dynamic>();
 		
 		Lib.stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
 		//moveTest();
@@ -62,7 +62,7 @@ class Character
 		tileset.loadDataAsync(done);
 	}
 	
-	private var events:IntHash<Dynamic>;
+	private var events:Map<Int, Dynamic>;
 	
 	public function kill():Void {
 		BraveLog.trace("killed!");
@@ -94,7 +94,7 @@ class Character
 		var cy = Std.int(y / 40);
 		var cell:Cell = mapSprite.map.get(cx, cy);
 		if (cell.info1 != 0) {
-			BraveLog.trace(Std.format("Can't move because: ${cell.info1}"));
+			BraveLog.trace('Can\'t move because: ${cell.info1}');
 			if (cell.info1 != 8) {
 				return false;
 			}

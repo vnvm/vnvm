@@ -56,7 +56,7 @@ class AB_OP
 			case '=': result = (state.flags[flag] == value);
 			case '}': result = (state.flags[flag] >  value);
 			case '{': result = (state.flags[flag] <  value);
-			default: throw(new Error(Std.format("Unknown JUMP_IF_NOT operation '$op'")));
+			default: throw(new Error('Unknown JUMP_IF_NOT operation \'$op\''));
 		}
 		if (!result) ab.jump(pointer);
 	}
@@ -65,8 +65,8 @@ class AB_OP
 	//@Unimplemented
 	public function SET_RANGE_FLAG(start:Int, end:Int, value:Int)
 	{
-		Log.trace(Std.format("FLAG[$start..$end] = $value"));
-		Log.trace(Std.format("CHECK: Is 'end' flag included?"));
+		Log.trace('FLAG[$start..$end] = $value');
+		Log.trace('CHECK: Is \'end\' flag included?');
 		for (n in start ... end) state.flags[n] = value;
 	}
 
@@ -75,12 +75,12 @@ class AB_OP
 	public function SET(flag:Int, opId:Int, value:Int)
 	{
 		var op:String = String.fromCharCode(opId);
-		Log.trace(Std.format("FLAG[$flag] $op $value"));
+		Log.trace('FLAG[$flag] $op $value');
 		switch (op) {
 			case '=': state.flags[flag]  = value;
 			case '+': state.flags[flag] += value;
 			case '-': state.flags[flag] -= value;
-			default: throw(Std.format("Unknown SET operation '$op'"));
+			default: throw('Unknown SET operation \'$op\'');
 		}
 	}
 
@@ -88,7 +88,7 @@ class AB_OP
 	//@Unimplemented
 	public function SCRIPT(done:Void -> Void, name:String):Void
 	{
-		Log.trace(Std.format("SCRIPT('$name')"));
+		Log.trace('SCRIPT(\'$name\')');
 		ab.loadScriptAsync(name, 0, done);
 	}
 	

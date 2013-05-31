@@ -8,7 +8,7 @@ import engines.brave.BraveAssets;
 import engines.brave.formats.BraveImage;
 import common.GameInput;
 import engines.brave.GameState;
-import engines.brave.map.Map;
+import engines.brave.map.GameMap;
 import engines.brave.script.Script;
 import engines.brave.script.ScriptReader;
 import engines.brave.script.ScriptThread;
@@ -84,7 +84,7 @@ class EngineMain extends Sprite
 		//new ScriptReader(Script.getScriptWithName("op")).readAllInstructions();
 		
 		if (false) {
-			Map.loadFromNameAsync("a_wood0", function(woods:Map):Void {
+			GameMap.loadFromNameAsync("a_wood0", function(woods:GameMap):Void {
 				var mapSprite:MapSprite = new MapSprite();
 				addChild(mapSprite);
 				mapSprite.setMap(woods);

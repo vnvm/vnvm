@@ -35,7 +35,7 @@ class AB
 	}
 	
 	public function loadScriptAsync(scriptName:String, scriptPos:Int = 0, done:Void -> Void):Void {
-		game.sg.openAndReadAllAsync(Std.format("${scriptName}.ab"), function(script:ByteArray):Void {
+		game.sg.openAndReadAllAsync('${scriptName}.ab', function(script:ByteArray):Void {
 			this.scriptName = scriptName;
 			this.script = script;
 			this.script.position = scriptPos;
@@ -51,7 +51,7 @@ class AB
 			case 'T', 'S', 's': return ByteArrayUtils.readStringz(script);
 			case 'P': return script.readUnsignedInt();
 			case 'c': return script.readUnsignedByte();
-			default: throw(Std.format("Invalid format type '$type'"));
+			default: throw('Invalid format type \'$type\'');
 		}
 	}
 		

@@ -23,6 +23,6 @@ class Variable
 	}
 	
 	public function toString():String {
-		return Std.format("Variable($value)");
+		return 'Variable($value)';
 	}
 }

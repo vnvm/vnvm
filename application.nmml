@@ -25,8 +25,8 @@
 	<haxelib name="nme-vfs" />
 	
 	<!-- TEST Libraries -->
-	<haxelib name="munit" />
 	<!--
+	<haxelib name="munit" />
 	<haxelib name="hamcres" />
 	-->
 	

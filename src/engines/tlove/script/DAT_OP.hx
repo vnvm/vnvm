@@ -81,7 +81,7 @@ class DAT_OP
 			} else if (e.type == MouseEvent.RIGHT_CLICK) {
 				dat.jumpLabel(rightClickLabel);
 			} else {
-				throw(new Error(Std.format("Invalid event for MOUSE_WAIT_CLICK_EVERYWHERE $e")));
+				throw(new Error('Invalid event for MOUSE_WAIT_CLICK_EVERYWHERE $e'));
 			}
 			done();
 		});

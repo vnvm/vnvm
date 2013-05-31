@@ -10,11 +10,11 @@ import nme.errors.Error;
 
 class ScriptOpcodes 
 {
-	private var opcodesById:IntHash<Opcode>;
+	private var opcodesById:Map<Int, Opcode>;
 	
 	public function new():Void
 	{
-		opcodesById = new IntHash<Opcode>();
+		opcodesById = new Map<Int, Opcode>();
 	}
 	
 	static public function createWithClass(opcodesClass:Class<Dynamic>):ScriptOpcodes {
@@ -62,7 +62,7 @@ class ScriptOpcodes
 	public function getOpcodeWithId(id:Int) 
 	{
 		var opcode = opcodesById.get(id);
-		if (opcode == null) throw(new Error(Std.format("Unknown opcode ${id}")));
+		if (opcode == null) throw(new Error('Unknown opcode ${id}'));
 		return opcode;
 	}
 	

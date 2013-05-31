@@ -5,7 +5,7 @@ import common.MathEx;
 import common.SpriteUtils;
 import common.GameInput;
 import common.Keys;
-import engines.brave.map.Map;
+import engines.brave.map.GameMap;
 import haxe.Log;
 import nme.display.BitmapData;
 import nme.display.Sprite;
@@ -30,8 +30,8 @@ private class RowSprite {
 
 class MapSprite extends Sprite
 {
-	public var map:Map;
-	public var characters:IntHash<Character>;
+	public var map:GameMap;
+	public var characters:Map<Int, Character>;
 	public var cameraX:Float = 0;
 	public var cameraY:Float = 0;
 
@@ -51,7 +51,7 @@ class MapSprite extends Sprite
 
 		rowSprites = LangUtils.createArray(function() { return new RowSprite(0, new Sprite()); }, tilesHeight);
 
-		this.characters = new IntHash<Character>();
+		this.characters = new Map<Int, Character>();
 
 		this.addEventListener(Event.ADDED_TO_STAGE, function(e:Event) {
 			this.stage.addEventListener(Event.ENTER_FRAME, function(e:Event) {
@@ -67,9 +67,9 @@ class MapSprite extends Sprite
 		}
 	}
 	
-	public function setMap(map:Map):Void {
+	public function setMap(map:GameMap):Void {
 		this.map = map;
-		this.characters = new IntHash<Character>();
+		this.characters = new Map<Int, Character>();
 		updateCamera();
 	}
 

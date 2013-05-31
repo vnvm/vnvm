@@ -4,7 +4,7 @@ import common.Animation;
 import common.MathEx;
 import common.script.ScriptOpcodes;
 import common.SpriteUtils;
-import engines.brave.map.Map;
+import engines.brave.map.GameMap;
 import engines.brave.script.Script;
 import engines.brave.script.ScriptInstructions;
 import engines.brave.script.ScriptThread;
@@ -44,10 +44,10 @@ class GameState
 		for (n in 0 ... 10000) this.variables.push(new Variable(0));
 		Lib.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 		Lib.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
-		keyPress = new IntHash<Void>();
+		keyPress = new Map<Int, Void>();
 	}
 	
-	static var keyPress:IntHash<Void>;
+	static var keyPress:Map<Int, Void>;
 	//static var pressingControl:Bool = false;
 	
 	public function onKeyDown(e:KeyboardEvent):Void {
@@ -68,7 +68,7 @@ class GameState
 	}
 	
 	public function setMapAsync(mapName:String, done:Void -> Void):Void {
-		Map.loadFromNameAsync(mapName, function(map:Map) {
+		GameMap.loadFromNameAsync(mapName, function(map:GameMap) {
 			rootClip.mapSprite.setMap(map);
 			done();
 		});
@@ -83,7 +83,7 @@ class GameState
 
 	public function getCharacter(charaId:Int):Character {
 		var chara:Character = rootClip.mapSprite.characters.get(charaId);
-		if (chara == null) throw(new Error(Std.format("Can't get character with id=${charaId}")));
+		if (chara == null) throw(new Error('Can\'t get character with id=${charaId}'));
 		return chara;
 	}
 
@@ -171,7 +171,7 @@ class GameState
 				rootClip.backgroundBack.addChild(image);
 				done();
 			} else {
-				throw(new Error(Std.format("Can't load image '$imageName'")));
+				throw(new Error('Can\'t load image \'$imageName\''));
 			}
 		});
 	}

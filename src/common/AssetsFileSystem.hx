@@ -23,11 +23,11 @@ class AssetsFileSystem
 			"assets", "../assets", "../../assets", "../../../assets", "../../../../assets"
 		]) {
 			#if !neko
-			Log.trace(Std.format("Try path '$tryPath'"));
+			Log.trace('Try path \'$tryPath\'');
 			#end
 			if (FileSystem.exists(tryPath) && FileSystem.isDirectory(tryPath)) {
 				#if !neko
-				Log.trace(Std.format("Found assets at '$tryPath'"));
+				Log.trace('Found assets at \'$tryPath\'');
 				#end
 				return tryPath;
 			}

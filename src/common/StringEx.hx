@@ -60,7 +60,7 @@ class StringEx
 	}
 	
 	static public function trimEnd(string:String, characters:String):String {
-		var vector:IntHash<Bool> = new IntHash<Bool>();
+		var vector:Map<Int, Bool> = new Map<Int, Bool>();
 		for (n in 0 ... characters.length) vector.set(characters.charCodeAt(n), true);
 		var n:Int = string.length - 1;
 		while ((n > 0) && vector.exists(string.charCodeAt(n))) n--;
@@ -71,7 +71,7 @@ class StringEx
 		var reg:EReg = ~/%(-)?(0)?(\d*)(d|x|X|s)/g;
 		var f:EReg;
 		
-		return reg.customReplace(format, function (f:EReg):String {
+		return reg.map(format, function (f:EReg):String {
 			var minus:String = f.matched(1);
 			var zero:String = f.matched(2);
 			var numbers:String = f.matched(3);
@@ -88,7 +88,7 @@ class StringEx
 				case 'x': uintToStringHex(params.shift()).toLowerCase();
 				case 'X': uintToStringHex(params.shift()).toUpperCase();
 				case 's': params.shift();
-				default: throw(new Error(Std.format("Format '%$type'")));
+				default: throw(new Error('Format \'%$type\''));
 			};
 			if (direction > 0) {
 				out = StringTools.lpad(out, padChar, padCount);

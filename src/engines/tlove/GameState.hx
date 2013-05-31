@@ -1,4 +1,5 @@
 package engines.tlove;
+import browser.errors.Error;
 import common.LangUtils;
 import haxe.Log;
 import nme.geom.Rectangle;
@@ -65,6 +66,7 @@ class GameState
 			case 1: getMV(index);
 			case 2: getLSB(index);
 			case 3: getLSW(index);
+			default: throw(new Error('Invalid type'));
 		};
 	}
 

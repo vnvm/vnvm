@@ -14,19 +14,19 @@ import nme.utils.Endian;
  * @author 
  */
 
-class Map 
+class GameMap 
 {
 	public var width:Int;
 	public var height:Int;
-	private var tilesets:IntHash<Tileset>;
+	private var tilesets:Map<Int, Tileset>;
 	private var cells:Array<Array<Cell>>;
 
-	private function new(width:Int, height:Int, ?tilesets:IntHash<Tileset>) 
+	private function new(width:Int, height:Int, ?tilesets:Map<Int, Tileset>) 
 	{
 		this.width = width;
 		this.height = height;
 		this.cells = LangUtils.createArray2D(function() { return new Cell(null, null, 0, 0); } , width, height);
-		if (tilesets == null) tilesets = new IntHash<Tileset>();
+		if (tilesets == null) tilesets = new Map<Int, Tileset>();
 		this.tilesets = tilesets;
 	}
 	
@@ -36,7 +36,7 @@ class Map
 	}
 	public function getTileset(id:Int):Tileset {
 		var tileset:Tileset = tilesets.get(id);
-		if (tileset == null) throw(new Error(Std.format("Can't get tileset with id $id")));
+		if (tileset == null) throw(new Error('Can\'t get tileset with id $id'));
 		return tileset;
 	}
 	
@@ -61,15 +61,15 @@ class Map
 		}
 	}
 
-	static public function loadFromNameAsync(name:String, done:Map -> Void):Void {
-		BraveAssets.getBytesAsync(Std.format("map/$name.dat"), function(bytes:ByteArray) {
+	static public function loadFromNameAsync(name:String, done:GameMap -> Void):Void {
+		BraveAssets.getBytesAsync('map/$name.dat', function(bytes:ByteArray) {
 			loadFromByteArrayAsync(Decrypt.decryptDataWithKey(bytes, Decrypt.key23), done);
 		});
 	}
 
-	static public function loadFromByteArrayAsync(data:ByteArray, done:Map -> Void):Void {
+	static public function loadFromByteArrayAsync(data:ByteArray, done:GameMap -> Void):Void {
 		
-		var tilesets:IntHash<Tileset> = new IntHash<Tileset>();
+		var tilesets:Map<Int, Tileset> = new Map<Int, Tileset>();
 
 		function readTilesets() {
 			// Read tilesets
@@ -92,7 +92,7 @@ class Map
 			
 			//BraveLog.trace(Std.format("$width,$height"));
 			
-			var map:Map = new Map(width, height, tilesets);
+			var map:GameMap = new GameMap(width, height, tilesets);
 			
 			data.readInt();
 			
@@ -100,7 +100,7 @@ class Map
 				for (x in 0 ... width) {
 					var cell:Cell = map.get(x, y);
 					
-					if (cell == null) throw(new Error(Std.format("Can't get cell at ($x, $y) - MapSize($width, $height)")));
+					if (cell == null) throw(new Error('Can\'t get cell at ($x, $y) - MapSize($width, $height)'));
 					
 					//if (y > 70) BraveLog.trace(Std.format("$x,$y : ${data.bytesAvailable}"));
 					
@@ -146,7 +146,7 @@ class Map
 
 	}
 
-	static public function create(width:Int, height:Int):Map {
-		return new Map(width, height);
+	static public function create(width:Int, height:Int):GameMap {
+		return new GameMap(width, height);
 	}
 }

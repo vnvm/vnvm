@@ -9,7 +9,7 @@ import nme.utils.Endian;
 
 class CgDb 
 {
-	private var entries:Hash<CgDbEntry>;
+	private var entries:Map<String, CgDbEntry>;
 
 	public function new(?data:ByteArray) 
 	{
@@ -36,7 +36,7 @@ class CgDb
 	}
 	
 	public function load(data:ByteArray):Void {
-		entries = new Hash<CgDbEntry>();
+		entries = new Map<String, CgDbEntry>();
 		data.position = 8;
 		while (data.bytesAvailable > 0) {
 			var entry:CgDbEntry = readEntry(data);

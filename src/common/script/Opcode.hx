@@ -23,6 +23,6 @@ class Opcode {
 	}
 	
 	public function toString():String {
-		return Std.format("Opcode(id=$opcodeId, name='$methodName', format='$format', description='$description', unimplemented=$unimplemented, untested=$untested)");
+		return 'Opcode(id=$opcodeId, name=\'$methodName\', format=\'$format\', description=\'$description\', unimplemented=$unimplemented, untested=$untested)';
 	}
 }

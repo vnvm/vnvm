@@ -8,10 +8,10 @@ import nme.utils.ByteArray;
 
 class DL1 extends VirtualFileSystem
 {
-	private var entries:Hash<Stream>;
+	private var entries:Map<String, Stream>;
 	
 	private function new() {
-		this.entries = new Hash<Stream>();
+		this.entries = new Map<String, Stream>();
 	}
 	
 	static public function loadAsync(stream:Stream, done:DL1 -> Void):Void {
@@ -26,7 +26,7 @@ class DL1 extends VirtualFileSystem
 			var offset:Int = header.readUnsignedInt();
 			var pos:Int = 0x10;
 			
-			if (magic != ("DL1.0" + String.fromCharCode(0x1A))) throw(Std.format("Invalid DL1 file. Magic : '$magic'"));
+			if (magic != ("DL1.0" + String.fromCharCode(0x1A))) throw('Invalid DL1 file. Magic : \'$magic\'');
 
 			//Log.trace(Std.format("DL1: {offset=$offset, count=$count}"));
 			
@@ -52,7 +52,7 @@ class DL1 extends VirtualFileSystem
 	{
 		name = name.toUpperCase();
 		var entry:Stream = entries.get(name);
-		if (entry == null) throw(Std.format("Can't find '$name'"));
+		if (entry == null) throw('Can\'t find \'$name\'');
 		done(entry);
 	}
 }

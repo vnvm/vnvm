@@ -59,7 +59,7 @@ class DAT
 	
 	public function loadAsync(name:String, done:Void -> Void):Void {
 		var data:ByteArray;
-		game.date.getBytesAsync(Std.format("$name.DAT"), function(data:ByteArray):Void {
+		game.date.getBytesAsync('$name.DAT', function(data:ByteArray):Void {
 			data.position = 0;
 			this.scriptName = name;
 			data.endian = Endian.BIG_ENDIAN;
@@ -195,7 +195,7 @@ class DAT
 				case '2': params.push(paramsByteArray.readUnsignedShort());
 				case 's': params.push(ByteArrayUtils.readStringz(paramsByteArray));
 				case '?': params.push(paramsByteArray);
-				default: throw(new Error(Std.format("Invalid format type '$type'")));
+				default: throw(new Error('Invalid format type \'$type\''));
 			}
 		}
 		return params;

@@ -8,10 +8,10 @@ import nme.utils.ByteArray;
 
 class PAK
 {
-	var items:Hash<SliceStream>;
+	var items:Map<String, SliceStream>;
 	
 	private function new() {
-		this.items = new Hash<SliceStream>();
+		this.items = new Map<String, SliceStream>();
 	}
 
 	public function getBytesAsync(name:String, done:ByteArray -> Void):Void {
@@ -21,7 +21,7 @@ class PAK
 
 	public function get(name:String):Stream {
 		var item:SliceStream = items.get(name.toUpperCase());
-		if (item == null) throw(new Error(Std.format("Can't find '$name'")));
+		if (item == null) throw(new Error('Can\'t find \'$name\''));
 		return SliceStream.fromAll(item);
 	}
 	

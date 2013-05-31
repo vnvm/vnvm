@@ -18,12 +18,12 @@ class SoundPack
 {
 	public var stream:Stream;
 	private var startPosition:Int;
-	private var entries:Hash<SoundEntry>;
+	private var entries:Map<String, SoundEntry>;
 	public var numberOfChannels:Int;
 
 	private function new(numberOfChannels:Int = 1)
 	{
-		this.entries = new Hash<SoundEntry>();
+		this.entries = new Map<String, SoundEntry>();
 		this.numberOfChannels = numberOfChannels;
 	}
 	
@@ -36,7 +36,7 @@ class SoundPack
 	
 	public function getSoundAsync(soundFile:String, done:Sound-> Void):Void {
 		var entry:SoundEntry = entries.get(soundFile);
-		if (entry == null) throw(new Error(Std.format("Can't find sound '${soundFile}'")));
+		if (entry == null) throw(new Error('Can\'t find sound \'${soundFile}\''));
 		entry.getSoundAsync(done);
 	}
 	
