@@ -1,9 +1,9 @@
 package common;
-import nme.display.Sprite;
-import nme.display.Stage;
-import nme.events.Event;
-import nme.geom.Rectangle;
-import nme.Lib;
+import flash.display.Sprite;
+import flash.display.Stage;
+import flash.events.Event;
+import flash.geom.Rectangle;
+import flash.Lib;
 
 /**
  * ...

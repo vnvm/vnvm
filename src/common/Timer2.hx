@@ -2,7 +2,7 @@ package common;
 import haxe.Log;
 import haxe.PosInfos;
 import haxe.Timer;
-import nme.events.Event;
+import flash.events.Event;
 
 /**
  * ...

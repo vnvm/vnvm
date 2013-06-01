@@ -14,19 +14,19 @@ import engines.tlove.script.DAT;
 import engines.tlove.script.DAT_OP;
 import haxe.Log;
 import haxe.Timer;
-import nme.display.Bitmap;
-import nme.display.BitmapData;
-import nme.display.PixelSnapping;
-import nme.display.Sprite;
-import nme.events.MouseEvent;
-import nme.geom.Point;
-import nme.geom.Rectangle;
-import nme.media.SoundChannel;
-import nme.text.AntiAliasType;
-import nme.text.TextField;
-import nme.text.TextFieldAutoSize;
-import nme.text.TextFormat;
-import nme.utils.ByteArray;
+import flash.display.Bitmap;
+import flash.display.BitmapData;
+import flash.display.PixelSnapping;
+import flash.display.Sprite;
+import flash.events.MouseEvent;
+import flash.geom.Point;
+import flash.geom.Rectangle;
+import flash.media.SoundChannel;
+import flash.text.AntiAliasType;
+import flash.text.TextField;
+import flash.text.TextFieldAutoSize;
+import flash.text.TextFormat;
+import flash.utils.ByteArray;
 
 /**
  * ...
@@ -110,7 +110,7 @@ class Game
 			updateMousePos(e);
 			this.onMouseLeftClick.trigger(e);
 		});
-		this.sprite.addEventListener(MouseEvent.RIGHT_CLICK, function(e:MouseEvent) {
+		this.sprite.addEventListener("rightClick", function(e:MouseEvent) {
 			updateMousePos(e);
 			this.onMouseRightClick.trigger(e);
 		});

@@ -1,10 +1,9 @@
 package engines.ethornell;
 import common.Reference;
 import common.StringEx;
-import haxe.Int32;
 import haxe.Int64;
-import nme.errors.Error;
-import nme.utils.ByteArray;
+import flash.errors.Error;
+import flash.utils.ByteArray;
 
 /**
  * ...

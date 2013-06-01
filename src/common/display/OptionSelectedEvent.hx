@@ -1,5 +1,5 @@
 package common.display;
-import nme.events.Event;
+import flash.events.Event;
 
 /**
  * ...

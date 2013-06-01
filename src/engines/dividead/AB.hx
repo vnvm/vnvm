@@ -10,12 +10,11 @@ import common.script.Opcode;
 import common.StringEx;
 import haxe.Log;
 import haxe.Timer;
-import nme.display.BitmapInt32;
-import nme.display.Sprite;
-import nme.geom.ColorTransform;
-import nme.geom.Point;
-import nme.geom.Rectangle;
-import nme.utils.ByteArray;
+import flash.display.Sprite;
+import flash.geom.ColorTransform;
+import flash.geom.Point;
+import flash.geom.Rectangle;
+import flash.utils.ByteArray;
 
 class AB
 {

@@ -1,8 +1,8 @@
 package engines.tlove;
-import browser.errors.Error;
 import common.LangUtils;
+import flash.errors.Error;
+import flash.geom.Rectangle;
 import haxe.Log;
-import nme.geom.Rectangle;
 
 /**
  * ...

@@ -2,7 +2,7 @@ package common;
 import vfs.HttpFileSystem;
 import vfs.VirtualFileSystem;
 import haxe.Log;
-import nme.errors.Error;
+import flash.errors.Error;
 
 #if (cpp || neko)
 import sys.FileSystem;
@@ -19,7 +19,7 @@ class AssetsFileSystem
 		for (tryPath in [
 			"/mnt/sdcard/vnvm",
 			"/private/var/mobile/vnvm",
-			nme.filesystem.File.applicationDirectory.nativePath + "/assets",
+			flash.filesystem.File.applicationDirectory.nativePath + "/assets",
 			"assets", "../assets", "../../assets", "../../../assets", "../../../../assets"
 		]) {
 			#if !neko

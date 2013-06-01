@@ -4,11 +4,11 @@ import haxe.io.Bytes;
 import haxe.io.BytesData;
 import haxe.io.BytesInput;
 import haxe.Log;
-import nme.errors.Error;
-import nme.events.Event;
-import nme.media.Sound;
-import nme.utils.ByteArray;
-import nme.utils.Endian;
+import flash.errors.Error;
+import flash.events.Event;
+import flash.media.Sound;
+import flash.utils.ByteArray;
+import flash.utils.Endian;
 //import sys.io.File;
 
 /**

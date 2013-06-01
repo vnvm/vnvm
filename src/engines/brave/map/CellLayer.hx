@@ -1,7 +1,7 @@
 package engines.brave.map;
 import common.GraphicUtils;
-import nme.display.Graphics;
-import nme.geom.Matrix;
+import flash.display.Graphics;
+import flash.geom.Matrix;
 
 /**
  * ...

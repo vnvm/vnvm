@@ -4,6 +4,7 @@ import common.Animation;
 import common.MathEx;
 import common.script.ScriptOpcodes;
 import common.SpriteUtils;
+import common.StageReference;
 import engines.brave.map.GameMap;
 import engines.brave.script.Script;
 import engines.brave.script.ScriptInstructions;
@@ -12,16 +13,15 @@ import engines.brave.script.Variable;
 import engines.brave.sprites.GameSprite;
 import engines.brave.sprites.map.Character;
 import haxe.Timer;
-import nme.display.Bitmap;
-import nme.display.BitmapData;
-import nme.display.PixelSnapping;
-import nme.errors.Error;
-import nme.events.KeyboardEvent;
-import nme.events.MouseEvent;
-import nme.Lib;
-import nme.media.SoundChannel;
-import nme.Memory;
-import nme.utils.ByteArray;
+import flash.display.Bitmap;
+import flash.display.BitmapData;
+import flash.display.PixelSnapping;
+import flash.errors.Error;
+import flash.events.KeyboardEvent;
+import flash.events.MouseEvent;
+import flash.media.SoundChannel;
+import flash.Memory;
+import flash.utils.ByteArray;
 
 /**
  * ...
@@ -42,8 +42,8 @@ class GameState
 		this.rootClip.mapSprite.visible = false;
 		this.variables = new Array<Variable>();
 		for (n in 0 ... 10000) this.variables.push(new Variable(0));
-		Lib.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
-		Lib.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
+		StageReference.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+		StageReference.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 		keyPress = new Map<Int, Void>();
 	}
 	
@@ -110,15 +110,15 @@ class GameState
 		}
 		var onClick = null;
 		onClick = function(e) {
-			Lib.stage.removeEventListener(MouseEvent.CLICK, onClick);
-			Lib.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onClick);
+			StageReference.stage.removeEventListener(MouseEvent.CLICK, onClick);
+			StageReference.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onClick);
 
 			Timer.delay(function() {
 				done();
 			}, 1);
 		};
-		Lib.stage.addEventListener(MouseEvent.CLICK, onClick);
-		Lib.stage.addEventListener(KeyboardEvent.KEY_DOWN, onClick);
+		StageReference.stage.addEventListener(MouseEvent.CLICK, onClick);
+		StageReference.stage.addEventListener(KeyboardEvent.KEY_DOWN, onClick);
 	}
 	
 	public function setBackgroundColor(color:Int):Void {

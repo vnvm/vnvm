@@ -4,9 +4,9 @@ import common.BitmapDataUtils;
 import vfs.SubVirtualFileSystem;
 import vfs.VirtualFileSystem;
 import vfs.VirtualFileSystemBase;
-import nme.display.Bitmap;
-import nme.display.Sprite;
-import nme.utils.ByteArray;
+import flash.display.Bitmap;
+import flash.display.Sprite;
+import flash.utils.ByteArray;
 //import sys.io.File;
 
 /**

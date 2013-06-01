@@ -1,5 +1,5 @@
 package common;
-import nme.errors.Error;
+import flash.errors.Error;
 
 /**
  * ...

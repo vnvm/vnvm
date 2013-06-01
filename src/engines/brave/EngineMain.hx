@@ -17,19 +17,19 @@ import engines.brave.sprites.GameSprite;
 import engines.brave.sprites.map.Character;
 import engines.brave.sprites.map.MapSprite;
 import haxe.Timer;
-import nme.geom.Rectangle;
-import nme.media.Sound;
-import nme.media.SoundChannel;
-import nme.media.SoundLoaderContext;
+import flash.geom.Rectangle;
+import flash.media.Sound;
+import flash.media.SoundChannel;
+import flash.media.SoundLoaderContext;
 import haxe.Log;
-import nme.Assets;
-import nme.display.Stage;
-import nme.display.Bitmap;
-import nme.display.PixelSnapping;
-import nme.display.Sprite;
-import nme.events.Event;
-import nme.Lib;
-import nme.media.SoundTransform;
+import openfl.Assets;
+import flash.display.Stage;
+import flash.display.Bitmap;
+import flash.display.PixelSnapping;
+import flash.display.Sprite;
+import flash.events.Event;
+import flash.Lib;
+import flash.media.SoundTransform;
 
 /**
  * ...
@@ -114,8 +114,8 @@ class EngineMain extends Sprite
 	static public function main() 
 	{
 		var stage = Lib.current.stage;
-		stage.scaleMode = nme.display.StageScaleMode.NO_SCALE;
-		stage.align = nme.display.StageAlign.TOP_LEFT;
+		stage.scaleMode = flash.display.StageScaleMode.NO_SCALE;
+		stage.align = flash.display.StageAlign.TOP_LEFT;
 		
 		Lib.current.addChild(new Main());
 	}

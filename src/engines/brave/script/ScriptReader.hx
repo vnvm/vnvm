@@ -4,7 +4,7 @@ import common.script.Instruction;
 import common.script.Opcode;
 import common.script.ScriptOpcodes;
 import haxe.Log;
-import nme.errors.Error;
+import flash.errors.Error;
 
 /**
  * ...

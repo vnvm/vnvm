@@ -1,7 +1,7 @@
 package common;
 
-import nme.events.Event;
-import nme.utils.Timer;
+import flash.events.Event;
+import flash.utils.Timer;
 
 /**
  * ...

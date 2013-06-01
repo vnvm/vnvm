@@ -9,14 +9,14 @@ import engines.brave.formats.Decrypt;
 import engines.dividead.AB;
 import haxe.Log;
 import haxe.Timer;
-import nme.display.BitmapData;
-import nme.errors.Error;
-import nme.events.Event;
-import nme.events.MouseEvent;
-import nme.geom.Matrix;
-import nme.media.Sound;
-import nme.media.SoundTransform;
-import nme.text.TextField;
+import flash.display.BitmapData;
+import flash.errors.Error;
+import flash.events.Event;
+import flash.events.MouseEvent;
+import flash.geom.Matrix;
+import flash.media.Sound;
+import flash.media.SoundTransform;
+import flash.text.TextField;
 
 class AB_OP
 {

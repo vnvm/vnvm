@@ -13,22 +13,22 @@ import engines.brave.formats.Decrypt;
 import engines.brave.sound.SoundPack;
 import engines.brave.BraveLog;
 import haxe.io.Bytes;
-import nme.Assets;
-import nme.display.Bitmap;
-import nme.display.BitmapData;
-import nme.display.PixelSnapping;
-import nme.errors.Error;
-import nme.events.Event;
-import nme.geom.Rectangle;
-import nme.media.Sound;
-import nme.net.URLLoader;
-import nme.net.URLLoaderDataFormat;
-import nme.net.URLRequest;
-import nme.utils.ByteArray;
-import nme.utils.Endian;
+import openfl.Assets;
+import flash.display.Bitmap;
+import flash.display.BitmapData;
+import flash.display.PixelSnapping;
+import flash.errors.Error;
+import flash.events.Event;
+import flash.geom.Rectangle;
+import flash.media.Sound;
+import flash.net.URLLoader;
+import flash.net.URLLoaderDataFormat;
+import flash.net.URLRequest;
+import flash.utils.ByteArray;
+import flash.utils.Endian;
 
 #if (cpp || neko)
-import nme.filesystem.File;
+import flash.filesystem.File;
 import sys.FileSystem;
 import sys.io.FileInput;
 #end

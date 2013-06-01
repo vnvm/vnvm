@@ -4,8 +4,8 @@ import common.GameScalerSprite;
 import vfs.SubVirtualFileSystem;
 import vfs.VirtualFileSystem;
 import common.StringEx;
-import nme.display.Bitmap;
-import nme.display.Sprite;
+import flash.display.Bitmap;
+import flash.display.Sprite;
 
 /**
  * ...

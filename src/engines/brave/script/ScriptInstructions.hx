@@ -6,10 +6,10 @@ import engines.brave.sprites.map.Character;
 import engines.brave.sprites.TextSprite;
 import haxe.Log;
 import haxe.Timer;
-import nme.errors.Error;
-import nme.media.Sound;
-import nme.media.SoundChannel;
-import nme.media.SoundTransform;
+import flash.errors.Error;
+import flash.media.Sound;
+import flash.media.SoundChannel;
+import flash.media.SoundTransform;
 
 /**
  * ...

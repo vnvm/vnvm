@@ -1,5 +1,5 @@
 package engines.tlove.mrs;
-import nme.utils.ByteArray;
+import flash.utils.ByteArray;
 
 /**
  * ...

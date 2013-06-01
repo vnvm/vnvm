@@ -1,5 +1,5 @@
 package engines.brave.sprites;
-import nme.display.Sprite;
+import flash.display.Sprite;
 
 /**
  * ...

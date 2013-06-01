@@ -1,6 +1,6 @@
 package common;
 import haxe.PosInfos;
-import nme.errors.Error;
+import flash.errors.Error;
 
 /**
  * ...

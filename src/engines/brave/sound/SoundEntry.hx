@@ -1,8 +1,8 @@
 package engines.brave.sound;
 import common.ByteUtils;
 import haxe.io.Bytes;
-import nme.media.Sound;
-import nme.utils.ByteArray;
+import flash.media.Sound;
+import flash.utils.ByteArray;
 
 /**
  * ...

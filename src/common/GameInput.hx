@@ -1,11 +1,10 @@
 package common;
 
 import haxe.Log;
-import nme.events.Event;
-import nme.events.KeyboardEvent;
-import nme.events.MouseEvent;
-import nme.geom.Point;
-import nme.Lib;
+import flash.events.Event;
+import flash.events.KeyboardEvent;
+import flash.events.MouseEvent;
+import flash.geom.Point;
 import common.Event2;
 
 /**
@@ -26,13 +25,13 @@ class GameInput
 	
 	static public function init() {
 		pressing = new Map<Int,Void>();
-		Lib.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
-		Lib.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
-		Lib.stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
-		Lib.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
-		Lib.stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
-		Lib.stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
-		Lib.stage.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent) {
+		StageReference.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+		StageReference.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
+		StageReference.stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
+		StageReference.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+		StageReference.stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+		StageReference.stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+		StageReference.stage.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent) {
 			onClick.trigger(e);
 		});
 		

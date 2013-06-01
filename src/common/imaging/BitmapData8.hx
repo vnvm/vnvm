@@ -4,13 +4,13 @@ import common.LangUtils;
 import common.MathEx;
 import haxe.io.Bytes;
 import haxe.Log;
-import nme.display.BitmapData;
-import nme.errors.Error;
-import nme.geom.Point;
-import nme.geom.Rectangle;
-import nme.Memory;
-import nme.utils.ByteArray;
-import nme.utils.Endian;
+import flash.display.BitmapData;
+import flash.errors.Error;
+import flash.geom.Point;
+import flash.geom.Rectangle;
+import flash.Memory;
+import flash.utils.ByteArray;
+import flash.utils.Endian;
 
 /**
  * ...

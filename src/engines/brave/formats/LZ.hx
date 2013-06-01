@@ -2,10 +2,10 @@ package engines.brave.formats;
 
 import haxe.io.BytesBuffer;
 import haxe.Log;
-import nme.errors.Error;
-import nme.utils.ByteArray;
-import nme.utils.Endian;
-import nme.Vector;
+import flash.errors.Error;
+import flash.utils.ByteArray;
+import flash.utils.Endian;
+import flash.Vector;
 
 /**
  * ...

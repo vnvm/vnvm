@@ -6,13 +6,13 @@ import common.Reference;
 import common.StringEx;
 import common.Timer2;
 import haxe.io.Bytes;
-import nme.geom.Rectangle;
-import nme.display.BitmapData;
-import nme.errors.Error;
-import nme.Memory;
-import nme.utils.ByteArray;
-import nme.utils.Endian;
-import nme.utils.Timer;
+import flash.geom.Rectangle;
+import flash.display.BitmapData;
+import flash.errors.Error;
+import flash.Memory;
+import flash.utils.ByteArray;
+import flash.utils.Endian;
+import flash.utils.Timer;
 
 /**
  * Class to uncompress "CompressedBG" files.

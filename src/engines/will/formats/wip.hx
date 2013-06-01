@@ -1,7 +1,7 @@
 package engines.will.formats;
 
 import common.ByteArrayUtils;
-import nme.utils.ByteArray;
+import flash.utils.ByteArray;
 
 class WIP
 {

@@ -7,11 +7,11 @@ import common.GameInput;
 import common.Keys;
 import engines.brave.map.GameMap;
 import haxe.Log;
-import nme.display.BitmapData;
-import nme.display.Sprite;
-import nme.events.Event;
-import nme.events.KeyboardEvent;
-import nme.system.System;
+import flash.display.BitmapData;
+import flash.display.Sprite;
+import flash.events.Event;
+import flash.events.KeyboardEvent;
+import flash.system.System;
 
 /**
  * ...

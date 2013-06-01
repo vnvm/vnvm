@@ -1,6 +1,6 @@
 package engines.brave.cgdb;
-import nme.utils.ByteArray;
-import nme.utils.Endian;
+import flash.utils.ByteArray;
+import flash.utils.Endian;
 
 /**
  * ...

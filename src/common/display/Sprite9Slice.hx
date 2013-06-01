@@ -1,9 +1,9 @@
 package common.display;
 import common.GraphicUtils;
 import common.SpriteUtils;
-import nme.display.BitmapData;
-import nme.display.Sprite;
-import nme.geom.Rectangle;
+import flash.display.BitmapData;
+import flash.display.Sprite;
+import flash.geom.Rectangle;
 
 /**
  * ...

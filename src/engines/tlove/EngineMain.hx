@@ -4,10 +4,10 @@ import vfs.Stream;
 import vfs.SubVirtualFileSystem;
 import vfs.VirtualFileSystem;
 import engines.tlove.mrs.MRS;
-import nme.display.Bitmap;
-import nme.display.PixelSnapping;
-import nme.display.Sprite;
-import nme.utils.ByteArray;
+import flash.display.Bitmap;
+import flash.display.PixelSnapping;
+import flash.display.Sprite;
+import flash.utils.ByteArray;
 
 /**
  * ...

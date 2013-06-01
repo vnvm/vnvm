@@ -1,8 +1,8 @@
 package common;
-import nme.display.BitmapData;
-import nme.display.BitmapDataChannel;
-import nme.geom.Point;
-import nme.geom.Rectangle;
+import flash.display.BitmapData;
+import flash.display.BitmapDataChannel;
+import flash.geom.Point;
+import flash.geom.Rectangle;
 
 /**
  * ...

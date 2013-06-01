@@ -4,9 +4,9 @@ import common.ByteArrayUtils;
 import common.imaging.BitmapData8;
 import common.imaging.BmpColor;
 import common.imaging.Palette;
-import nme.errors.Error;
-import nme.utils.ByteArray;
-import nme.utils.Endian;
+import flash.errors.Error;
+import flash.utils.ByteArray;
+import flash.utils.Endian;
 
 class MRS
 {

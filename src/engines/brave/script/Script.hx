@@ -4,10 +4,10 @@ import engines.brave.formats.Decrypt;
 import engines.brave.GameState;
 import haxe.Log;
 import haxe.rtti.Meta;
-import nme.Assets;
-import nme.errors.Error;
-import nme.utils.ByteArray;
-import nme.utils.Endian;
+import openfl.Assets;
+import flash.errors.Error;
+import flash.utils.ByteArray;
+import flash.utils.Endian;
 
 /**
  * ...

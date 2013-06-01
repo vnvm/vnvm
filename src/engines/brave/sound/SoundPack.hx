@@ -3,9 +3,9 @@ package engines.brave.sound;
 import common.ByteArrayUtils;
 import vfs.Stream;
 import haxe.Log;
-import nme.errors.Error;
-import nme.media.Sound;
-import nme.utils.ByteArray;
+import flash.errors.Error;
+import flash.media.Sound;
+import flash.utils.ByteArray;
 
 //typedef Input = sys.io.FileInput;
 

@@ -4,7 +4,7 @@ import vfs.SliceStream;
 import vfs.Stream;
 import vfs.VirtualFileSystem;
 import haxe.Log;
-import nme.utils.ByteArray;
+import flash.utils.ByteArray;
 
 class DL1 extends VirtualFileSystem
 {

@@ -1,13 +1,13 @@
 package common.imaging;
 import common.ByteArrayUtils;
 import haxe.Log;
-import nme.display.BitmapData;
-import nme.errors.Error;
-import nme.geom.ColorTransform;
-import nme.geom.Rectangle;
-import nme.Memory;
-import nme.utils.ByteArray;
-import nme.utils.Endian;
+import flash.display.BitmapData;
+import flash.errors.Error;
+import flash.geom.ColorTransform;
+import flash.geom.Rectangle;
+import flash.Memory;
+import flash.utils.ByteArray;
+import flash.utils.Endian;
 //import sys.io.File;
 
 /**

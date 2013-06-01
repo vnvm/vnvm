@@ -7,15 +7,15 @@ import vfs.Stream;
 import vfs.VirtualFileSystem;
 import common.Keys;
 import common.script.ScriptOpcodes;
-import nme.display.Bitmap;
-import nme.display.BitmapData;
-import nme.display.PixelSnapping;
-import nme.display.Sprite;
-import nme.media.Sound;
-import nme.media.SoundChannel;
-import nme.text.TextField;
-import nme.text.TextFormat;
-import nme.utils.ByteArray;
+import flash.display.Bitmap;
+import flash.display.BitmapData;
+import flash.display.PixelSnapping;
+import flash.display.Sprite;
+import flash.media.Sound;
+import flash.media.SoundChannel;
+import flash.text.TextField;
+import flash.text.TextFormat;
+import flash.utils.ByteArray;
 
 /**
  * Dividead's Game class

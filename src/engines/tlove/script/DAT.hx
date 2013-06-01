@@ -5,9 +5,9 @@ import common.script.Opcode;
 import common.StringEx;
 import engines.tlove.Game;
 import haxe.Log;
-import nme.errors.Error;
-import nme.utils.ByteArray;
-import nme.utils.Endian;
+import flash.errors.Error;
+import flash.utils.ByteArray;
+import flash.utils.Endian;
 
 class StackItem
 {

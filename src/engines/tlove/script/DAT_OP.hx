@@ -12,12 +12,12 @@ import engines.tlove.GameState;
 import engines.tlove.mrs.MRS;
 import haxe.Log;
 import haxe.Timer;
-import nme.errors.Error;
-import nme.events.MouseEvent;
-import nme.geom.Point;
-import nme.geom.Rectangle;
-import nme.media.Sound;
-import nme.utils.ByteArray;
+import flash.errors.Error;
+import flash.events.MouseEvent;
+import flash.geom.Point;
+import flash.geom.Rectangle;
+import flash.media.Sound;
+import flash.utils.ByteArray;
 
 /**
  * XYZ Script Engine
@@ -78,7 +78,7 @@ class DAT_OP
 			//e.type = MouseEvent.CLICK;
 			if (e.type == MouseEvent.CLICK) {
 				dat.jumpLabel(leftClickLabel);
-			} else if (e.type == MouseEvent.RIGHT_CLICK) {
+			} else if (e.type == "rightClick") {
 				dat.jumpLabel(rightClickLabel);
 			} else {
 				throw(new Error('Invalid event for MOUSE_WAIT_CLICK_EVERYWHERE $e'));
@@ -115,7 +115,7 @@ class DAT_OP
 	function MOUSE_JUMP_IF_EVENT(leftClickLabel:Int, rightClickLabel:Int, missLabel:Int, rectCount:Int):Void {
 		if (game.lastMouseEvent.type == MouseEvent.CLICK) {
 			dat.jumpLabel(leftClickLabel);
-		} else if (game.lastMouseEvent.type == MouseEvent.RIGHT_CLICK) {
+		} else if (game.lastMouseEvent.type == "rightClick") {
 			dat.jumpLabel(rightClickLabel);
 		} else {
 			dat.jumpLabel(missLabel);

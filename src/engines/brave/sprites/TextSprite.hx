@@ -2,14 +2,15 @@ package engines.brave.sprites;
 import common.Animation;
 import common.SpriteUtils;
 import common.StringEx;
+import cpp.vm.Profiler;
 import engines.brave.BraveAssets;
 import haxe.Log;
-import nme.display.Bitmap;
-import nme.display.BitmapData;
-import nme.display.PixelSnapping;
-import nme.display.Sprite;
-import nme.text.TextField;
-import nme.text.TextFormat;
+import flash.display.Bitmap;
+import flash.display.BitmapData;
+import flash.display.PixelSnapping;
+import flash.display.Sprite;
+import flash.text.TextField;
+import flash.text.TextFormat;
 
 /**
  * ...
@@ -39,10 +40,7 @@ class TextSprite extends Sprite
 		picture.x = -30;
 		picture.y = 480;
 		
-		textContainer.addChild(textBackground);
-		textContainer.addChild(textTextField);
-		
-		textTextField.defaultTextFormat = new TextFormat("Arial", 16, 0xFFFFFF);
+		textTextField.defaultTextFormat = new TextFormat("Lucida Console", 16, 0xFFFFFF);
 		textTextField.selectable = false;
 		textTextField.multiline = true;
 		textTextField.text = "";
@@ -52,7 +50,10 @@ class TextSprite extends Sprite
 		//textField.textColor = 0xFFFFFF;
 		
 		this.alpha = 0;
-		
+
+		textContainer.addChild(textBackground);
+		textContainer.addChild(textTextField);
+
 		addChild(picture);
 		addChild(textContainer);
 	}
@@ -72,15 +73,23 @@ class TextSprite extends Sprite
 		textTextField.y = padding;
 	}
 	
+	private function _setText(text:String):Void
+	{
+		textTextField.text = text;
+	}
+	
 	private function setText(faceId:Int, title:String, text:String, done:Void -> Void):Void {
-		if (animateText) {
+		if (animateText) 
+		{
 			var obj:Dynamic = { showChars : 0 };
 			var time:Float = text.length * 0.01;
 			Animation.animate(done, time, obj, { showChars : text.length } , Animation.Linear, function(step:Float) {
-				textTextField.text = text.substr(0, Std.int(obj.showChars));
+				_setText(text.substr(0, Std.int(obj.showChars)));
 			} );
-		} else {
-			textTextField.text = text;
+		}
+		else
+		{
+			_setText(textTextField.text);
 			done();
 		}
 	}

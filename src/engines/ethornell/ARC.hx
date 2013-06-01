@@ -4,8 +4,8 @@ import vfs.Stream;
 import vfs.VirtualFileSystem;
 import common.StringEx;
 import engines.brave.cgdb.CgDbEntry;
-import nme.errors.Error;
-import nme.utils.ByteArray;
+import flash.errors.Error;
+import flash.utils.ByteArray;
 
 /**
  * Class to have read access to ARC files.

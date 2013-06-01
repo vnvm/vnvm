@@ -2,6 +2,7 @@ package engines.brave.sprites.map;
 import common.Animation;
 import common.GraphicUtils;
 import common.MathEx;
+import common.StageReference;
 import engines.brave.AsyncList;
 import engines.brave.BraveAssets;
 import common.GameInput;
@@ -13,9 +14,8 @@ import engines.brave.map.Tileset;
 import engines.brave.script.ScriptThread;
 import haxe.Log;
 import haxe.Timer;
-import nme.display.Sprite;
-import nme.events.Event;
-import nme.Lib;
+import flash.display.Sprite;
+import flash.events.Event;
 
 /**
  * ...
@@ -54,7 +54,7 @@ class Character
 		this.actions = new AsyncList();
 		this.events = new Map<Int, Dynamic>();
 		
-		Lib.stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+		StageReference.stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
 		//moveTest();
 	}
 	

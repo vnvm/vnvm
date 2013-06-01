@@ -3,8 +3,8 @@ package engines.tlove;
 import common.ByteArrayUtils;
 import vfs.SliceStream;
 import vfs.Stream;
-import nme.errors.Error;
-import nme.utils.ByteArray;
+import flash.errors.Error;
+import flash.utils.ByteArray;
 
 class PAK
 {

@@ -1,17 +1,17 @@
 package common;
 
-import nme.utils.ByteArray;
-import nme.utils.Endian;
+import flash.utils.ByteArray;
+import flash.utils.Endian;
 
 /**
  * ...
  * @author 
  */
 
-#if cpp
-typedef EndianType = String;
+#if flash
+typedef EndianType = flash.utils.Endian;
 #else
-typedef EndianType = nme.utils.Endian;
+typedef EndianType = String;
 #end
 
 class ByteArrayUtils 

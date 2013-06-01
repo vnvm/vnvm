@@ -1,7 +1,7 @@
 package engines.brave.map;
 import engines.brave.BraveAssets;
 import engines.brave.cgdb.CgDbEntry;
-import nme.display.BitmapData;
+import flash.display.BitmapData;
 
 /**
  * ...

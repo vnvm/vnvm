@@ -1,14 +1,15 @@
 package ;
 import common.AssetsFileSystem;
 import common.GameInput;
+import common.StageReference;
 import vfs.VirtualFileSystem;
 import common.StringEx;
-import nme.display.Sprite;
-import nme.display.Stage;
-import nme.errors.Error;
-import nme.events.Event;
-import nme.Lib;
-import nme.utils.ByteArray;
+import flash.display.Sprite;
+import flash.display.Stage;
+import flash.errors.Error;
+import flash.events.Event;
+import flash.Lib;
+import flash.utils.ByteArray;
 
 /**
  * ...
@@ -33,6 +34,7 @@ class Main extends Sprite
 	
 	private function initOnce(e) 
 	{
+		removeEventListener(Event.ADDED_TO_STAGE, initOnce);
 		if (!initialized) {
 			initialized = true;
 			init(e);
@@ -41,6 +43,7 @@ class Main extends Sprite
 
 	private function init(e) 
 	{
+		StageReference.stage = this.stage;
 		GameInput.init();
 		
 		fs = AssetsFileSystem.getAssetsFileSystem();
@@ -80,8 +83,8 @@ class Main extends Sprite
 	static public function main() 
 	{
 		var stage = Lib.current.stage;
-		stage.scaleMode = nme.display.StageScaleMode.NO_SCALE;
-		stage.align = nme.display.StageAlign.TOP_LEFT;
+		stage.scaleMode = flash.display.StageScaleMode.NO_SCALE;
+		stage.align = flash.display.StageAlign.TOP_LEFT;
 		
 		Lib.current.addChild(new Main());
 	}

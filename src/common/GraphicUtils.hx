@@ -1,11 +1,11 @@
 package common;
-import nme.display.Bitmap;
-import nme.display.BitmapData;
-import nme.display.Graphics;
-import nme.display.Sprite;
-import nme.geom.Matrix;
-import nme.geom.Point;
-import nme.Vector;
+import flash.display.Bitmap;
+import flash.display.BitmapData;
+import flash.display.Graphics;
+import flash.display.Sprite;
+import flash.geom.Matrix;
+import flash.geom.Point;
+import flash.Vector;
 
 /**
  * ...

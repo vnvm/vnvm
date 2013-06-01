@@ -1,12 +1,13 @@
 package engines.dividead;
 import common.imaging.BMP;
-import nme.display.BitmapData;
-import nme.utils.ByteArray;
+import flash.display.BitmapData;
+import flash.utils.ByteArray;
 
 class SG
 {
 	static public function getImage(data:ByteArray):BitmapData
 	{
+		//return new BitmapData(640, 480);
 		return BMP.decode(LZ.decode(data));
 	}
 }

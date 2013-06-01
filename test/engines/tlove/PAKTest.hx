@@ -7,7 +7,7 @@ import common.io.VirtualFileSystem;
 import haxe.Log;
 import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
-import nme.utils.ByteArray;
+import flash.utils.ByteArray;
 
 /**
  * ...

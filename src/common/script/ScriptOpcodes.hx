@@ -1,7 +1,7 @@
 package common.script;
 import haxe.Log;
 import haxe.rtti.Meta;
-import nme.errors.Error;
+import flash.errors.Error;
 
 /**
  * ...

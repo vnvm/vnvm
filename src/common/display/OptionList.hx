@@ -2,14 +2,14 @@ package common.display;
 import common.Event2;
 import common.GameInput;
 import common.SpriteUtils;
+import common.StageReference;
 import haxe.Log;
-import nme.display.Sprite;
-import nme.display.Stage;
-import nme.events.Event;
-import nme.events.MouseEvent;
-import nme.geom.Point;
-import nme.geom.Rectangle;
-import nme.Lib;
+import flash.display.Sprite;
+import flash.display.Stage;
+import flash.events.Event;
+import flash.events.MouseEvent;
+import flash.geom.Point;
+import flash.geom.Rectangle;
 
 /**
  * ...
@@ -42,9 +42,9 @@ class OptionList
 		this.fillRowsThenColumns = fillRowsThenColumns;
 		this.onSelected = new Event2<OptionSelectedEvent>();
 		this.sprite = new Sprite();
-		Lib.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseUpdate);
-		Lib.stage.addEventListener(MouseEvent.MOUSE_OUT, onMouseUpdate);
-		Lib.stage.addEventListener(MouseEvent.CLICK, onMouseClick);
+		StageReference.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseUpdate);
+		StageReference.stage.addEventListener(MouseEvent.MOUSE_OUT, onMouseUpdate);
+		StageReference.stage.addEventListener(MouseEvent.CLICK, onMouseClick);
 		clear();
 	}
 	

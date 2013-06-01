@@ -2,11 +2,11 @@ package engines.brave.formats;
 
 import common.ByteUtils;
 import haxe.io.Bytes;
-import nme.display.BitmapData;
-import nme.errors.Error;
-import nme.geom.Rectangle;
-import nme.utils.ByteArray;
-import nme.utils.Endian;
+import flash.display.BitmapData;
+import flash.errors.Error;
+import flash.geom.Rectangle;
+import flash.utils.ByteArray;
+import flash.utils.Endian;
 
 /**
  * ...

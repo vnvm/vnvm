@@ -1,5 +1,5 @@
 package engines.brave.formats;
-import nme.utils.ByteArray;
+import flash.utils.ByteArray;
 
 /**
  * ...

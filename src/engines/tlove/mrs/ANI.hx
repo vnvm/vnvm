@@ -1,7 +1,7 @@
 package engines.tlove.mrs;
-import nme.errors.Error;
-import nme.utils.ByteArray;
-import nme.utils.Endian;
+import flash.errors.Error;
+import flash.utils.ByteArray;
+import flash.utils.Endian;
 
 /**
  * ...

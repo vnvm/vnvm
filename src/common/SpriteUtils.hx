@@ -1,8 +1,8 @@
 package common;
 import haxe.Log;
-import nme.display.DisplayObject;
-import nme.display.Graphics;
-import nme.display.Sprite;
+import flash.display.DisplayObject;
+import flash.display.Graphics;
+import flash.display.Sprite;
 
 /**
  * ...

@@ -1,9 +1,9 @@
 package common.display;
-import nme.display.Sprite;
-import nme.events.MouseEvent;
-import nme.geom.Rectangle;
-import nme.text.TextField;
-import nme.text.TextFormat;
+import flash.display.Sprite;
+import flash.events.MouseEvent;
+import flash.geom.Rectangle;
+import flash.text.TextField;
+import flash.text.TextFormat;
 
 /**
  * ...

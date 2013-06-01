@@ -7,7 +7,7 @@ import engines.tlove.PAK;
 import haxe.Log;
 import massive.munit.Assert;
 import massive.munit.async.AsyncFactory;
-import nme.utils.ByteArray;
+import flash.utils.ByteArray;
 import sys.io.File;
 
 /**

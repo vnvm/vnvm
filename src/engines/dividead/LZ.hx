@@ -2,7 +2,7 @@ package engines.dividead;
 import common.compression.RingBuffer;
 import haxe.io.Bytes;
 import haxe.Log;
-import nme.utils.ByteArray;
+import flash.utils.ByteArray;
 
 class LZ
 {
