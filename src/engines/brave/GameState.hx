@@ -166,7 +166,7 @@ class GameState
 		rootClip.backgroundBack.visible = true;
 		
 		SpriteUtils.extractSpriteChilds(rootClip.backgroundBack);
-		BraveAssets.getBitmapAsync(imageName, function(image:Bitmap) {
+		BraveAssets.getBitmapAsync(imageName).then(function(image:Bitmap) {
 			if (image != null) {
 				rootClip.backgroundBack.addChild(image);
 				done();

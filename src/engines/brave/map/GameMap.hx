@@ -62,7 +62,7 @@ class GameMap
 	}
 
 	static public function loadFromNameAsync(name:String, done:GameMap -> Void):Void {
-		BraveAssets.getBytesAsync('map/$name.dat', function(bytes:ByteArray) {
+		BraveAssets.getBytesAsync('map/$name.dat').then(function(bytes:ByteArray) {
 			loadFromByteArrayAsync(Decrypt.decryptDataWithKey(bytes, Decrypt.key23), done);
 		});
 	}

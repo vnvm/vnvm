@@ -1,5 +1,6 @@
 package engines.brave;
 
+import promhx.Promise;
 import common.AssetsFileSystem;
 import common.ByteUtils;
 import vfs.FileStream;
@@ -50,25 +51,23 @@ class BraveAssets
 		
 	}
 	
-	static public function getCgDbEntryAsync(name:String, done:CgDbEntry -> Void):Void {
-		if (cgDb == null) {
-			BraveAssets.getBytesAsync("cgdb.dat", function(data:ByteArray) {
-				cgDb = new CgDb(Decrypt.decryptDataWithKey(data, Decrypt.key23));
-				done(cgDb.get(name));
-			});
-		} else {
-			done(cgDb.get(name));
-		}
+	static public function getCgDbEntryAsync(name:String):Promise<CgDbEntry> {
+		if (cgDb != null) return Promise.promise(cgDb.get(name));
+		
+		return BraveAssets.getBytesAsync("cgdb.dat").then(function(data:ByteArray) {
+			cgDb = new CgDb(Decrypt.decryptDataWithKey(data, Decrypt.key23));
+			return cgDb.get(name);
+		});
 	}
 	
-	static public function getBitmapAsync(name:String, done:Bitmap -> Void):Void {
-		BraveAssets.getBitmapDataAsync(name, function(bitmapData:BitmapData) {
-			done(new Bitmap(bitmapData, PixelSnapping.AUTO, true));
+	static public function getBitmapAsync(name:String):Promise<Bitmap> {
+		return BraveAssets.getBitmapDataAsync(name).then(function(bitmapData:BitmapData) {
+			return new Bitmap(bitmapData, PixelSnapping.AUTO, true);
 		});
 	}
 
-	@:noStack static public function getBitmapDataWithAlphaCombinedAsync(name:String, done:BitmapData -> Void):Void {
-		BraveAssets.getBitmapDataAsync(name, function(mixed:BitmapData) {
+	@:noStack static public function getBitmapDataWithAlphaCombinedAsync(name:String):Promise<BitmapData> {
+		return BraveAssets.getBitmapDataAsync(name).then(function(mixed:BitmapData) {
 			var width:Int = mixed.width;
 			var hwidth:Int = Std.int(width / 2);
 			var height:Int = mixed.height;
@@ -85,7 +84,7 @@ class BraveAssets
 			
 			out.setPixels(out.rect, color);
 			
-			done(out);
+			return out;
 		});
 	}
 
@@ -97,44 +96,50 @@ class BraveAssets
 	}
 	*/
 
-	static public function getBitmapDataAsync(name:String, done:BitmapData -> Void):Void {
+	static public function getBitmapDataAsync(name:String):Promise<BitmapData> {
 		name = name.toUpperCase();
 		
-		BraveAssets.getBytesAsync('parts/${name}.CRP', function(bytes:ByteArray) {
+		return BraveAssets.getBytesAsync('parts/${name}.CRP').then(function(bytes:ByteArray) {
 			var braveImage:BraveImage = new BraveImage();
 			braveImage.load(bytes);
-			done(braveImage.bitmapData);
+			return braveImage.bitmapData;
 		});
 	}
 	
-	static public function getSoundAsync(name:String, done:Sound -> Void):Void {
-		if (soundPack == null) {
-			getStreamAsync("sound.pck", function(stream:Stream):Void {
-				SoundPack.newAsync(1, stream, function(_soundPack:SoundPack):Void {
-					BraveAssets.soundPack = _soundPack;
-					BraveAssets.soundPack.getSoundAsync(name, done);
+	static public function getSoundAsync(name:String):Promise<Sound> {
+		if (soundPack != null) return soundPack.getSoundAsync(name);
+
+		var promise = new Promise<Sound>();
+		getStreamAsync("sound.pck").then(function(stream:Stream):Void {
+			SoundPack.newAsync(1, stream).then(function(_soundPack:SoundPack) {
+				BraveAssets.soundPack = _soundPack;
+				BraveAssets.soundPack.getSoundAsync(name).then(function(sound:Sound) {
+					promise.resolve(sound);
 				});
 			});
-		} else {
-			soundPack.getSoundAsync(name, done);
-		}
+		});
+		return promise;
 	}
 
-	static public function getVoiceAsync(name:String, done:Sound -> Void):Void {
-		if (voicePack == null) {
-			getStreamAsync("voice/voice.pck", function(stream:Stream):Void {
-				SoundPack.newAsync(1, stream, function(_voicePack:SoundPack):Void {
-					BraveAssets.voicePack = _voicePack;
-					BraveAssets.voicePack.getSoundAsync(name, done);
+	static public function getVoiceAsync(name:String):Promise<Sound> {
+		if (voicePack != null) return voicePack.getSoundAsync(name);
+		
+		var promise = new Promise<Sound>();
+		
+		getStreamAsync("voice/voice.pck").then(function(stream:Stream):Void {
+			SoundPack.newAsync(1, stream).then(function(_voicePack:SoundPack):Void {
+				BraveAssets.voicePack = _voicePack;
+				BraveAssets.voicePack.getSoundAsync(name).then(function(sound:Sound):Void {
+					promise.resolve(sound);
 				});
 			});
-		} else {
-			voicePack.getSoundAsync(name, done);
-		}
+		});
+		
+		return promise;
 	}
 	
-	static public function getMusicAsync(name:String, done:Sound -> Void):Void {
-		BraveAssets.getBytesAsync("midi/" + name + ".mid", function(bytes:ByteArray) {
+	static public function getMusicAsync(name:String):Promise<Sound> {
+		return BraveAssets.getBytesAsync("midi/" + name + ".mid").then(function(bytes:ByteArray) {
 			var sound:Sound = new Sound();
 			//sound.loadPCMFromByteArray(
 			try {
@@ -142,15 +147,15 @@ class BraveAssets
 			} catch (e:Error) {
 				BraveLog.trace(e);
 			}
-			done(sound);
+			return sound;
 		});
 	}
 
-	static public function getBytesAsync(name:String, done:ByteArray -> Void):Void {
-		fs.openAndReadAllAsync(name, done);
+	static public function getBytesAsync(name:String):Promise<ByteArray> {
+		return fs.openAndReadAllAsync(name);
 	}
 
-	static private function getStreamAsync(name:String, done:Stream -> Void):Void {
-		fs.openAsync(name, done);
+	static private function getStreamAsync(name:String):Promise<Stream> {
+		return fs.openAsync(name);
 	}
 }

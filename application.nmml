@@ -16,13 +16,18 @@
 	<window width="960" height="640" unless="mobile" />
 	
 	<window orientation="landscape" vsync="true" antialiasing="0" if="cpp" />
+	<!--<window hardware="false" />-->
+
 	
 	<!-- classpath, haxe libs -->
 	<source path="src" />
 
 	<haxelib name="format" />
+	<!--
 	<haxelib name="openfl-vfs" />
+	-->
 	<haxelib name="openfl" />
+	<haxelib name="promhx" />
 	
 	<!-- TEST Libraries -->
 	<!--

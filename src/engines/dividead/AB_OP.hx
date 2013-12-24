@@ -227,7 +227,7 @@ class AB_OP
 		var sound:Sound;
 		
 		MUSIC_STOP();
-		ab.game.getMusicAsync(name, function(sound:Sound) {
+		ab.game.getMusicAsync(name).then(function(sound:Sound) {
 			ab.game.musicChannel = sound.play(0, -1, new SoundTransform(1, 0));
 			done();
 		});
@@ -248,7 +248,7 @@ class AB_OP
 	public function VOICE_PLAY(done:Void -> Void, name:String):Void
 	{
 		var sound:Sound;
-		ab.game.getSoundAsync(name, function(sound:Sound):Void {
+		ab.game.getSoundAsync(name).then(function(sound:Sound):Void {
 			ab.game.voiceChannel = sound.play(0, 0, new SoundTransform(1, 0));
 			done();
 		});
@@ -260,7 +260,7 @@ class AB_OP
 	{
 		var sound:Sound;
 		EFFECT_STOP();
-		ab.game.getSoundAsync(name, function(sound:Sound):Void {
+		ab.game.getSoundAsync(name).then(function(sound:Sound):Void {
 			ab.game.effectChannel = sound.play(0, 0, new SoundTransform(1, 0));
 			done();
 		});
@@ -284,7 +284,7 @@ class AB_OP
 	//@Unimplemented
 	public function FOREGROUND(done:Void -> Void, name:String):Void
 	{
-		game.getImageCachedAsync(name, function(bitmapData:BitmapData):Void {
+		game.getImageCachedAsync(name).then(function(bitmapData:BitmapData):Void {
 			var matrix:Matrix = new Matrix();
 			matrix.translate(0, 0);
 			game.back.draw(bitmapData, matrix);
@@ -296,7 +296,7 @@ class AB_OP
 	//@Unimplemented
 	public function BACKGROUND(done:Void -> Void, name:String):Void
 	{
-		game.getImageCachedAsync(name, function(bitmapData:BitmapData):Void {
+		game.getImageCachedAsync(name).then(function(bitmapData:BitmapData):Void {
 			var matrix:Matrix = new Matrix();
 			matrix.translate(32, 8);
 			game.back.draw(bitmapData, matrix);
@@ -319,7 +319,7 @@ class AB_OP
 		var nameColor = name;
 		var nameMask = name.split('_')[0] + '_0' ;
 		
-		game.getImageMaskCachedAsync(nameColor, nameMask, function(bitmapData:BitmapData):Void {
+		game.getImageMaskCachedAsync(nameColor, nameMask).then(function(bitmapData:BitmapData):Void {
 			var matrix:Matrix = new Matrix();
 			matrix.translate(Std.int(640 / 2 - bitmapData.width / 2), Std.int(385 - bitmapData.height));
 			game.back.draw(bitmapData, matrix);
@@ -340,19 +340,19 @@ class AB_OP
 		var name2Color = name2;
 		var name2Mask = name2.split('_')[0] + '_0' ;
 
-		game.getImageMaskCachedAsync(name1Color, name1Mask, function(bitmapData1:BitmapData):Void {
-		game.getImageMaskCachedAsync(name2Color, name2Mask, function(bitmapData2:BitmapData):Void {
-			var matrix:Matrix;
-			matrix = new Matrix();
-			matrix.translate(Std.int(640 * 1 / 3 - bitmapData1.width / 2), Std.int(385 - bitmapData1.height));
-			game.back.draw(bitmapData1, matrix);
+		game.getImageMaskCachedAsync(name1Color, name1Mask).then(function(bitmapData1:BitmapData):Void {
+			game.getImageMaskCachedAsync(name2Color, name2Mask).then(function(bitmapData2:BitmapData):Void {
+				var matrix:Matrix;
+				matrix = new Matrix();
+				matrix.translate(Std.int(640 * 1 / 3 - bitmapData1.width / 2), Std.int(385 - bitmapData1.height));
+				game.back.draw(bitmapData1, matrix);
 
-			matrix = new Matrix();
-			matrix.translate(Std.int(640 * 2 / 3 - bitmapData2.width / 2), Std.int(385 - bitmapData2.height));
-			game.back.draw(bitmapData2, matrix);
+				matrix = new Matrix();
+				matrix.translate(Std.int(640 * 2 / 3 - bitmapData2.width / 2), Std.int(385 - bitmapData2.height));
+				game.back.draw(bitmapData2, matrix);
 
-			done();
-		});
+				done();
+			});
 		});
 	}
 

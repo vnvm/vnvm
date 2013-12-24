@@ -1,4 +1,6 @@
 package engines.dividead;
+
+import promhx.Promise;
 import common.BitmapDataUtils;
 import common.display.OptionList;
 import common.GameInput;
@@ -161,32 +163,36 @@ class Game
 	 * @param	imageName
 	 * @param	done
 	 */
-	public function getImageCachedAsync(imageName:String, done:BitmapData -> Void):Void {
+	public function getImageCachedAsync(imageName:String):Promise<BitmapData> {
+		var promise = new Promise<BitmapData>();
 		imageName = addExtensionsWhenRequired(imageName, "bmp").toUpperCase();
 		
 		if (imageCache.exists(imageName)) {
-			done(imageCache.get(imageName));
+			promise.resolve(imageCache.get(imageName));
 		} else {
-			sg.openAndReadAllAsync(imageName, function(byteArray:ByteArray):Void {
+			sg.openAndReadAllAsync(imageName).then(function(byteArray:ByteArray):Void {
 				imageCache.set(imageName, SG.getImage(byteArray));
-				done(imageCache.get(imageName));
+				promise.resolve(imageCache.get(imageName));
 			});
 		}
+		return promise;
 	}
 
-	public function getImageMaskCachedAsync(imageNameColor:String, imageNameMask:String, done:BitmapData -> Void):Void {
+	public function getImageMaskCachedAsync(imageNameColor:String, imageNameMask:String):Promise<BitmapData> {
 		var imageName:String = '${imageNameColor}${imageNameMask}';
+		var promise = new Promise<BitmapData>();
 		
 		if (imageCache.exists(imageName)) {
-			done(imageCache.get(imageName));
+			promise.resolve(imageCache.get(imageName));
 		} else {
-			getImageCachedAsync(imageNameColor, function(color:BitmapData) {
-				getImageCachedAsync(imageNameMask, function(mask:BitmapData) {
-					imageCache.set(imageName, BitmapDataUtils.combineColorMask(color, mask));
-					done(imageCache.get(imageName));
-				});
+			getImageCachedAsync(imageNameColor).then(function(color:BitmapData) {
+			getImageCachedAsync(imageNameMask).then(function(mask:BitmapData) {
+				imageCache.set(imageName, BitmapDataUtils.combineColorMask(color, mask));
+				promise.resolve(imageCache.get(imageName));
+			});
 			});
 		}
+		return promise;
 	}
 
 	/**
@@ -194,26 +200,30 @@ class Game
 	 * @param	soundName
 	 * @param	done
 	 */
-	public function getSoundAsync(soundName:String, done:Sound -> Void):Void {
+	public function getSoundAsync(soundName:String):Promise<Sound> {
 		soundName = addExtensionsWhenRequired(soundName, "wav").toUpperCase();
 
 		var byteArray:ByteArray;
-		wv.openAndReadAllAsync(soundName, function(byteArray:ByteArray) {
+		var promise = new Promise<Sound>();
+		wv.openAndReadAllAsync(soundName).then(function(byteArray:ByteArray) {
 			var sound:Sound = new Sound();
 			sound.loadCompressedDataFromByteArray(byteArray, byteArray.length);
-			done(sound);
+			promise.resolve(sound);
 		});
+		return promise;
 	}
 	
-	public function getMusicAsync(musicName:String, done:Sound -> Void):Void {
+	public function getMusicAsync(musicName:String):Promise<Sound> {
 		musicName = addExtensionsWhenRequired(musicName, "mid").toUpperCase();
 		
 		var byteArray:ByteArray;
-		fileSystem.openAndReadAllAsync('MID/$musicName', function(byteArray:ByteArray):Void {
+		var promise = new Promise<Sound>();
+		fileSystem.openAndReadAllAsync('MID/$musicName').then(function(byteArray:ByteArray):Void {
 			var sound:Sound = new Sound();
 			sound.loadCompressedDataFromByteArray(byteArray, byteArray.length);
-			done(sound);
+			promise.resolve(sound);
 		});
+		return promise;
 	}
 	
 	/**
@@ -221,15 +231,17 @@ class Game
 	 * @param	fileSystem
 	 * @param	done
 	 */
-	static public function newAsync(fileSystem:VirtualFileSystem, done:Game -> Void):Void {
-		fileSystem.openAsync("SG.DL1", function(sgStream:Stream) {
-		fileSystem.openAsync("WV.DL1", function(wvStream:Stream) {
-			DL1.loadAsync(sgStream, function(sg:DL1) {
-			DL1.loadAsync(wvStream, function(wv:DL1) {
-				done(new Game(fileSystem, sg, wv));
-			});
+	static public function newAsync(fileSystem:VirtualFileSystem):Promise<Game> {
+		var promise:Promise<Game> = new Promise<Game>();
+		fileSystem.openAsync("SG.DL1").then(function(sgStream:Stream):Void {
+			fileSystem.openAsync("WV.DL1").then(function(wvStream:Stream):Void {
+				DL1.loadAsync(sgStream, function(sg:DL1) {
+				DL1.loadAsync(wvStream, function(wv:DL1) {
+					promise.resolve(new Game(fileSystem, sg, wv));
+				});
+				});
 			});
 		});
-		});
+		return promise;
 	}
 }

@@ -2,7 +2,6 @@ package engines.brave.sprites;
 import common.Animation;
 import common.SpriteUtils;
 import common.StringEx;
-import cpp.vm.Profiler;
 import engines.brave.BraveAssets;
 import haxe.Log;
 import flash.display.Bitmap;
@@ -104,7 +103,7 @@ class TextSprite extends Sprite
 		SpriteUtils.extractSpriteChilds(picture);
 		setTextSize(faceId >= -1);
 		if (faceId >= 0) {
-			BraveAssets.getBitmapDataWithAlphaCombinedAsync(StringEx.sprintf("Z_%02d_%02d", [Std.int(faceId / 100), Std.int(faceId % 100)]), function(bitmapData:BitmapData) {
+			BraveAssets.getBitmapDataWithAlphaCombinedAsync(StringEx.sprintf("Z_%02d_%02d", [Std.int(faceId / 100), Std.int(faceId % 100)])).then(function(bitmapData:BitmapData) {
 				var bmp:Bitmap = SpriteUtils.center(new Bitmap(bitmapData, PixelSnapping.AUTO, true), 0, 1);
 				picture.addChild(bmp);
 				_setTextAndEnable(faceId, title, text, done);

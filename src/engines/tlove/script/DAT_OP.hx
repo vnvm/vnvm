@@ -684,10 +684,10 @@ class DAT_OP
 	//@Unimplemented
 	function MUSIC_PLAY(done:Void -> Void, name:String, loop:Int):Void {
 		MUSIC_STOP(function():Void {
-			game.midi.getBytesAsync(PathUtils.addExtensionIfMissing(name, "mid").toUpperCase(), function(bytes:ByteArray) {
-				var sound:Sound = new Sound();
-				sound.loadCompressedDataFromByteArray(bytes, bytes.length);
-				game.musicChannel = sound.play();
+			game.midi.getBytesAsync(PathUtils.addExtensionIfMissing(name, "mid").toUpperCase()).then(function(bytes:ByteArray) {
+				//var sound:Sound = new Sound();
+				//sound.loadCompressedDataFromByteArray(bytes, bytes.length);
+				//game.musicChannel = sound.play();
 				done();
 			});
 		});

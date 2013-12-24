@@ -28,7 +28,7 @@ class SoundEntry
 	public function getSoundAsync(done:Sound -> Void):Void {
 		if (bytes == null) {
 			soundPack.stream.position = this.offset;
-			soundPack.stream.readBytesAsync(this.length, function(_bytes:ByteArray):Void {
+			soundPack.stream.readBytesAsync(this.length).then(function(_bytes:ByteArray):Void {
 				this.bytes = ByteUtils.ByteArrayToBytes(_bytes);
 				done((new SoundInstance(this)).getSound());
 			});

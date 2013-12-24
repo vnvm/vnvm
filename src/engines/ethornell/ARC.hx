@@ -29,7 +29,7 @@ class ARC
 	static public function openAsyncFromFileSystem(fs:VirtualFileSystem, fileName:String, done:ARC -> Void):Void
 	{
 		var stream:Stream;
-		fs.openAsync(fileName, function(stream:Stream):Void {
+		fs.openAsync(fileName).then(function(stream:Stream):Void {
 			openAsync(stream, done, fileName);
 		});
 	}
@@ -47,7 +47,7 @@ class ARC
 		// 12 + 4
 		
 		stream.position = 0;
-		stream.readBytesAsync(12 + 4, function(ba:ByteArray):Void {
+		stream.readBytesAsync(12 + 4).then(function(ba:ByteArray):Void {
 			var magic:String = ba.readUTFBytes(12);
 			var tableLength:Int = ba.readUnsignedInt();
 			if (magic != "PackFile    ") throw(new Error('It doesn\'t seems to be an ARC file (\'$name\')'));
@@ -58,7 +58,7 @@ class ARC
 				arc.baseStream.length
 			);
 			
-			stream.readBytesAsync(0x20 * tableLength, function(ba:ByteArray):Void {
+			stream.readBytesAsync(0x20 * tableLength).then(function(ba:ByteArray):Void {
 				for (n in 0 ... tableLength) {
 					var entry:Entry = Entry.createFromArcAndByteArray(arc, ba);
 					arc.table.push(entry);
@@ -134,6 +134,8 @@ private class Entry {
 	public function readAsync(done:ByteArray -> Void):Void {
 		//throw(new Error("Not implemented ARC.Entry.readAsync"));
 		SliceStream.fromLength(arc.fileStream, this.offset, this.length
-		).readAllBytesAsync(done);
+		).readAllBytesAsync().then(function(byteArray:ByteArray) {
+			done(byteArray);
+		});
 	}	
 }

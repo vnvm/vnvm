@@ -23,9 +23,9 @@ class Tileset
 	
 	public function loadDataAsync(done:Void -> Void):Void {
 		if ((partId >= 0) && (name != "")) {
-			BraveAssets.getBitmapDataAsync(name, function(bitmapData:BitmapData) {
+			BraveAssets.getBitmapDataAsync(name).then(function(bitmapData:BitmapData) {
 				this.bitmapData = bitmapData;
-				BraveAssets.getCgDbEntryAsync(name, function(cgDbEntry:CgDbEntry) {
+				BraveAssets.getCgDbEntryAsync(name).then(function(cgDbEntry:CgDbEntry) {
 					this.cgDbEntry = cgDbEntry;
 					done();
 				});

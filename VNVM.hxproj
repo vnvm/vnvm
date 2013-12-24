@@ -4,38 +4,41 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="application.nmml" />
+    <movie path="application.xml" />
     <movie fps="60" />
-    <movie width="960" />
-    <movie height="640" />
+    <movie width="800" />
+    <movie height="480" />
     <movie version="3" />
     <movie minorVersion="0" />
     <movie platform="NME" />
     <movie background="#000000" />
+    <movie preferredSDK=";3;" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
     <class path="src" />
-    <class path="C:\HaxeToolkit\haxe\lib\nme/3,5,6/" />
-    <class path="bin/windows/cpp/haxe" />
+    <class path="bin\windows\cpp\haxe" />
   </classpaths>
   <!-- Build options -->
   <build>
-    <option directives="nme&#xA;nme_ver=3.5.6&#xA;nme_install_tool=1&#xA;nme3=1&#xA;windows&#xA;desktop" />
+    <option directives="tools=1.1.6&#xA;openfl=1.1&#xA;display&#xA;windows&#xA;desktop&#xA;no-compilation" />
     <option flashStrict="False" />
+    <option noInlineOnDebug="False" />
     <option mainClass="ApplicationMain" />
     <option enabledebug="True" />
-    <option additional="--remap flash:nme&#xA;--remap browser:native" />
+    <option additional="--no-output&#xA;--macro allowPackage(&quot;flash&quot;)&#xA;--macro keep(&quot;Main&quot;)" />
   </build>
   <!-- haxelib libraries -->
   <haxelib>
-    <library name="nme" />
+    <library name="openfl" />
+    <library name="openfl-vfs" />
+    <library name="actuate" />
     <library name="format" />
-    <library name="nme-vfs" />
+    <library name="promhx" />
   </haxelib>
   <!-- Class files to compile (other referenced classes will automatically be included) -->
   <compileTargets>
-    <compile path="src\Main.hx" />
+    <compile path="src\src\soywiz\vnvm\Main.hx" />
   </compileTargets>
   <!-- Assets to embed into the output SWF -->
   <library>
@@ -43,7 +46,7 @@
   </library>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>
-    <!-- example: <hidden path="..." /> -->
+    <hidden path="obj" />
   </hiddenPaths>
   <!-- Executed before build -->
   <preBuildCommand />

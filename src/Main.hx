@@ -2,6 +2,7 @@ package ;
 import common.AssetsFileSystem;
 import common.GameInput;
 import common.StageReference;
+import haxe.Log;
 import vfs.VirtualFileSystem;
 import common.StringEx;
 import flash.display.Sprite;
@@ -10,6 +11,7 @@ import flash.errors.Error;
 import flash.events.Event;
 import flash.Lib;
 import flash.utils.ByteArray;
+import promhx.Promise;
 
 /**
  * ...
@@ -49,20 +51,22 @@ class Main extends Sprite
 		fs = AssetsFileSystem.getAssetsFileSystem();
 
 		var loadByteArray:ByteArray;
-		fs.tryOpenAndReadAllAsync("load.txt", function(loadByteArray:ByteArray) {
-			if (loadByteArray == null) {
-				loadEngine("dividead", null);
+		var fileName:String = "load.txt";
+		fs.existsAsync(fileName).then(function(exists:Bool) {
+			if (exists) {
+				fs.openAndReadAllAsync(fileName).then(function(loadByteArray:ByteArray) {
+					var text:String = StringTools.trim(loadByteArray.readUTFBytes(loadByteArray.length));
+					var parts:Array<String> = text.split(':');
+					var scriptName:String = null;
+					var scriptPos:Int = 0;
+					
+					fileName = parts[0];
+					if (parts.length >= 1) scriptName = parts[1];
+					if (parts.length >= 2) scriptPos = StringEx.parseInt(parts[2], 16);
+					loadEngine(fileName, scriptName, scriptPos);
+				});
 			} else {
-				var text:String = StringTools.trim(loadByteArray.readUTFBytes(loadByteArray.length));
-				var parts:Array<String> = text.split(':');
-				var name:String;
-				var scriptName:String = null;
-				var scriptPos:Int = 0;
-				
-				name = parts[0];
-				if (parts.length >= 1) scriptName = parts[1];
-				if (parts.length >= 2) scriptPos = StringEx.parseInt(parts[2], 16);
-				loadEngine(name, scriptName, scriptPos);
+				loadEngine("dividead", null);
 			}
 		});
 	}

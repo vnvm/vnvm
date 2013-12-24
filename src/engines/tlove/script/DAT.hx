@@ -59,7 +59,7 @@ class DAT
 	
 	public function loadAsync(name:String, done:Void -> Void):Void {
 		var data:ByteArray;
-		game.date.getBytesAsync('$name.DAT', function(data:ByteArray):Void {
+		game.date.getBytesAsync('$name.DAT').then(function(data:ByteArray):Void {
 			data.position = 0;
 			this.scriptName = name;
 			data.endian = Endian.BIG_ENDIAN;

@@ -1,5 +1,6 @@
 package engines.tlove;
 
+import promhx.Promise;
 import common.Event2;
 import common.GraphicUtils;
 import common.imaging.BitmapData8;
@@ -142,7 +143,7 @@ class Game
 	
 	public function getMrsAsync(name:String, done:MRS -> Void):Void {
 		var ba:ByteArray;
-		mrs.getBytesAsync(PathUtils.addExtensionIfMissing(name, "mrs").toUpperCase(), function(ba:ByteArray):Void {
+		mrs.getBytesAsync(PathUtils.addExtensionIfMissing(name, "mrs").toUpperCase()).then(function(ba:ByteArray):Void {
 			done(new MRS(ba));
 		});
 	}
@@ -214,21 +215,31 @@ class Game
 	static public function initFromFileSystemAsync(fs:VirtualFileSystem, done:Game -> Void):Void {
 		var game:Game = new Game();
 		
-		fs.openBatchAsync(["MIDI", "MRS", "DATE", "EFF"], function(midiStream:Stream, mrsStream:Stream, dateStream:Stream, effStream:Stream):Void {
-			PAK.newPakAsync(midiStream, function(midi:PAK) {
-			PAK.newPakAsync(mrsStream, function(mrs:PAK) {
-			PAK.newPakAsync(dateStream, function(date:PAK) {
-			PAK.newPakAsync(effStream, function(eff:PAK) {
-				game.midi = midi;
-				game.mrs = mrs;
-				game.date = date;
-				game.eff = eff;
-				
-				done(game);
-			});
-			});
-			});
+		openAndCreatePakAsync(fs, "MIDI").then(function(midi:PAK):Void {
+		openAndCreatePakAsync(fs, "MRS").then(function(mrs:PAK):Void {
+		openAndCreatePakAsync(fs, "DATE").then(function(date:PAK):Void {
+		openAndCreatePakAsync(fs, "EFF").then(function(eff:PAK):Void {
+			game.midi = midi;
+			game.mrs = mrs;
+			game.date = date;
+			game.eff = eff;
+			
+			done(game);
+		});
+		});
+		});
+		});
+	}
+	
+	static private function openAndCreatePakAsync(fs:VirtualFileSystem, name:String):Promise<PAK>
+	{
+		var stream:Stream;
+		var promise = new Promise<PAK>();
+		fs.openAsync(name).then(function(stream:Stream) {
+			PAK.newPakAsync(stream).then(function(pak:PAK) {
+				promise.resolve(pak);
 			});
 		});
+		return promise;
 	}
 }

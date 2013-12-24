@@ -245,7 +245,7 @@ class ScriptInstructions
 		var music:Sound;
 		MUSIC_STOP();
 		var fileName:String = StringEx.sprintf('bgm%02dgm', [index]);
-		BraveAssets.getMusicAsync(fileName, function(music:Sound) {
+		BraveAssets.getMusicAsync(fileName).then(function(music:Sound) {
 			BraveLog.trace("MUSIC_PLAY:" + fileName);
 			scriptThread.gameState.musicChannel = music.play(0, -1, new SoundTransform(1, 0));
 			done();
@@ -528,7 +528,7 @@ class ScriptInstructions
 		};
 
 		if (voiceName != "") {
-			BraveAssets.getVoiceAsync(voiceName, function(voice:Sound) {
+			BraveAssets.getVoiceAsync(voiceName).then(function(voice:Sound) {
 				voiceChannel = voice.play();
 				internal();
 			});

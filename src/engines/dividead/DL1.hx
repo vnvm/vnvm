@@ -1,5 +1,6 @@
 package engines.dividead;
 
+import promhx.Promise;
 import vfs.SliceStream;
 import vfs.Stream;
 import vfs.VirtualFileSystem;
@@ -20,7 +21,7 @@ class DL1 extends VirtualFileSystem
 		var dl1:DL1 = new DL1();
 
 		// Read header
-		stream.readBytesAsync(0x10, function(header:ByteArray) {
+		stream.readBytesAsync(0x10).then(function(header:ByteArray) {
 			var magic:String = StringTools.replace(header.readUTFBytes(8), String.fromCharCode(0), '');
 			var count:Int = header.readUnsignedShort();
 			var offset:Int = header.readUnsignedInt();
@@ -32,7 +33,7 @@ class DL1 extends VirtualFileSystem
 			
 			// Read entries
 			stream.position = offset;
-			stream.readBytesAsync(16 * count, function(entriesByteArray:ByteArray):Void {
+			stream.readBytesAsync(16 * count).then(function(entriesByteArray:ByteArray):Void {
 				for (n in 0 ... count) {
 					var name:String = StringTools.replace(entriesByteArray.readUTFBytes(12), String.fromCharCode(0), '');
 					var size:Int = entriesByteArray.readUnsignedInt();
@@ -48,11 +49,11 @@ class DL1 extends VirtualFileSystem
 		});
 	}
 	
-	override public function openAsync(name:String, done:Stream -> Void):Void 
+	override public function openAsync(name:String):Promise<Stream> 
 	{
 		name = name.toUpperCase();
 		var entry:Stream = entries.get(name);
 		if (entry == null) throw('Can\'t find \'$name\'');
-		done(entry);
+		return Promise.promise(entry);
 	}
 }

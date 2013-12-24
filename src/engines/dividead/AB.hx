@@ -34,7 +34,7 @@ class AB
 	}
 	
 	public function loadScriptAsync(scriptName:String, scriptPos:Int = 0, done:Void -> Void):Void {
-		game.sg.openAndReadAllAsync('${scriptName}.ab', function(script:ByteArray):Void {
+		game.sg.openAndReadAllAsync('${scriptName}.ab').then(function(script:ByteArray):Void {
 			this.scriptName = scriptName;
 			this.script = script;
 			this.script.position = scriptPos;

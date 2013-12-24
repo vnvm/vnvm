@@ -1,5 +1,6 @@
 package engines.brave.sound;
 //import haxe.io.Input;
+import promhx.Promise;
 import common.ByteArrayUtils;
 import vfs.Stream;
 import haxe.Log;
@@ -27,17 +28,21 @@ class SoundPack
 		this.numberOfChannels = numberOfChannels;
 	}
 	
-	static public function newAsync(numberOfChannels:Int = 1, stream:Stream, done:SoundPack -> Void):Void {
+	static public function newAsync(numberOfChannels:Int = 1, stream:Stream):Promise<SoundPack> {
 		var soundPack:SoundPack = new SoundPack(numberOfChannels);
-		soundPack.loadAsync(stream, function():Void {
-			done(soundPack);
+		return soundPack.loadAsync(stream).then(function(empty) {
+			return soundPack;
 		});
 	}
 	
-	public function getSoundAsync(soundFile:String, done:Sound-> Void):Void {
+	public function getSoundAsync(soundFile:String):Promise<Sound> {
 		var entry:SoundEntry = entries.get(soundFile);
 		if (entry == null) throw(new Error('Can\'t find sound \'${soundFile}\''));
-		entry.getSoundAsync(done);
+		var promise = new Promise<Sound>();
+		entry.getSoundAsync(function(sound:Sound) {
+			promise.resolve(sound);
+		});
+		return promise;
 	}
 	
 	private function readEntry(stream:ByteArray):SoundEntry {
@@ -49,13 +54,14 @@ class SoundPack
 		return new SoundEntry(this, name, position, length);
 	}
 	
-	public function loadAsync(stream:Stream, done:Void -> Void):Void {
+	public function loadAsync(stream:Stream):Promise<Dynamic> {
 		this.stream = stream;
 		
 		var header1:ByteArray;
 		var header2:ByteArray;
 		
-		stream.readBytesAsync(8, function(header1:ByteArray):Void {
+		var promise = new Promise();
+		stream.readBytesAsync(8).then(function(header1:ByteArray):Void {
 			header1.readInt();
 			var headerBlocks:Int = header1.readUnsignedShort();
 			var entryCount:Int = header1.readUnsignedShort();
@@ -63,15 +69,16 @@ class SoundPack
 			stream.position += headerBlocks * 20 +  2;
 			startPosition = 4 + 2 + 2 + (headerBlocks * 20) + 2 + (entryCount * 24);
 			
-			stream.readBytesAsync((entryCount * 24), function(header2:ByteArray):Void {
+			stream.readBytesAsync((entryCount * 24)).then(function(header2:ByteArray):Void {
 				for (n in 0 ... entryCount) {
 					var entry:SoundEntry = readEntry(header2);
 					entries.set(entry.name, entry);
 					//BraveLog.trace(entry.name);
 				}
 				
-				done();
+				promise.resolve(null);
 			});
 		});
+		return promise;
 	}
 }

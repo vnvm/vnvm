@@ -24,7 +24,7 @@ class Script
 	}
 
 	static public function getScriptWithNameAsync(name:String, done:Script -> Void):Void {
-		BraveAssets.getBytesAsync('scenario/${name}.dat', function(bytes:ByteArray) {
+		BraveAssets.getBytesAsync('scenario/${name}.dat').then(function(bytes:ByteArray) {
 			done(getScriptWithByteArray(name, Decrypt.decryptDataWithKey(bytes, Decrypt.key23)));
 		});
 	}

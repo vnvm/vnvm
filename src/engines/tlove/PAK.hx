@@ -1,5 +1,6 @@
 package engines.tlove;
 
+import promhx.Promise;
 import common.ByteArrayUtils;
 import vfs.SliceStream;
 import vfs.Stream;
@@ -14,9 +15,9 @@ class PAK
 		this.items = new Map<String, SliceStream>();
 	}
 
-	public function getBytesAsync(name:String, done:ByteArray -> Void):Void {
+	public function getBytesAsync(name:String):Promise<ByteArray> {
 		var stream:Stream = get(name);
-		stream.readAllBytesAsync(done);
+		return stream.readAllBytesAsync();
 	}
 
 	public function get(name:String):Stream {
@@ -31,16 +32,17 @@ class PAK
 		return a;
 	}
 	
-	static public function newPakAsync(pakStream:Stream, done:PAK -> Void):Void
+	static public function newPakAsync(pakStream:Stream):Promise<PAK>
 	{
 		var pak:PAK = new PAK();
 		var countByteArray:ByteArray;
 		var headerByteArray:ByteArray;
+		var promise = new Promise<PAK>();
 		
-		pakStream.readBytesAsync(2, function(countByteArray:ByteArray):Void {
+		pakStream.readBytesAsync(2).then(function(countByteArray:ByteArray):Void {
 			var headerSize:Int = countByteArray.readUnsignedShort();
 
-			pakStream.readBytesAsync(headerSize, function(headerByteArray:ByteArray):Void {
+			pakStream.readBytesAsync(headerSize).then(function(headerByteArray:ByteArray):Void {
 				var names:Array<String> = [];
 				var offsets:Array<Int> = [];
 
@@ -55,8 +57,10 @@ class PAK
 					pak.items.set(names[n], SliceStream.fromBounds(pakStream, offsets[n], offsets[n + 1]));
 				}
 				
-				done(pak);
+				promise.resolve(pak);
 			});
 		});
+		
+		return promise;
 	}
 }
