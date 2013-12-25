@@ -29,7 +29,7 @@ class LZ
 		var outputBytes = Bytes.alloc(uncompressedSize);
 		var outputData = outputBytes.getData();
 		var outputPosition = 0;
-		var ring = new RingBuffer(0x1000, 0xFEE);
+		var ringStart = 0xFEE;
 
 		//Log.trace("[1]");
 		while (inputPosition < inputLength)
@@ -46,25 +46,35 @@ class LZ
 				{
 					var byte:Int = Bytes.fastGet(inputData, inputPosition++);
 					outputBytes.set(outputPosition++, byte);
-					ring.write(byte);
 				}
 				// Compressed
 				else
 				{
 					if (inputPosition >= inputLength) break;
 
-					var l:Int = Bytes.fastGet(inputData, inputPosition++);
-					var h:Int = Bytes.fastGet(inputData, inputPosition++);
+					var paramL:Int = Bytes.fastGet(inputData, inputPosition++);
+					var paramH:Int = Bytes.fastGet(inputData, inputPosition++);
 					
-					var d:Int = l | (h << 8);
-					var p:Int = (d & 0xFF) | ((d >> 4) & 0xF00);
-					var s:Int = ((d >> 8) & 0xF) + 3;
-					ring.readPosition = p;
-					for (n in 0 ... s)
+					var param:Int = paramL | (paramH << 8);
+
+					var ringOffset:Int = (param & 0xFF) | ((param >> 4) & 0xF00);
+					var ringLength:Int = ((param >> 8) & 0xF) + 3;
+
+					var convertedP:Int = ((ringStart + outputPosition) & 0xFFF) - ringOffset;
+					if (convertedP < 0) convertedP += 0x1000;
+
+					var outputReadOffset:Int = outputPosition - convertedP;
+
+					while (outputReadOffset < 0)
 					{
-						var byte:Int = ring.read();
-						outputBytes.set(outputPosition++, byte);
-						ring.write(byte);
+						outputBytes.set(outputPosition++, 0);
+						outputReadOffset++;
+						ringLength--;
+					}
+
+					while (ringLength-- > 0)
+					{
+						outputBytes.set(outputPosition++, Bytes.fastGet(outputData, outputReadOffset++));
 					}
 				}
 

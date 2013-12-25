@@ -108,12 +108,15 @@ class AB
 		this.running = false;
 	}
 	
-	public function paintToColorAsync(color:Array<Int>, time:Float, done:Void -> Void):Void
+	public function paintToColorAsync(color:Array<Int>, time:Float):Promise<Dynamic>
 	{
 		var sprite:Sprite = new Sprite();
 		GraphicUtils.drawSolidFilledRectWithBounds(sprite.graphics, 0, 0, 640, 480, 0x000000, 1.0);
+		var promise = new Promise<Dynamic>();
 		
-		Animation.animate(done, time, { }, { }, Animation.Linear, function(step:Float):Void {
+		Animation.animate(function() {
+			promise.resolve(null);
+		}, time, { }, { }, Animation.Linear, function(step:Float):Void {
 			game.front.copyPixels(game.back, game.back.rect, new Point(0, 0));
 			//sprite.alpha = step;
 			game.front.draw(sprite, null, new ColorTransform(1, 1, 1, step, 0, 0, 0, 0));
@@ -136,16 +139,20 @@ class AB
 		Screen.flip();
 		Screen.frame(60);
 		*/
+		return promise;
 	}
 	
-	public function paintAsync(pos:Int, type:Int, done:Void -> Void):Void
+	public function paintAsync(pos:Int, type:Int):Promise<Dynamic>
 	{
 		var allRects:Array<Array<Rectangle>> = [];
+		var promise = new Promise<Dynamic>();
 		
 		if ((type == 0) || game.isSkipping()) {
 			game.front.copyPixels(game.back, new Rectangle(0, 0, 640, 480), new Point(0, 0));
-			Timer.delay(done, 4);
-			return;
+			Timer.delay(function() {
+				promise.resolve(null);
+			}, 4);
+			return promise;
 		}
 
 		function addFlipSet(action:Array<Rectangle> -> Void):Void {
@@ -210,10 +217,12 @@ class AB
 				
 				Timer.delay(step, frameTime);
 			} else {
-				done();
+				promise.resolve(null);
 			}
 		};
 		
 		step();
+
+		return promise;
 	}
 }

@@ -2,17 +2,12 @@ package engines.dividead;
 import common.display.OptionSelectedEvent;
 import common.Event2;
 import common.GameInput;
-import common.Keys;
-import common.MathEx;
 import common.Timer2;
-import engines.brave.formats.Decrypt;
 import engines.dividead.AB;
 import haxe.Log;
-import haxe.Timer;
 import flash.display.BitmapData;
 import flash.errors.Error;
 import flash.events.Event;
-import flash.events.MouseEvent;
 import flash.geom.Matrix;
 import flash.media.Sound;
 import flash.media.SoundTransform;
@@ -20,49 +15,49 @@ import flash.text.TextField;
 
 class AB_OP
 {
-	//static var margin = { x = 108, y = 400, h = 12 };
-	
+//static var margin = { x = 108, y = 400, h = 12 };
+
 	var ab:AB;
 	var game:Game;
 	var state:GameState;
-	
+
 	public function new(ab:AB)
 	{
 		this.ab = ab;
 		this.game = ab.game;
 		this.state = ab.game.state;
 	}
-	
-	// ---------------
-	//  FLOW RELATED  
-	// ---------------
-	
+
+// ---------------
+//  FLOW RELATED
+// ---------------
+
 	@Opcode({ id:0x02, format:"P", description:"Jumps unconditionally to a fixed adress" })
-	//@Unimplemented
+//@Unimplemented
 	public function JUMP(offset:Int)
 	{
 		ab.jump(offset);
 	}
-	
+
 	@Opcode({ id:0x10, format:"Fc2P", description:"Jumps if the condition is not true" })
-	//@Unimplemented
+//@Unimplemented
 	public function JUMP_IF_NOT(flag:Int, opId:Int, value:Int, pointer:Int):Void
 	{
 		var op:String = String.fromCharCode(opId);
-		//printf("JUMP_IF_NOT (%08X) FLAG[%d] %c %d\n", pointer, flag, op, value);
+//printf("JUMP_IF_NOT (%08X) FLAG[%d] %c %d\n", pointer, flag, op, value);
 		var result:Bool = false;
 		switch (op)
 		{
 			case '=': result = (state.flags[flag] == value);
-			case '}': result = (state.flags[flag] >  value);
-			case '{': result = (state.flags[flag] <  value);
+			case '}': result = (state.flags[flag] > value);
+			case '{': result = (state.flags[flag] < value);
 			default: throw(new Error('Unknown JUMP_IF_NOT operation \'$op\''));
 		}
 		if (!result) ab.jump(pointer);
 	}
-	
+
 	@Opcode({ id:0x03, format:"FF2", description:"Sets a range of flags to a value" })
-	//@Unimplemented
+//@Unimplemented
 	public function SET_RANGE_FLAG(start:Int, end:Int, value:Int)
 	{
 		Log.trace('FLAG[$start..$end] = $value');
@@ -71,13 +66,13 @@ class AB_OP
 	}
 
 	@Opcode({ id:0x04, format:"Fc2", description:"Sets a flag with a value" })
-	//@Unimplemented
+//@Unimplemented
 	public function SET(flag:Int, opId:Int, value:Int)
 	{
 		var op:String = String.fromCharCode(opId);
 		Log.trace('FLAG[$flag] $op $value');
 		switch (op) {
-			case '=': state.flags[flag]  = value;
+			case '=': state.flags[flag] = value;
 			case '+': state.flags[flag] += value;
 			case '-': state.flags[flag] -= value;
 			default: throw('Unknown SET operation \'$op\'');
@@ -85,17 +80,18 @@ class AB_OP
 	}
 
 	@Opcode({ id:0x18, format:"<S", description:"Loads and executes a script" })
-	//@Unimplemented
+//@Unimplemented
 	public function SCRIPT(done:Void -> Void, name:String):Void
 	{
 		Log.trace('SCRIPT(\'$name\')');
-		ab.loadScriptAsync(name, 0).then(function(success:Bool) {
+		ab.loadScriptAsync(name, 0).then(function(success:Bool)
+		{
 			done();
 		});
 	}
-	
+
 	@Opcode({ id:0x19, format:"", description:"Ends the game" })
-	//@Unimplemented
+//@Unimplemented
 	public function GAME_END():Void
 	{
 		Log.trace("GAME_END");
@@ -103,35 +99,37 @@ class AB_OP
 		throw(new Error("GAME_END"));
 	}
 
-	// ---------------
-	//  INPUT
-	// ---------------
-	
+// ---------------
+//  INPUT
+// ---------------
+
 	@Opcode({ id:0x00, format:"<T", description:"Prints a text on the screen", savepoint:1 })
-	//@Unimplemented
+//@Unimplemented
 	public function TEXT(done:Void -> Void, text:String):Void
 	{
 		game.textField.text = StringTools.replace(text, '@', '"');
 
-		Event2.registerOnceAny([GameInput.onClick, GameInput.onKeyPress], function(e:Event):Void {
+		Event2.registerOnceAny([GameInput.onClick, GameInput.onKeyPress], function(e:Event):Void
+		{
 			game.textField.text = '';
-			if (game.voiceChannel != null) {
+			if (game.voiceChannel != null)
+			{
 				game.voiceChannel.stop();
 				game.voiceChannel = null;
 			}
 			done();
 		});
 	}
-	
+
 	@Opcode({ id:0x50, format:"T", description:"Sets the title for the save" })
-	//@Unimplemented
+//@Unimplemented
 	public function TITLE(title:String):Void
 	{
 		state.title = title;
 	}
 
 	@Opcode({ id:0x06, format:"", description:"Empties the option list", savepoint:1 })
-	//@Unimplemented
+//@Unimplemented
 	public function OPTION_RESET()
 	{
 		game.optionList.clear();
@@ -139,20 +137,21 @@ class AB_OP
 	}
 
 	@Opcode({ id:0x01, format:"PT", description:"Adds an option to the list of options" })
-	//@Unimplemented
+//@Unimplemented
 	public function OPTION_ADD(pointer:Int, text:String)
 	{
-		state.options.push( { pointer : pointer, text : text } );
+		state.options.push({ pointer : pointer, text : text });
 		game.optionList.addOption(text, { pointer : pointer, text : text });
 	}
-	
+
 	@Opcode({ id:0x07, format:"<", description:"Show the list of options" })
-	//@Unimplemented
+//@Unimplemented
 	public function OPTION_SHOW(done:Void -> Void)
 	{
 		var e:OptionSelectedEvent;
 		game.optionList.visible = true;
-		game.optionList.onSelected.registerOnce(function(e:OptionSelectedEvent):Void {
+		game.optionList.onSelected.registerOnce(function(e:OptionSelectedEvent):Void
+		{
 			game.optionList.visible = false;
 			ab.jump(e.selectedOption.data.pointer);
 			done();
@@ -160,7 +159,7 @@ class AB_OP
 	}
 
 	@Opcode({ id:0x0A, format:"<", description:"Shows again a list of options" })
-	//@Unimplemented
+//@Unimplemented
 	public function OPTION_RESHOW(done:Void -> Void)
 	{
 		OPTION_SHOW(done);
@@ -191,7 +190,7 @@ class AB_OP
 	public function MAP_OPTION_SHOW(done:Void -> Void):Void
 	{
 		throw(new Error("MAP_OPTION_SHOW not implemented"));
-		/*
+/*
 		printf("MAP_OPTIONS:\n");
 		for (local n = 0; n < map_options.len(); n++) {
 			local option = map_options[n];
@@ -206,87 +205,96 @@ class AB_OP
 	}
 
 	@Opcode({ id:0x11, format:"<2", description:"Wait `time` milliseconds" })
-	//@Unimplemented
+//@Unimplemented
 	public function WAIT(done:Void -> Void, time:Int):Void
 	{
-		if (game.isSkipping()) {
+		if (game.isSkipping())
+		{
 			done();
-		} else {
-			Event2.registerOnceAny([Timer2.createAndStart(time / 1000).onTick], function(e:Event) {
+		} else
+		{
+			Event2.registerOnceAny([Timer2.createAndStart(time / 1000).onTick], function(e:Event)
+			{
 				done();
 			});
 		}
 	}
-	
-	// ---------------
-	//  SOUND RELATED 
-	// ---------------
+
+// ---------------
+//  SOUND RELATED
+// ---------------
 
 	@Opcode({ id:0x26, format:"<S", description:"Starts a music" })
-	//@Unimplemented
+//@Unimplemented
 	public function MUSIC_PLAY(done:Void -> Void, name:String):Void
 	{
 		var sound:Sound;
-		
+
 		MUSIC_STOP();
-		ab.game.getMusicAsync(name).then(function(sound:Sound) {
+		ab.game.getMusicAsync(name).then(function(sound:Sound)
+		{
 			ab.game.musicChannel = sound.play(0, -1, new SoundTransform(1, 0));
 			done();
 		});
 	}
 
 	@Opcode({ id:0x28, format:"", description:"Stops the currently playing music" })
-	//@Unimplemented
+//@Unimplemented
 	public function MUSIC_STOP():Void
 	{
-		if (ab.game.musicChannel != null) {
+		if (ab.game.musicChannel != null)
+		{
 			ab.game.musicChannel.stop();
 			ab.game.musicChannel = null;
 		}
 	}
 
 	@Opcode({ id:0x2B, format:"<S", description:"Plays a sound in the voice channel" })
-	//@Unimplemented
+//@Unimplemented
 	public function VOICE_PLAY(done:Void -> Void, name:String):Void
 	{
 		var sound:Sound;
-		ab.game.getSoundAsync(name).then(function(sound:Sound):Void {
+		ab.game.getSoundAsync(name).then(function(sound:Sound):Void
+		{
 			ab.game.voiceChannel = sound.play(0, 0, new SoundTransform(1, 0));
 			done();
 		});
 	}
 
 	@Opcode({ id:0x35, format:"<S", description:"Plays a sound in the effect channel" })
-	//@Unimplemented
+//@Unimplemented
 	public function EFFECT_PLAY(done:Void -> Void, name:String):Void
 	{
 		var sound:Sound;
 		EFFECT_STOP();
-		ab.game.getSoundAsync(name).then(function(sound:Sound):Void {
+		ab.game.getSoundAsync(name).then(function(sound:Sound):Void
+		{
 			ab.game.effectChannel = sound.play(0, 0, new SoundTransform(1, 0));
 			done();
 		});
 	}
 
 	@Opcode({ id:0x36, format:"", description:"Stops the sound playing in the effect channgel" })
-	//@Unimplemented
+//@Unimplemented
 	public function EFFECT_STOP():Void
 	{
-		if (ab.game.effectChannel != null) {
+		if (ab.game.effectChannel != null)
+		{
 			ab.game.effectChannel.stop();
 			ab.game.effectChannel = null;
 		}
 	}
-	
-	// ---------------
-	//  IMAGE RELATED
-	// ---------------
+
+// ---------------
+//  IMAGE RELATED
+// ---------------
 
 	@Opcode({ id:0x46, format:"<S", description:"Sets an image as the foreground" })
-	//@Unimplemented
+//@Unimplemented
 	public function FOREGROUND(done:Void -> Void, name:String):Void
 	{
-		game.getImageCachedAsync(name).then(function(bitmapData:BitmapData):Void {
+		game.getImageCachedAsync(name).then(function(bitmapData:BitmapData):Void
+		{
 			var matrix:Matrix = new Matrix();
 			matrix.translate(0, 0);
 			game.back.draw(bitmapData, matrix);
@@ -295,17 +303,18 @@ class AB_OP
 	}
 
 	@Opcode({ id:0x47, format:"<s", description:"Sets an image as the background" })
-	//@Unimplemented
+//@Unimplemented
 	public function BACKGROUND(done:Void -> Void, name:String):Void
 	{
-		game.getImageCachedAsync(name).then(function(bitmapData:BitmapData):Void {
+		game.getImageCachedAsync(name).then(function(bitmapData:BitmapData):Void
+		{
 			var matrix:Matrix = new Matrix();
 			matrix.translate(32, 8);
 			game.back.draw(bitmapData, matrix);
 			done();
 		});
 	}
-	
+
 	@Opcode({ id:0x16, format:"S", description:"Puts an image overlay on the screen" })
 	@Unimplemented
 	public function IMAGE_OVERLAY(name:String):Void
@@ -313,15 +322,16 @@ class AB_OP
 	}
 
 	@Opcode({ id:0x4B, format:"<S", description:"Puts a character in the middle of the screen" })
-	//@Unimplemented
+//@Unimplemented
 	public function CHARA1(done:Void -> Void, name:String):Void
 	{
 		var bitmapData:BitmapData;
-		
+
 		var nameColor = name;
 		var nameMask = name.split('_')[0] + '_0' ;
-		
-		game.getImageMaskCachedAsync(nameColor, nameMask).then(function(bitmapData:BitmapData):Void {
+
+		game.getImageMaskCachedAsync(nameColor, nameMask).then(function(bitmapData:BitmapData):Void
+		{
 			var matrix:Matrix = new Matrix();
 			matrix.translate(Std.int(640 / 2 - bitmapData.width / 2), Std.int(385 - bitmapData.height));
 			game.back.draw(bitmapData, matrix);
@@ -335,15 +345,17 @@ class AB_OP
 	{
 		var bitmapData1:BitmapData;
 		var bitmapData2:BitmapData;
-		
+
 		var name1Color = name1;
 		var name1Mask = name1.split('_')[0] + '_0' ;
-		
+
 		var name2Color = name2;
 		var name2Mask = name2.split('_')[0] + '_0' ;
 
-		game.getImageMaskCachedAsync(name1Color, name1Mask).then(function(bitmapData1:BitmapData):Void {
-			game.getImageMaskCachedAsync(name2Color, name2Mask).then(function(bitmapData2:BitmapData):Void {
+		game.getImageMaskCachedAsync(name1Color, name1Mask).then(function(bitmapData1:BitmapData):Void
+		{
+			game.getImageMaskCachedAsync(name2Color, name2Mask).then(function(bitmapData2:BitmapData):Void
+			{
 				var matrix:Matrix;
 				matrix = new Matrix();
 				matrix.translate(Std.int(640 * 1 / 3 - bitmapData1.width / 2), Std.int(385 - bitmapData1.height));
@@ -358,9 +370,9 @@ class AB_OP
 		});
 	}
 
-	// ----------------------
-	//  IMAGE/EFFECT RELATED
-	// ----------------------
+// ----------------------
+//  IMAGE/EFFECT RELATED
+// ----------------------
 
 	@Opcode({ id:0x4D, format:"<", description:"Performs an animation with the current background (ABCDEF)" })
 	@Unimplemented
@@ -383,9 +395,9 @@ class AB_OP
 		done();
 	}
 
-	// ----------------------
-	//  EFFECT RELATED
-	// ----------------------
+// ----------------------
+//  EFFECT RELATED
+// ----------------------
 
 	@Opcode({ id:0x30, format:"2222", description:"Sets a clipping for the screen" })
 	@Unimplemented
@@ -394,30 +406,42 @@ class AB_OP
 	}
 
 	@Opcode({ id:0x14, format:"<2", description:"Repaints the screen" })
-	//@Unimplemented
+//@Unimplemented
 	public function REPAINT(done:Void -> Void, type:Int):Void
 	{
-		ab.paintAsync(0, type, done);
+		ab.paintAsync(0, type).then(function(e)
+		{
+			done();
+		});
 	}
 
 	@Opcode({ id:0x4A, format:"<2", description:"Repaints the inner part of the screen" })
-	//@Unimplemented
+//@Unimplemented
 	public function REPAINT_IN(done:Void -> Void, type:Int):Void
 	{
-		ab.paintAsync(1, type, done);
+		ab.paintAsync(1, type).then(function(e)
+		{
+			done();
+		});
 	}
 
 	@Opcode({ id:0x1E, format:"<", description:"Performs a fade out to color black" })
-	//@Unimplemented
+//@Unimplemented
 	public function FADE_OUT_BLACK(done:Void -> Void)
 	{
-		ab.paintToColorAsync([0x00, 0x00, 0x00], 1.0, done);
+		ab.paintToColorAsync([0x00, 0x00, 0x00], 1.0).then(function(e)
+		{
+			done();
+		});
 	}
 
 	@Opcode({ id:0x1F, format:"<", description:"Performs a fade out to color white" })
-	//@Unimplemented
+//@Unimplemented
 	public function FADE_OUT_WHITE(done:Void -> Void)
 	{
-		ab.paintToColorAsync([0xFF, 0xFF, 0xFF], 1.0, done);
+		ab.paintToColorAsync([0xFF, 0xFF, 0xFF], 1.0).then(function(e)
+		{
+			done();
+		});
 	}
 }

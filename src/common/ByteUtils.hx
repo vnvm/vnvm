@@ -48,4 +48,12 @@ class ByteUtils
 		return bytes;
 	}
 
+	@:noStack static public function memset(bytes:Bytes, offset:Int, length:Int, value:Int):Void
+	{
+		for (n in offset ... offset + length)
+		{
+			bytes.set(n, value);
+		}
+	}
+
 }
