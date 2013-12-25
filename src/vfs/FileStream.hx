@@ -62,4 +62,11 @@ class FileStream extends Stream
 	
 }
 
+#else
+
+class FileStream extends Stream
+{
+
+}
+
 #end

@@ -25,13 +25,17 @@ class GraphicUtils
 
 		var uvPointTL:Point = new Point((srcX) / bitmapData.width, (srcY) / bitmapData.height);
 		var uvPointBR:Point = new Point((srcX + srcW) / bitmapData.width, (srcY + srcH) / bitmapData.height);
-		
+
 		var verticies:Array<Float> = [pointTL.x, pointTL.y, pointBR.x, pointTL.y, pointTL.x, pointBR.y, pointBR.x, pointBR.y];
 		var uvtData:Array<Float> = [uvPointTL.x, uvPointTL.y, uvPointBR.x, uvPointTL.y, uvPointTL.x, uvPointBR.y, uvPointBR.x, uvPointBR.y];
 		var indices:Array<Int> = [0, 1, 2, 1, 3, 2];
 		 
 		graphics.beginBitmapFill(bitmapData, null, false, true);
+		#if flash
+		graphics.drawTriangles(Vector.ofArray(verticies), Vector.ofArray(indices), Vector.ofArray(uvtData));
+		#else
 		graphics.drawTriangles(cast verticies, cast indices, cast uvtData);
+		#end
 		graphics.endFill();
 	}
 

@@ -1,4 +1,6 @@
 package vfs;
+import flash.utils.Endian;
+import vfs.utils.EventListenerOnce;
 import promhx.Promise;
 import flash.errors.Error;
 import flash.events.Event;
@@ -42,18 +44,21 @@ class HttpFileSystem extends VirtualFileSystem
 		
 		var promise = new Promise<Stream>();
 		//done = LangUtils.callOnce(done);
-		
-		EventUtils.addEventListenerWeak(loader, Event.COMPLETE, function(e:Event):Void {
+
+		var loaderEventListener = new EventListenerOnce(loader);
+
+		loaderEventListener.addEventListener(Event.COMPLETE, function(e:Event):Void {
 			loader.close();
+			loader.data.endian = Endian.LITTLE_ENDIAN;
 			promise.resolve(new BytesStream(loader.data));
 		});
-		EventUtils.addEventListenerWeak(loader, SecurityErrorEvent.SECURITY_ERROR, function(e:SecurityErrorEvent):Void {
+		loaderEventListener.addEventListener(SecurityErrorEvent.SECURITY_ERROR, function(e:SecurityErrorEvent):Void {
 			var error:Error = new Error("SECURITY_ERROR: " + name + " # " + baseUrl);
 			throw(error);
 			loader.close();
 			promise.reject(error);
 		});
-		EventUtils.addEventListenerWeak(loader, IOErrorEvent.IO_ERROR, function(e:SecurityErrorEvent):Void {
+		loaderEventListener.addEventListener(IOErrorEvent.IO_ERROR, function(e:SecurityErrorEvent):Void {
 			var error = new Error("IO_ERROR: " + name + " # " + baseUrl);
 			throw(error);
 			loader.close();
@@ -77,7 +82,7 @@ class HttpFileSystem extends VirtualFileSystem
 		
 		EventUtils.addEventListenerWeak(loader, Event.COMPLETE, function(e:Event):Void {
 			loader.close();
-			promise.resolve(false);
+			promise.resolve(true);
 		});
 		EventUtils.addEventListenerWeak(loader, "httpResponseStatus", function(e:HTTPStatusEvent):Void {
 			loader.close();

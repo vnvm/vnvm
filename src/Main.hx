@@ -1,4 +1,6 @@
 package ;
+import flash.display.StageAlign;
+import flash.display.StageScaleMode;
 import common.AssetsFileSystem;
 import common.GameInput;
 import common.StageReference;
@@ -26,15 +28,19 @@ class Main extends Sprite
 	public function new() 
 	{
 		super();
-		
+
 		#if (cpp || neko)
 		Stage.setFixedOrientation(Stage.OrientationLandscapeRight);
 		#end
 
-		addEventListener(Event.ADDED_TO_STAGE, initOnce);
+		if (stage != null) {
+			initOnce();
+		} else {
+			addEventListener(Event.ADDED_TO_STAGE, initOnce);
+		}
 	}
 	
-	private function initOnce(e) 
+	private function initOnce(?e)
 	{
 		removeEventListener(Event.ADDED_TO_STAGE, initOnce);
 		if (!initialized) {
@@ -53,6 +59,7 @@ class Main extends Sprite
 		var loadByteArray:ByteArray;
 		var fileName:String = "load.txt";
 		fs.existsAsync(fileName).then(function(exists:Bool) {
+			Log.trace('Exists load.txt: ' + exists);
 			if (exists) {
 				fs.openAndReadAllAsync(fileName).then(function(loadByteArray:ByteArray) {
 					var text:String = StringTools.trim(loadByteArray.readUTFBytes(loadByteArray.length));
@@ -66,13 +73,15 @@ class Main extends Sprite
 					loadEngine(fileName, scriptName, scriptPos);
 				});
 			} else {
-				loadEngine("dividead", null);
+				//loadEngine("dividead", null);
+				loadEngine("tlove", null);
 			}
 		});
 	}
 	
 	private function loadEngine(name:String, ?scriptName:String, ?scriptPos:Int):Void
 	{
+		Log.trace('loadEngine: ' + name);
 		switch (name) {
 			case "tlove": addChild(new engines.tlove.EngineMain(fs, scriptName, scriptPos));
 			case "dividead": addChild(new engines.dividead.EngineMain(fs, scriptName, scriptPos));
@@ -87,8 +96,8 @@ class Main extends Sprite
 	static public function main() 
 	{
 		var stage = Lib.current.stage;
-		stage.scaleMode = flash.display.StageScaleMode.NO_SCALE;
-		stage.align = flash.display.StageAlign.TOP_LEFT;
+		stage.scaleMode = StageScaleMode.NO_SCALE;
+		stage.align = StageAlign.TOP_LEFT;
 		
 		Lib.current.addChild(new Main());
 	}

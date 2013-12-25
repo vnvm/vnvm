@@ -1,5 +1,6 @@
 package engines.dividead;
 
+import flash.utils.Endian;
 import promhx.Promise;
 import vfs.SliceStream;
 import vfs.Stream;
@@ -26,6 +27,8 @@ class DL1 extends VirtualFileSystem
 			var count:Int = header.readUnsignedShort();
 			var offset:Int = header.readUnsignedInt();
 			var pos:Int = 0x10;
+
+			Log.trace('' + count + ': ' + offset);
 			
 			if (magic != ("DL1.0" + String.fromCharCode(0x1A))) throw('Invalid DL1 file. Magic : \'$magic\'');
 
@@ -37,6 +40,8 @@ class DL1 extends VirtualFileSystem
 				for (n in 0 ... count) {
 					var name:String = StringTools.replace(entriesByteArray.readUTFBytes(12), String.fromCharCode(0), '');
 					var size:Int = entriesByteArray.readUnsignedInt();
+
+					Log.trace(name + ':' + size);
 					
 					//Log.trace(name);
 					dl1.entries.set(name.toUpperCase(), SliceStream.fromLength(stream, pos, size));

@@ -1,5 +1,6 @@
 package vfs;
 import flash.errors.Error;
+import promhx.Promise;
 import promhx.Promise.Promise;
 
 /**

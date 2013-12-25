@@ -1,5 +1,6 @@
 package vfs.utils;
 
+import haxe.Log;
 import flash.utils.ByteArray;
 import flash.utils.Endian;
 
@@ -39,6 +40,7 @@ class ByteArrayUtils
 
 	static public function readByteArray(src:ByteArray, count:Int):ByteArray {
 		var dst:ByteArray = newByteArray(src.endian);
+		Log.trace('readByteArray(' + count + '): ' + src.position + ': ' + src.length);
 		if (count > 0) {
 			src.readBytes(dst, 0, count);
 		}

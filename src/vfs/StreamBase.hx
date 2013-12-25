@@ -1,6 +1,6 @@
 package vfs;
 import flash.utils.ByteArray;
-import promhx.Promise.Promise;
+import promhx.Promise;
 
 /**
  * ...

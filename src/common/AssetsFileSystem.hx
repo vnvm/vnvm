@@ -48,7 +48,9 @@ class AssetsFileSystem
 		return "../../../assets";
 	}
 
-	static public function getAssetsFileSystem():VirtualFileSystem {
+	static public function getAssetsFileSystem():VirtualFileSystem
+	{
+		Log.trace('flash.AssetsFileSystem.getAssetsFileSystem()');
 		return new HttpFileSystem(getAssetsLocalPath());
 	}
 }

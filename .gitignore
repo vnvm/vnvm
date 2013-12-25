@@ -2,3 +2,6 @@
 /report
 /test.n
 /.build
+/out
+
+/*.iws
