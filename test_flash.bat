@@ -1,2 +1,2 @@
 @echo off
-openfl test application.xml flash -debug -Dnative_trace %*
+openfl test application.nmml flash -debug -Dnative_trace %*

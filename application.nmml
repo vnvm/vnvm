@@ -18,8 +18,15 @@
 	<window orientation="landscape" vsync="true" antialiasing="0" if="cpp" />
 	<!--<window hardware="false" />-->
 
-	
-	<!-- classpath, haxe libs -->
+    <android target-sdk-version="12" minimum-sdk-version="7" />
+    <android install-location="preferExternal" />
+    <android permission="android.permission.READ_EXTERNAL_STORAGE" />
+    <android permission="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+
+    <template path="templates" />
+
+    <!-- classpath, haxe libs -->
 	<source path="src" />
 
 	<haxelib name="format" />
@@ -39,12 +46,6 @@
 	<icon path="assets/logo.svg" />
 	<!--
 	<assets path="assets/img" rename="img" />
-	-->
-	
-	<!--
-	<section if="ios">
-		<assets path="assets" rename="assets" include="*" exclude="nme.svg" />
-	</section>
 	-->
 	
 	<!-- DLLs -->

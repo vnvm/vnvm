@@ -12,23 +12,27 @@ class DL1 extends VirtualFileSystem
 {
 	private var entries:Map<String, Stream>;
 	
-	private function new() {
+	private function new()
+	{
 		this.entries = new Map<String, Stream>();
 	}
 	
-	static public function loadAsync(stream:Stream, done:DL1 -> Void):Void {
+	static public function loadAsync(stream:Stream):Promise<DL1>
+	{
 		var header:ByteArray;
 		var entriesByteArray:ByteArray;
 		var dl1:DL1 = new DL1();
+		var promise = new Promise<DL1>();
 
 		// Read header
-		stream.readBytesAsync(0x10).then(function(header:ByteArray) {
+		stream.readBytesAsync(0x10).then(function(header:ByteArray)
+		{
 			var magic:String = StringTools.replace(header.readUTFBytes(8), String.fromCharCode(0), '');
 			var count:Int = header.readUnsignedShort();
 			var offset:Int = header.readUnsignedInt();
 			var pos:Int = 0x10;
 
-			Log.trace('' + count + ': ' + offset);
+			Log.trace('Loading entries from DL1' + count + ': ' + offset);
 			
 			if (magic != ("DL1.0" + String.fromCharCode(0x1A))) throw('Invalid DL1 file. Magic : \'$magic\'');
 
@@ -36,7 +40,8 @@ class DL1 extends VirtualFileSystem
 			
 			// Read entries
 			stream.position = offset;
-			stream.readBytesAsync(16 * count).then(function(entriesByteArray:ByteArray):Void {
+			stream.readBytesAsync(16 * count).then(function(entriesByteArray:ByteArray):Void
+			{
 				for (n in 0 ... count) {
 					var name:String = StringTools.replace(entriesByteArray.readUTFBytes(12), String.fromCharCode(0), '');
 					var size:Int = entriesByteArray.readUnsignedInt();
@@ -48,10 +53,12 @@ class DL1 extends VirtualFileSystem
 					
 					pos += size;
 				}
-				
-				done(dl1);
+
+				promise.resolve(dl1);
 			});
 		});
+
+		return promise;
 	}
 	
 	override public function openAsync(name:String):Promise<Stream> 

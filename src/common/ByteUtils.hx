@@ -41,9 +41,10 @@ class ByteUtils
 	@:noStack static public function ByteArrayToBytes(byteArray:ByteArray):Bytes {
 		if (byteArray == null) return null;
 		var bytes:Bytes = Bytes.alloc(byteArray.length);
+		var initialByteArrayPosition:Int = byteArray.position;
 		byteArray.position = 0;
 		for (n in 0 ... bytes.length) bytes.set(n, byteArray.readUnsignedByte());
-		byteArray.position = 0;
+		byteArray.position = initialByteArrayPosition;
 		return bytes;
 	}
 

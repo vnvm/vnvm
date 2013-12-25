@@ -89,7 +89,9 @@ class AB_OP
 	public function SCRIPT(done:Void -> Void, name:String):Void
 	{
 		Log.trace('SCRIPT(\'$name\')');
-		ab.loadScriptAsync(name, 0, done);
+		ab.loadScriptAsync(name, 0).then(function(success:Bool) {
+			done();
+		});
 	}
 	
 	@Opcode({ id:0x19, format:"", description:"Ends the game" })

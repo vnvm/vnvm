@@ -1,4 +1,6 @@
 package engines.dividead;
+import common.ByteUtils;
+import common.ByteArrayUtils;
 import common.compression.RingBuffer;
 import haxe.io.Bytes;
 import haxe.Log;
@@ -14,42 +16,54 @@ class LZ
 
 		if (magic != "LZ") throw("Invalid LZ stream");
 		
-		return _decode(data);
+		return _decode(data, uncompressedSize);
 	}
 	
-	@:noStack static private function _decode(input:ByteArray):ByteArray {
-		var output:ByteArray = new ByteArray();
-		var ring:RingBuffer = new RingBuffer(0x1000, 0xFEE);
+	@:noStack static private function _decode(input:ByteArray, uncompressedSize:Int):ByteArray
+	{
+		var inputBytes = ByteUtils.ByteArrayToBytes(input);
+		var inputData = inputBytes.getData();
+		var inputPosition = input.position;
+		var inputLength:Int = input.length;
+
+		var outputBytes = Bytes.alloc(uncompressedSize);
+		var outputData = outputBytes.getData();
+		var outputPosition = 0;
+		var ring = new RingBuffer(0x1000, 0xFEE);
 
 		//Log.trace("[1]");
-		while (input.position < input.length) {
-			var code:Int = (input.readUnsignedByte() & 0xFF) | 0x100;
+		while (inputPosition < inputLength)
+		{
+			var code:Int = (Bytes.fastGet(inputData, inputPosition++) & 0xFF) | 0x100;
+			//Log.trace('[2] $code');
 			
-			//Log.trace(Std.format("[2] $code"));
-			
-			while (code != 1) {
+			while (code != 1)
+			{
 				//Log.trace("[3]");
 				
 				// Uncompressed
-				if ((code & 1) != 0) {
-					var byte:Int = input.readUnsignedByte();
-					output.writeByte(byte);
+				if ((code & 1) != 0)
+				{
+					var byte:Int = Bytes.fastGet(inputData, inputPosition++);
+					outputBytes.set(outputPosition++, byte);
 					ring.write(byte);
 				}
 				// Compressed
-				else {
-					if (input.position >= input.length) break;
+				else
+				{
+					if (inputPosition >= inputLength) break;
 
-					var l:Int = input.readUnsignedByte();
-					var h:Int = input.readUnsignedByte();
+					var l:Int = Bytes.fastGet(inputData, inputPosition++);
+					var h:Int = Bytes.fastGet(inputData, inputPosition++);
 					
 					var d:Int = l | (h << 8);
 					var p:Int = (d & 0xFF) | ((d >> 4) & 0xF00);
 					var s:Int = ((d >> 8) & 0xF) + 3;
 					ring.readPosition = p;
-					for (n in 0 ... s) {
+					for (n in 0 ... s)
+					{
 						var byte:Int = ring.read();
-						output.writeByte(byte);
+						outputBytes.set(outputPosition++, byte);
 						ring.write(byte);
 					}
 				}
@@ -58,11 +72,6 @@ class LZ
 			}
 		}
 
-		//Log.trace(Std.format("compressed: ${input.position},${input.length}, uncompressed: ${output.position},${output.length}"));
-
-		input.position = 0;
-		output.position = 0;
-
-		return output;
+		return ByteUtils.BytesToByteArray(outputBytes);
 	}
 }

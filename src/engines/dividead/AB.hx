@@ -1,4 +1,5 @@
 package engines.dividead;
+import promhx.Promise;
 import common.Animation;
 import common.ByteArrayUtils;
 import common.GraphicUtils;
@@ -33,12 +34,13 @@ class AB
 		this.running = true;
 	}
 	
-	public function loadScriptAsync(scriptName:String, scriptPos:Int = 0, done:Void -> Void):Void {
-		game.sg.openAndReadAllAsync('${scriptName}.ab').then(function(script:ByteArray):Void {
+	public function loadScriptAsync(scriptName:String, scriptPos:Int = 0):Promise<Bool>
+	{
+		return game.sg.openAndReadAllAsync('${scriptName}.ab').then(function(script:ByteArray):Bool {
 			this.scriptName = scriptName;
 			this.script = script;
 			this.script.position = scriptPos;
-			done();
+			return true;
 		});
 	}
 	

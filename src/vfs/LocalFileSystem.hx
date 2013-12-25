@@ -3,7 +3,6 @@ package vfs;
 import promhx.Promise;
 import haxe.Log;
 
-#if (cpp || neko)
 import sys.FileSystem;
 
 /**
@@ -19,15 +18,24 @@ class LocalFileSystem extends VirtualFileSystem
 	{
 		this.path = path;
 	}
+
+	private function getFullPath(name:String):String
+	{
+		return this.path + "/" + name;
+	}
 	
 	override public function openAsync(name:String):Promise<Stream> 
 	{
-		return Promise.promise(cast(new FileStream(this.path + "/" + name), Stream));
+		var fullPath:String = getFullPath(name);
+		Log.trace('openAsync: "' + fullPath + '"');
+		return Promise.promise(cast(new FileStream(fullPath), Stream));
 	}
 	
 	override public function existsAsync(name:String):Promise<Bool> 
 	{
-		return Promise.promise(FileSystem.exists(this.path + "/" + name));
+		var fullPath:String = getFullPath(name);
+		var exists = FileSystem.exists(fullPath);
+		Log.trace('existsAsync: "' + fullPath + '": ' + exists);
+		return Promise.promise(exists);
 	}
 }
-#end

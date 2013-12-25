@@ -1,2 +1,2 @@
 @echo off
-openfl test application.xml windows -debug -Dnative_trace %*
+openfl test application.nmml windows -debug -Dnative_trace %*

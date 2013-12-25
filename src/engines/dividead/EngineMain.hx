@@ -35,7 +35,7 @@ class EngineMain extends Sprite
 		Game.newAsync(SubVirtualFileSystem.fromSubPath(fs, "dividead")).then(function(game:Game) {
 			var ab:AB = new AB(game);
 			addChild(new GameScalerSprite(640, 480, game.gameSprite));
-			ab.loadScriptAsync(scriptName, scriptPos, function():Void {
+			ab.loadScriptAsync(scriptName, scriptPos).then(function(success:Bool):Void {
 				ab.execute();
 			});
 			/*

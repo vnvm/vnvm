@@ -17,9 +17,9 @@ import promhx.Promise;
 
 /**
  * ...
- * @author 
+ * @author
+ * @see http://developer.android.com/reference/android/Manifest.permission.html
  */
-
 class Main extends Sprite 
 {
 	var fs:VirtualFileSystem;
