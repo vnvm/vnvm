@@ -235,7 +235,7 @@ class RIO_OP
 
 		function onClick() {
 			//throw(new Error("onClick!"));
-			this.state.setFlag(flagMaskClick, 1);
+			this.state.setFlag(flagMaskClick, (overKind != 0) ? 1 : 0);
 			this.state.setFlag(flagMaskOver, overKind);
 			clicked = false;
 			promise.resolve(null);
