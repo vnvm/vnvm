@@ -12,7 +12,7 @@ import engines.will.script.RIO_OP_PW;
 import common.ByteArrayUtils;
 import flash.utils.ByteArray;
 
-class RIO2 implements IScript
+class RIO implements IScript
 {
 	private var willResourceManager:WillResourceManager;
 	private var gameState:GameState;

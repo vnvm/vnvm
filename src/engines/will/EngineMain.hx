@@ -51,7 +51,7 @@ class EngineMain extends Sprite implements IScene
 		var _this = this;
 		WillResourceManager.createFromFileSystemAsync(fs).then(function(willResourceManager:WillResourceManager) {
 			_this.willResourceManager = willResourceManager;
-			var rio = new RIO2(_this, willResourceManager);
+			var rio = new RIO(_this, willResourceManager);
 
 			rio.loadAsync(initScript).then(function(e) {
 				rio.executeAsync().then(function(e) {
