@@ -1,9 +1,11 @@
 package engines.will.formats;
 
+import engines.will.formats.wip.WipEntry;
+import flash.geom.Rectangle;
 import common.ByteArrayUtils;
 import flash.utils.ByteArray;
 
-class WIP
+class WIP2
 {
 	private var name:String;
 	private var data:ByteArray;
@@ -20,9 +22,9 @@ class WIP
 		this.data = data;
 		this.infos = [];
 		this.images = [];
-		parse_header();
-		foreach (info in infos) parse_image(info);
-		this.memory_size = get_memory_size();
+		readHeader(data);
+		for (info in infos) readImage(info);
+		this.memory_size = getMemorySize();
 	}
 	
 	function export(folder)
@@ -32,34 +34,27 @@ class WIP
 		}
 	}
 	
-	function get_memory_size()
+	function getMemorySize()
 	{
-		local memory_size = 0;
-		foreach (image in images) memory_size += image.memory_size;
+		var memory_size = 0;
+		for (image in images) memory_size += image.memory_size;
 		return memory_size;
 	}
 	
-	function parse_header()
+	private function readHeader(data:ByteArray)
 	{
-		if (ByteArrayUtils.readStringz(data, 4); != "WIPF") throw("Not a WIP File.");
+		if (ByteArrayUtils.readStringz(data, 4) != "WIPF") throw("Not a WIP File.");
 		count = data.readUnsignedShort();
 		bpp   = data.readUnsignedShort();
-		for (n in 0 ... count) infos.push(parse_entry());
+		for (n in 0 ... count) infos.push(readHeaderImageEntry(data));
 	}
 
-	function parse_entry()
+	private function readHeaderImageEntry(data:ByteArray)
 	{
-		return {
-			w     = data.readUnsignedInt(),
-			h     = data.readUnsignedInt(),
-			x     = data.readUnsignedInt(),
-			y     = data.readUnsignedInt(),
-			unk   = data.readUnsignedInt(),
-			csize = data.readUnsignedInt(),
-		};
+		return new WipEntry().read(data);
 	}
 	
-	function parse_image(info)
+	function readImage(info:WipEntry)
 	{
 		var pal = null;
 		// has palette
@@ -96,20 +91,15 @@ class WIP
 		));
 	}
 	
-	function getRect(index = 0, x = 0, y = 0)
+	private function getRect(index = 0, x = 0, y = 0)
 	{
-		local info = infos[index];
-		return {
-			x = info.x + x,
-			y = info.y + y,
-			w = info.w,
-			h = info.h,
-		};
+		var info = infos[index];
+		return new Rectangle(info.x + x, info.x + y, info.w, info.h)
 	}
 	
 	function drawTo(destinationBitmap, index = 0, x = 0, y = 0, alpha = 1.0, size = 1.0, rotation = 0.0)
 	{
-		local info = infos[index];
+		var info = infos[index];
 		destinationBitmap.drawBitmap(images[index], info.x + x, info.y + y, alpha, size, rotation);
 	}
 	
@@ -122,24 +112,25 @@ class WIP
 	{
 		return pointInRect(point, this.infos[index]);
 	}
-}
 
-function WIP_MSK(wip_s, msk_s, name) {
-	local translation_path = info.game_data_path + "/translation/" + ::info.game_lang + "/";
-	local wip = WIP(wip_s, name);
-	local msk = null;
-	try {
+	static public function WIP_MSK(wip_s, msk_s, name) {
+		local translation_path = info.game_data_path + "/translation/" + ::info.game_lang + "/";
+		local wip = WIP(wip_s, name);
+		local msk = null;
+		try {
 		msk = WIP(msk_s, name);
-	} catch (e) {
-	}
-	for (local n = 0; n < wip.images.len(); n++) {
-		local slice_image_file = format("%s/%s.%d.png", translation_path, name, n);
-		//printf("FILE: '%s'\n", slice_image_file);
-		if (file_exists(slice_image_file)) {
-			wip.images[n] = Bitmap.fromFile(slice_image_file);
-		} else {
-			if (msk) wip.images[n].copyChannel(msk.images[n], "red", "alpha", 1);
+		} catch (e) {
 		}
+		for (local n = 0; n < wip.images.len(); n++) {
+		local slice_image_file = format("%s/%s.%d.png", translation_path, name, n);
+//printf("FILE: '%s'\n", slice_image_file);
+		if (file_exists(slice_image_file)) {
+		wip.images[n] = Bitmap.fromFile(slice_image_file);
+		} else {
+		if (msk) wip.images[n].copyChannel(msk.images[n], "red", "alpha", 1);
+		}
+		}
+		return wip;
 	}
-	return wip;
+
 }

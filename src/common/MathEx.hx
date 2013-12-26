@@ -44,7 +44,8 @@ class MathEx
 	}
 
 	#if cpp @:functionCode("return numerator / denominator;") #end
-	static inline public function int_div(numerator:Int, denominator:Int):Int {
+	@:noStack static inline public function int_div(numerator:Int, denominator:Int):Int
+	{
 		return Std.int(numerator / denominator);
 	}
 	

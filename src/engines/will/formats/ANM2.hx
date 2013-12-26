@@ -1,24 +1,12 @@
-/*
-struct ANM_ENTRY {
-	ushort data[402];
-}
+package engines.will.formats;
 
-struct ANM {
-	char file_name[9];
-	ANM_ENTRY entries[100];
-}
-*/
-class ANM
+class ANM2
 {
 	// Struct
-	wip_name = null;
-	entries = null;
+	private var wip_name:String;
+	private var entries = null;
 
-	// Local
-	wip = null;
-	active = null;
-
-	constructor()
+	public function new()
 	{
 		this.wip_name = null;
 		this.entries = []; for (local n = 0; n < 100; n++) this.entries.push(array(402, 0));

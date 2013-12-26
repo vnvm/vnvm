@@ -46,7 +46,7 @@ class DL1 extends VirtualFileSystem
 					var name:String = StringTools.replace(entriesByteArray.readUTFBytes(12), String.fromCharCode(0), '');
 					var size:Int = entriesByteArray.readUnsignedInt();
 
-					Log.trace(name + ':' + size);
+					//Log.trace(name + ':' + size);
 					
 					//Log.trace(name);
 					dl1.entries.set(name.toUpperCase(), SliceStream.fromLength(stream, pos, size));

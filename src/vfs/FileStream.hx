@@ -7,8 +7,6 @@ import haxe.Log;
 import flash.errors.Error;
 import flash.utils.ByteArray;
 
-#if (cpp || neko)
-
 import sys.FileStat;
 import sys.FileSystem;
 import sys.io.File;
@@ -61,12 +59,3 @@ class FileStream extends Stream
 	}
 	
 }
-
-#else
-
-class FileStream extends Stream
-{
-
-}
-
-#end

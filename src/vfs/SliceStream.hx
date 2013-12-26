@@ -48,6 +48,7 @@ class SliceStream extends Stream
 	
 	static public function fromAll(parent:Stream):SliceStream
 	{
+		if (parent == null) throw("Parent can't be null!");
 		return fromLength(parent, 0, parent.length);
 	}
 }

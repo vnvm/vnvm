@@ -1,3 +1,5 @@
+package engines.will.formats;
+
 /*
 struct TBL {
 	uint count;
@@ -7,7 +9,7 @@ struct TBL {
 	ubyte keymap[0x12][0x10];
 }
 */
-class TBL
+class TBL2
 {
 	// Struct data.
 	name     = null;

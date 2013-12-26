@@ -71,7 +71,8 @@ class HttpFileSystem extends VirtualFileSystem
 		return promise;
 	}
 	
-	override public function existsAsync(name:String):Promise<Bool> {
+	override public function existsAsync(name:String):Promise<Bool>
+	{
 		var loader:URLLoader = new URLLoader();
 		var urlRequest:URLRequest = new URLRequest(getAbsolutePath(name));
 		loader.dataFormat = URLLoaderDataFormat.BINARY;

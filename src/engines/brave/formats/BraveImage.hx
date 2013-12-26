@@ -1,5 +1,6 @@
 package engines.brave.formats;
 
+import common.BitUtils;
 import common.ByteUtils;
 import haxe.io.Bytes;
 import flash.display.BitmapData;
@@ -31,20 +32,7 @@ class BraveImage
 	static private var decodeImageKey:Array<Int> = [
 		0x84, 0x41, 0xDE, 0x48, 0x08, 0xCF, 0xCF, 0x6F, 0x62, 0x51, 0x64, 0xDF, 0x41, 0xDF, 0xE2, 0xE1
 	];
-	
-	/**
-	 * 
-	 * @param	v
-	 * @param	offset
-	 * @param	count
-	 * @param	to
-	 * @return
-	 */
-	static private inline function extractScale(v:Int, offset:Int, count:Int, to:Int):Int
-	{
-		var mask:Int = ((1 << count) - 1);
-		return cast((((v >> offset) & mask) * to) / mask);
-	}
+
 	
 	static private function decryptChunk(input:ByteArray, key:Bytes):ByteArray {
 		var output:ByteArray = new ByteArray();
@@ -101,9 +89,9 @@ class BraveImage
 		for (y in 0 ... height) {
 			for (x in 0 ... width) {
 				var pixelData:Int = data.readUnsignedShort();
-				var b:Int = extractScale(pixelData, 0, 5, 0xFF);
-				var g:Int = extractScale(pixelData, 5, 6, 0xFF);
-				var r:Int = extractScale(pixelData, 11, 5, 0xFF);
+				var b:Int = BitUtils.extractScaled(pixelData, 0, 5, 0xFF);
+				var g:Int = BitUtils.extractScaled(pixelData, 5, 6, 0xFF);
+				var r:Int = BitUtils.extractScaled(pixelData, 11, 5, 0xFF);
 				var a:Int = 0xFF;
 				if ((r == 0xFF) && (g == 0x00) && (b == 0xFF))
 				{

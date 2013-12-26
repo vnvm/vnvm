@@ -1,4 +1,5 @@
 package common;
+import haxe.io.BytesData;
 import haxe.io.Bytes;
 import flash.utils.ByteArray;
 import flash.utils.Endian;
@@ -13,9 +14,13 @@ class ByteUtils
 	@:noStack static public function BytesToByteArray(bytes:Bytes):ByteArray {
 		if (bytes == null) return null;
 		//return bytes.getData();
+		var bytesData:BytesData = bytes.getData();
 		var byteArray:ByteArray = new ByteArray();
 		byteArray.endian = Endian.LITTLE_ENDIAN;
-		for (n in 0 ... bytes.length) byteArray.writeByte(bytes.get(n));
+		for (n in 0 ... bytes.length) {
+			//byteArray.writeByte(bytes.get(n));
+			byteArray[n] = cast bytesData[n];
+		}
 		byteArray.position = 0;
 		return byteArray;
 	}
@@ -39,11 +44,16 @@ class ByteUtils
 	}
 
 	@:noStack static public function ByteArrayToBytes(byteArray:ByteArray):Bytes {
+		#if flash9
+			return Bytes.ofData(byteArray);
+		#elseif (cpp || neko)
+			return byteArray;
+		#end
 		if (byteArray == null) return null;
 		var bytes:Bytes = Bytes.alloc(byteArray.length);
 		var initialByteArrayPosition:Int = byteArray.position;
 		byteArray.position = 0;
-		for (n in 0 ... bytes.length) bytes.set(n, byteArray.readUnsignedByte());
+		//for (n in 0 ... bytes.length) bytes.set(n, byteArray.readUnsignedByte());
 		byteArray.position = initialByteArrayPosition;
 		return bytes;
 	}

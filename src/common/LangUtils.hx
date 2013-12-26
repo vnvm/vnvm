@@ -8,6 +8,10 @@ import flash.errors.Error;
 
 class LangUtils 
 {
+	static public inline var ByteSize:Int = 2;
+	static public inline var ShortSize:Int = 2;
+	static public inline var IntSize:Int = 4;
+
 	static public function tryFinally(action:Void -> Void, finally:Void -> Void) {
 		try {
 			action();

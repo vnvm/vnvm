@@ -1,4 +1,5 @@
 package common.compression;
+import haxe.io.BytesData;
 import haxe.io.Bytes;
 
 /**
@@ -8,28 +9,37 @@ import haxe.io.Bytes;
 
 class RingBuffer 
 {
-	public var readPosition:Int; 
-	public var writePosition:Int; 
+	private var readPosition:Int;
+	private var writePosition:Int;
+	private var length:Int;
+	private var mask:Int;
 	private var bytes:Bytes;
+	private var bytesData:BytesData;
 
 	public function new(size:Int, position:Int = 0) 
 	{
 		this.bytes = Bytes.alloc(size);
+		this.bytesData = bytes.getData();
 		this.readPosition = position;
 		this.writePosition = position;
+		this.length = size;
+		this.mask = size - 1;
 		for (n in 0 ... this.bytes.length) this.bytes.set(n, 0);
 	}
 
-	inline public function read():Int
+	@:noStack public function setReadPosition(readPosition:Int):Void
 	{
-		var result:Int = bytes.get(readPosition);
-		readPosition = (readPosition + 1) % bytes.length;
-		return result;
+		this.readPosition = readPosition & mask;
 	}
-	
-	inline public function write(value:Int):Void
+
+	@:noStack public inline function readByte():Int
 	{
-		bytes.set(writePosition, value);
-		writePosition = (writePosition + 1) % bytes.length;
+		return cast Bytes.fastGet(bytesData, readPosition++ & mask);
+	}
+
+	@:noStack public inline function writeByte(value:Int):Void
+	{
+		bytes.set(writePosition++ & mask, cast value);
+		//bytesData[writePosition++ & mask] = cast value;
 	}
 }
