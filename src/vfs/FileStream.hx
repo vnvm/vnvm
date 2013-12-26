@@ -1,7 +1,7 @@
 package vfs;
 import promhx.Promise;
-import vfs.utils.ByteUtils;
-import vfs.utils.StringEx;
+import common.ByteUtils;
+import common.StringEx;
 import haxe.io.Bytes;
 import haxe.Log;
 import flash.errors.Error;

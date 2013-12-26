@@ -1,6 +1,6 @@
 package vfs;
 
-import promhx.Promise.Promise;
+import promhx.Promise;
 import vfs.Stream;
 import haxe.Timer;
 import flash.errors.Error;

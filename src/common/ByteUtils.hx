@@ -14,13 +14,9 @@ class ByteUtils
 	@:noStack static public function BytesToByteArray(bytes:Bytes):ByteArray {
 		if (bytes == null) return null;
 		//return bytes.getData();
-		var bytesData:BytesData = bytes.getData();
 		var byteArray:ByteArray = new ByteArray();
 		byteArray.endian = Endian.LITTLE_ENDIAN;
-		for (n in 0 ... bytes.length) {
-			//byteArray.writeByte(bytes.get(n));
-			byteArray[n] = cast bytesData[n];
-		}
+		for (n in 0 ... bytes.length) byteArray.writeByte(bytes.get(n));
 		byteArray.position = 0;
 		return byteArray;
 	}

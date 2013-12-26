@@ -1,4 +1,4 @@
-package vfs.utils;
+package common;
 import flash.errors.Error;
 import flash.events.IEventDispatcher;
 

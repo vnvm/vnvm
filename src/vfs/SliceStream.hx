@@ -1,7 +1,7 @@
 package vfs;
 
 import promhx.Promise;
-import vfs.utils.LangUtils;
+import common.LangUtils;
 import flash.utils.ByteArray;
 import vfs.Stream;
 
