@@ -39,7 +39,7 @@ class GameLayer extends Sprite
 	{
 		removeObject(index);
 
-		return getWipWithMaskAsync(name).then(function(wip:WIP)
+		return willResourceManager.getWipWithMaskAsync(name).then(function(wip:WIP)
 		{
 			var bitmapData = wip.get(0).bitmapData;
 			var sprite = new Sprite();
@@ -72,28 +72,5 @@ class GameLayer extends Sprite
 		this.x = x;
 		this.y = y;
 		return this;
-	}
-
-	private function getWipWithMaskAsync(name:String):Promise<WIP>
-	{
-		var promise = new Promise<WIP>();
-
-		getWipAsync('$name.WIP').then(function(colorWip:WIP)
-		{
-			getWipAsync('$name.MSK').then(function(alphaWip:WIP)
-			{
-				colorWip.mergeAlpha(alphaWip);
-				promise.resolve(colorWip);
-			});
-		});
-		return promise;
-	}
-
-	private function getWipAsync(name:String):Promise<WIP>
-	{
-		return willResourceManager.readAllBytesAsync(name).then(function(data:ByteArray):WIP
-		{
-			return (data != null) ? WIP.fromByteArray(data) : null;
-		});
 	}
 }

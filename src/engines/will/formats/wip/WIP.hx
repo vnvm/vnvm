@@ -41,11 +41,9 @@ class WIP
 		for (entry in entries)
 		{
 			var palette:Array<Int> = new Array<Int>();
-			var empty:Array<Int> = new Array<Int>();
 			if (bpp == 8) {
 				for (n in 0 ... 0x100) {
 					palette.push(data.readInt());
-					empty.push(0);
 				}
 			}
 			var compressedData = ByteArrayUtils.readByteArray(data, entry.compressedSize);
@@ -55,7 +53,8 @@ class WIP
 					entry.bitmapData = BitmapDataSerializer.decode(uncompressedData, entry.width, entry.height, "bgr", false);
 				case 8:
 					entry.bitmapData = BitmapDataSerializer.decode(uncompressedData, entry.width, entry.height, "r", false);
-					entry.bitmapData.paletteMap(entry.bitmapData, entry.bitmapData.rect, new Point(0, 0), palette, empty, empty, empty);
+					BitmapDataUtils.applyPalette(entry.bitmapData, palette);
+					//entry.bitmapData.paletteMap(entry.bitmapData, entry.bitmapData.rect, new Point(0, 0), palette, empty, empty, empty);
 				default:
 					throw('Not implemented bpp=$bpp');
 			}

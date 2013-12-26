@@ -6,7 +6,7 @@ import common.ByteArrayUtils;
 import flash.utils.ByteArray;
 class ANM
 {
-	private var wipName:String;
+	public var wipName:String;
 	private var entries:GenericMatrix2D<Int>;
 
 	private function new()
@@ -23,7 +23,9 @@ class ANM
 		{
 			for (x in 0 ... this.entries.width)
 			{
-				this.entries.set(x, y, input.readUnsignedShort());
+				var value = input.readUnsignedShort();
+				this.entries.set(x, y, value);
+				//Log.trace('$x, $y: $value');
 			}
 		}
 	}

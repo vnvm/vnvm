@@ -1,5 +1,6 @@
 package engines.will;
 
+import engines.will.formats.wip.WIP;
 import vfs.Stream;
 import flash.utils.ByteArray;
 import promhx.Promise;
@@ -71,5 +72,28 @@ class WillResourceManager
 		}
 		return Promise.promise(null);
 		//throw(new Error('Can\'t find "$name"'));
+	}
+
+	public function getWipWithMaskAsync(name:String):Promise<WIP>
+	{
+		var promise = new Promise<WIP>();
+
+		getWipAsync('$name.WIP').then(function(colorWip:WIP)
+		{
+			getWipAsync('$name.MSK').then(function(alphaWip:WIP)
+			{
+				colorWip.mergeAlpha(alphaWip);
+				promise.resolve(colorWip);
+			});
+		});
+		return promise;
+	}
+
+	public function getWipAsync(name:String):Promise<WIP>
+	{
+		return readAllBytesAsync(name).then(function(data:ByteArray):WIP
+		{
+			return (data != null) ? WIP.fromByteArray(data) : null;
+		});
 	}
 }

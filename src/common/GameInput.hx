@@ -21,6 +21,7 @@ class GameInput
 	}
 	
 	static public var onClick:Event2<MouseEvent>;
+	static public var onMouseMoveEvent:Event2<MouseEvent>;
 	static public var onKeyPress:Event2<KeyboardEvent>;
 	
 	static public function init() {
@@ -31,14 +32,18 @@ class GameInput
 		StageReference.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 		StageReference.stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
 		StageReference.stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
-		StageReference.stage.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent) {
+		StageReference.stage.addEventListener(MouseEvent.CLICK, function(e:MouseEvent) {
 			onClick.trigger(e);
+		});
+		StageReference.stage.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent) {
+			//onClick.trigger(e);
 		});
 		
 		mouseCurrent = new Point(-1, -1);
 		mouseCurrentClick = new Point( -1, -1);
 		mouseStart = new Point(-1, -1);
 		onClick = new Event2<MouseEvent>();
+		onMouseMoveEvent = new Event2<MouseEvent>();
 		onKeyPress = new Event2<KeyboardEvent>();
 	}
 	
@@ -104,5 +109,7 @@ class GameInput
 			setKey(Keys.Up, (offset.y < -deltaThresold));
 			setKey(Keys.Down, (offset.y > deltaThresold));
 		}
+
+		onMouseMoveEvent.trigger(e);
 	}
 }

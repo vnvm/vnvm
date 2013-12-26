@@ -8,6 +8,8 @@ PRINCESS WALTZ:
 	sub_406F00
 */
 
+import flash.events.MouseEvent;
+import flash.geom.Point;
 import flash.events.Event;
 import common.Event2;
 import common.GameInput;
@@ -24,12 +26,16 @@ class RIO_OP
 	private var scene:IScene;
 	private var state:GameState;
 	private var script:IScript;
+	private var clicked:Bool;
 
 	public function new(scene:IScene, state:GameState, script:IScript)
 	{
 		this.scene = scene;
 		this.state = state;
 		this.script = script;
+		GameInput.onClick.register(function(e) {
+			clicked = true;
+		});
 	}
 
 	/*
@@ -61,6 +67,7 @@ class RIO_OP
 	@Opcode({ id:0x55, format:"1", description:"" })
 	public function UNK_55(unk:Int)
 	{
+		//scene.setDirectMode(true);
 		//this.interface.enabled = false;
 		//gameStep();
 		//this.interface.enabled = false;
@@ -131,6 +138,7 @@ class RIO_OP
 	@Opcode({ id:0x85, format:"2", description:"" })
 	public function UNK_85(param:Int)
 	{
+		// @TODO: Maybe related with being able to save?
 	}
 
 	@Opcode({ id:0x89, format:"1", description:"" })
@@ -141,6 +149,7 @@ class RIO_OP
 	@Opcode({ id:0x8C, format:"21", description:"" })
 	public function UNK_8C(unk1:Int, unk2:Int)
 	{
+		//scene.setDirectMode(false);
 	}
 
 	@Opcode({ id:0x8E, format:"1", description:"" })
@@ -192,17 +201,19 @@ class RIO_OP
 	}
 
 	@Opcode({ id:0x45, format:"121", description:"" })
-	public function TABLE_ANIM_OBJECT_PUT(unk1, index, unk2)
+	public function TABLE_ANIM_OBJECT_PUT(unk1:Int, index:Int, unk2:Int)
 	{
-		throw(new NotImplementedException());
+		//throw(new NotImplementedException());
+		return this.scene.setAnimObjectVisibility(index, true);
 
 		//this.scene.table.anim.active_set(index, 1);
 	}
 
 	@Opcode({ id:0x4F, format:"121", description:"" })
-	public function TABLE_ANIM_OBJECT_UNPUT(unk1, index, unk2)
+	public function TABLE_ANIM_OBJECT_UNPUT(unk1:Int, index:Int, unk2:Int)
 	{
-		throw(new NotImplementedException());
+		return this.scene.setAnimObjectVisibility(index, false);
+		//throw(new NotImplementedException());
 
 		//this.scene.table.anim.active_set(index, 0);
 	}
@@ -214,9 +225,45 @@ class RIO_OP
 	}
 
 	@Opcode({ id:0x51, format:"ff1", description:"" })
-	public function TABLE_PICK(flag_move_click:Int, flag_mask_kind:Int, unk1:Int)
+	public function TABLE_PICK(flagMaskClick:Int, flagMaskOver:Int, unk1:Int)
 	{
-		return Timer2.waitAsync(40);
+		scene.setDirectMode(true);
+
+		var promise = new Promise<Dynamic>();
+		var mousePosition:Point = scene.getGameSprite().globalToLocal(GameInput.mouseCurrent);
+		var overKind:Int = scene.getMaskValueAt(mousePosition);
+
+		function onClick() {
+			//throw(new Error("onClick!"));
+			this.state.setFlag(flagMaskClick, 1);
+			this.state.setFlag(flagMaskOver, overKind);
+			clicked = false;
+			promise.resolve(null);
+		}
+
+		function onMove() {
+			this.state.setFlag(flagMaskClick, 0);
+			this.state.setFlag(flagMaskOver, overKind);
+			clicked = false;
+			promise.resolve(null);
+		}
+
+		if (clicked)
+		{
+			onClick();
+		}
+		else
+		{
+			Event2.registerOnceAny([GameInput.onClick, GameInput.onMouseMoveEvent], function(e:MouseEvent) {
+				if (e.type == MouseEvent.CLICK || e.type == MouseEvent.MOUSE_DOWN) {
+					onClick();
+				} else {
+					onMove();
+				}
+			});
+		}
+
+		return promise;
 		//throw(new NotImplementedException());
 		/*
 		this._interface.enabled = false;
@@ -283,6 +330,7 @@ class RIO_OP
 	{
 		Log.trace('TRANSITION: $kind, $ms_time');
 
+		scene.setDirectMode(false);
 		return this.scene.performTransitionAsync(kind, ms_time);
 
 		/*

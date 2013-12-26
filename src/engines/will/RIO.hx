@@ -22,9 +22,9 @@ class RIO implements IScript
 	private var scriptOpcodes:ScriptOpcodes;
 	private var opcodeReader:OpcodeReader;
 
-	public function new(scene:IScene, willResourceManager:WillResourceManager)
+	public function new(scene:IScene, willResourceManager:WillResourceManager, gameState:GameState)
 	{
-		this.gameState = new GameState();
+		this.gameState = gameState;
 		this.willResourceManager = willResourceManager;
 		this.opcodes = new RIO_OP_PW(scene, gameState, this);
 		this.scriptOpcodes = ScriptOpcodes.createWithClass(RIO_OP_PW);

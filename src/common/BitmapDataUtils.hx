@@ -1,4 +1,6 @@
 package common;
+import lang.exceptions.OutOfBoundsException;
+import flash.Vector;
 import haxe.io.BytesData;
 import flash.errors.Error;
 import common.imaging.BitmapDataSerializer;
@@ -30,26 +32,32 @@ class BitmapDataUtils
 		return newBitmap;
 	}
 
-	@:noStack static private function _blend(colorDataData:BytesData, maskDataData:BytesData, totalPixels:Int, readOffset:Int, writeOffset:Int, ratio:Float)
+	@:noStack static private function _blend(colorDataData:BytesData, maskDataData:BytesData, totalPixels:Int, readOffset:Int, writeOffset:Int, ratio:Float, reverse:Bool)
 	{
 		var offset:Int = Std.int(MathEx.interpolate(ratio, 0, 1, -255, 255));
+		if (reverse) offset = -offset;
 
 		while (totalPixels-- > 0)
 		{
 			//Log.trace('$writeOffset, $readOffset');
-			colorDataData[writeOffset] = cast MathEx.clampInt(cast(maskDataData[readOffset], Int) + offset, 0, 255);
+			var value = MathEx.clampInt(cast(maskDataData[readOffset], Int) + offset, 0, 255);
+			if (reverse) value = 255 - value;
+			colorDataData[writeOffset] = cast value;
 			readOffset += 4;
 			writeOffset += 4;
 		}
 	}
 
-	@:noStack static private function _mask(colorDataData:BytesData, maskDataData:BytesData, totalPixels:Int, readOffset:Int, writeOffset:Int, ratio:Float)
+	@:noStack static private function _mask(colorDataData:BytesData, maskDataData:BytesData, totalPixels:Int, readOffset:Int, writeOffset:Int, ratio:Float, reverse:Bool)
 	{
 		var thresold:Int = Std.int(MathEx.interpolate(ratio, 0, 1, 0, 255));
+		if (reverse) thresold = 255 - thresold;
 
 		while (totalPixels-- > 0)
 		{
-			colorDataData[writeOffset] = cast((cast(maskDataData[readOffset], Int) >= thresold) ? 0xFF : 0x00);
+			var value = (cast(maskDataData[readOffset], Int) >= thresold) ? 0xFF : 0x00;
+			if (reverse) value = 255 - value;
+			colorDataData[writeOffset] = cast value;
 			readOffset += 4;
 			writeOffset += 4;
 		}
@@ -57,17 +65,17 @@ class BitmapDataUtils
 
 	static public function applyBlendMaskWithOffset(color:BitmapData, mask:BitmapData, ratio:Float, reverse:Bool):Void
 	{
-		applyAlphaFunction(color, mask, ratio, _blend);
+		applyAlphaFunction(color, mask, ratio, _blend, reverse);
 	}
 
 	static public function applyNoBlendMaskWithOffset(color:BitmapData, mask:BitmapData, ratio:Float, reverse:Bool):Void
 	{
-		applyAlphaFunction(color, mask, ratio, _mask);
+		applyAlphaFunction(color, mask, ratio, _mask, reverse);
 	}
 
-	static public function applyAlphaFunction(color:BitmapData, mask:BitmapData, ratio:Float, callback:Dynamic):Void
+	static public function applyAlphaFunction(color:BitmapData, mask:BitmapData, ratio:Float, callback:Dynamic, reverse:Bool):Void
 	{
-		if (color.width != mask.width || color.height != mask.height) throw(new Error("Invalid arguments"));
+		if (color.width != mask.width || color.height != mask.height) throw(new Error('Invalid arguments ${color.width}x${color.height} != ${mask.width}x${mask.height}}'));
 
 		color.lock();
 		{
@@ -83,9 +91,38 @@ class BitmapDataUtils
 			var readOffset:Int = BitmapDataSerializer.getChannelOffset('r');
 			var writeOffset:Int = BitmapDataSerializer.getChannelOffset('a');
 
-			callback(colorDataData, maskDataData, totalPixels, readOffset, writeOffset, ratio);
+			callback(colorDataData, maskDataData, totalPixels, readOffset, writeOffset, ratio, reverse);
 
 			color.setPixels(color.rect, colorData);
+		}
+		color.unlock();
+	}
+
+	static public function applyPalette(color:BitmapData, palette:Array<Int>):Void
+	{
+		if (palette.length != 0x100) throw(new OutOfBoundsException("Palette must have 256 elements"));
+
+		color.lock();
+		{
+			var colorData = color.getPixels(color.rect);
+			var colorDataData = colorData.getData();
+
+			var totalPixels = color.width * color.height;
+
+			//var pixels = new Vector<Int>(totalPixels, true);
+			//pixels.length = totalPixels;
+			var pixels = new Vector<Int>();
+
+			var redOffset:Int = BitmapDataSerializer.getChannelOffset('r');
+			var offset:Int = 0;
+			for (n in 0 ... totalPixels)
+			{
+				var value = cast colorDataData[offset + redOffset];
+				//pixels[n] = palette[value];
+				pixels.push(palette[value]);
+				offset += 4;
+			}
+			color.setVector(color.rect, pixels);
 		}
 		color.unlock();
 	}
