@@ -1,5 +1,7 @@
 package engines.will.formats.wip;
 
+import flash.geom.Point;
+import common.BitmapDataUtils;
 import common.compression.LzOptions;
 import common.imaging.BitmapDataSerializer;
 import common.compression.LzDecoder;
@@ -37,13 +39,24 @@ class WIP
 	{
 		for (entry in entries)
 		{
+			var palette:Array<Int> = new Array<Int>();
+			var empty:Array<Int> = new Array<Int>();
+			if (bpp == 8) {
+				for (n in 0 ... 0x100) {
+					palette.push(data.readInt());
+					empty.push(0);
+				}
+			}
 			var compressedData = ByteArrayUtils.readByteArray(data, entry.compressedSize);
 			var uncompressedData = LzDecoder.decode(compressedData, new LzOptions(), Std.int(entry.width * entry.height * bpp / 8));
 			switch (bpp) {
 				case 24:
 					entry.bitmapData = BitmapDataSerializer.decode(uncompressedData, entry.width, entry.height, "bgr", false);
+				case 8:
+					entry.bitmapData = BitmapDataSerializer.decode(uncompressedData, entry.width, entry.height, "r", false);
+					entry.bitmapData.paletteMap(entry.bitmapData, entry.bitmapData.rect, new Point(0, 0), palette, empty, empty, empty);
 				default:
-					throw('Not implemented $bpp');
+					throw('Not implemented bpp=$bpp');
 			}
 			//Log.trace(bpp);
 		}
@@ -54,14 +67,19 @@ class WIP
 		return entries[index];
 	}
 
+	static public function fromByteArray(data:ByteArray):WIP
+	{
+		var wip = new WIP();
+		wip.readHeader(data);
+		wip.readImages(data);
+		return wip;
+	}
+
 	static public function fromStreamAsync(stream:Stream):Promise<WIP>
 	{
 		return stream.readAllBytesAsync().then(function(data:ByteArray)
 		{
-			var wip = new WIP();
-			wip.readHeader(data);
-			wip.readImages(data);
-			return wip;
+			return fromByteArray(data);
 		});
 	}
 }

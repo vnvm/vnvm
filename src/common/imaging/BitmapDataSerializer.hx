@@ -11,6 +11,7 @@ class BitmapDataSerializer
 
 	@:noStack static public function decode(input:ByteArray, width:Int, height:Int, channels:String = "argb", interleaved:Bool = true):BitmapData
 	{
+		var inputStart = input.position;
 		var output = ByteArrayUtils.newByteArrayWithLength(width * height * 4, Endian.LITTLE_ENDIAN);
 		var totalPixels = width * height;
 		var inputPixelSize = interleaved ? channels.length : 1;
@@ -19,7 +20,7 @@ class BitmapDataSerializer
 
 		for (channelChar in channels.split(''))
 		{
-			var readOffset = channelStartOffset;
+			var readOffset = inputStart + channelStartOffset;
 			var writeOffset = getChannelOffset(channelChar);
 			for (n in 0 ... totalPixels)
 			{

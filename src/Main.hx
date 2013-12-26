@@ -1,4 +1,8 @@
 package ;
+import engines.will.RIO2;
+import engines.will.WillResourceManager;
+import haxe.Serializer;
+import engines.tlove.GameState;
 import flash.display.PixelSnapping;
 import common.GameScalerSprite;
 import engines.will.formats.wip.WIP;
@@ -84,34 +88,21 @@ class Main extends Sprite
 
 		fs = AssetsFileSystem.getAssetsFileSystem();
 
-		fs.openAsync('pw/Chip.arc').then(function(stream:Stream)
-		{
-			ARC.fromStreamAsync(stream).then(function(arc:ARC)
-			{
-				Log.trace(arc);
+		//Log.trace(haxe.Serializer.run(new GameState()));
 
-/*
-				arc.openAsync("PW0006_1.WSC").then(function(wipStream:Stream)
-				{
-					wipStream.readAllBytesAsync().then(function(data:ByteArray) {
-						ByteArrayUtils.rotateBytesInplaceRight(data, 2);
-						File.saveBytes("c:/temp/lol.bin", data);
-					});
-				});
-				*/
+		/*
+		WillResourceManager.createFromFileSystemAsync(fs).then(function(willResourceManager:WillResourceManager) {
+			var rio = new RIO(willResourceManager);
 
-				arc.openAsync("CG12_12.WIP").then(function(wipStream:Stream)
-				{
-					WIP.fromStreamAsync(wipStream).then(function(wip:WIP)
-					{
-						addChild(new GameScalerSprite(800, 600, new Bitmap(wip.get(0).bitmapData, PixelSnapping.AUTO, true)));
-						Log.trace('image loaded!');
-					});
+			rio.loadAsync('PW0001').then(function(e) {
+				rio.executeAsync().then(function(e) {
+					Log.trace('END!');
 				});
 			});
 		});
+		*/
 
-		return;
+		//return;
 
 		var loadByteArray:ByteArray;
 		var fileName:String = "load.txt";
@@ -134,8 +125,8 @@ class Main extends Sprite
 				});
 			} else
 			{
-//loadEngine("dividead", null);
-				loadEngine("tlove", null);
+				loadEngine("dividead", null);
+				//loadEngine("tlove", null);
 			}
 		});
 	}

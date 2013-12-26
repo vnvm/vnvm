@@ -1,4 +1,4 @@
-package engines.dividead;
+package engines.dividead.formats;
 import flash.Memory;
 import haxe.Timer;
 import common.compression.IPositionCountExtractor;

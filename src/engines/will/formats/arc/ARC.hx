@@ -26,9 +26,14 @@ class ARC extends VirtualFileSystem
 		return Promise.promise(cast SliceStream.fromAll(files[name]));
 	}
 
+	public function contains(name:String):Bool
+	{
+		return files.exists(name.toUpperCase());
+	}
+
 	override public function existsAsync(name:String):Promise<Bool>
 	{
-		return Promise.promise(files.exists(name.toUpperCase()));
+		return Promise.promise(contains(name));
 	}
 
 	private function readHeaderAsync():Promise<Dynamic>

@@ -23,7 +23,7 @@ class GameState
 	private var names:Array<String>;
 
 	public function new() {
-		this.flags = LangUtils.createArray(function() { return 0x00; }, 0x1000);
+		this.flags = [for( x in 0...0x1000 ) 0];
 		this.sysflags = LangUtils.createArray(function() { return 0x00; }, 0x1000);
 		this.menuFlags = LangUtils.createArray(function() { return 0x00; }, 0x100);
 		this.LSB = LangUtils.createArray(function() { return 0; }, 0x8000);

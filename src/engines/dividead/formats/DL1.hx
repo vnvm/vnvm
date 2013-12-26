@@ -1,4 +1,4 @@
-package engines.dividead;
+package engines.dividead.formats;
 
 import flash.utils.Endian;
 import promhx.Promise;

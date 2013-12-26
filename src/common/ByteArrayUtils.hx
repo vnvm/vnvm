@@ -16,6 +16,15 @@ typedef EndianType = String;
 
 class ByteArrayUtils
 {
+	static public function clone(input:ByteArray):ByteArray
+	{
+		var output:ByteArray = new ByteArray();
+		output.endian = input.endian;
+		output.writeBytes(input);
+		output.position = 0;
+		return output;
+	}
+
 	static public function newByteArray(endian:EndianType):ByteArray
 	{
 		var byteArray:ByteArray = new ByteArray();
@@ -69,6 +78,13 @@ class ByteArrayUtils
 
 			return (zeroIndex == -1) ? string : string.substr(0, zeroIndex);
 		}
+	}
+
+	static public function rotateBytesRight(input:ByteArray, rotate:Int):ByteArray
+	{
+		var output:ByteArray = ByteArrayUtils.clone(input);
+		rotateBytesInplaceRight(output, rotate);
+		return output;
 	}
 
 	static public function rotateBytesInplaceRight(data:ByteArray, rotate:Int):Void

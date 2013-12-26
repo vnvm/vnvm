@@ -3,6 +3,7 @@
   <component name="HaxeModuleSettingsStorage">
     <option name="buildConfig" value="3" />
     <option name="flexSdkName" value="airsdk" />
+    <option name="openFLTarget" value="Windows" />
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/out/production/vnvm" />

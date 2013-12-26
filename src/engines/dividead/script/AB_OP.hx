@@ -1,4 +1,4 @@
-package engines.dividead;
+package engines.dividead.script;
 import common.display.OptionSelectedEvent;
 import common.Event2;
 import common.GameInput;

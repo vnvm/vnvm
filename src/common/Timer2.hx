@@ -1,4 +1,5 @@
 package common;
+import promhx.Promise;
 import haxe.Log;
 import haxe.PosInfos;
 import haxe.Timer;
@@ -32,4 +33,14 @@ class Timer2
 		var end:Float = Timer.stamp();
 		trace(pos.className + "." + pos.methodName + ": " + (end - start));
 	}
+
+	static public function waitAsync(timeMilliseconds:Int):Promise<Dynamic>
+	{
+		var promise = new Promise<Dynamic>();
+		Timer.delay(function() {
+			promise.resolve(null);
+		}, timeMilliseconds);
+		return promise;
+	}
+
 }

@@ -1,4 +1,4 @@
-class RIO extends Component
+class RIO_old extends Component
 {
 	static opcodes = {};
 	static opcodesByName = {};

@@ -4,8 +4,8 @@ package common.script;
  * ...
  * @author 
  */
-
-class Opcode {
+class Opcode
+{
 	public var opcodeId:Int;
 	public var methodName:String;
 	public var format:String;
@@ -13,7 +13,8 @@ class Opcode {
 	public var unimplemented:Bool;
 	public var untested:Bool;
 	
-	public function new(methodName:String, opcodeId:Int, format:String, description:String, unimplemented:Bool, untested:Bool) {
+	public function new(methodName:String, opcodeId:Int, format:String, description:String, unimplemented:Bool, untested:Bool)
+	{
 		this.methodName = methodName;
 		this.opcodeId = opcodeId;
 		this.format = format;
@@ -22,7 +23,8 @@ class Opcode {
 		this.untested = untested;
 	}
 	
-	public function toString():String {
+	public function toString():String
+	{
 		return 'Opcode(id=$opcodeId, name=\'$methodName\', format=\'$format\', description=\'$description\', unimplemented=$unimplemented, untested=$untested)';
 	}
 }

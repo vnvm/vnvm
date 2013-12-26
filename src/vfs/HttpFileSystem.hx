@@ -58,7 +58,7 @@ class HttpFileSystem extends VirtualFileSystem
 			loader.close();
 			promise.reject(error);
 		});
-		loaderEventListener.addEventListener(IOErrorEvent.IO_ERROR, function(e:SecurityErrorEvent):Void {
+		loaderEventListener.addEventListener(IOErrorEvent.IO_ERROR, function(e:IOErrorEvent):Void {
 			var error = new Error("IO_ERROR: " + name + " # " + baseUrl);
 			throw(error);
 			loader.close();
