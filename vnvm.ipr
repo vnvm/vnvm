@@ -288,15 +288,6 @@
         <root url="file://C:/HaxeToolkit/haxe/lib/openfl/1,2,1" />
       </SOURCES>
     </library>
-    <library name="promhx" type="Haxe">
-      <CLASSES>
-        <root url="file://C:/HaxeToolkit/haxe/lib/promhx/0,2,9" />
-      </CLASSES>
-      <JAVADOC />
-      <SOURCES>
-        <root url="file://C:/HaxeToolkit/haxe/lib/promhx/0,2,9" />
-      </SOURCES>
-    </library>
   </component>
 </project>
 

@@ -17,7 +17,6 @@
     <orderEntry type="jdk" jdkName="Haxe 3.0.0" jdkType="Haxe SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="openfl" level="project" />
-    <orderEntry type="library" name="promhx" level="project" />
   </component>
 </module>
 

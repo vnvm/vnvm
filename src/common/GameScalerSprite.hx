@@ -1,4 +1,5 @@
 package common;
+import flash.display.DisplayObject;
 import flash.display.Sprite;
 import flash.display.Stage;
 import flash.events.Event;
@@ -15,7 +16,7 @@ class GameScalerSprite extends Sprite
 	var scalerWidth:Int;
 	var scalerHeight:Int;
 	
-	public function new(width:Int, height:Int, gameSprite:Sprite) 
+	public function new(width:Int, height:Int, gameSprite:DisplayObject)
 	{
 		super();
 		
@@ -29,7 +30,7 @@ class GameScalerSprite extends Sprite
 		Lib.current.stage.addEventListener(Event.RESIZE, resize);
 	}
 	
-	var gameSprite:Sprite;
+	var gameSprite:DisplayObject;
 	var blackBorder:Sprite;
 	var gameSpriteRectangle:Rectangle;
 

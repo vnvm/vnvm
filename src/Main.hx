@@ -1,4 +1,6 @@
 package ;
+import flash.display.PixelSnapping;
+import common.GameScalerSprite;
 import engines.will.formats.wip.WIP;
 import vfs.Stream;
 import engines.will.formats.arc.ARC;
@@ -102,7 +104,7 @@ class Main extends Sprite
 				{
 					WIP.fromStreamAsync(wipStream).then(function(wip:WIP)
 					{
-						addChild(new Bitmap(wip.get(0).bitmapData));
+						addChild(new GameScalerSprite(800, 600, new Bitmap(wip.get(0).bitmapData, PixelSnapping.AUTO, true)));
 						Log.trace('image loaded!');
 					});
 				});

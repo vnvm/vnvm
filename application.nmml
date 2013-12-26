@@ -16,6 +16,9 @@
 	<window width="960" height="640" unless="mobile" />
 	
 	<window orientation="landscape" vsync="true" antialiasing="0" if="cpp" />
+
+    <window fullscreen="true" if="mobile" />
+
 	<!--<window hardware="false" />-->
 
     <android target-sdk-version="12" minimum-sdk-version="7" />
@@ -36,8 +39,7 @@
 	<haxelib name="openfl-vfs" />
 	-->
 	<haxelib name="openfl" />
-	<haxelib name="promhx" />
-	
+
 	<!-- TEST Libraries -->
 	<!--
 	<haxelib name="munit" />
