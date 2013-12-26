@@ -15,27 +15,30 @@ class MathEx
 		
 	}
 
-	static public function _length(x:Float, y:Float):Float {
+	@:noStack static public function _length(x:Float, y:Float):Float
+	{
 		return Math.sqrt(x * x + y * y);
 	}
 
-	static public function clamp(v:Float, min:Float, max:Float):Float {
+	@:noStack static public function clamp(v:Float, min:Float, max:Float):Float
+	{
 		if (v < min) return min;
 		if (v > max) return max;
 		return v;
 	}
 
-	static public function clampInt(v:Int, min:Int, max:Int):Int {
-		if (v < min) return min;
-		if (v > max) return max;
-		return v;
+	@:noStack static public inline function clampInt(v:Int, min:Int, max:Int):Int
+	{
+		return (v < min) ? min : ((v > max) ? max : v);
 	}
 
-	static public function randomInt(min:Int, max:Int):Int {
+	static public function randomInt(min:Int, max:Int):Int
+	{
 		return Std.int((Math.random() * (max - min)) + min);
 	}
 
-	static public function interpolate(v:Float, aMin:Float, aMax:Float, bMin:Float, bMax:Float):Float {
+	static public function interpolate(v:Float, aMin:Float, aMax:Float, bMin:Float, bMax:Float):Float
+	{
 		var aDist:Float = aMax - aMin;
 		var bDist:Float = bMax - bMin;
 		v = clamp(v, aMin, aMax);
@@ -57,7 +60,8 @@ class MathEx
 	 * @param	denominator   Constant denominator value
 	 * @return
 	 */
-	macro static public function fastUintConstDivShort(numerator:Expr, denominator:Int):Expr {
+	macro static public function fastUintConstDivShort(numerator:Expr, denominator:Int):Expr
+{
 		var result = _magicu2_bits(denominator, 16);
 		
 		var mult:Expr = { expr : EConst(CInt(Std.string(result.magic))), pos : Context.currentPos() };
@@ -77,7 +81,8 @@ class MathEx
 	 * @see http://www.hackersdelight.org/magic.htm
 	 * @see http://research.swtch.com/divmult
 	 */
-	static private inline function _magicu2_bits(d:Int, bits:Int):Dynamic {
+	static private inline function _magicu2_bits(d:Int, bits:Int):Dynamic
+	{
 		var mask2:Int = ((1 << (bits - 1)));
 		var mask:Int = ((1 << (bits - 1)) - 1);
 		var p:Int;

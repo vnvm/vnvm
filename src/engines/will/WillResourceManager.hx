@@ -69,6 +69,7 @@ class WillResourceManager
 				return arc.openAndReadAllAsync(name);
 			}
 		}
-		throw(new Error('Can\'t find "$name"'));
+		return Promise.promise(null);
+		//throw(new Error('Can\'t find "$name"'));
 	}
 }

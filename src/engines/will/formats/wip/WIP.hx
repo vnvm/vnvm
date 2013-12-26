@@ -1,5 +1,6 @@
 package engines.will.formats.wip;
 
+import flash.display.BitmapDataChannel;
 import flash.geom.Point;
 import common.BitmapDataUtils;
 import common.compression.LzOptions;
@@ -62,9 +63,35 @@ class WIP
 		}
 	}
 
+	public function getLength():Int
+	{
+		return entries.length;
+	}
+
 	public function get(index:Int):WipEntry
 	{
 		return entries[index];
+	}
+
+	public function iterator():Iterator<WipEntry>
+	{
+		return entries.iterator();
+	}
+
+	public function mergeAlpha(alphaWip:WIP):Void
+	{
+		var colorWip = this;
+
+		if (alphaWip != null)
+		{
+			for (n in 0 ... colorWip.getLength())
+			{
+				var colorEntry = colorWip.get(n);
+				var alphaEntry = alphaWip.get(n);
+
+				colorEntry.bitmapData.copyChannel(alphaEntry.bitmapData, alphaEntry.bitmapData.rect, new Point(0, 0), BitmapDataChannel.RED, BitmapDataChannel.ALPHA);
+			}
+		}
 	}
 
 	static public function fromByteArray(data:ByteArray):WIP
@@ -73,6 +100,17 @@ class WIP
 		wip.readHeader(data);
 		wip.readImages(data);
 		return wip;
+	}
+
+	static public function fromByteArrayWithMask(color:ByteArray, alpha:ByteArray = null):WIP
+	{
+		var colorWip = fromByteArray(color);
+		if (alpha != null)
+		{
+			colorWip.mergeAlpha(fromByteArray(alpha));
+		}
+
+		return colorWip;
 	}
 
 	static public function fromStreamAsync(stream:Stream):Promise<WIP>

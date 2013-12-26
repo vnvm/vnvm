@@ -44,7 +44,7 @@ class BitmapDataSerializer
 		return BitmapDataSerializer.fromByteArray(width, height, output);
 	}
 
-	static private function getChannelOffset(channelChar:String)
+	static public function getChannelOffset(channelChar:String):Int
 	{
 		#if flash9
 		return switch (channelChar) { case 'a': 3; case 'r': 2; case 'g': 1; case 'b': 0; default: throw('Invalid channel char $channelChar'); }

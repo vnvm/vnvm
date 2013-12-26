@@ -19,8 +19,14 @@ class ARC extends VirtualFileSystem
 		this.files = new Map<String, SliceStream>();
 	}
 
+	private function normalizeName(name:String):String
+	{
+		return name.toUpperCase();
+	}
+
 	override public function openAsync(name:String):Promise<Stream>
 	{
+		name = normalizeName(name);
 		//for (name in files.keys()) Log.trace(name);
 		if (!files.exists(name)) throw('Can\'t find file "$name"');
 		return Promise.promise(cast SliceStream.fromAll(files[name]));
@@ -28,6 +34,7 @@ class ARC extends VirtualFileSystem
 
 	public function contains(name:String):Bool
 	{
+		name = normalizeName(name);
 		return files.exists(name.toUpperCase());
 	}
 

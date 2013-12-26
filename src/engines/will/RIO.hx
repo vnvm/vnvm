@@ -49,15 +49,15 @@ class RIO implements IScript
 		var opcodePosition = this.scriptBytes.position;
 		var opcodeId = this.scriptBytes.readUnsignedByte();
 		var opcode = scriptOpcodes.getOpcodeWithId(opcodeId);
-		Log.trace('*************************************');
-		Log.trace(opcode);
+		//Log.trace('*************************************');
+		//Log.trace(opcode);
 		var params = this.opcodeReader.read(opcode.format, scriptBytes);
 		var opcodeLength = this.scriptBytes.position - opcodePosition;
-		Log.trace(params);
+		//Log.trace(params);
 		var instruction = new Instruction2(scriptName, opcode, params, opcodePosition, opcodeLength);
-		Log.trace(instruction);
+		//Log.trace(instruction);
 		var result = instruction.call(opcodes);
-		Log.trace(result);
+		//Log.trace(result);
 		if (Std.is(result, Promise))
 		{
 			result.then(function(e)
@@ -72,18 +72,23 @@ class RIO implements IScript
 		return promise;
 	}
 
-	public function loadFromByteArray(encryptedScript:ByteArray, name:String)
+	public function loadFromByteArray(encryptedScript:ByteArray, name:String, position:Int = 0)
 	{
 		this.scriptName = name;
 		this.scriptBytes = ByteArrayUtils.rotateBytesRight(encryptedScript, 2);
-		this.scriptBytes.position = 0;
+		this.scriptBytes.position = position;
 	}
 
-	public function loadAsync(name:String):Promise<Dynamic>
+	public function loadAsync(name:String, position:Int = 0):Promise<Dynamic>
 	{
 		return willResourceManager.readAllBytesAsync('$name.WSC').then(function(data:ByteArray) {
-			loadFromByteArray(data, name);
+			loadFromByteArray(data, name, position);
 		});
+	}
+
+	public function jumpAbsolute(position:Int):Void
+	{
+		this.scriptBytes.position = position;
 	}
 
 	public function jumpRelative(offset:Int):Void
@@ -141,11 +146,13 @@ class NodeItem implements INode
 	{
 		switch (this.char)
 		{
-			case '.': if (data.readUnsignedByte() != 0) throw("WARNING: ignored parameter has a value different than zero!");
+			case '.': if (data.readUnsignedByte() != 0) Log.trace("WARNING: ignored parameter has a value different than zero!");
 			case '1': state.result.push(data.readUnsignedByte());
 			case '2': state.result.push(data.readShort());
+			case '4': state.result.push(data.readInt());
 			case 'f': state.result.push(data.readUnsignedShort());
 			case 'l': state.result.push(data.readInt());
+			case 'L': state.result.push(data.readInt());
 			case 'o': state.result.push(data.readUnsignedByte()); // SET_OP
 			case 's': state.result.push(ByteArrayUtils.readStringz(data));
 			case 't': state.result.push(ByteArrayUtils.readStringz(data));

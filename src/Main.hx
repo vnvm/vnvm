@@ -1,4 +1,6 @@
 package ;
+import common.encoding.Encoding;
+import flash.display.Shape;
 import engines.will.RIO;
 import engines.will.WillResourceManager;
 import haxe.Serializer;
@@ -86,6 +88,13 @@ class Main extends Sprite
 		return;
 		*/
 
+		/*
+		var svg = new SVG(Assets.getText("nme.svg"));
+		var shape = new Shape();
+		svg.render(shape.graphics);
+		addChild(shape);
+		*/
+
 		fs = AssetsFileSystem.getAssetsFileSystem();
 
 		//Log.trace(haxe.Serializer.run(new GameState()));
@@ -113,15 +122,24 @@ class Main extends Sprite
 			{
 				fs.openAndReadAllAsync(fileName).then(function(loadByteArray:ByteArray)
 				{
-					var text:String = StringTools.trim(loadByteArray.readUTFBytes(loadByteArray.length));
-					var parts:Array<String> = text.split(':');
-					var scriptName:String = null;
-					var scriptPos:Int = 0;
+					var text:String = StringTools.trim(Encoding.UTF8.getString(loadByteArray));
+					for (line in text.split('\n'))
+					{
+						line = StringTools.trim(line);
+						Log.trace('load line: $line');
+						if (line.substr(0, 1) == '#') continue;
 
-					fileName = parts[0];
-					if (parts.length >= 1) scriptName = parts[1];
-					if (parts.length >= 2) scriptPos = StringEx.parseInt(parts[2], 16);
-					loadEngine(fileName, scriptName, scriptPos);
+						var parts:Array<String> = line.split(':');
+						var scriptName:String = null;
+						var scriptPos:Int = 0;
+
+						fileName = parts[0];
+						if (parts.length >= 1) scriptName = parts[1];
+						if (parts.length >= 2) scriptPos = StringEx.parseInt(parts[2], 16);
+						loadEngine(fileName, scriptName, scriptPos);
+
+						return;
+					}
 				});
 			} else
 			{
@@ -133,14 +151,14 @@ class Main extends Sprite
 
 	private function loadEngine(name:String, ?scriptName:String, ?scriptPos:Int):Void
 	{
-		Log.trace('loadEngine: ' + name);
+		Log.trace('loadEngine: $name:$scriptName:$scriptPos');
 		switch (name) {
 			case "tlove": addChild(new engines.tlove.EngineMain(fs, scriptName, scriptPos));
 			case "dividead": addChild(new engines.dividead.EngineMain(fs, scriptName, scriptPos));
 			case "brave": addChild(new engines.brave.EngineMain(fs, scriptName));
 			case "edelweiss": addChild(new engines.ethornell.EngineMain(fs, scriptName));
 			case "yume":
-			case "pw": addChild(new engines.will.EngineMain(fs, name, scriptName));
+			case "pw": addChild(new engines.will.EngineMain(fs, name, scriptName, scriptPos));
 			default: throw(new Error('Invalid engine \'$name\''));
 		}
 	}

@@ -35,9 +35,6 @@
 	<source path="src" />
 
 	<haxelib name="format" />
-	<!--
-	<haxelib name="openfl-vfs" />
-	-->
 	<haxelib name="openfl" />
 
 	<!-- TEST Libraries -->
@@ -53,8 +50,10 @@
 	-->
 	
 	<!-- DLLs -->
+    <!--
 	<ndll name="std" />
 	<ndll name="regexp" />
 	<ndll name="zlib" />
+	-->
 
 </project>

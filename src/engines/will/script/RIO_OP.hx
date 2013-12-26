@@ -8,6 +8,10 @@ PRINCESS WALTZ:
 	sub_406F00
 */
 
+import flash.events.Event;
+import common.Event2;
+import common.GameInput;
+import common.geom.Anchor;
 import haxe.Log;
 import common.Timer2;
 import common.MathEx;
@@ -74,14 +78,12 @@ class RIO_OP
 	}
 
 	@Opcode({ id:0x30, format:"22", description:"" })
-	public function UNK_30(param1, param2)
+	public function UNK_30(param1:Int, param2:Int)
 	{
-		throw(new NotImplementedException());
-		//this.TODO();
 	}
 
 	@Opcode({ id:0x61, format:"1s", description:"" })
-	public function MOVIE(can_stop, name)
+	public function MOVIE(can_stop:Int, name:String)
 	{
 		throw(new NotImplementedException());
 
@@ -112,72 +114,58 @@ class RIO_OP
 	}
 
 	@Opcode({ id:0x4E, format:"4", description:"" })
-	public function UNK_4E(param)
+	public function UNK_4E(param:Int)
 	{
-		throw(new NotImplementedException());
 	}
 
 	@Opcode({ id:0x76, format:"441", description:"" })
-	public function UNK_76(unk1, unk2, unk3)
+	public function UNK_76(unk1:Int, unk2:Int, unk3:Int)
 	{
-		throw(new NotImplementedException());
 	}
 
 	@Opcode({ id:0x62, format:"1", description:"" })
-	public function UNK_62(param)
+	public function UNK_62(param:Int)
 	{
-		throw(new NotImplementedException());
 	}
 
 	@Opcode({ id:0x85, format:"2", description:"" })
-	public function UNK_85(param)
+	public function UNK_85(param:Int)
 	{
-		throw(new NotImplementedException());
 	}
 
 	@Opcode({ id:0x89, format:"1", description:"" })
-	public function UNK_89(unk)
+	public function UNK_89(unk:Int)
 	{
-		throw(new NotImplementedException());
 	}
 
 	@Opcode({ id:0x8C, format:"21", description:"" })
-	public function UNK_8C(unk1, unk2)
+	public function UNK_8C(unk1:Int, unk2:Int)
 	{
-		//throw(new NotImplementedException());
-		return Promise.promise(null);
 	}
 
 	@Opcode({ id:0x8E, format:"1", description:"" })
-	public function UNK_8E(param)
+	public function UNK_8E(param:Int)
 	{
-		throw(new NotImplementedException());
 	}
 
 	@Opcode({ id:0xBD, format:"2", description:"" })
-	public function UNK_BD(param)
+	public function UNK_BD(param:Int)
 	{
-		throw(new NotImplementedException());
 	}
 
 	@Opcode({ id:0xBE, format:"1", description:"" })
-	public function UNK_BE(param)
+	public function UNK_BE(param:Int)
 	{
-		throw(new NotImplementedException());
 	}
 
 	@Opcode({ id:0xBC, format:"22", description:"" })
-	public function UNK_BC(param1, param2)
+	public function UNK_BC(param1:Int, param2:Int)
 	{
-		throw(new NotImplementedException());
-		//this.TODO();
 	}
 
 	@Opcode({ id:0xE5, format:"1", description:"" })
-	public function UNK_E5(param)
+	public function UNK_E5(param:Int)
 	{
-		throw(new NotImplementedException());
-		//this.TODO();
 	}
 
 	/*
@@ -193,9 +181,9 @@ class RIO_OP
 	/////////////////////////////////////////////////////////////////////////////////////
 
 	@Opcode({ id:0x43, format:"42s", description:"" })
-	public function TABLE_ANIM_LOAD(unk, unk, file)
+	public function TABLE_ANIM_LOAD(unk1:Int, unk1:Int, file:String)
 	{
-		throw(new NotImplementedException());
+		return scene.animLoadAsync(file);
 		/*
 		this.scene.table.anim.load(file);
 		this.scene.table.enabled = true;
@@ -220,19 +208,16 @@ class RIO_OP
 	}
 
 	@Opcode({ id:0x50, format:"s", description:"" })
-	public function TABLE_TABLE_LOAD(table_name)
+	public function TABLE_TABLE_LOAD(table_name:String)
 	{
-		throw(new NotImplementedException());
-		/*
-		this.scene.table.table.load(table_name);
-		this._interface.enabled = false;
-		*/
+		return scene.tableLoadAsync(table_name);
 	}
 
 	@Opcode({ id:0x51, format:"ff1", description:"" })
-	public function TABLE_PICK(flag_move_click, flag_mask_kind, unk1)
+	public function TABLE_PICK(flag_move_click:Int, flag_mask_kind:Int, unk1:Int)
 	{
-		throw(new NotImplementedException());
+		return Timer2.waitAsync(40);
+		//throw(new NotImplementedException());
 		/*
 		this._interface.enabled = false;
 		this.scene.table.flag_move_click = flag_move_click;
@@ -251,31 +236,21 @@ class RIO_OP
 	@Opcode({ id:0x22, format:"121", description:"" })
 	public function MUSIC_STOP(unk:Int, fadeout_ms:Int, idx:Int)
 	{
-		Log.trace('MUSIC_STOP: $fadeout_ms, $idx');
-		//throw(new NotImplementedException());
-
-		//Music.stop(fadeout_ms);
+		return this.scene.soundPlayStopAsync('music', null, fadeout_ms);
 	}
 
 	// 23 - VOICE_PLAY idx, u2, u3, kind(girl=0,boy=1), unk4, voice_file   //
 	@Opcode({ id:0x23, format:"12112s", description:"" })
 	public function VOICE_PLAY(channel:Int, u2:Int, u3:Int, kind:Int, unk4:Int, voice_file:String)
 	{
-		Log.trace('VOICE_PLAY: $channel, $u2, $u3, $kind, $unk4, $voice_file');
-		//throw(new NotImplementedException());
-		/*
-		if (!this.skipping()) {
-			//this.sound.play(6 + channel, 1, 0);
-			this.voice_channel = resman.get_sound(voice_file + ".OGG").play(this.voice_channel, 1, 0);
-		}
-		//this.TODO();
-		*/
+		return this.scene.soundPlayStopAsync('voice', voice_file, 0);
 	}
 
 	@Opcode({ id:0x26, format:"2", description:"" })
 	public function SOUND_STOP(channel:Int)
 	{
 		Log.trace('SOUND_STOP: $channel');
+		return this.scene.soundPlayStopAsync('sound', null, 0);
 		//throw(new NotImplementedException());
 
 		//Audio.channelStop(channel);
@@ -308,7 +283,24 @@ class RIO_OP
 	{
 		Log.trace('TRANSITION: $kind, $ms_time');
 
+		return this.scene.performTransitionAsync(kind, ms_time);
+
+		/*
+		switch (kind) {
+			default:
+
+			case 23, 24: // TRANSITION MASK (NO BLEND) (23: REVERSED=0, 24: REVERSED=1)
+				return this.scene.performTransitionMaskAsync(ms_time);
+				//this.scene.setEffect("transition", {
+				//blend   = 0,
+				//reverse = ((kind == 24) ? 1 : 0),
+				//mask    = this.scene.maskLayer,
+				//});
+				//ms_time *= 2;
+		}
+
 		return Timer2.waitAsync(10);
+		*/
 		//throw(new NotImplementedException());
 
 	/*
@@ -722,17 +714,17 @@ class RIO_OP
 	}
 
 	@Opcode({ id:0x06, format:"L1", description:"Jumps always" })
-	public function JUMP(absolute_position, param)
+	public function JUMP(absolute_position:Int, param)
 	{
-		throw(new NotImplementedException());
+		this.script.jumpAbsolute(absolute_position);
+		//throw(new NotImplementedException());
 		//this.jump_absolute(absolute_position);
 	}
 
 	@Opcode({ id:0x07, format:"s", description:"Switches to an script" })
-	public function SCRIPT(name)
+	public function SCRIPT(name:String)
 	{
-		throw(new NotImplementedException());
-		//this.load(name, 0);
+		return script.loadAsync(name);
 	}
 
 	@Opcode({ id:0x09, format:"s", description:"Calls a script" })
@@ -918,8 +910,8 @@ class RIO_OP
 	@Opcode({ id:0x46, format:"22221s", description:"Puts a background in a position" })
 	public function BACKGROUND(x:Int, y:Int, unk1:Int, unk2:Int, index:Int, name:String)
 	{
-		return scene.setBackgroundAsync(x, y, index, name);
-		Log.trace('TODO:BACKGROUND: $x, $y, $index, $name');
+		return scene.getLayerWithName('background').putObjectAsync(0, x, y, name, Anchor.centerCenter);
+		//Log.trace('TODO:BACKGROUND: $x, $y, $index, $name');
 		//throw(new NotImplementedException());
 
 		/*
@@ -965,13 +957,7 @@ class RIO_OP
 	@Opcode({ id:0x68, format:"2221", description:"Sets background size and position x and y coords are the center points of the viewport." })
 	public function BACKGROUND_VIEWPORT(size:Int, x:Int, y:Int, unk4:Int)
 	{
-		Log.trace('BACKGROUND_VIEWPORT: $size, $x, $y');
-
-		//throw(new NotImplementedException());
-		//var sizef = size / 100.0;
-		//this.scene.background.size = sizef;
-		//this.scene.background.add_x = 400 - x * sizef;
-		//this.scene.background.add_y = 300 - y * sizef;
+		return scene.getLayerWithName('background').setLayerViewPort(size / 100.0, x, y);
 	}
 
 	@Opcode({ id:0x48, format:"122221s", description:"" })
@@ -994,9 +980,9 @@ class RIO_OP
 
 	// OBJ_PUT : [243,276,0,0,0,"EC_001"]
 	@Opcode({ id:0x73, format:"22221s", description:"" })
-	public function OBJ_PUT(x, y, unk1, unk2, unk3, name)
+	public function OBJ_PUT(x:Int, y:Int, unk1:Int, unk2:Int, unk3:Int, name:String)
 	{
-		throw(new NotImplementedException());
+		return scene.getLayerWithName('objects').putObjectAsync(0, x, y, name, Anchor.topLeft);
 		/*
 		local object = this.scene.overlay;
 		object.index = 0;
@@ -1011,33 +997,37 @@ class RIO_OP
 	}
 
 	@Opcode({ id:0x49, format:"2.", description:"Clears an object/character in layer1 (0=LEFT, 1=CENTER, 2=RIGHT)" })
-	public function CLEAR_L1(index)
+	public function CLEAR_L1(index:Int)
 	{
-		Log.trace('Not implemented CLEAR_L1');
-		//this.scene.sprites_l1[index].enabled = false;
+		scene.getLayerWithName('layer1').removeObject(index);
 	}
 
 	@Opcode({ id:0xB8, format:"2.", description:"" })
-	public function CLEAR_L2(index)
+	public function CLEAR_L2(index:Int)
 	{
-		Log.trace('Not implemented CLEAR_L2');
-		//this.scene.sprites_l2[index].enabled = false;
+		scene.getLayerWithName('layer2').removeObject(index);
 	}
 
 	@Opcode({ id:0x74, format:"2", description:"" })
-	public function OBJ_CLEAR(index)
+	public function OBJ_CLEAR(index:Int)
 	{
-		Log.trace('Not implemented OBJ_CLEAR');
-		//this.scene.overlay.enabled = false;
+		scene.getLayerWithName('objects').removeObject(index);
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////
 	// TEXT                                                                            //
 	/////////////////////////////////////////////////////////////////////////////////////
 
-	public function TEXT_COMMON(text_id, title, text, reset = 1)
+	public function TEXT_COMMON(text_id:Int, text:String, ?title:String)
 	{
-		throw(new NotImplementedException());
+		var promise = new Promise<Dynamic>();
+		scene.setText(text);
+		Event2.registerOnceAny([GameInput.onClick, GameInput.onKeyPress], function(e:Event) {
+			scene.setText('');
+			promise.resolve(null);
+		});
+		return promise;
+
 		/*
 		if (reset) {
 			this.interface.text_title = "";
@@ -1063,19 +1053,15 @@ class RIO_OP
 	}
 
 	@Opcode({ id:0x41, format:"2.t", description:"" })
-	public function TEXT(text_id:String, text:String)
+	public function TEXT(text_id:Int, text:String)
 	{
-		Log.trace('TEXT: $text_id, $text');
-		return Timer2.waitAsync(1000);
-		//throw(new NotImplementedException());
-		//RIO_OP_TEXT.TEXT_COMMON(text_id, "", text, 1);
+		return TEXT_COMMON(text_id, text);
 	}
 
 	@Opcode({ id:0x42, format:"2..tt", description:"" })
-	public function TEXT2(text_id, title, text)
+	public function TEXT2(text_id:Int, title:String, text:String)
 	{
-		throw(new NotImplementedException());
-		//RIO_OP_TEXT.TEXT_COMMON(text_id, title, text, 1);
+		return TEXT_COMMON(text_id, text, title);
 	}
 
 	@Opcode({ id:0xB6, format:"2t", description:"" })

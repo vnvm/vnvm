@@ -23,7 +23,6 @@ class GameState
 	public function getFlag(id:Int):Int
 	{
 		// % State.MAX_FLAGS
-		Log.trace('Not implemented GameState.getFlag()');
 		return flags[id];
 	}
 
