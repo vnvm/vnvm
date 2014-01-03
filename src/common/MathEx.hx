@@ -37,7 +37,17 @@ class MathEx
 		return Std.int((Math.random() * (max - min)) + min);
 	}
 
-	static public function interpolate(v:Float, aMin:Float, aMax:Float, bMin:Float, bMax:Float):Float
+	static public function interpolate(v:Float, aMin:Float, aMax:Float):Float
+	{
+		return aMin + ((aMax - aMin) * v);
+	}
+
+	static public function interpolateDynamic(step:Float, a:Dynamic, b:Dynamic):Float
+	{
+		return a + ((b - a) * step);
+	}
+
+	static public function translateRange(v:Float, aMin:Float, aMax:Float, bMin:Float, bMax:Float):Float
 	{
 		var aDist:Float = aMax - aMin;
 		var bDist:Float = bMax - bMin;

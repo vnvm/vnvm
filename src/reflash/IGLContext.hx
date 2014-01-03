@@ -1,0 +1,6 @@
+package reflash;
+
+interface IGLContext
+{
+
+}

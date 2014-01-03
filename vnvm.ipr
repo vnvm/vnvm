@@ -29,7 +29,7 @@
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
   <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false" />
-  <component name="HaxeProjectSettings" defines="" />
+  <component name="HaxeProjectSettings" defines="display" />
   <component name="Palette2">
     <group name="Swing">
       <item class="com.intellij.uiDesigner.HSpacer" tooltip-text="Horizontal Spacer" icon="/com/intellij/uiDesigner/icons/hspacer.png" removable="false" auto-create-binding="false" can-attach-label="false">
@@ -176,7 +176,7 @@
       <module fileurl="file://$PROJECT_DIR$/vnvm.iml" filepath="$PROJECT_DIR$/vnvm.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="Haxe 3.0.0" project-jdk-type="Haxe SDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="Haxe 3.0.1" project-jdk-type="Haxe SDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="RunManager">
@@ -281,11 +281,13 @@
     <mapping directory="" vcs="Git" />
   </component>
   <component name="libraryTable">
-    <library name="openfl" type="Haxe">
-      <CLASSES />
+    <library name="openfl">
+      <CLASSES>
+        <root url="file://C:/HaxeToolkit/haxe/lib/openfl/1,2,2" />
+      </CLASSES>
       <JAVADOC />
       <SOURCES>
-        <root url="file://C:/HaxeToolkit/haxe/lib/openfl/1,2,1" />
+        <root url="file://C:/HaxeToolkit/haxe/lib/openfl/1,2,2" />
       </SOURCES>
     </library>
   </component>

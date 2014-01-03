@@ -34,7 +34,7 @@ class BitmapDataUtils
 
 	@:noStack static private function _blend(colorDataData:BytesData, maskDataData:BytesData, totalPixels:Int, readOffset:Int, writeOffset:Int, ratio:Float, reverse:Bool)
 	{
-		var offset:Int = Std.int(MathEx.interpolate(ratio, 0, 1, -255, 255));
+		var offset:Int = Std.int(MathEx.translateRange(ratio, 0, 1, -255, 255));
 		if (reverse) offset = -offset;
 
 		while (totalPixels-- > 0)
@@ -50,7 +50,7 @@ class BitmapDataUtils
 
 	@:noStack static private function _mask(colorDataData:BytesData, maskDataData:BytesData, totalPixels:Int, readOffset:Int, writeOffset:Int, ratio:Float, reverse:Bool)
 	{
-		var thresold:Int = Std.int(MathEx.interpolate(ratio, 0, 1, 0, 255));
+		var thresold:Int = Std.int(MathEx.translateRange(ratio, 0, 1, 0, 255));
 		if (reverse) thresold = 255 - thresold;
 
 		while (totalPixels-- > 0)

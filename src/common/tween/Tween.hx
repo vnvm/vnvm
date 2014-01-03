@@ -9,11 +9,13 @@ class Tween
 {
 	private var totalTime:Float;
 	private var stepSignal:Signal<Float>;
+	private var easing:Float -> Float;
 
 	private function new(totalTime:Float)
 	{
 		this.totalTime = totalTime;
 		this.stepSignal = new Signal<Float>();
+		this.easing = Easing.linear;
 	}
 
 	static public function forTime(time:Float):Tween
@@ -27,20 +29,48 @@ class Tween
 		return this;
 	}
 
+	public function interpolateTo(object:Dynamic, dstProperties:Dynamic):Tween
+	{
+		var srcProperties = {};
+		for (property in Reflect.fields(dstProperties))
+		{
+			Reflect.setField(srcProperties, property, Reflect.field(object, property));
+		}
+
+		onStep(function(step:Float) {
+			for (property in Reflect.fields(dstProperties))
+			{
+				var src = Reflect.field(srcProperties, property);
+				var dst = Reflect.field(dstProperties, property);
+				var interpolated = MathEx.interpolate(step, src, dst);
+				//Log.trace('$src, $dst -> $interpolated');
+				Reflect.setField(object, property, interpolated);
+			}
+		});
+		return this;
+	}
+
+	public function withEasing(easing: Float -> Float):Tween
+	{
+		this.easing = easing;
+		return this;
+	}
+
 	public function animateAsync():Promise<Dynamic>
 	{
 		var promise = new Promise<Dynamic>();
 		var start = Timer.stamp();
 		var stageGroup = new EventListenerGroup(StageReference.stage);
 
-		function step(?e) {
+		function step(?e)
+		{
 			var current = Timer.stamp();
 			var elapsed = current - start;
 			var ratio = MathEx.clamp(elapsed / totalTime, 0, 1);
 
 			//Log.trace('********************* animateAsync: $start, $current, $elapsed, $totalTime, $ratio');
 
-			stepSignal.dispatch(ratio);
+			stepSignal.dispatch(easing(ratio));
 
 			if (ratio >= 1)
 			{

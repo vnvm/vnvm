@@ -3,6 +3,7 @@
   <component name="HaxeModuleSettingsStorage">
     <option name="buildConfig" value="3" />
     <option name="flexSdkName" value="airsdk" />
+    <option name="openFLCompilePath" value="$MODULE_DIR$" />
     <option name="openFLTarget" value="Windows" />
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="false">
@@ -15,7 +16,7 @@
       <excludeFolder url="file://$MODULE_DIR$/bin" />
       <excludeFolder url="file://$MODULE_DIR$/out" />
     </content>
-    <orderEntry type="jdk" jdkName="Haxe 3.0.0" jdkType="Haxe SDK" />
+    <orderEntry type="jdk" jdkName="Haxe 3.0.1" jdkType="Haxe SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="openfl" level="project" />
   </component>
