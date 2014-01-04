@@ -1,5 +1,6 @@
 package reflash.gl.wgl;
 
+import openfl.gl.GLUniformLocation;
 import haxe.Log;
 import openfl.gl.GLProgram;
 import openfl.gl.GLShader;
@@ -10,6 +11,8 @@ class WGLProgram implements IGLProgram
 	private var vertexShader:WGLShader;
 	private var fragmentShader:WGLShader;
 	private var programHandle:GLProgram;
+	private var vertexShaderSource:String;
+	private var fragmentShaderSource:String;
 
 	static public function createProgram(vertexShaderSource:String, fragmentShaderSource:String):WGLProgram
 	{
@@ -18,25 +21,47 @@ class WGLProgram implements IGLProgram
 
 	public function new(vertexShaderSource:String, fragmentShaderSource:String)
 	{
+		this.vertexShaderSource = vertexShaderSource;
+		this.fragmentShaderSource = fragmentShaderSource;
+
+		__recreate();
+	}
+
+	public function __recreate()
+	{
 		vertexShader = WGLShader.createWithSource(vertexShaderSource, WGLShaderType.VERTEX);
 		fragmentShader = WGLShader.createWithSource(fragmentShaderSource, WGLShaderType.FRAGMENT);
 
-		programHandle = GL.createProgram();
-		GL.attachShader(programHandle, vertexShader.handle);
-		GL.attachShader(programHandle, fragmentShader.handle);
-		GL.linkProgram(programHandle);
+		programHandle = GL.createProgram(); WGLCommon.check();
+		GL.attachShader(programHandle, vertexShader.handle); WGLCommon.check();
+		GL.attachShader(programHandle, fragmentShader.handle); WGLCommon.check();
+		GL.linkProgram(programHandle); WGLCommon.check();
 
 		if (GL.getProgramParameter(programHandle, GL.LINK_STATUS) == 0) throw "Unable to initialize the shader program.";
+		WGLCommon.check();
+	}
+
+	private function __check()
+	{
+		//if (programHandle == null) return;
+
+		if (!GL.isProgram(programHandle))
+		{
+			__recreate();
+		}
 	}
 
 	public function use()
 	{
-		GL.useProgram(programHandle);
+		__check();
+		GL.useProgram(programHandle); WGLCommon.check();
 	}
 
 	public function getAttribute(name:String):IGLAttribute
 	{
+		__check();
 		var location = GL.getAttribLocation(programHandle, name);
+		WGLCommon.check();
 		if (location < 0) {
 			//throw('Can\'t find attribute "$name""');
 			Log.trace('Can\'t find attribute "$name""');
@@ -51,7 +76,8 @@ class WGLProgram implements IGLProgram
 
 	public function getUniform(name:String):IGLUniform
 	{
-		var location = GL.getUniformLocation(programHandle, name);
+		__check();
+		var location = GL.getUniformLocation(programHandle, name); WGLCommon.check();
 		if (location < 0) {
 			//throw('Can\'t find uniform "$name""');
 			Log.trace('Can\'t find uniform "$name""');
@@ -61,8 +87,9 @@ class WGLProgram implements IGLProgram
 
 	public function dispose()
 	{
-		vertexShader.dispose();
-		fragmentShader.dispose();
-		GL.deleteProgram(programHandle);
+
+		if (vertexShader != null) { vertexShader.dispose(); vertexShader = null; }
+		if (fragmentShader != null) { fragmentShader.dispose(); fragmentShader = null; }
+		GL.deleteProgram(programHandle); WGLCommon.check();
 	}
 }

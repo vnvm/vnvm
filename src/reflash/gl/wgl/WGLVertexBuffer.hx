@@ -9,6 +9,7 @@ class WGLVertexBuffer implements IDisposable
 {
 	private var vertexBuffer:GLBuffer;
 	private var vertexDescriptor:IGLVertexDescriptor;
+	private var data:Array<Float>;
 
 	static public function create(vertexDescriptor:IGLVertexDescriptor):WGLVertexBuffer
 	{
@@ -17,33 +18,67 @@ class WGLVertexBuffer implements IDisposable
 
 	public function new(vertexDescriptor:IGLVertexDescriptor)
 	{
-		this.vertexBuffer = GL.createBuffer();
 		this.vertexDescriptor = vertexDescriptor;
+		__recreate();
+	}
+
+	private function __recreate()
+	{
+		this.vertexBuffer = GL.createBuffer();
+		_setData();
+	}
+
+	private function _check()
+	{
+		if (!GL.isBuffer(this.vertexBuffer))
+		{
+			__recreate();
+		}
+	}
+
+	private function _setData()
+	{
+		if (this.data != null)
+		{
+			this._bind();
+			GL.bufferData(GL.ARRAY_BUFFER, new Float32Array (cast this.data), GL.STATIC_DRAW);
+			WGLCommon.check();
+		}
 	}
 
 	public function setData(vertices:Array<Float>):WGLVertexBuffer
 	{
-		this.bind();
-		GL.bufferData(GL.ARRAY_BUFFER, new Float32Array (cast vertices), GL.STATIC_DRAW);
+		this.data = vertices.slice(0);
+		//this.data = vertices;
+		this._check();
+		_setData();
 		return this;
 	}
 
-	public function bind()
+	private function _bind()
 	{
 		GL.bindBuffer(GL.ARRAY_BUFFER, vertexBuffer);
+		WGLCommon.check();
 	}
 
 	public function draw(first:Int, count:Int):WGLVertexBuffer
 	{
-		this.bind();
+		this._check();
+		this._bind();
 		this.vertexDescriptor.use();
 		GL.drawArrays(GL.TRIANGLE_STRIP, first, count);
+		WGLCommon.check();
 		this.vertexDescriptor.unuse();
 		return this;
 	}
 
 	public function dispose()
 	{
-		GL.deleteBuffer(vertexBuffer);
+		if (vertexBuffer != null)
+		{
+			GL.deleteBuffer(vertexBuffer);
+			WGLCommon.check();
+			vertexBuffer = null;
+		}
 	}
 }

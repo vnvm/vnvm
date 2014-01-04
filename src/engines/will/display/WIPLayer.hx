@@ -1,4 +1,4 @@
-package engines.will;
+package engines.will.display;
 
 import reflash.gl.wgl.WGLTexture;
 import reflash.display.Image2;

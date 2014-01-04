@@ -1,5 +1,6 @@
 package engines.will;
 
+import engines.will.display.GameLayer;
 import reflash.display.Sprite2;
 import flash.geom.Point;
 import flash.utils.ByteArray;

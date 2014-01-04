@@ -21,6 +21,7 @@
 
 	<!--<window hardware="false" />-->
 
+    <!-- http://developer.android.com/guide/topics/manifest/uses-sdk-element.html#ApiLevels -->
     <android target-sdk-version="12" minimum-sdk-version="7" />
     <android install-location="preferExternal" />
     <android permission="android.permission.READ_EXTERNAL_STORAGE" />

@@ -226,6 +226,7 @@ class RIO_OP
 	}
 
 	@Opcode({ id:0x51, format:"ff1", description:"" })
+	@SkipLog
 	public function TABLE_PICK(flagMaskClick:Int, flagMaskOver:Int, unk1:Int)
 	{
 		scene.setDirectMode(true);

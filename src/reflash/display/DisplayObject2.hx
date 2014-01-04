@@ -109,8 +109,13 @@ class DisplayObject2 implements IDrawable
 				{
 					case BlendMode.NORMAL:
 						GL.enable(GL.BLEND);
-						//GL.blendFunc (GL.ONE, GL.ONE_MINUS_SRC_ALPHA);
+						GL.blendFunc (GL.ONE, GL.ONE_MINUS_SRC_ALPHA);
 						GL.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
+
+						//GL.blendEquationSeparate(GL.FUNC_ADD, GL.FUNC_ADD);
+						//GL.blendFuncSeparate(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA, GL.ONE, GL.ZERO);
+
+						//GL.blendEquationSeparate
 					case BlendMode.ADD:
 						GL.enable(GL.BLEND);
 						GL.blendFunc(GL.SRC_ALPHA, GL.ONE);

@@ -1,4 +1,4 @@
-package engines.will;
+package engines.will.display;
 
 import flash.display.BitmapData;
 import reflash.display.DisplayObject2;

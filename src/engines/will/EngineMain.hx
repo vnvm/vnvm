@@ -1,5 +1,6 @@
 package engines.will;
 
+import engines.will.display.GameLayer;
 import common.display.GameScalerSprite2;
 import haxe.io.Path;
 import reflash.gl.wgl.WGLTexture;
@@ -74,6 +75,7 @@ class EngineMain extends Sprite2 implements IScene
 		return gameSprite.globalToLocal(GameInput.mouseCurrent);
 	}
 
+	private var emptyTexture:IGLTexture;
 	private var previousBitmap:IGLFrameBuffer;
 	private var renderedBitmap:IGLFrameBuffer;
 	private var currentBitmap:IGLFrameBuffer;
@@ -136,6 +138,7 @@ class EngineMain extends Sprite2 implements IScene
 		this.contentContainer.addChild(this.objectsLayer = new GameLayer(willResourceManager, Anchor.topLeft));
 		this.contentContainer.addChild(this.menuLayer = new Sprite2());
 
+		this.emptyTexture = WGLTexture.fromEmpty(800, 600);
 		this.previousBitmap = WGLFrameBuffer.create(800, 600).clear(HtmlColors.black).finish();
 		this.renderedBitmap = WGLFrameBuffer.create(800, 600).clear(HtmlColors.black).finish();
 		this.currentBitmap = WGLFrameBuffer.create(800, 600).clear(HtmlColors.black).finish();
@@ -210,15 +213,17 @@ class EngineMain extends Sprite2 implements IScene
 
 				case 25: // TRANSITION NORMAL FADE IN (alpha)
 					currentBitmapImage.alpha = ratio;
+
 				case 26: // TRANSITION NORMAL FADE IN BURN (alpha)
 					// @TODO
 					currentBitmapImage.alpha = ratio;
 
-				case 42, 44: // TRANSITION MASK (blend) (42: normal, 44: reverse)
-					//currentBitmapImage.x = 300;
-					currentBitmap.clear(HtmlColors.transparent).draw(new TransitionImage2(previousBitmap.texture, renderedBitmap.texture, transitionMaskTexture.value, ratio)).finish();
-				case 23, 24: // TRANSITION MASK (no blend) (23: normal, 24: reverse)
-					currentBitmap.clear(HtmlColors.transparent).draw(new TransitionImage2(previousBitmap.texture, renderedBitmap.texture, transitionMaskTexture.value, ratio)).finish();
+				case 42, 44, 23, 24: // TRANSITION MASK (blend) (42: normal, 44: reverse), TRANSITION MASK (no blend) (23: normal, 24: reverse)
+					var reverse = (kind == 44) || (kind == 24);
+					var blend = (kind == 42) || (kind == 44);
+					currentBitmap.clear(HtmlColors.transparent).draw(new TransitionImage2(previousBitmap.texture, renderedBitmap.texture, transitionMaskTexture.value, ratio, reverse, blend)).finish();
+					//currentBitmap.clear(HtmlColors.transparent).draw(new TransitionImage2(emptyTexture, renderedBitmap.texture, transitionMaskTexture.value, ratio)).finish();
+
 				default:
 					throw('Invalid transition kind $kind');
 			}

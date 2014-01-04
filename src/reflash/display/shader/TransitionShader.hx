@@ -34,13 +34,24 @@ class TransitionShader extends PlaneShader
         		uniform sampler2D uSamplerMask;
         		uniform float alpha;
         		uniform float step;
+        		uniform bool reverse;
+        		uniform bool blend;
 
 				void main(void)
 				{
 					vec3 color1 = texture2D(uSampler1, vTexCoord).rgb;
 					vec3 color2 = texture2D(uSampler2, vTexCoord).rgb;
 					float step1 = texture2D(uSamplerMask, vTexCoord).r;
-					gl_FragColor.rgb = mix(color1, color2, clamp(step1 + step, 0.0, 1.0));
+					if (!reverse) step1 = 1.0 - step1;
+					float mixStep = clamp(step1 + step, 0.0, 1.0);
+					if (!blend) {
+						if (mixStep != 0.0) {
+							mixStep = 1.0;
+						} else {
+							mixStep = 0.0;
+						}
+					}
+					gl_FragColor.rgb = mix(color1, color2, mixStep);
 					gl_FragColor.a = alpha;
 				}
 			"
@@ -91,6 +102,20 @@ class TransitionShader extends PlaneShader
 	{
 		flush();
 		program.getUniform("step").setFloat(MathEx.translateRange(value, 0, 1, -1, 1));
+		return this;
+	}
+
+	public function setReverse(value:Bool):TransitionShader
+	{
+		flush();
+		program.getUniform("reverse").setBool(value);
+		return this;
+	}
+
+	public function setBlend(value:Bool):TransitionShader
+	{
+		flush();
+		program.getUniform("blend").setBool(value);
 		return this;
 	}
 

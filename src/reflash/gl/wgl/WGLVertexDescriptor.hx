@@ -68,8 +68,10 @@ class WGLVertexDescriptor implements IGLVertexDescriptor
 		for (item in array)
 		{
 			GL.enableVertexAttribArray(item.index);
+			WGLCommon.check();
 			//Log.trace('${item.index}, ${item.count}, ${item.glType}, ${item.normalized}, ${this.totalSize}, ${item.offset}');
 			GL.vertexAttribPointer(item.index, item.count, item.glType, item.normalized, this.totalSize, item.offset);
+			WGLCommon.check();
 			//GL.vertexAttribPointer(item.index, 4, item.glType, item.normalized, 0, item.offset);
 		}
 	}
@@ -79,6 +81,7 @@ class WGLVertexDescriptor implements IGLVertexDescriptor
 		for (item in array)
 		{
 			GL.disableVertexAttribArray(item.index);
+			WGLCommon.check();
 		}
 	}
 }

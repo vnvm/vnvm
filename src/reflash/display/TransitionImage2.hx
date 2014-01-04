@@ -10,8 +10,10 @@ class TransitionImage2 extends DisplayObject2
 	private var maskTexture:IGLTexture;
 	private var mask:IGLTexture;
 	public var step:Float;
+	public var reverse:Bool;
+	public var blend:Bool;
 
-	public function new(colorTexture1:IGLTexture, colorTexture2:IGLTexture, maskTexture:IGLTexture, step:Float = 0.5)
+	public function new(colorTexture1:IGLTexture, colorTexture2:IGLTexture, maskTexture:IGLTexture, step:Float = 0.5, reverse:Bool = false, blend:Bool = false)
 	{
 		super();
 		this.colorTexture1 = colorTexture1;
@@ -20,6 +22,8 @@ class TransitionImage2 extends DisplayObject2
 		this.width = maskTexture.width;
 		this.height = maskTexture.height;
 		this.step = step;
+		this.reverse = reverse;
+		this.blend = blend;
 	}
 
 	override private function drawInternal(drawContext:DrawContext)
@@ -43,6 +47,8 @@ class TransitionImage2 extends DisplayObject2
 		shader.setColorTexture2(this.colorTexture2.textureBase);
 		shader.setMaskTexture(this.maskTexture.textureBase);
 		shader.setStep(step);
+		shader.setReverse(reverse);
+		shader.setBlend(blend);
 		//shader.setTexture(this.colorTexture.textureBase);
 
 		shader.setAlpha(drawContext.alpha);

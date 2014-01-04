@@ -57,17 +57,33 @@ class WGLFrameBuffer implements IGLFrameBuffer
 		this._width = width;
 		this._height = height;
 
-		frameBuffer = GL.createFramebuffer();
+		__recreate();
+
+		return this;
+	}
+
+	private function __recreate()
+	{
+		frameBuffer = GL.createFramebuffer(); WGLCommon.check();
 		//renderbuffer = GL.createRenderbuffer();
 
 		temporalTexture = WGLTexture.fromEmpty(_width, _height);
 		texture = WGLTexture.fromEmpty(_width, _height);
 
-		bind();
+		GL.bindFramebuffer(GL.FRAMEBUFFER, frameBuffer); WGLCommon.check();
 		GL.framebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, temporalTexture.textureBase.textureId, 0);
+		WGLCommon.check();
 		//GL.framebufferRenderbuffer(GL.FRAMEBUFFER, GL.DEPTH_ATTACHMENT, GL.RENDERBUFFER, renderbuffer);
+	}
 
-		return this;
+	private function __check()
+	{
+		if (frameBuffer == null) return;
+		//return;
+		if (!GL.isFramebuffer(frameBuffer))
+		{
+			__recreate();
+		}
 	}
 
 	static public function create(width:Int, height:Int):IGLFrameBuffer
@@ -86,6 +102,7 @@ class WGLFrameBuffer implements IGLFrameBuffer
 		var rect = getRectangle();
 		//Log.trace('$rect');
 		GL.viewport(Std.int(rect.x), Std.int(rect.y), Std.int(rect.width), Std.int(rect.height));
+		WGLCommon.check();
 	}
 
 	private function bindAndSetViewport()
@@ -98,7 +115,9 @@ class WGLFrameBuffer implements IGLFrameBuffer
 	{
 		bindAndSetViewport();
 		GL.clearColor(color.r, color.g, color.b, color.a);
+		WGLCommon.check();
 		GL.clear(GL.COLOR_BUFFER_BIT);
+		WGLCommon.check();
 		//unbind();
 
 		return this;
@@ -130,6 +149,7 @@ class WGLFrameBuffer implements IGLFrameBuffer
 
 	public function drawElement(drawContext:DrawContext):Void
 	{
+		__check();
 		new Image2(texture).setAnchor(0, 0).drawElement(drawContext);
 	}
 
@@ -173,6 +193,7 @@ class WGLFrameBuffer implements IGLFrameBuffer
 
 	private function bind()
 	{
+		__check();
 		// no change
 		if (lastFrameBuffer == this) return;
 
@@ -182,7 +203,7 @@ class WGLFrameBuffer implements IGLFrameBuffer
 		}
 		//GL.bindTexture(GL.TEXTURE_2D, texture.textureBase.textureId);
 		//GL.enable(GL.TEXTURE_2D);
-		GL.bindFramebuffer(GL.FRAMEBUFFER, frameBuffer);
+		GL.bindFramebuffer(GL.FRAMEBUFFER, frameBuffer); WGLCommon.check();
 		lastFrameBuffer = this;
 		//GL.bindRenderbuffer(GL.RENDERBUFFER, renderbuffer);
 
@@ -192,19 +213,21 @@ class WGLFrameBuffer implements IGLFrameBuffer
 
 	public function finish():IGLFrameBuffer
 	{
+		__check();
+
 		if (!isScreenBuffer())
 		{
-			GL.bindFramebuffer(GL.FRAMEBUFFER, frameBuffer);
+			GL.bindFramebuffer(GL.FRAMEBUFFER, frameBuffer); WGLCommon.check();
 			texture.textureBase.bindToUnit(4);
-			GL.copyTexSubImage2D(GL.TEXTURE_2D, 0, 0, 0, 0, 0, getWidth(), getHeight());
-			GL.bindTexture(GL.TEXTURE_2D, null);
+			GL.copyTexSubImage2D(GL.TEXTURE_2D, 0, 0, 0, 0, 0, getWidth(), getHeight()); WGLCommon.check();
+			GL.bindTexture(GL.TEXTURE_2D, null); WGLCommon.check();
 		}
 		return this;
 	}
 
 	public function dispose()
 	{
-		if (frameBuffer != null) { GL.deleteFramebuffer(frameBuffer); frameBuffer = null; }
+		if (frameBuffer != null) { GL.deleteFramebuffer(frameBuffer); WGLCommon.check(); frameBuffer = null; }
 		if (texture != null) { texture.textureBase.dispose(); texture = null; }
 		if (temporalTexture != null) { temporalTexture.textureBase.dispose(); temporalTexture = null; }
 	}
