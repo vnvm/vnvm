@@ -128,4 +128,15 @@ class MathEx
 			add : add,
 		};
 	}
+
+	/*
+	@:macro public static function repeat(cond:Expr,e:Expr) : Expr {
+		return macro while( $cond ) trace($e);
+	}
+	*/
+
+	macro public static function swap (e1:Expr, e2:Expr):Expr
+	{
+		return macro { var temp = $e1; $e1 = $e2; $e2 = temp; };
+	}
 }

@@ -1,6 +1,6 @@
 package reflash.display;
 
-class Color
+class Color2
 {
 	public var r(default, null):Float;
 	public var g(default, null):Float;
@@ -15,8 +15,8 @@ class Color
 		this.a = a;
 	}
 
-	static public function create(r:Float, g:Float, b:Float, a:Float = 1):Color
+	static public function create(r:Float, g:Float, b:Float, a:Float = 1):Color2
 	{
-		return new Color(r, g, b, a);
+		return new Color2(r, g, b, a);
 	}
 }

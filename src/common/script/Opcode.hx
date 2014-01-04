@@ -12,8 +12,9 @@ class Opcode
 	public var description:String;
 	public var unimplemented:Bool;
 	public var untested:Bool;
+	public var skipLog:Bool;
 	
-	public function new(methodName:String, opcodeId:Int, format:String, description:String, unimplemented:Bool, untested:Bool)
+	public function new(methodName:String, opcodeId:Int, format:String, description:String, unimplemented:Bool, untested:Bool, skipLog:Bool)
 	{
 		this.methodName = methodName;
 		this.opcodeId = opcodeId;
@@ -21,10 +22,11 @@ class Opcode
 		this.description = description;
 		this.unimplemented = unimplemented;
 		this.untested = untested;
+		this.skipLog = skipLog;
 	}
 	
 	public function toString():String
 	{
-		return 'Opcode(id=$opcodeId, name=\'$methodName\', format=\'$format\', description=\'$description\', unimplemented=$unimplemented, untested=$untested)';
+		return 'Opcode(id=$opcodeId, name=\'$methodName\', format=\'$format\', description=\'$description\', unimplemented=$unimplemented, untested=$untested, skipLog=$skipLog)';
 	}
 }

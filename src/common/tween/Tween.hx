@@ -29,15 +29,18 @@ class Tween
 		return this;
 	}
 
-	public function interpolateTo(object:Dynamic, dstProperties:Dynamic):Tween
+	public function interpolateTo(object:Dynamic, dstProperties:Dynamic, easing:Float -> Float = null):Tween
 	{
+		if (easing == null) easing = Easing.linear;
 		var srcProperties = {};
 		for (property in Reflect.fields(dstProperties))
 		{
 			Reflect.setField(srcProperties, property, Reflect.field(object, property));
 		}
 
-		onStep(function(step:Float) {
+		onStep(function(step:Float)
+		{
+			step = easing(step);
 			for (property in Reflect.fields(dstProperties))
 			{
 				var src = Reflect.field(srcProperties, property);

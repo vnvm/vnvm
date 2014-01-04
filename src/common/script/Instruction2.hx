@@ -31,7 +31,7 @@ class Instruction2
 			Log.trace('Unimplemented: $this');
 		} else if (opcode.untested) {
 			Log.trace('Untested... $this');
-		} else {
+		} else if (!opcode.skipLog) {
 			Log.trace('Executing... $this');
 		}
 		return Reflect.callMethod(object, Reflect.field(object, opcode.methodName), parameters);

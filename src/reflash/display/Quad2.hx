@@ -5,9 +5,9 @@ import reflash.display.shader.SolidColorShader;
 
 class Quad2 extends DisplayObject2
 {
-	public var color:Color;
+	public var color:Color2;
 
-	public function new(width:Int, height:Int, color:Color)
+	public function new(width:Int, height:Int, color:Color2)
 	{
 		super();
 		this.color = color;

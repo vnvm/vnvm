@@ -1,4 +1,7 @@
 package ;
+import reflash.display.HtmlColors;
+import vfs.SubVirtualFileSystem;
+import common.tween.Easing;
 import common.tween.Tween;
 import reflash.display.Stage2;
 import flash.display.BitmapData;
@@ -7,7 +10,7 @@ import flash.display.BitmapData;
 import common.BitmapDataUtils;
 import reflash.wgl.WGLTextureBase;
 import reflash.display.Image2;
-import reflash.display.Color;
+import reflash.display.Color2;
 import reflash.display.Sprite2;
 import reflash.display.Sprite2;
 import reflash.display.Quad2;
@@ -96,99 +99,40 @@ class Main extends Sprite
 
 		Stage2.createAndInitializeStage2(stage);
 
-		var quad = new Quad2(200, 200, Color.create(1, 0, 0)).setPosition(0, 0).setAnchor(0.5, 0.5);
-		Stage2.instance.addChild(quad);
-
-		Tween.forTime(4).interpolateTo(quad, {angle: 360, x: 500, y: 500}).animateAsync();
+		/*
+		var bitmapData = new BitmapData(512, 512); bitmapData.noise(0);
+		var test = WGLFrameBuffer.create(512, 512);
+		test.clear(HtmlColors.red);
+		test.draw(new Image2(WGLTexture.createWithBitmapData(bitmapData)));
+		//test.drawElement();
+		//test.draw(new Quad2(200, 200, HtmlColors.red));
+		Stage2.instance.addChild(new Image2(test.texture).setAnchor(0, 0));
+		return;
+		*/
 
 		/*
 		var view = new OpenGLView();
-
 		var screen = WGLFrameBuffer.getScreen();
 		var test = WGLFrameBuffer.create(512, 512);
-		//var projectionMatrix:Matrix3D;
-		//var modelViewMatrix:Matrix3D;
+		test.clear(HtmlColors.blue);
 
-		//var drawContext:DrawContext = new DrawContext();
+		var once = true;
 
-		var sprite = new Sprite2();
-		var quad1 = new Quad2(200, 200, Color.create(1, 0, 0)).setPosition(0, 0).setAnchor(0.5, 0.5);
-
-		var bitmapData:BitmapData = new BitmapData(256, 256, true);
-		bitmapData.noise(0);
-		bitmapData.setPixel32(0, 0, 0xFF0000FF);
-		bitmapData.setPixel32(1, 0, 0x00FF00FF);
-		bitmapData.setPixel32(0, 1, 0x0000FFFF);
-		bitmapData.setPixel32(1, 1, 0x000000FF);
-
-		//BitmapData.noise(0);
-
-		var image = new Image2(WGLTexture.createWithBitmapData(bitmapData)).setPosition(200, 200);
-
-		var zx = 0;
-
-		sprite.addChild(quad1);
-		sprite.addChild(image);
-		//sprite.addChild(quad2);
-
-		view.render = function(rect:Rectangle)
-		{
-			sprite.x = 100;
-			sprite.y = 100;
-			//sprite.scaleY = sprite.scaleX = 0.5;
-			//sprite.alpha = 0.8;
-			//quad1.alpha = 0.1;
-
-			quad1.angle++;
-
-			test.clear(Color.create(0, 0, 0, 0));
-			test.draw(sprite);
-
-			screen.clear(Color.create(8 / 256, 146 / 256, 208 / 256, 1));
-			screen.draw(sprite);
-			screen.draw(test, 100, 0);
-			//screen.draw(new Image2(frameBuffer.texture).setAnchor(0, 0).setPosition(600 - zx, 0));
-
-			zx++;
+		view.render = function(rect:Rectangle) {
+			screen.clear(HtmlColors.red);
+			screen.draw(test);
 		};
-
-		addChild(view);
-		*/
-
-		return;
-
-/*
-		var bitmap = new Bitmap(BitmapSerializer.decode(
-			ByteUtils.ArrayToByteArray([
-				0xFF, 0xFF, 0, 0,
-				0xFF, 0, 0, 0xFF
-			]),
-			1,
-			2,
-			"arbg",
-			true
-		));
-
-		bitmap.scaleX = bitmap.scaleY = 100;
-
-		addChild(bitmap);
-
+		this.stage.addChild(view);
 		return;
 		*/
 
-		/*
-		var svg = new SVG(Assets.getText("nme.svg"));
-		var shape = new Shape();
-		svg.render(shape.graphics);
-		addChild(shape);
-		*/
 
 		fs = AssetsFileSystem.getAssetsFileSystem();
 
 		//Log.trace(haxe.Serializer.run(new GameState()));
 
 		/*
-		WillResourceManager.createFromFileSystemAsync(fs).then(function(willResourceManager:WillResourceManager) {
+		WillResourceManager.createFromFileSystemAsync(SubVirtualFileSystem.fromSubPath(fs, "pw")).then(function(willResourceManager:WillResourceManager) {
 			var rio = new RIO(willResourceManager);
 
 			rio.loadAsync('PW0001').then(function(e) {
@@ -196,10 +140,14 @@ class Main extends Sprite
 					Log.trace('END!');
 				});
 			});
+			willResourceManager.getWipWithMaskAsync("EV_P1A").then(function(wip:WIP) {
+				var bitmapData = wip.get(0).bitmapData;
+				Stage2.instance.addChild(new Image2(WGLTexture.createWithBitmapData(bitmapData)));
+			});
 		});
-		*/
 
-		//return;
+		return;
+		*/
 
 		var loadByteArray:ByteArray;
 		var fileName:String = "load.txt";
@@ -246,7 +194,8 @@ class Main extends Sprite
 			case "brave": addChild(new engines.brave.EngineMain(fs, scriptName));
 			case "edelweiss": addChild(new engines.ethornell.EngineMain(fs, scriptName));
 			case "yume":
-			case "pw": addChild(new engines.will.EngineMain(fs, name, scriptName, scriptPos));
+			case "pw":
+				Stage2.instance.addChild(new engines.will.EngineMain(fs, name, scriptName, scriptPos));
 			default: throw(new Error('Invalid engine \'$name\''));
 		}
 	}

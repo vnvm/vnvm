@@ -34,9 +34,12 @@ class RIO_OP_PW extends RIO_OP
 	}
 
 	@Opcode({ id:0x64, format:"1221", description:"" })
-	public function CHARA_PUT_INFO(index, size, rotation, unk6)
+	@Unimplemented
+	public function CHARA_PUT_INFO(index:Int, size:Int, rotation:Int, unk6:Int)
 	{
-		throw(new NotImplementedException());
+		scene.getLayerWithName("layer2").setObjectSizeRotation(index, size / 100, rotation / -640.0);
+
+		//throw(new NotImplementedException());
 		/*
 		local object = this.scene.sprites_l1[index];
 		object.size = size / 100.0;

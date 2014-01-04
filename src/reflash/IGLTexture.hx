@@ -1,5 +1,7 @@
 package reflash;
 
-interface IGLTexture
+import lang.IDisposable;
+
+interface IGLTexture extends IDisposable
 {
 }

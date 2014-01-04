@@ -22,7 +22,7 @@ class WGLUniform
 		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
 		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
 		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
-		textureBase.bind();
+		textureBase.bindToUnit(textureUnit);
 		GL.uniform1i(this.index, textureUnit);
 	}
 

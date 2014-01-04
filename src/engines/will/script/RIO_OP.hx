@@ -230,7 +230,7 @@ class RIO_OP
 		scene.setDirectMode(true);
 
 		var promise = new Promise<Dynamic>();
-		var mousePosition:Point = scene.getGameSprite().globalToLocal(GameInput.mouseCurrent);
+		var mousePosition:Point = scene.getMousePosition();
 		var overKind:Int = scene.getMaskValueAt(mousePosition);
 
 		function onClick() {
@@ -621,9 +621,10 @@ class RIO_OP
 	}
 
 	@Opcode({ id:0x4D, format:"1121", description:"" })
-	public function EFFECT(kind, duration, quantity, unk1)
+	@Unimplemented
+	public function EFFECT(kind:Int, duration:Int, quantity:Int, unk1:Int)
 	{
-		throw(new NotImplementedException());
+		//throw(new NotImplementedException());
 		/*
 		local kinds = [null, "quake", "heat"];
 		local kind_name = (kind in kinds) ? kinds[kind] : "unknown";
@@ -705,6 +706,7 @@ class RIO_OP
 		*/
 
 	@Opcode({ id:0x01, format:"Of2l.", description:"Jumps if the condition is false" })
+	@SkipLog
 	public function JUMP_IF(operation:Int, leftFlag:Int, rightValueOrFlag:Int, relativeOffset:Int)
 	{
 		var isRightFlag = BitUtils.extract(operation, 4, 4) != 0;
@@ -762,6 +764,7 @@ class RIO_OP
 	}
 
 	@Opcode({ id:0x06, format:"L1", description:"Jumps always" })
+	@SkipLog
 	public function JUMP(absolute_position:Int, param)
 	{
 		this.script.jumpAbsolute(absolute_position);
@@ -1009,9 +1012,17 @@ class RIO_OP
 	}
 
 	@Opcode({ id:0x48, format:"122221s", description:"" })
-	public function CHARA_PUT(index, x, y, unk1, unk2, index2, name)
+	@Unimplemented
+	public function CHARA_PUT(index:Int, x:Int, y:Int, unk1:Int, unk2:Int, index2:Int, name:String)
 	{
-		throw(new NotImplementedException());
+		return scene.getLayerWithName("layer2").putObjectAsync(
+			index,
+			x,
+			y,
+			name,
+			Anchor.topLeft
+		);
+		//throw(new NotImplementedException());
 		/*
 		local object = this.scene.sprites_l1[index];
 		object.index = index2;

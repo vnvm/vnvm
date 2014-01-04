@@ -1,5 +1,7 @@
 package reflash.display;
 
+import haxe.Log;
+import flash.geom.Point;
 import flash.geom.Vector3D;
 import flash.geom.Matrix3D;
 import reflash.display.shader.SolidColorShader;
@@ -7,22 +9,46 @@ import reflash.wgl.WGLVertexBuffer;
 
 class DisplayObject2 implements IDrawable
 {
+	public var parent:DisplayObjectContainer2;
 	public var anchorX:Float = 0;
 	public var anchorY:Float = 0;
 	public var x:Float = 0;
 	public var y:Float = 0;
 	public var scaleX:Float = 1;
 	public var scaleY:Float = 1;
-	public var zIndex:Int = 0;
+	public var zIndex(default, set):Int;
 	public var width:Float;
 	public var height:Float;
 	public var angle:Float = 0;
 	public var alpha:Float = 1;
+	public var visible:Bool = true;
+
+	public function globalToLocal(point:Point):Point
+	{
+		Log.trace('Not implemented!');
+		return new Point(point.x, point.y);
+	}
+
+	private function set_zIndex(value:Int):Int
+	{
+		if (zIndex != value)
+		{
+			zIndex = value;
+			if (parent != null) parent.resort(this);
+		}
+		return zIndex;
+	}
 
 	public function setAnchor(x:Float, y:Float):DisplayObject2
 	{
 		this.anchorX = x;
 		this.anchorY = y;
+		return this;
+	}
+
+	public function setZIndex(zIndex:Int):DisplayObject2
+	{
+		this.zIndex = zIndex;
 		return this;
 	}
 
@@ -37,19 +63,22 @@ class DisplayObject2 implements IDrawable
 	{
 	}
 
-	inline public function drawElement(drawContext:DrawContext)
+	public function drawElement(drawContext:DrawContext)
 	{
-		var oldModelViewMatrix = drawContext.modelViewMatrix.clone();
-		var oldAlpha = drawContext.alpha;
+		if (visible)
 		{
-			drawContext.modelViewMatrix.prependTranslation(x, y, 0);
-			drawContext.modelViewMatrix.prependRotation(angle, Vector3D.Z_AXIS);
-			drawContext.modelViewMatrix.prependScale(scaleX, scaleY, 1);
-			drawContext.alpha *= alpha;
-			drawInternal(drawContext);
+			var oldModelViewMatrix = drawContext.modelViewMatrix.clone();
+			var oldAlpha = drawContext.alpha;
+			{
+				drawContext.modelViewMatrix.prependTranslation(x, y, 0);
+				drawContext.modelViewMatrix.prependRotation(angle, Vector3D.Z_AXIS);
+				drawContext.modelViewMatrix.prependScale(scaleX, scaleY, 1);
+				drawContext.alpha *= alpha;
+				drawInternal(drawContext);
+			}
+			drawContext.alpha = oldAlpha;
+			drawContext.modelViewMatrix = oldModelViewMatrix;
 		}
-		drawContext.alpha = oldAlpha;
-		drawContext.modelViewMatrix = oldModelViewMatrix;
 	}
 
 	private function drawInternal(drawContext:DrawContext)

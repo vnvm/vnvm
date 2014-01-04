@@ -1,7 +1,7 @@
 package engines.will;
 
+import reflash.display.Sprite2;
 import flash.geom.Point;
-import flash.display.Sprite;
 import flash.utils.ByteArray;
 import promhx.Promise;
 
@@ -9,7 +9,6 @@ interface IScene
 {
 	function getMaskValueAt(point:Point):Int;
 	function getMousePosition():Point;
-	function getGameSprite():Sprite;
 
 	function soundPlayStopAsync(channelName:String, name:String, fadeInOutMs:Int):Promise<Dynamic>;
 	function getBtyeArrayAsync(name:String):Promise<ByteArray>;

@@ -153,7 +153,7 @@ class BraveAssets
 //sound.loadPCMFromByteArray(
 			try
 			{
-				sound.loadCompressedDataFromByteArray(bytes, bytes.length);
+				sound.loadCompressedDataFromByteArray(bytes, bytes.length, true);
 			}
 			catch (e:Error)
 			{

@@ -1,6 +1,8 @@
 package reflash.wgl;
 
-import reflash.display.Color;
+import reflash.display.HtmlColors;
+import common.MathEx;
+import reflash.display.Color2;
 import reflash.display.Image2;
 import reflash.display.IDrawable;
 import common.StageReference;
@@ -17,6 +19,7 @@ class WGLFrameBuffer implements IDrawable
 {
 	//private var renderbuffer:GLRenderbuffer;
 	public var texture(default, null):WGLTexture;
+	private var temporalTexture:WGLTexture;
 	private var frameBuffer:GLFramebuffer = null;
 	private var _width:Int;
 	private var _height:Int;
@@ -55,14 +58,13 @@ class WGLFrameBuffer implements IDrawable
 
 		frameBuffer = GL.createFramebuffer();
 		//renderbuffer = GL.createRenderbuffer();
-		texture = WGLTexture.createEmpty(_width, _height);
+
+		temporalTexture = WGLTexture.fromEmpty(_width, _height);
+		texture = WGLTexture.fromEmpty(_width, _height);
 
 		bind();
-		{
-			GL.framebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, texture.textureBase.textureId, 0);
-			//GL.framebufferRenderbuffer(GL.FRAMEBUFFER, GL.DEPTH_ATTACHMENT, GL.RENDERBUFFER, renderbuffer);
-		}
-		//unbind();
+		GL.framebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, temporalTexture.textureBase.textureId, 0);
+		//GL.framebufferRenderbuffer(GL.FRAMEBUFFER, GL.DEPTH_ATTACHMENT, GL.RENDERBUFFER, renderbuffer);
 
 		return this;
 	}
@@ -70,7 +72,7 @@ class WGLFrameBuffer implements IDrawable
 	static public function create(width:Int, height:Int):WGLFrameBuffer
 	{
 		var frameBuffer = new WGLFrameBuffer();
-		return frameBuffer.createFrameBuffer(width, height);
+		return frameBuffer.createFrameBuffer(width, height).clear(HtmlColors.transparent).finish();
 	}
 
 	private function getRectangle():Rectangle
@@ -91,23 +93,30 @@ class WGLFrameBuffer implements IDrawable
 		setViewport();
 	}
 
-	public function clear(color:Color)
+	public function clear(color:Color2):WGLFrameBuffer
 	{
 		bindAndSetViewport();
-		GL.clearColor (color.r, color.g, color.b, color.a);
+		GL.clearColor(color.r, color.g, color.b, color.a);
 		GL.clear(GL.COLOR_BUFFER_BIT);
+		//unbind();
+
+	return this;
 	}
 
-	public function draw(drawable:IDrawable, x:Int = 0, y:Int = 0)
+	public function draw(drawable:IDrawable, x:Int = 0, y:Int = 0):WGLFrameBuffer
 	{
 		var rect = getRectangle();
 
 		var drawContext:DrawContext = new DrawContext();
-		if (isScreenBuffer()) {
-			drawContext.projectionMatrix = Matrix3D.createOrtho(rect.left, rect.right, rect.bottom, rect.top, -1, 1);
-		} else {
-			drawContext.projectionMatrix = Matrix3D.createOrtho(rect.left, rect.right, rect.top, rect.bottom, -1, 1);
-		}
+
+		var left = rect.left;
+		var right = rect.right;
+		var top = rect.top;
+		var bottom = rect.bottom;
+
+		if (isScreenBuffer()) MathEx.swap(top, bottom);
+
+		drawContext.projectionMatrix = Matrix3D.createOrtho(left, right, top, bottom, -1, 1);
 		drawContext.modelViewMatrix.prependTranslation(x, y, 0);
 
 		GL.enable(GL.BLEND);
@@ -115,6 +124,10 @@ class WGLFrameBuffer implements IDrawable
 
 		bindAndSetViewport();
 		drawable.drawElement(drawContext);
+		//unbind();
+		//GL.bindFramebuffer(GL.FRAMEBUFFER, null);
+
+		return this;
 	}
 
 	public function drawElement(drawContext:DrawContext):Void
@@ -158,15 +171,44 @@ class WGLFrameBuffer implements IDrawable
 	}
 	*/
 
-	public function bind()
+	static private var lastFrameBuffer:WGLFrameBuffer;
+
+	private function bind()
 	{
+		// no change
+		if (lastFrameBuffer == this) return;
+
+		if (lastFrameBuffer != null)
+		{
+			//lastFrameBuffer.unbind();
+		}
 		//GL.bindTexture(GL.TEXTURE_2D, texture.textureBase.textureId);
 		//GL.enable(GL.TEXTURE_2D);
 		GL.bindFramebuffer(GL.FRAMEBUFFER, frameBuffer);
+		lastFrameBuffer = this;
 		//GL.bindRenderbuffer(GL.RENDERBUFFER, renderbuffer);
 
 		//GL.bindRenderbuffer(GL.RENDERBUFFER, renderbuffer);
 		//GL.renderbufferStorage(GL.RENDERBUFFER, GL.DEPTH_COMPONENT16, width, height);
+	}
+
+	public function finish():WGLFrameBuffer
+	{
+		if (!isScreenBuffer())
+		{
+			GL.bindFramebuffer(GL.FRAMEBUFFER, frameBuffer);
+			texture.textureBase.bindToUnit(4);
+			GL.copyTexSubImage2D(GL.TEXTURE_2D, 0, 0, 0, 0, 0, getWidth(), getHeight());
+			GL.bindTexture(GL.TEXTURE_2D, null);
+		}
+		return this;
+	}
+
+	public function dispose()
+	{
+		if (frameBuffer != null) { GL.deleteFramebuffer(frameBuffer); frameBuffer = null; }
+		if (texture != null) { texture.textureBase.dispose(); texture = null; }
+		if (temporalTexture != null) { temporalTexture.textureBase.dispose(); temporalTexture = null; }
 	}
 
 	/*

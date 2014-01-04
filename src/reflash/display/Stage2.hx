@@ -28,7 +28,7 @@ class Stage2 extends Sprite2
 	private function render(rect:Rectangle)
 	{
 		var screen = WGLFrameBuffer.getScreen();
-		screen.clear(Color.create(8 / 256, 146 / 256, 208 / 256, 1));
+		//screen.clear(Color2.create(8 / 256, 146 / 256, 208 / 256, 1));
 		screen.draw(this);
 	}
 

@@ -1,5 +1,6 @@
 package reflash.display.shader;
 
+import common.MathEx;
 import openfl.gl.GL;
 import reflash.wgl.WGLTextureBase;
 import reflash.wgl.WGLType;
@@ -31,11 +32,12 @@ class TransitionShader extends PlaneShader
         		uniform sampler2D uSampler;
         		uniform sampler2D uSamplerMask;
         		uniform float alpha;
+        		uniform float step;
 
 				void main(void)
 				{
 					gl_FragColor = texture2D(uSampler, vTexCoord);
-					gl_FragColor.a = texture2D(uSamplerMask, vTexCoord).r;
+					gl_FragColor.a = texture2D(uSamplerMask, vTexCoord).r + step;
 					gl_FragColor.a *= alpha;
 				}
 			"
@@ -46,32 +48,37 @@ class TransitionShader extends PlaneShader
 		vertexDescriptor.addField("aTexCoord", WGLType.FLOAT, 2);
 	}
 
-	static private var instance:TextureShader;
+	static private var instance:TransitionShader;
 
-	static public function getInstance():TextureShader
+	static public function getInstance():TransitionShader
 	{
-		if (instance == null) instance = new TextureShader();
+		if (instance == null) instance = new TransitionShader();
 		return instance;
 	}
 
-	public function setColorTexture(texture:WGLTextureBase):Void
+	public function setColorTexture(value:WGLTextureBase):Void
 	{
 		flush();
-		program.getUniform("uSampler").setTexture(0, texture);
+		program.getUniform("uSampler").setTexture(0, value);
 	}
 
-	public function setMaskTexture(texture:WGLTextureBase):Void
+	public function setMaskTexture(value:WGLTextureBase):Void
 	{
 		flush();
-		program.getUniform("uSamplerMask").setTexture(1, texture);
+		program.getUniform("uSamplerMask").setTexture(1, value);
 	}
 
-	public function setAlpha(alpha:Float):Void
+	public function setAlpha(value:Float):Void
 	{
 		flush();
-		program.getUniform("alpha").setFloat(alpha);
+		program.getUniform("alpha").setFloat(value);
 	}
 
+	public function setStep(value:Float):Void
+	{
+		flush();
+		program.getUniform("step").setFloat(MathEx.translateRange(value, 0, 1, -1, 1));
+	}
 
 	public function addVertex(x:Float, y:Float, tx:Float, ty:Float)
 	{

@@ -20,16 +20,12 @@ class Image2 extends DisplayObject2
 	override private function drawInternal(drawContext:DrawContext)
 	{
 		var shader = TextureShader.getInstance();
-		//var shader = SolidColorShader.getInstance();
 		shader.use();
 		shader.setProjection(drawContext.projectionMatrix);
 		shader.setModelView(drawContext.modelViewMatrix);
 
 		var dpx = Std.int(width * this.anchorX);
 		var dpy = Std.int(height * this.anchorY);
-
-		//dpx = 0;
-		//dpy = 0;
 
 		var x1:Float = 0 - dpx, x2:Float = width - dpx;
 		var y1:Float = 0 - dpy, y2:Float = height - dpy;
@@ -47,12 +43,6 @@ class Image2 extends DisplayObject2
 		shader.addVertex(x2, y2, texture.px2, texture.py2);
 		shader.addVertex(x2, y1, texture.px2, texture.py1);
 
-		/*
-		shader.addVertex(x1, y2, texture.px1, texture.py2);
-		shader.addVertex(x2, y2, texture.px2, texture.py2);
-		shader.addVertex(x1, y1, texture.px1, texture.py1);
-		shader.addVertex(x2, y1, texture.px2, texture.py1);
-		*/
 		shader.draw();
 	}
 }

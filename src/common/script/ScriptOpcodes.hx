@@ -43,6 +43,7 @@ class ScriptOpcodes
 			var opcodeAttribute:Dynamic = metas.Opcode;
 			var unimplemented:Bool = Reflect.hasField(metas, "Unimplemented");
 			var untested:Bool = Reflect.hasField(metas, "Untested");
+			var skipLog:Bool = Reflect.hasField(metas, "SkipLog");
 			
 			//Log.trace(unimplemented);
 			if (opcodeAttribute != null)
@@ -65,7 +66,7 @@ class ScriptOpcodes
 					format = opcodeAttribute[Std.int(opcodeAttribute.length - 1)];
 				}
 
-				var opcode:Opcode = new Opcode(key, id, format, description, unimplemented, untested);
+				var opcode:Opcode = new Opcode(key, id, format, description, unimplemented, untested, skipLog);
 				//Log.trace(opcodeAttribute);
 				//Log.trace(opcode);
 				opcodesById.set(id, opcode);

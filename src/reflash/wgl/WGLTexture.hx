@@ -1,8 +1,9 @@
 package reflash.wgl;
 
+import lang.IDisposable;
 import flash.display.BitmapData;
 
-class WGLTexture
+class WGLTexture implements IDisposable
 {
 	public var textureBase(default, null):WGLTextureBase;
 	public var x(default, null):Int;
@@ -17,6 +18,7 @@ class WGLTexture
 
 	private function new(textureBase:WGLTextureBase, x:Int, y:Int, width:Int, height:Int)
 	{
+		textureBase.referenceCounter.increment();
 		this.textureBase = textureBase;
 		this.x = x;
 		this.y = y;
@@ -44,18 +46,27 @@ class WGLTexture
 		return new WGLTexture(this.textureBase, nx, ny, nw, nh);
 	}
 
-	static public function createWithTextureBase(textureBase:WGLTextureBase, width:Int, height:Int):WGLTexture
+	static public function fromTextureBase(textureBase:WGLTextureBase, width:Int, height:Int):WGLTexture
 	{
 		return new WGLTexture(textureBase, 0, 0, width, height);
 	}
 
-	static public function createEmpty(width:Int, height:Int):WGLTexture
+	static public function fromEmpty(width:Int, height:Int):WGLTexture
 	{
-		return createWithTextureBase(WGLTextureBase.createEmpty(width, height), width, height);
+		return fromTextureBase(WGLTextureBase.createEmpty(width, height), width, height);
 	}
 
-	static public function createWithBitmapData(bitmapData:BitmapData):WGLTexture
+	static public function fromBitmapData(bitmapData:BitmapData):WGLTexture
 	{
-		return createWithTextureBase(WGLTextureBase.createWithBitmapData(bitmapData), bitmapData.width, bitmapData.height);
+		return fromTextureBase(WGLTextureBase.createWithBitmapData(bitmapData), bitmapData.width, bitmapData.height);
+	}
+
+	public function dispose()
+	{
+		if (textureBase != null)
+		{
+			textureBase.referenceCounter.decrement();
+			textureBase = null;
+		}
 	}
 }
