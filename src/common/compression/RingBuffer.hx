@@ -32,12 +32,17 @@ class RingBuffer
 		this.readPosition = readPosition & mask;
 	}
 
-	@:noStack public inline function readByte():Int
+	#if cpp @:functionCode("return this->bytesData->__unsafe_get(((int((this->readPosition)++) & int(this->mask))));") #end
+	@:noStack public function readByte():Int
 	{
 		return cast Bytes.fastGet(bytesData, readPosition++ & mask);
 	}
 
-	@:noStack public inline function writeByte(value:Int):Void
+	#if cpp @:functionCode("
+		this->bytesData->__unsafe_set((int((this->writePosition)++) & int(this->mask)), value);
+		return null();
+	") #end
+	@:noStack public function writeByte(value:Int):Void
 	{
 		bytes.set(writePosition++ & mask, cast value);
 		//bytesData[writePosition++ & mask] = cast value;

@@ -1,11 +1,12 @@
 package reflash.display;
 
+import openfl.gl.GL;
 import haxe.Log;
 import flash.geom.Point;
 import flash.geom.Vector3D;
 import flash.geom.Matrix3D;
 import reflash.display.shader.SolidColorShader;
-import reflash.wgl.WGLVertexBuffer;
+import reflash.gl.wgl.WGLVertexBuffer;
 
 class DisplayObject2 implements IDrawable
 {
@@ -22,6 +23,12 @@ class DisplayObject2 implements IDrawable
 	public var angle:Float = 0;
 	public var alpha:Float = 1;
 	public var visible:Bool = true;
+	public var blendMode:BlendMode;
+
+	public function new()
+	{
+		blendMode = BlendMode.NORMAL;
+	}
 
 	public function globalToLocal(point:Point):Point
 	{
@@ -59,10 +66,6 @@ class DisplayObject2 implements IDrawable
 		return this;
 	}
 
-	public function new()
-	{
-	}
-
 	public function drawElement(drawContext:DrawContext)
 	{
 		if (visible)
@@ -74,6 +77,19 @@ class DisplayObject2 implements IDrawable
 				drawContext.modelViewMatrix.prependRotation(angle, Vector3D.Z_AXIS);
 				drawContext.modelViewMatrix.prependScale(scaleX, scaleY, 1);
 				drawContext.alpha *= alpha;
+
+				switch (blendMode)
+				{
+					case BlendMode.NORMAL:
+						GL.enable(GL.BLEND);
+						//GL.blendFunc (GL.ONE, GL.ONE_MINUS_SRC_ALPHA);
+						GL.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
+					case BlendMode.ADD:
+						GL.enable(GL.BLEND);
+						GL.blendFunc(GL.SRC_ALPHA, GL.ONE);
+					//default: throw('Invalid blendMode: $blendMode');
+				}
+
 				drawInternal(drawContext);
 			}
 			drawContext.alpha = oldAlpha;

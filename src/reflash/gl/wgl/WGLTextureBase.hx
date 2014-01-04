@@ -1,4 +1,4 @@
-package reflash.wgl;
+package reflash.gl.wgl;
 
 import lang.ReferenceCounter;
 import flash.geom.Rectangle;
@@ -40,6 +40,10 @@ class WGLTextureBase implements IGLTexture
 	{
 		GL.activeTexture(GL.TEXTURE0 + unit);
 		GL.bindTexture(GL.TEXTURE_2D, textureId);
+		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
+		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
+		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
 		return this;
 	}
 
@@ -64,6 +68,7 @@ class WGLTextureBase implements IGLTexture
 		var data = bitmapData.getPixels(bitmapData.rect);
 		var src = 0;
 		var dst = 0;
+
 		for (n in 0 ... width * height)
 		{
 			var a = data[src++];
@@ -76,6 +81,7 @@ class WGLTextureBase implements IGLTexture
 			data[dst++] = b; // b
 			data[dst++] = a; // a
 		}
+
 		var pixels = new UInt8Array(data);
 		//var pixels = new UInt8Array(bitmapData.getPixels(new flash.geom.Rectangle(1000, 1000)));
 

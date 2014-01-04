@@ -2,7 +2,7 @@ package engines.will;
 
 import flash.display.BitmapData;
 import reflash.display.DisplayObject2;
-import reflash.wgl.WGLTexture;
+import reflash.gl.wgl.WGLTexture;
 import reflash.display.Image2;
 import reflash.display.Sprite2;
 import flash.geom.Rectangle;

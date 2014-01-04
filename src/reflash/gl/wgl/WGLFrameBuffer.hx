@@ -1,5 +1,6 @@
-package reflash.wgl;
+package reflash.gl.wgl;
 
+import lang.LangMacros;
 import reflash.display.HtmlColors;
 import common.MathEx;
 import reflash.display.Color2;
@@ -100,7 +101,7 @@ class WGLFrameBuffer implements IDrawable
 		GL.clear(GL.COLOR_BUFFER_BIT);
 		//unbind();
 
-	return this;
+		return this;
 	}
 
 	public function draw(drawable:IDrawable, x:Int = 0, y:Int = 0):WGLFrameBuffer
@@ -114,13 +115,10 @@ class WGLFrameBuffer implements IDrawable
 		var top = rect.top;
 		var bottom = rect.bottom;
 
-		if (isScreenBuffer()) MathEx.swap(top, bottom);
+		if (isScreenBuffer()) LangMacros.swap(top, bottom);
 
 		drawContext.projectionMatrix = Matrix3D.createOrtho(left, right, top, bottom, -1, 1);
 		drawContext.modelViewMatrix.prependTranslation(x, y, 0);
-
-		GL.enable(GL.BLEND);
-		GL.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA); //I've seen this on most tutorials
 
 		bindAndSetViewport();
 		drawable.drawElement(drawContext);

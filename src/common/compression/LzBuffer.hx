@@ -12,6 +12,7 @@ class LzBuffer
 	private var inputLength:Int;
 
 	private var output:ByteArray;
+	private var outputData:BytesData;
 	private var outputPos:Int;
 
 	private var ring:RingBuffer;
@@ -23,11 +24,13 @@ class LzBuffer
 		this.input = ByteUtils.ByteArrayToBytes(input);
 		this.inputData = this.input.getData();
 		this.output = output;
+		this.outputData = this.output.getData();
 		this.outputPos = 0;
 		this.ring = ring;
 	}
 
-	@:noStack public inline function readByte():Int
+	#if cpp @:functionCode("return this->inputData->__unsafe_get(((this->inputPos)++));") #end
+	@:noStack public function readByte():Int
 	{
 		return Bytes.fastGet(inputData, inputPos++);
 	}
@@ -43,9 +46,15 @@ class LzBuffer
 		while (count-- > 0) this.writeByte(ring.readByte());
 	}
 
+	#if cpp @:functionCode("
+		this->ring->writeByte(byte);
+		this->outputData->__unsafe_set((this->outputPos)++, byte);
+		return null();
+	") #end
 	@:noStack public function writeByte(byte:Int):Void
 	{
 		ring.writeByte(byte);
-		output[outputPos++] = byte;
+		outputData[outputPos++] = cast byte;
+		//output[outputPos++] = byte;
 	}
 }

@@ -1,13 +1,21 @@
-package reflash.wgl;
+package reflash.gl.wgl;
 
 import haxe.Log;
 import openfl.gl.GL;
-import reflash.wgl.WGLProgram;
+
+typedef ComponentInfo =
+{
+	index: Int,
+	count: Int,
+	glType: Int,
+	offset: Int,
+	normalized: Bool
+}
 
 class WGLVertexDescriptor
 {
 	private var program:WGLProgram;
-	private var array:Array<Dynamic>;
+	private var array:Array<ComponentInfo>;
 	private var totalSize:Int;
 
 	public function new(program:WGLProgram)

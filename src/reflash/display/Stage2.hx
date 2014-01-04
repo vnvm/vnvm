@@ -1,6 +1,6 @@
 package reflash.display;
 
-import reflash.wgl.WGLFrameBuffer;
+import reflash.gl.wgl.WGLFrameBuffer;
 import flash.geom.Rectangle;
 import openfl.display.OpenGLView;
 import flash.display.Stage;

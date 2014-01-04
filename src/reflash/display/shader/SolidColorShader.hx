@@ -1,9 +1,9 @@
 package reflash.display.shader;
 
-import reflash.wgl.WGLType;
-import reflash.wgl.WGLVertexBuffer;
-import reflash.wgl.WGLVertexDescriptor;
-import reflash.wgl.WGLProgram;
+import reflash.gl.wgl.WGLType;
+import reflash.gl.wgl.WGLVertexBuffer;
+import reflash.gl.wgl.WGLVertexDescriptor;
+import reflash.gl.wgl.WGLProgram;
 
 class SolidColorShader extends PlaneShader
 {

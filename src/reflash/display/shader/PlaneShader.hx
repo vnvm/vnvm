@@ -1,10 +1,10 @@
 package reflash.display.shader;
 
 import haxe.Log;
-import reflash.wgl.WGLVertexBuffer;
-import reflash.wgl.WGLVertexDescriptor;
+import reflash.gl.wgl.WGLVertexBuffer;
+import reflash.gl.wgl.WGLVertexDescriptor;
 import flash.geom.Matrix3D;
-import reflash.wgl.WGLProgram;
+import reflash.gl.wgl.WGLProgram;
 class PlaneShader
 {
 	private var program:WGLProgram;

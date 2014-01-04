@@ -6,9 +6,9 @@ import reflash.display.HtmlColors;
 import reflash.display.Stage2;
 import reflash.display.Quad2;
 import reflash.display.Color2;
-import reflash.wgl.WGLFrameBuffer;
+import reflash.gl.wgl.WGLFrameBuffer;
 import reflash.display.DisplayObject2;
-import reflash.wgl.WGLTexture;
+import reflash.gl.wgl.WGLTexture;
 import reflash.display.Image2;
 import reflash.display.Sprite2;
 import common.GameInput;
@@ -179,92 +179,39 @@ class EngineMain extends Sprite2 implements IScene
 		{
 			var wip = WIP.fromByteArray(data);
 			transitionMask = wip.get(0).bitmapData;
-			//transitionMaskTexture.set(WGLTexture.fromBitmapData(transitionMask));
+			transitionMaskTexture.set(WGLTexture.fromBitmapData(transitionMask));
 		});
 	}
 
 	public function performTransitionAsync(kind:Int, time:Int):Promise<Dynamic>
 	{
-		/*
 		previousBitmap.clear(HtmlColors.black).draw(renderedBitmap).finish();
 		renderedBitmap.clear(HtmlColors.black).draw(contentContainer).finish();
 		currentBitmap.clear(HtmlColors.black).draw(renderedBitmap).finish();
-		*/
-
-		previousBitmap.clear(HtmlColors.black).draw(currentBitmap).finish();
-		currentBitmap.clear(HtmlColors.black).draw(contentContainer).finish();
-
-		//gameSprite.addChild(contentContainer).setZIndex(100);
-
-		//var bitmapData = new BitmapData(800, 600); bitmapData.noise(0);
-		//currentBitmap.draw(new Image2(WGLTexture.createWithBitmapData(bitmapData)));
-		//currentBitmap.draw(new Quad2(100, 100, Color.create(1, 0, 0, 1)));
-
-		//gameSprite.addChild(new Quad2(100, 100, Color.create(1, 0, 0, 1)));
-
-		//Stage2.instance.addChild(new Quad2(100, 100, Color.create(1, 0, 0, 1)));
 
 		return Tween.forTime(time / 1000).onStep(function(ratio:Float)
 		{
-			switch (kind) {
+			currentBitmapImage.y = currentBitmapImage.x = 0;
+			switch (kind)
+			{
+				case 0: // EFFECT
+					// @TODO
+					currentBitmapImage.alpha = ratio;
+				case 25: // TRANSITION NORMAL FADE IN (alpha)
+					currentBitmapImage.alpha = ratio;
+				case 26: // TRANSITION NORMAL FADE IN BURN (alpha)
+					// @TODO
+					currentBitmapImage.alpha = ratio;
+
 				case 42, 44: // TRANSITION MASK (blend) (42: normal, 44: reverse)
-					//BitmapDataUtils.applyBlendMaskWithOffset(currentBitmapData, transitionMask, ratio, (kind != 44));
-					//currentBitmap.alpha = 1;
-					//currentBitmap.clear(HtmlColors.black).draw(new TransitionImage2(renderedBitmap.texture, transitionMaskTexture, ratio)).finish();
-					currentBitmapImage.alpha = ratio;
-				case 23, 24: // TRANSITION MASK (no blend) (42: normal, 44: reverse)
-					//BitmapDataUtils.applyNoBlendMaskWithOffset(currentBitmapData, transitionMask, ratio, (kind == 24));
-					//currentBitmap.alpha = 1;
-					//currentBitmap.clear(HtmlColors.black).draw(new TransitionImage2(renderedBitmap.texture, transitionMaskTexture, ratio)).finish();
-					currentBitmapImage.alpha = ratio;
+					//currentBitmapImage.x = 300;
+					currentBitmap.clear(HtmlColors.transparent).draw(new TransitionImage2(previousBitmap.texture, renderedBitmap.texture, transitionMaskTexture.value, ratio)).finish();
+				case 23, 24: // TRANSITION MASK (no blend) (23: normal, 24: reverse)
+					currentBitmap.clear(HtmlColors.transparent).draw(new TransitionImage2(previousBitmap.texture, renderedBitmap.texture, transitionMaskTexture.value, ratio)).finish();
 				default:
-					currentBitmapImage.alpha = ratio;
+					throw('Invalid transition kind $kind');
 			}
 		}).animateAsync();
-		/*
-		var rect = previousBitmap.bitmapData.rect;
-		var previousBitmapData = previousBitmap.bitmapData;
-		var currentBitmapData = currentBitmap.bitmapData;
-
-		previousBitmapData.copyPixels(currentBitmapData, rect, new Point(0, 0));
-
-		previousBitmap.alpha = 1;
-		currentBitmap.alpha = 0;
-
-		currentBitmapData.lock();
-		currentBitmapData.fillRect(rect, 0x00000000);
-		currentBitmapData.draw(contentContainer);
-		currentBitmapData.unlock();
-
-		//var outputBitmapData = previousBitmap.bitmapData;
-		//
-		//var previous = renderPrev();
-		//var next = renderNext();
-		//var temp1 = renderTemp1();
-		//var temp2 = renderTemp2();
-
-		//return new Promise<Dynamic>();
-
-		return Tween.forTime(time / 1000).onStep(function(ratio:Float)
-		{
-			switch (kind) {
-				case 42, 44: // TRANSITION MASK (blend) (42: normal, 44: reverse)
-					{
-						BitmapDataUtils.applyBlendMaskWithOffset(currentBitmapData, transitionMask, ratio, (kind != 44));
-						currentBitmap.alpha = 1;
-					}
-				case 23, 24: // TRANSITION MASK (no blend) (42: normal, 44: reverse)
-					{
-						BitmapDataUtils.applyNoBlendMaskWithOffset(currentBitmapData, transitionMask, ratio, (kind == 24));
-						currentBitmap.alpha = 1;
-					}
-				default:
-					{
-						currentBitmap.alpha = ratio;
-					}
-			}
-		}).animateAsync();
-		*/
 	}
 
 	public function getLayerWithName(name:String):GameLayer

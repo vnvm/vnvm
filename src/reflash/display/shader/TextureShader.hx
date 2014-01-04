@@ -1,10 +1,10 @@
 package reflash.display.shader;
 
 import openfl.gl.GL;
-import reflash.wgl.WGLTextureBase;
-import reflash.wgl.WGLType;
-import reflash.wgl.WGLVertexDescriptor;
-import reflash.wgl.WGLProgram;
+import reflash.gl.wgl.WGLTextureBase;
+import reflash.gl.wgl.WGLType;
+import reflash.gl.wgl.WGLVertexDescriptor;
+import reflash.gl.wgl.WGLProgram;
 
 class TextureShader extends PlaneShader
 {

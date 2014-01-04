@@ -1,9 +1,11 @@
-package reflash.wgl;
+package reflash.gl.wgl;
 
+import reflash.display.IDrawable;
 import lang.IDisposable;
 import flash.display.BitmapData;
 
 class WGLTexture implements IDisposable
+	//implements IDrawable
 {
 	public var textureBase(default, null):WGLTextureBase;
 	public var x(default, null):Int;
@@ -69,4 +71,11 @@ class WGLTexture implements IDisposable
 			textureBase = null;
 		}
 	}
+
+	/*
+	public function drawElement(drawContext:DrawContext):Void
+	{
+		new Image2(drawContext).setAnchor(0, 0).setPosition(0, 0).drawElement(drawContext);
+	}
+	*/
 }

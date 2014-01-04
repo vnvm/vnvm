@@ -2,10 +2,10 @@ package reflash.display.shader;
 
 import common.MathEx;
 import openfl.gl.GL;
-import reflash.wgl.WGLTextureBase;
-import reflash.wgl.WGLType;
-import reflash.wgl.WGLVertexDescriptor;
-import reflash.wgl.WGLProgram;
+import reflash.gl.wgl.WGLTextureBase;
+import reflash.gl.wgl.WGLType;
+import reflash.gl.wgl.WGLVertexDescriptor;
+import reflash.gl.wgl.WGLProgram;
 
 class TransitionShader extends PlaneShader
 {
@@ -29,16 +29,19 @@ class TransitionShader extends PlaneShader
 			",
 			"
         		varying vec2 vTexCoord;
-        		uniform sampler2D uSampler;
+        		uniform sampler2D uSampler1;
+        		uniform sampler2D uSampler2;
         		uniform sampler2D uSamplerMask;
         		uniform float alpha;
         		uniform float step;
 
 				void main(void)
 				{
-					gl_FragColor = texture2D(uSampler, vTexCoord);
-					gl_FragColor.a = texture2D(uSamplerMask, vTexCoord).r + step;
-					gl_FragColor.a *= alpha;
+					vec3 color1 = texture2D(uSampler1, vTexCoord).rgb;
+					vec3 color2 = texture2D(uSampler2, vTexCoord).rgb;
+					float step1 = texture2D(uSamplerMask, vTexCoord).r;
+					gl_FragColor.rgb = mix(color1, color2, clamp(step1 + step, 0, 1));
+					gl_FragColor.a = alpha;
 				}
 			"
 		);
@@ -56,28 +59,39 @@ class TransitionShader extends PlaneShader
 		return instance;
 	}
 
-	public function setColorTexture(value:WGLTextureBase):Void
+	public function setColorTexture1(value:WGLTextureBase):TransitionShader
 	{
 		flush();
-		program.getUniform("uSampler").setTexture(0, value);
+		program.getUniform("uSampler1").setTexture(1, value);
+		return this;
 	}
 
-	public function setMaskTexture(value:WGLTextureBase):Void
+	public function setColorTexture2(value:WGLTextureBase):TransitionShader
 	{
 		flush();
-		program.getUniform("uSamplerMask").setTexture(1, value);
+		program.getUniform("uSampler2").setTexture(2, value);
+		return this;
 	}
 
-	public function setAlpha(value:Float):Void
+	public function setMaskTexture(value:WGLTextureBase):TransitionShader
+	{
+		flush();
+		program.getUniform("uSamplerMask").setTexture(0, value);
+		return this;
+	}
+
+	public function setAlpha(value:Float):TransitionShader
 	{
 		flush();
 		program.getUniform("alpha").setFloat(value);
+		return this;
 	}
 
-	public function setStep(value:Float):Void
+	public function setStep(value:Float):TransitionShader
 	{
 		flush();
 		program.getUniform("step").setFloat(MathEx.translateRange(value, 0, 1, -1, 1));
+		return this;
 	}
 
 	public function addVertex(x:Float, y:Float, tx:Float, ty:Float)

@@ -1,8 +1,8 @@
 package reflash.display;
 
 import haxe.Log;
-import reflash.wgl.WGLTexture;
-import reflash.wgl.WGLTextureBase;
+import reflash.gl.wgl.WGLTexture;
+import reflash.gl.wgl.WGLTextureBase;
 import reflash.display.shader.TextureShader;
 import reflash.display.shader.SolidColorShader;
 class Image2 extends DisplayObject2

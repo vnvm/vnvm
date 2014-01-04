@@ -1,4 +1,4 @@
-package reflash;
+package reflash.gl;
 
 import lang.IDisposable;
 

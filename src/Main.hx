@@ -1,14 +1,15 @@
 package ;
+import common.imaging.BitmapDataBuilder;
 import reflash.display.HtmlColors;
 import vfs.SubVirtualFileSystem;
 import common.tween.Easing;
 import common.tween.Tween;
 import reflash.display.Stage2;
 import flash.display.BitmapData;
-import reflash.wgl.WGLTexture;
+import reflash.gl.wgl.WGLTexture;
 import flash.display.BitmapData;
 import common.BitmapDataUtils;
-import reflash.wgl.WGLTextureBase;
+import reflash.gl.wgl.WGLTextureBase;
 import reflash.display.Image2;
 import reflash.display.Color2;
 import reflash.display.Sprite2;
@@ -16,10 +17,10 @@ import reflash.display.Sprite2;
 import reflash.display.Quad2;
 import reflash.display.DrawContext;
 import reflash.display.DisplayObject2;
-import reflash.wgl.WGLFrameBuffer;
-import reflash.wgl.WGLVertexBuffer;
-import reflash.wgl.WGLType;
-import reflash.wgl.WGLProgram;
+import reflash.gl.wgl.WGLFrameBuffer;
+import reflash.gl.wgl.WGLVertexBuffer;
+import reflash.gl.wgl.WGLType;
+import reflash.gl.wgl.WGLProgram;
 import flash.geom.Matrix3D;
 import openfl.utils.Float32Array;
 import flash.geom.Rectangle;
@@ -98,6 +99,20 @@ class Main extends Sprite
 		GameInput.init();
 
 		Stage2.createAndInitializeStage2(stage);
+
+		/*
+		var texture1 = WGLTexture.fromBitmapData(BitmapDataBuilder.create(512, 512).noise().bitmapData);
+		var buffer1 = WGLFrameBuffer.create(512, 512).clear(HtmlColors.red).draw(new Image2(texture1)).finish();
+
+		//var buffer1 = WGLFrameBuffer.create(512, 512).clear(HtmlColors.black).draw(new Image2(texture1)).finish();
+		//var buffer2 = WGLFrameBuffer.create(512, 512).clear(HtmlColors.black).draw(new Image2(texture2)).finish();
+
+
+		//Stage2.instance.addChild(new Image2(texture1));
+		Stage2.instance.addChild(new Image2(buffer1.texture));
+		return;
+		*/
+
 
 		/*
 		var bitmapData = new BitmapData(512, 512); bitmapData.noise(0);

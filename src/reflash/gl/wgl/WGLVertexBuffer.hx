@@ -1,4 +1,4 @@
-package reflash.wgl;
+package reflash.gl.wgl;
 
 import openfl.gl.GLBuffer;
 import openfl.utils.Float32Array;

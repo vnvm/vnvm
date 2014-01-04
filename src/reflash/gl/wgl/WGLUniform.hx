@@ -1,7 +1,6 @@
-package reflash.wgl;
+package reflash.gl.wgl;
 
 import openfl.gl.GL;
-import reflash.wgl.WGLProgram;
 import flash.geom.Matrix3D;
 
 class WGLUniform
@@ -17,11 +16,6 @@ class WGLUniform
 
 	public function setTexture(textureUnit:Int, textureBase:WGLTextureBase)
 	{
-		GL.activeTexture(GL.TEXTURE0 + textureUnit);
-		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
-		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
 		textureBase.bindToUnit(textureUnit);
 		GL.uniform1i(this.index, textureUnit);
 	}

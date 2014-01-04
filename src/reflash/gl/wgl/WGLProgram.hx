@@ -1,4 +1,4 @@
-package reflash.wgl;
+package reflash.gl.wgl;
 
 import haxe.Log;
 import openfl.gl.GLProgram;

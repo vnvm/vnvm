@@ -1,6 +1,6 @@
-package reflash.wgl;
+package reflash.gl.wgl;
 
-import reflash.wgl.WGLProgram;
+import reflash.gl.wgl.WGLProgram;
 
 class WGLAttribute
 {
