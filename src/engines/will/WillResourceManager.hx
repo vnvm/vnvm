@@ -95,7 +95,7 @@ class WillResourceManager
 		getWipAsync('$name.WIP').then(function(colorWip:WIP)
 		{
 			if (colorWip == null) throw('Can\'t find $name.WIP');
-			getWipAsync('$name.MSK').then(function(alphaWip:WIP)
+			getWipAsync('$name.MSK', true).then(function(alphaWip:WIP)
 			{
 				colorWip.mergeAlpha(alphaWip);
 				promise.resolve(colorWip);
@@ -104,10 +104,11 @@ class WillResourceManager
 		return promise;
 	}
 
-	public function getWipAsync(name:String):Promise<WIP>
+	public function getWipAsync(name:String, optional:Bool = false):Promise<WIP>
 	{
 		return readAllBytesAsync(name).then(function(data:ByteArray):WIP
 		{
+			if (!optional && (data == null)) throw('Can\'t find file "$name"');
 			return (data != null) ? WIP.fromByteArray(data) : null;
 		});
 	}

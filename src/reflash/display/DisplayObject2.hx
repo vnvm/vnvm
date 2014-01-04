@@ -75,6 +75,20 @@ class DisplayObject2 implements IDrawable
 		return this;
 	}
 
+	public function setAnchorAdjustingPosition(x:Float, y:Float):DisplayObject2
+	{
+		this.x -= this.anchorX * width;
+		this.y -= this.anchorY * height;
+
+		this.anchorX = x;
+		this.anchorY = y;
+
+		this.x += this.anchorX * width;
+		this.y += this.anchorY * height;
+
+		return this;
+	}
+
 	public function setZIndex(zIndex:Int):DisplayObject2
 	{
 		this.zIndex = zIndex;

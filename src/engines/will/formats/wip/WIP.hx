@@ -1,5 +1,7 @@
 package engines.will.formats.wip;
 
+import sys.io.File;
+import lang.MathEx;
 import flash.display.BitmapDataChannel;
 import flash.geom.Point;
 import common.imaging.BitmapDataUtils;
@@ -18,6 +20,8 @@ class WIP
 	private var bpp:Int;
 	private var entries:Array<WipEntry>;
 	public var length(get, null):Int;
+	public var width(default, null):Int;
+	public var height(default, null):Int;
 
 	private function new()
 	{
@@ -31,9 +35,14 @@ class WIP
 		if (ByteArrayUtils.readStringz(data, 4) != "WIPF") throw("Not a WIP File.");
 		count = data.readUnsignedShort();
 		bpp   = data.readUnsignedShort();
+		width = 0;
+		height = 0;
 		for (n in 0 ... count)
 		{
-			entries.push(new WipEntry().read(data));
+			var entry = new WipEntry().read(n, data);
+			entries.push(entry);
+			width = Std.int(Math.max(width, entry.x + entry.width));
+			height = Std.int(Math.max(height, entry.y + entry.height));
 		}
 	}
 
@@ -119,5 +128,13 @@ class WIP
 		{
 			return fromByteArray(data);
 		});
+	}
+
+	public function save(folder:String):Void
+	{
+		for (entry in entries)
+		{
+			File.saveBytes('$folder/${entry.index}.png', entry.bitmapData.encode('png'));
+		}
 	}
 }

@@ -20,7 +20,7 @@ interface IScene
 
 	function performTransitionAsync(kind:Int, time:Int):Promise<Dynamic>;
 
-	function setText(text:String):Void;
+	function setTextAsync(text:String):Promise<Dynamic>;
 
 	function animLoadAsync(name:String):Promise<Dynamic>;
 	function tableLoadAsync(name:String):Promise<Dynamic>;

@@ -1,5 +1,7 @@
 package engines.will;
 
+import common.PromiseUtils;
+import engines.will.display.GameInterfaceLayer;
 import engines.will.display.IGameElementsLayer;
 import engines.will.display.WIPLayer;
 import engines.will.display.GameInterfaceLayerList;
@@ -73,6 +75,7 @@ class EngineMain extends Sprite2 implements IScene
 	//private var textLayer:TextField;
 	//private var menuLayer:Sprite2;
 	private var gameLayerList:GameInterfaceLayerList;
+	private var interfaceLayer:GameInterfaceLayer;
 
 
 	private var screenRect:Rectangle;
@@ -124,18 +127,24 @@ class EngineMain extends Sprite2 implements IScene
 
 		this.gameSprite.addChild(previousBitmapImage = new Image2(previousBitmap.texture));
 		this.gameSprite.addChild(currentBitmapImage = new Image2(currentBitmap.texture));
+		this.gameSprite.addChild(interfaceLayer = new GameInterfaceLayer(willResourceManager));
+
+		interfaceLayer.setZIndex(10);
 
 		addChild(new GameScalerSprite2(800, 600, this.gameSprite));
 
 		gameState = new GameState();
 		var rio = new RIO(this, willResourceManager, gameState);
 
-		rio.loadAsync(initScript).then(function(e)
+		interfaceLayer.initAsync().then(function(?e)
 		{
-			rio.jumpAbsolute(initScriptPos);
-			rio.executeAsync().then(function(e)
+			rio.loadAsync(initScript).then(function(?e)
 			{
-				Log.trace('END!');
+				rio.jumpAbsolute(initScriptPos);
+				rio.executeAsync().then(function(?e)
+				{
+					Log.trace('END!');
+				});
 			});
 		});
 	}
@@ -152,42 +161,47 @@ class EngineMain extends Sprite2 implements IScene
 
 	public function performTransitionAsync(kind:Int, time:Int):Promise<Dynamic>
 	{
-		previousBitmap.clear(HtmlColors.black).draw(renderedBitmap).finish();
-		renderedBitmap.clear(HtmlColors.black).draw(contentContainer).finish();
-		currentBitmap.clear(HtmlColors.black).draw(renderedBitmap).finish();
+		var promise = PromiseUtils.create();
 
-		return Tween.forTime(time / 1000).onStep(function(ratio:Float)
+		interfaceLayer.hideAsync().then(function(?e)
 		{
-			currentBitmapImage.y = currentBitmapImage.x = 0;
-			switch (kind)
+			previousBitmap.clear(HtmlColors.black).draw(renderedBitmap).finish();
+			renderedBitmap.clear(HtmlColors.black).draw(contentContainer).finish();
+			currentBitmap.clear(HtmlColors.black).draw(renderedBitmap).finish();
+
+			Tween.forTime(time / 1000).onStep(function(ratio:Float)
 			{
-				case 0: // EFFECT
-					// @TODO
-					currentBitmapImage.alpha = ratio;
-				case 11, 12, 13, 14: // COURTAIN TOP-BOTTOM, BOTTOM-TOP, LEFT->RIGHT, RIGHT->LEFT
-					// @TODO
-					currentBitmapImage.alpha = ratio;
-				case 28, 29, 30, 31: // EFFECT BOTTOM->TOP, TOP->BOTTOM, RIGHT->LEFT, LEFT->RIGHT
-					// @TODO
-					currentBitmapImage.alpha = ratio;
+				currentBitmapImage.y = currentBitmapImage.x = 0;
+				switch (kind)
+				{
+					case 0: // EFFECT // @TODO
+						currentBitmapImage.alpha = ratio;
+					case 11, 12, 13, 14: // COURTAIN TOP-BOTTOM, BOTTOM-TOP, LEFT->RIGHT, RIGHT->LEFT // @TODO
+						currentBitmapImage.alpha = ratio;
+					case 28, 29, 30, 31: // EFFECT BOTTOM->TOP, TOP->BOTTOM, RIGHT->LEFT, LEFT->RIGHT // @TODO
+						currentBitmapImage.alpha = ratio;
 
-				case 25: // TRANSITION NORMAL FADE IN (alpha)
-					currentBitmapImage.alpha = ratio;
+					case 25: // TRANSITION NORMAL FADE IN (alpha)
+						currentBitmapImage.alpha = ratio;
 
-				case 26: // TRANSITION NORMAL FADE IN BURN (alpha)
-					// @TODO
-					currentBitmapImage.alpha = ratio;
+					case 26: // TRANSITION NORMAL FADE IN BURN (alpha) // @TODO
+						currentBitmapImage.alpha = ratio;
 
-				case 42, 44, 23, 24: // TRANSITION MASK (blend) (42: normal, 44: reverse), TRANSITION MASK (no blend) (23: normal, 24: reverse)
-					var reverse = (kind == 44) || (kind == 24);
-					var blend = (kind == 42) || (kind == 44);
-					currentBitmap.clear(HtmlColors.transparent).draw(new TransitionImage2(previousBitmap.texture, renderedBitmap.texture, transitionMaskTexture.value, ratio, reverse, blend)).finish();
-					//currentBitmap.clear(HtmlColors.transparent).draw(new TransitionImage2(emptyTexture, renderedBitmap.texture, transitionMaskTexture.value, ratio)).finish();
+					case 42, 44, 23, 24: // TRANSITION MASK (blend) (42: normal, 44: reverse), TRANSITION MASK (no blend) (23: normal, 24: reverse)
+						var reverse = (kind == 44) || (kind == 24);
+						var blend = (kind == 42) || (kind == 44);
+						currentBitmap.clear(HtmlColors.transparent).draw(new TransitionImage2(previousBitmap.texture, renderedBitmap.texture, transitionMaskTexture.value, ratio, reverse, blend)).finish();
 
-				default:
-					throw('Invalid transition kind $kind');
-			}
-		}).animateAsync();
+					default:
+						throw('Invalid transition kind $kind');
+				}
+			}).animateAsync().then(function(?e)
+			{
+				promise.resolve(null);
+			});
+		});
+
+		return promise;
 	}
 
 	public function getLayerWithName(name:String):IGameElementsLayer
@@ -210,7 +224,7 @@ class EngineMain extends Sprite2 implements IScene
 		}
 	}
 
-	public function setText(text:String):Void
+	public function setTextAsync(text:String):Promise<Dynamic>
 	{
 		/*
 		textLayer.defaultTextFormat = new TextFormat("Arial", 16, 0xFFFFFFFF);
@@ -219,6 +233,7 @@ class EngineMain extends Sprite2 implements IScene
 		textLayer.height = 600;
 		textLayer.text = StringTools.replace(text, '\\n', '\n');
 		*/
+		return interfaceLayer.showAsync();
 	}
 
 	public function soundPlayStopAsync(channelName:String, name:String, fadeInOutMs:Int):Promise<Dynamic>

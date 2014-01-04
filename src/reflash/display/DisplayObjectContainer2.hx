@@ -65,8 +65,11 @@ class DisplayObjectContainer2 extends DisplayObject2
 
 	override public function drawInternal(drawContext:DrawContext):Void
 	{
+		drawContext.modelViewMatrix.prependTranslation(-anchorX * width, -anchorY * height, 0);
+
 		//Log.trace('------------------');
-		for (child in childs) {
+		for (child in childs)
+		{
 			//Log.trace(child);
 			child.drawElement(drawContext);
 		}

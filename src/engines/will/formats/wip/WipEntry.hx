@@ -7,6 +7,7 @@ class WipEntry
 {
 	static public inline var structSize:Int = 6 * LangUtils.IntSize;
 
+	public var index:Int;
 	public var width:Int;
 	public var height:Int;
 	public var x:Int;
@@ -20,14 +21,15 @@ class WipEntry
 
 	}
 
-	public function read(data:ByteArray)
+	public function read(index:Int, data:ByteArray):WipEntry
 	{
-		width = data.readUnsignedInt();
-		height = data.readUnsignedInt();
-		x = data.readUnsignedInt();
-		y = data.readUnsignedInt();
-		unknown = data.readUnsignedInt();
-		compressedSize = data.readUnsignedInt();
+		this.index = index;
+		this.width = data.readUnsignedInt();
+		this.height = data.readUnsignedInt();
+		this.x = data.readUnsignedInt();
+		this.y = data.readUnsignedInt();
+		this.unknown = data.readUnsignedInt();
+		this.compressedSize = data.readUnsignedInt();
 		return this;
 	}
 }

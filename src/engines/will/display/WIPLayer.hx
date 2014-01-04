@@ -24,15 +24,27 @@ class WIPLayer extends Sprite2
 		this.layers = [];
 		this.layersEnabled = [];
 
+		this.width = this.wip.width;
+		this.height = this.wip.height;
+
 		for (index in 0 ... wip.length)
 		{
 			var wipEntry = wip.get(index);
-			var image = new Image2(WGLTexture.fromBitmapData(wipEntry.bitmapData)).setPosition(wipEntry.x, wipEntry.y).setZIndex(index);
+			var image = new Image2(WGLTexture.fromBitmapData(wipEntry.bitmapData));
+			image.setPosition(wipEntry.x, wipEntry.y).setZIndex(index);
+			image.setAnchorAdjustingPosition(0.5, 0.5);
 			image.visible = (index == 0);
+			//image.visible = true;
 			this.addChild(image);
 			this.layersEnabled.push(false);
 			this.layers.push(image);
 		}
+	}
+
+	public function getLayer(layerId:Int):DisplayObject2
+	{
+		if (!isValidLayerId(layerId)) throw('Invalid layer id');
+		return this.layers[layerId];
 	}
 
 	private function isValidLayerId(layerId:Int):Bool

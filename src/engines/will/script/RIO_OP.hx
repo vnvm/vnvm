@@ -1066,18 +1066,21 @@ class RIO_OP
 	}
 
 	@Opcode({ id:0x49, format:"2.", description:"Clears an object/character in layer1 (0=LEFT, 1=CENTER, 2=RIGHT)" })
+	@SkipLog
 	public function CLEAR_L1(index:Int)
 	{
 		scene.getLayerWithName('layer1').removeObject(index);
 	}
 
 	@Opcode({ id:0xB8, format:"2.", description:"" })
+	@SkipLog
 	public function CLEAR_L2(index:Int)
 	{
 		scene.getLayerWithName('layer2').removeObject(index);
 	}
 
 	@Opcode({ id:0x74, format:"2", description:"" })
+	@SkipLog
 	public function OBJ_CLEAR(index:Int)
 	{
 		scene.getLayerWithName('objects').removeObject(index);
@@ -1090,10 +1093,14 @@ class RIO_OP
 	public function TEXT_COMMON(text_id:Int, text:String, ?title:String)
 	{
 		var promise = new Promise<Dynamic>();
-		scene.setText(text);
-		Event2.registerOnceAny([GameInput.onClick, GameInput.onKeyPress], function(e:Event) {
-			scene.setText('');
-			promise.resolve(null);
+		scene.setTextAsync(text).then(function(?e)
+		{
+			Event2.registerOnceAny([GameInput.onClick, GameInput.onKeyPress], function(e:Event) {
+				scene.setTextAsync('').then(function(?e)
+				{
+					promise.resolve(null);
+				});
+			});
 		});
 		return promise;
 
