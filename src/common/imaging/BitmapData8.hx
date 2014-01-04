@@ -1,7 +1,7 @@
 package common.imaging;
 import common.ByteArrayUtils;
 import lang.LangUtils;
-import common.MathEx;
+import lang.MathEx;
 import haxe.io.Bytes;
 import haxe.Log;
 import flash.display.BitmapData;

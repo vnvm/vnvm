@@ -1,12 +1,10 @@
 package engines.dividead.formats;
+import common.ByteArrayUtils;
 import flash.Memory;
 import haxe.Timer;
 import common.compression.IPositionCountExtractor;
 import common.compression.LzOptions;
 import common.compression.LzDecoder;
-import common.ByteUtils;
-import common.ByteArrayUtils;
-import common.compression.RingBuffer;
 import haxe.io.Bytes;
 import haxe.Log;
 import flash.utils.ByteArray;
@@ -52,7 +50,7 @@ class LZ
 
 	@:noStack static private function _decodeFast(input:ByteArray, uncompressedSize:Int):ByteArray
 	{
-		var inputBytes = ByteUtils.ByteArrayToBytes(input);
+		var inputBytes = ByteArrayUtils.ByteArrayToBytes(input);
 		var inputData = inputBytes.getData();
 		var inputPosition = input.position;
 		var inputLength:Int = input.length;
@@ -121,7 +119,7 @@ class LZ
 			}
 		}
 
-		return ByteUtils.BytesToByteArray(outputBytes);
+		return ByteArrayUtils.BytesToByteArray(outputBytes);
 	}
 
 	@:noStack static private inline function extractPosition(param:Int):Int

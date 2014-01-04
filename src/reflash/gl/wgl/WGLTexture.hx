@@ -4,10 +4,10 @@ import reflash.display.IDrawable;
 import lang.IDisposable;
 import flash.display.BitmapData;
 
-class WGLTexture implements IDisposable
+class WGLTexture implements IGLTexture
 	//implements IDrawable
 {
-	public var textureBase(default, null):WGLTextureBase;
+	public var textureBase(default, null):IGLTextureBase;
 	public var x(default, null):Int;
 	public var y(default, null):Int;
 	public var width(default, null):Int;
@@ -18,7 +18,7 @@ class WGLTexture implements IDisposable
 	public var px2(default, null):Float;
 	public var py2(default, null):Float;
 
-	private function new(textureBase:WGLTextureBase, x:Int, y:Int, width:Int, height:Int)
+	private function new(textureBase:IGLTextureBase, x:Int, y:Int, width:Int, height:Int)
 	{
 		textureBase.referenceCounter.increment();
 		this.textureBase = textureBase;
@@ -39,7 +39,7 @@ class WGLTexture implements IDisposable
 		*/
 	}
 
-	public function slice(x:Int, y:Int, width:Int, height:Int):WGLTexture
+	public function slice(x:Int, y:Int, width:Int, height:Int):IGLTexture
 	{
 		var nx = Std.int(Math.min(this.x + x, this.width));
 		var ny = Std.int(Math.min(this.y + y, this.height));
@@ -48,17 +48,17 @@ class WGLTexture implements IDisposable
 		return new WGLTexture(this.textureBase, nx, ny, nw, nh);
 	}
 
-	static public function fromTextureBase(textureBase:WGLTextureBase, width:Int, height:Int):WGLTexture
+	static public function fromTextureBase(textureBase:IGLTextureBase, width:Int, height:Int):IGLTexture
 	{
 		return new WGLTexture(textureBase, 0, 0, width, height);
 	}
 
-	static public function fromEmpty(width:Int, height:Int):WGLTexture
+	static public function fromEmpty(width:Int, height:Int):IGLTexture
 	{
 		return fromTextureBase(WGLTextureBase.createEmpty(width, height), width, height);
 	}
 
-	static public function fromBitmapData(bitmapData:BitmapData):WGLTexture
+	static public function fromBitmapData(bitmapData:BitmapData):IGLTexture
 	{
 		return fromTextureBase(WGLTextureBase.createWithBitmapData(bitmapData), bitmapData.width, bitmapData.height);
 	}

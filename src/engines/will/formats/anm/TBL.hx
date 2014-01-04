@@ -1,6 +1,6 @@
 package engines.will.formats.anm;
 
-import common.GenericMatrix2D;
+import lang.GenericMatrix2D;
 import common.ByteArrayUtils;
 import flash.utils.ByteArray;
 

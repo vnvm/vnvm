@@ -1,6 +1,6 @@
 package engines.ethornell;
 import lang.Reference;
-import common.StringEx;
+import lang.StringEx;
 import haxe.Int64;
 import flash.errors.Error;
 import flash.utils.ByteArray;

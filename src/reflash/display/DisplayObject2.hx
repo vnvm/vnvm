@@ -5,8 +5,6 @@ import haxe.Log;
 import flash.geom.Point;
 import flash.geom.Vector3D;
 import flash.geom.Matrix3D;
-import reflash.display.shader.SolidColorShader;
-import reflash.gl.wgl.WGLVertexBuffer;
 
 class DisplayObject2 implements IDrawable
 {
@@ -30,11 +28,35 @@ class DisplayObject2 implements IDrawable
 		blendMode = BlendMode.NORMAL;
 	}
 
+	private function applyMatrix(matrix:Matrix3D, recursive:Bool = false)
+	{
+		if (recursive && (parent != null))
+		{
+			parent.applyMatrix(matrix);
+		}
+
+		matrix.prependTranslation(x, y, 0);
+		matrix.prependRotation(angle, Vector3D.Z_AXIS);
+		matrix.prependScale(scaleX, scaleY, 1);
+	}
+
 	public function globalToLocal(point:Point):Point
 	{
-		Log.trace('Not implemented!');
-		return new Point(point.x, point.y);
+		var matrix = new Matrix3D();
+		applyMatrix(matrix, true);
+		matrix.invert();
+		var transformedVector = matrix.transformVector(new Vector3D(point.x, point.y));
+		return new Point(transformedVector.x, transformedVector.y);
 	}
+
+	public function localToGlobal(point:Point):Point
+	{
+		var matrix = new Matrix3D();
+		applyMatrix(matrix, true);
+		var transformedVector = matrix.transformVector(new Vector3D(point.x, point.y));
+		return new Point(transformedVector.x, transformedVector.y);
+	}
+
 
 	private function set_zIndex(value:Int):Int
 	{
@@ -66,6 +88,13 @@ class DisplayObject2 implements IDrawable
 		return this;
 	}
 
+	public function setSize(width:Float, height:Float):DisplayObject2
+	{
+		this.width = width;
+		this.height = height;
+		return this;
+	}
+
 	public function drawElement(drawContext:DrawContext)
 	{
 		if (visible)
@@ -73,9 +102,7 @@ class DisplayObject2 implements IDrawable
 			var oldModelViewMatrix = drawContext.modelViewMatrix.clone();
 			var oldAlpha = drawContext.alpha;
 			{
-				drawContext.modelViewMatrix.prependTranslation(x, y, 0);
-				drawContext.modelViewMatrix.prependRotation(angle, Vector3D.Z_AXIS);
-				drawContext.modelViewMatrix.prependScale(scaleX, scaleY, 1);
+				applyMatrix(drawContext.modelViewMatrix);
 				drawContext.alpha *= alpha;
 
 				switch (blendMode)

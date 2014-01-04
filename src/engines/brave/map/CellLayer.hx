@@ -1,5 +1,5 @@
 package engines.brave.map;
-import common.GraphicUtils;
+import common.imaging.GraphicUtils;
 import flash.display.Graphics;
 import flash.geom.Matrix;
 

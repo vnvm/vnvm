@@ -1,17 +1,21 @@
 package engines.will;
 
+import common.display.GameScalerSprite2;
+import haxe.io.Path;
+import reflash.gl.wgl.WGLTexture;
+import reflash.gl.wgl.WGLFrameBuffer;
+import reflash.gl.IGLTexture;
+import reflash.gl.IGLFrameBuffer;
 import lang.DisposableHolder;
 import reflash.display.TransitionImage2;
 import reflash.display.HtmlColors;
 import reflash.display.Stage2;
 import reflash.display.Quad2;
 import reflash.display.Color2;
-import reflash.gl.wgl.WGLFrameBuffer;
 import reflash.display.DisplayObject2;
-import reflash.gl.wgl.WGLTexture;
 import reflash.display.Image2;
 import reflash.display.Sprite2;
-import common.GameInput;
+import common.input.GameInput;
 import flash.display.DisplayObject;
 import engines.will.formats.anm.TBL;
 import engines.will.formats.anm.ANM;
@@ -23,7 +27,6 @@ import flash.errors.Error;
 import common.tween.Tween;
 import flash.geom.Point;
 import flash.display.BitmapData;
-import common.PathUtils;
 import flash.media.SoundChannel;
 import flash.media.SoundTransform;
 import flash.media.Sound;
@@ -31,7 +34,7 @@ import flash.display.PixelSnapping;
 import engines.will.formats.wip.WIP;
 import promhx.Promise;
 import haxe.Log;
-import common.GameScalerSprite;
+import common.display.GameScalerSprite;
 import common.imaging.BitmapDataUtils;
 import vfs.SubVirtualFileSystem;
 import vfs.VirtualFileSystem;
@@ -71,9 +74,9 @@ class EngineMain extends Sprite2 implements IScene
 		return gameSprite.globalToLocal(GameInput.mouseCurrent);
 	}
 
-	private var previousBitmap:WGLFrameBuffer;
-	private var renderedBitmap:WGLFrameBuffer;
-	private var currentBitmap:WGLFrameBuffer;
+	private var previousBitmap:IGLFrameBuffer;
+	private var renderedBitmap:IGLFrameBuffer;
+	private var currentBitmap:IGLFrameBuffer;
 
 	private var previousBitmapImage:Image2;
 	private var currentBitmapImage:Image2;
@@ -92,13 +95,13 @@ class EngineMain extends Sprite2 implements IScene
 	private var gameState:GameState;
 
 	private var transitionMask:BitmapData;
-	private var transitionMaskTexture:DisposableHolder<WGLTexture>;
+	private var transitionMaskTexture:DisposableHolder<IGLTexture>;
 
 	public function new(fs:VirtualFileSystem, subpath:String, script:String, scriptPos:Int = 0)
 	{
 		super();
 
-		transitionMaskTexture = new DisposableHolder<WGLTexture>();
+		transitionMaskTexture = new DisposableHolder<IGLTexture>();
 
 //if (script == null) script = 'PW0001';
 		if (script == null) script = 'START';
@@ -158,7 +161,8 @@ class EngineMain extends Sprite2 implements IScene
 		//textLayer.selectable = false;
 
 		//addChild(new GameScalerSprite(800, 600, this.gameSprite));
-		addChild(this.gameSprite);
+		addChild(new GameScalerSprite2(800, 600, this.gameSprite));
+		//addChild(this.gameSprite);
 
 		gameState = new GameState();
 		var rio = new RIO(this, willResourceManager, gameState);
@@ -197,6 +201,13 @@ class EngineMain extends Sprite2 implements IScene
 				case 0: // EFFECT
 					// @TODO
 					currentBitmapImage.alpha = ratio;
+				case 11, 12, 13, 14: // COURTAIN TOP-BOTTOM, BOTTOM-TOP, LEFT->RIGHT, RIGHT->LEFT
+					// @TODO
+					currentBitmapImage.alpha = ratio;
+				case 28, 29, 30, 31: // EFFECT BOTTOM->TOP, TOP->BOTTOM, RIGHT->LEFT, LEFT->RIGHT
+					// @TODO
+					currentBitmapImage.alpha = ratio;
+
 				case 25: // TRANSITION NORMAL FADE IN (alpha)
 					currentBitmapImage.alpha = ratio;
 				case 26: // TRANSITION NORMAL FADE IN BURN (alpha)
@@ -269,7 +280,7 @@ class EngineMain extends Sprite2 implements IScene
 		}
 		else
 		{
-			return getBtyeArrayAsync(PathUtils.addExtensionIfMissing(name, 'ogg')).then(function(data:ByteArray)
+			return getBtyeArrayAsync(Path.withExtension(name, 'ogg')).then(function(data:ByteArray)
 			{
 				var sound = new Sound();
 				var playAsMusic = (channelName == 'music');
@@ -287,7 +298,7 @@ class EngineMain extends Sprite2 implements IScene
 		if (menuItems == null) menuItems = [];
 
 		var promise = new Promise<Dynamic>();
-		getBtyeArrayAsync(PathUtils.addExtensionIfMissing(name, 'anm')).then(function(data:ByteArray)
+		getBtyeArrayAsync(Path.withExtension(name, 'anm')).then(function(data:ByteArray)
 		{
 			var anm = ANM.fromByteArray(data);
 			willResourceManager.getWipWithMaskAsync(anm.wipName).then(function(wip:WIP)
@@ -329,7 +340,7 @@ class EngineMain extends Sprite2 implements IScene
 	public function tableLoadAsync(name:String):Promise<Dynamic>
 	{
 		var promise = new Promise<Dynamic>();
-		getBtyeArrayAsync(PathUtils.addExtensionIfMissing(name, 'TBL')).then(function(data:ByteArray)
+		getBtyeArrayAsync(Path.withExtension(name, 'TBL')).then(function(data:ByteArray)
 		{
 			tbl = TBL.fromByteArray(data);
 

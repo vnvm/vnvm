@@ -4,7 +4,8 @@ import haxe.Log;
 import openfl.gl.GLProgram;
 import openfl.gl.GLShader;
 import openfl.gl.GL;
-class WGLProgram
+
+class WGLProgram implements IGLProgram
 {
 	private var vertexShader:WGLShader;
 	private var fragmentShader:WGLShader;
@@ -33,7 +34,7 @@ class WGLProgram
 		GL.useProgram(programHandle);
 	}
 
-	public function getAttribute(name:String):WGLAttribute
+	public function getAttribute(name:String):IGLAttribute
 	{
 		var location = GL.getAttribLocation(programHandle, name);
 		if (location < 0) {
@@ -43,12 +44,12 @@ class WGLProgram
 		return new WGLAttribute(this, location);
 	}
 
-	public function getVertexDescriptor():WGLVertexDescriptor
+	public function getVertexDescriptor():IGLVertexDescriptor
 	{
 		return new WGLVertexDescriptor(this);
 	}
 
-	public function getUniform(name:String):WGLUniform
+	public function getUniform(name:String):IGLUniform
 	{
 		var location = GL.getUniformLocation(programHandle, name);
 		if (location < 0) {

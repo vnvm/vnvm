@@ -1,12 +1,12 @@
 package engines.brave;
 
-import common.GameScalerSprite;
-import common.GraphicUtils;
+import common.display.GameScalerSprite;
+import common.imaging.GraphicUtils;
 import vfs.SubVirtualFileSystem;
 import vfs.VirtualFileSystem;
 import engines.brave.BraveAssets;
 import engines.brave.formats.BraveImage;
-import common.GameInput;
+import common.input.GameInput;
 import engines.brave.GameState;
 import engines.brave.map.GameMap;
 import engines.brave.script.Script;

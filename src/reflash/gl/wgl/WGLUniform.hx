@@ -3,18 +3,18 @@ package reflash.gl.wgl;
 import openfl.gl.GL;
 import flash.geom.Matrix3D;
 
-class WGLUniform
+class WGLUniform implements IGLUniform
 {
-	private var program:WGLProgram;
+	private var program:IGLProgram;
 	private var index:Int;
 
-	public function new(program:WGLProgram, index:Int)
+	public function new(program:IGLProgram, index:Int)
 	{
 		this.program = program;
 		this.index = index;
 	}
 
-	public function setTexture(textureUnit:Int, textureBase:WGLTextureBase)
+	public function setTexture(textureUnit:Int, textureBase:IGLTextureBase)
 	{
 		textureBase.bindToUnit(textureUnit);
 		GL.uniform1i(this.index, textureUnit);

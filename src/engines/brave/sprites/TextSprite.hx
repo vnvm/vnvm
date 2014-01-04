@@ -1,7 +1,7 @@
 package engines.brave.sprites;
 import common.tween.Tween;
-import common.SpriteUtils;
-import common.StringEx;
+import common.display.SpriteUtils;
+import lang.StringEx;
 import engines.brave.BraveAssets;
 import flash.display.Bitmap;
 import flash.display.BitmapData;

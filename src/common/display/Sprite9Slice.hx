@@ -1,6 +1,5 @@
 package common.display;
-import common.GraphicUtils;
-import common.SpriteUtils;
+import common.imaging.GraphicUtils;
 import flash.display.BitmapData;
 import flash.display.Sprite;
 import flash.geom.Rectangle;

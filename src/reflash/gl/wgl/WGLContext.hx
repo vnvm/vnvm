@@ -1,6 +1,6 @@
 package reflash.gl.wgl;
 
-class WGLContext
+class WGLContext implements IGLContext
 {
 
 }

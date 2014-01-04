@@ -1,5 +1,5 @@
 package engines.tlove;
-import common.GameScalerSprite;
+import common.display.GameScalerSprite;
 import vfs.Stream;
 import vfs.SubVirtualFileSystem;
 import vfs.VirtualFileSystem;

@@ -1,5 +1,5 @@
 package common.script;
-import common.StringEx;
+import lang.StringEx;
 import haxe.Log;
 import flash.errors.Error;
 

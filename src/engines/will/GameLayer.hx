@@ -46,20 +46,7 @@ class GameLayer extends Sprite2
 
 		return willResourceManager.getWipWithMaskAsync(name).then(function(wip:WIP)
 		{
-			//var bitmapData = new BitmapData(800, 600); bitmapData.noise(0);
 			var bitmapData = wip.get(0).bitmapData;
-			/*
-			var sprite = new Sprite2();
-			var bitmap = new Image2(WGLTexture.fromBitmapData(bitmapData));
-			bitmap.x = -bitmap.width * anchor.sx;
-			bitmap.y = -bitmap.height * anchor.sy;
-			sprite.addChild(bitmap);
-			sprite.x = x;
-			sprite.y = y;
-			//sprite.zIndex = index;
-			this.layerChilds.set(index, sprite);
-			addChild(sprite);
-			*/
 			var sprite = new Image2(WGLTexture.fromBitmapData(bitmapData)).setAnchor(anchor.sx, anchor.sy).setPosition(x, y);
 			this.layerChilds.set(index, sprite);
 			addChild(sprite);

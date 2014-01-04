@@ -1,14 +1,14 @@
 package engines.tlove;
 
+import haxe.io.Path;
 import promhx.Promise;
 import common.event.Event2;
-import common.GraphicUtils;
+import common.imaging.GraphicUtils;
 import common.imaging.BitmapData8;
 import common.imaging.Palette;
 import vfs.Stream;
 import vfs.VirtualFileSystem;
 import lang.LangUtils;
-import common.PathUtils;
 import common.script.ScriptOpcodes;
 import engines.tlove.mrs.MRS;
 import engines.tlove.script.DAT;
@@ -143,7 +143,7 @@ class Game
 	
 	public function getMrsAsync(name:String, done:MRS -> Void):Void {
 		var ba:ByteArray;
-		mrs.getBytesAsync(PathUtils.addExtensionIfMissing(name, "mrs").toUpperCase()).then(function(ba:ByteArray):Void {
+		mrs.getBytesAsync(Path.withExtension(name, "mrs").toUpperCase()).then(function(ba:ByteArray):Void {
 			done(new MRS(ba));
 		});
 	}

@@ -1,5 +1,6 @@
 package common;
 
+import lang.MathEx;
 class BitUtils
 {
 	@:noStack static public inline function mask(bits:Int):Int

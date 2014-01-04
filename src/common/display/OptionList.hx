@@ -1,7 +1,6 @@
 package common.display;
 import common.event.Event2;
-import common.GameInput;
-import common.SpriteUtils;
+import common.input.GameInput;
 import common.StageReference;
 import haxe.Log;
 import flash.display.Sprite;

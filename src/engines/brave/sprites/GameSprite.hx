@@ -1,5 +1,5 @@
 package engines.brave.sprites;
-import common.SpriteUtils;
+import common.display.SpriteUtils;
 import engines.brave.sprites.map.MapSprite;
 import flash.display.Graphics;
 import flash.display.Sprite;

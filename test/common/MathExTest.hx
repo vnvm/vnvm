@@ -1,5 +1,5 @@
 package common;
-import common.MathEx;
+import lang.MathEx;
 import massive.munit.Assert;
 
 /**

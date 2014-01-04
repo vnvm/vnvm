@@ -1,9 +1,9 @@
 package engines.dividead;
 import common.assets.AssetsFileSystem;
-import common.GameScalerSprite;
+import common.display.GameScalerSprite;
 import vfs.SubVirtualFileSystem;
 import vfs.VirtualFileSystem;
-import common.StringEx;
+import lang.StringEx;
 import flash.display.Bitmap;
 import flash.display.Sprite;
 

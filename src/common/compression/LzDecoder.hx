@@ -1,5 +1,6 @@
 package common.compression;
 
+import lang.time.Timer2;
 import haxe.Timer;
 import flash.utils.Endian;
 import common.compression.LzOptions;

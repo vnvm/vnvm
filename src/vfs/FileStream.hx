@@ -1,7 +1,6 @@
 package vfs;
+import common.ByteArrayUtils;
 import promhx.Promise;
-import common.ByteUtils;
-import common.StringEx;
 import haxe.io.Bytes;
 import haxe.Log;
 import flash.errors.Error;
@@ -55,7 +54,7 @@ class FileStream extends Stream
 			Log.trace("Error in readBytesAsync: " + e);
 		}
 			
-		return Promise.promise(ByteUtils.BytesToByteArray(bytes));
+		return Promise.promise(ByteArrayUtils.BytesToByteArray(bytes));
 	}
 	
 }

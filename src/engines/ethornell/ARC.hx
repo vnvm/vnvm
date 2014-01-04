@@ -2,7 +2,7 @@ package engines.ethornell;
 import vfs.SliceStream;
 import vfs.Stream;
 import vfs.VirtualFileSystem;
-import common.StringEx;
+import lang.StringEx;
 import engines.brave.cgdb.CgDbEntry;
 import flash.errors.Error;
 import flash.utils.ByteArray;

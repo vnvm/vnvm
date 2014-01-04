@@ -12,26 +12,27 @@ typedef ComponentInfo =
 	normalized: Bool
 }
 
-class WGLVertexDescriptor
+class WGLVertexDescriptor implements IGLVertexDescriptor
 {
-	private var program:WGLProgram;
+	private var program:IGLProgram;
 	private var array:Array<ComponentInfo>;
 	private var totalSize:Int;
 
-	public function new(program:WGLProgram)
+	public function new(program:IGLProgram)
 	{
 		this.program = program;
 		this.array = [];
 		this.totalSize = 0;
 	}
 
-	static public function create(program:WGLProgram):WGLVertexDescriptor
+	static public function create(program:IGLProgram):WGLVertexDescriptor
 	{
 		return new WGLVertexDescriptor(program);
 	}
 
-	public function addField(name:String, type:WGLType, count:Int, normalized:Bool = false)
+	public function addField(name:String, count:Int, normalized:Bool = false)
 	{
+		var type:WGLType = WGLType.FLOAT;
 		var attribute = program.getAttribute(name);
 
 		var typeSize = switch (type) {

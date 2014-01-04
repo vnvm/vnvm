@@ -1,4 +1,4 @@
-package common;
+package lang;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 

@@ -1,6 +1,6 @@
 package engines.ethornell;
 
-import common.StringEx;
+import lang.StringEx;
 
 /**
  * ...

@@ -1,7 +1,7 @@
 package reflash.display;
 
 import haxe.Log;
-import common.MathEx;
+import lang.MathEx;
 class DisplayObjectContainer2 extends DisplayObject2
 {
 	private var childs:Array<DisplayObject2>;

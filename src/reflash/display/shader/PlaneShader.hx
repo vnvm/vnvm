@@ -1,14 +1,14 @@
 package reflash.display.shader;
 
-import haxe.Log;
+import reflash.gl.IGLProgram;
+import reflash.gl.IGLVertexDescriptor;
 import reflash.gl.wgl.WGLVertexBuffer;
-import reflash.gl.wgl.WGLVertexDescriptor;
 import flash.geom.Matrix3D;
-import reflash.gl.wgl.WGLProgram;
+
 class PlaneShader
 {
-	private var program:WGLProgram;
-	public var vertexDescriptor:WGLVertexDescriptor;
+	private var program:IGLProgram;
+	public var vertexDescriptor:IGLVertexDescriptor;
 
 	public function setModelView(matrix:Matrix3D)
 	{

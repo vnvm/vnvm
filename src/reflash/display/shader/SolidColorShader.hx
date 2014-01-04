@@ -33,7 +33,7 @@ class SolidColorShader extends PlaneShader
 		);
 
 		vertexDescriptor = WGLVertexDescriptor.create(program);
-		vertexDescriptor.addField("vertexPosition", WGLType.FLOAT, 2);
+		vertexDescriptor.addField("vertexPosition", 2);
 	}
 
 	static private var instance:SolidColorShader;

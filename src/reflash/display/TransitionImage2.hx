@@ -1,17 +1,17 @@
 package reflash.display;
 
-import reflash.display.shader.TextureShader;
+import reflash.gl.IGLTexture;
 import reflash.display.shader.TransitionShader;
-import reflash.gl.wgl.WGLTexture;
+
 class TransitionImage2 extends DisplayObject2
 {
-	private var colorTexture1:WGLTexture;
-	private var colorTexture2:WGLTexture;
-	private var maskTexture:WGLTexture;
-	private var mask:WGLTexture;
+	private var colorTexture1:IGLTexture;
+	private var colorTexture2:IGLTexture;
+	private var maskTexture:IGLTexture;
+	private var mask:IGLTexture;
 	public var step:Float;
 
-	public function new(colorTexture1:WGLTexture, colorTexture2:WGLTexture, maskTexture:WGLTexture, step:Float = 0.5)
+	public function new(colorTexture1:IGLTexture, colorTexture2:IGLTexture, maskTexture:IGLTexture, step:Float = 0.5)
 	{
 		super();
 		this.colorTexture1 = colorTexture1;

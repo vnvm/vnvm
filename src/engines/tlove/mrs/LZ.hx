@@ -1,5 +1,5 @@
 package engines.tlove.mrs;
-import common.StringEx;
+import lang.StringEx;
 import haxe.Log;
 import flash.errors.Error;
 import flash.utils.ByteArray;

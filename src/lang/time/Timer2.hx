@@ -1,4 +1,4 @@
-package common;
+package lang.time;
 import common.event.Event2;
 import promhx.Promise;
 import haxe.Log;
@@ -47,13 +47,12 @@ class Timer2
 		return Timer.stamp();
 	}
 
-	static public function waitAsync(timeMilliseconds:Int):Promise<Dynamic>
+	static public function waitAsync(seconds:Float):Promise<Dynamic>
 	{
 		var promise = new Promise<Dynamic>();
 		Timer.delay(function() {
 			promise.resolve(null);
-		}, timeMilliseconds);
+		}, Std.int(seconds * 1000));
 		return promise;
 	}
-
 }

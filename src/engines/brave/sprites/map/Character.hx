@@ -1,12 +1,12 @@
 package engines.brave.sprites.map;
 import common.tween.Tween;
-import common.GraphicUtils;
-import common.MathEx;
+import common.imaging.GraphicUtils;
+import lang.MathEx;
 import common.StageReference;
 import engines.brave.AsyncList;
-import common.GameInput;
+import common.input.GameInput;
 import engines.brave.GameThreadState;
-import common.Keys;
+import common.input.Keys;
 import engines.brave.map.Cell;
 import engines.brave.map.GameMap;
 import engines.brave.map.Tileset;

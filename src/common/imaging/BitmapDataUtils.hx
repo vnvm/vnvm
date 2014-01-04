@@ -1,4 +1,5 @@
 package common.imaging;
+import lang.MathEx;
 import haxe.io.Bytes;
 import lang.exceptions.OutOfBoundsException;
 import flash.Vector;

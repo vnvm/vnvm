@@ -9,14 +9,14 @@ import openfl.gl.GLTexture;
 import flash.display.BitmapData;
 import openfl.gl.GL;
 
-class WGLTextureBase implements IGLTexture
+class WGLTextureBase implements IGLTextureBase
 {
 	public var textureId(default, null):GLTexture;
 	public var width(default, null):Int;
 	public var height(default, null):Int;
 	public var referenceCounter(default, null):ReferenceCounter;
 
-	public function new(textureId:GLTexture)
+	private function new(textureId:GLTexture)
 	{
 		this.textureId = textureId;
 		this.referenceCounter = new ReferenceCounter(this);
@@ -36,7 +36,7 @@ class WGLTextureBase implements IGLTexture
 	}
 	*/
 
-	public function bindToUnit(unit:Int):WGLTextureBase
+	public function bindToUnit(unit:Int):IGLTextureBase
 	{
 		GL.activeTexture(GL.TEXTURE0 + unit);
 		GL.bindTexture(GL.TEXTURE_2D, textureId);
@@ -47,7 +47,7 @@ class WGLTextureBase implements IGLTexture
 		return this;
 	}
 
-	public function setEmptyPixels(width:Int, height:Int):WGLTextureBase
+	public function setEmptyPixels(width:Int, height:Int):IGLTextureBase
 	{
 		this.width = width;
 		this.height = height;
@@ -55,7 +55,7 @@ class WGLTextureBase implements IGLTexture
 		return this;
 	}
 
-	@:noStack public function setPixels(bitmapData:BitmapData):WGLTextureBase
+	@:noStack public function setPixels(bitmapData:BitmapData):IGLTextureBase
 	{
 		var width = bitmapData.width, height = bitmapData.height;
 		//new ArrayBufferView();
@@ -89,13 +89,18 @@ class WGLTextureBase implements IGLTexture
 		return this;
 	}
 
-	static public function createEmpty(width:Int, height:Int):WGLTextureBase
+	static private function create():IGLTextureBase
 	{
-		return (new WGLTextureBase(GL.createTexture())).bindToUnit(0).setEmptyPixels(width, height);
+		return new WGLTextureBase(GL.createTexture());
 	}
 
-	static public function createWithBitmapData(bitmapData:BitmapData):WGLTextureBase
+	static public function createEmpty(width:Int, height:Int):IGLTextureBase
 	{
-		return (new WGLTextureBase(GL.createTexture())).bindToUnit(0).setPixels(bitmapData);
+		return create().bindToUnit(0).setEmptyPixels(width, height);
+	}
+
+	static public function createWithBitmapData(bitmapData:BitmapData):IGLTextureBase
+	{
+		return create().bindToUnit(0).setPixels(bitmapData);
 	}
 }

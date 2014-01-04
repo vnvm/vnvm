@@ -1,5 +1,6 @@
 package common.tween;
 
+import lang.MathEx;
 import common.event.EventListenerGroup;
 import lang.ObjectUtils;
 import haxe.Log;

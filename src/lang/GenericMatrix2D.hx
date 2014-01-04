@@ -1,4 +1,4 @@
-package common;
+package lang;
 
 import lang.exceptions.OutOfBoundsException;
 class GenericMatrix2D<T>

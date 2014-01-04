@@ -21,7 +21,7 @@ class LzBuffer
 	{
 		this.inputPos = input.position;
 		this.inputLength = input.length;
-		this.input = ByteUtils.ByteArrayToBytes(input);
+		this.input = ByteArrayUtils.ByteArrayToBytes(input);
 		this.inputData = this.input.getData();
 		this.output = output;
 		this.outputData = this.output.getData();

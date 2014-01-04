@@ -8,16 +8,16 @@ PRINCESS WALTZ:
 	sub_406F00
 */
 
-import common.Keys;
+import common.input.Keys;
 import flash.events.MouseEvent;
 import flash.geom.Point;
 import flash.events.Event;
 import common.event.Event2;
-import common.GameInput;
+import common.input.GameInput;
 import common.geom.Anchor;
 import haxe.Log;
-import common.Timer2;
-import common.MathEx;
+import lang.time.Timer2;
+import lang.MathEx;
 import common.BitUtils;
 import promhx.Promise;
 import lang.exceptions.NotImplementedException;
@@ -949,7 +949,7 @@ class RIO_OP
 	public function WAIT(delay_ms:Int, unk1:Int)
 	{
 		if (state.debug) delay_ms = Std.int(delay_ms / 10);
-		return Timer2.waitAsync(delay_ms);
+		return Timer2.waitAsync(delay_ms / 1000);
 		throw(new NotImplementedException());
 		/*
 		local timer = Timer(delay_ms);

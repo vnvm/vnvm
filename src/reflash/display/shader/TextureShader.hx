@@ -1,7 +1,6 @@
 package reflash.display.shader;
 
-import openfl.gl.GL;
-import reflash.gl.wgl.WGLTextureBase;
+import reflash.gl.IGLTextureBase;
 import reflash.gl.wgl.WGLType;
 import reflash.gl.wgl.WGLVertexDescriptor;
 import reflash.gl.wgl.WGLProgram;
@@ -40,8 +39,8 @@ class TextureShader extends PlaneShader
 		);
 
 		vertexDescriptor = WGLVertexDescriptor.create(program);
-		vertexDescriptor.addField("vertexPosition", WGLType.FLOAT, 2);
-		vertexDescriptor.addField("aTexCoord", WGLType.FLOAT, 2);
+		vertexDescriptor.addField("vertexPosition", 2);
+		vertexDescriptor.addField("aTexCoord", 2);
 	}
 
 	static private var instance:TextureShader;
@@ -52,7 +51,7 @@ class TextureShader extends PlaneShader
 		return instance;
 	}
 
-	public function setTexture(texture:WGLTextureBase):Void
+	public function setTexture(texture:IGLTextureBase):Void
 	{
 		flush();
 		program.getUniform("uSampler").setTexture(0, texture);

@@ -1,4 +1,6 @@
-package common;
+package common.display;
+import lang.MathEx;
+import common.imaging.GraphicUtils;
 import flash.display.DisplayObject;
 import flash.display.Sprite;
 import flash.display.Stage;

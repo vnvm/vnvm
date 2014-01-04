@@ -1,15 +1,15 @@
 package engines.tlove.script;
+import haxe.io.Path;
 import common.tween.Tween;
 import common.PromiseUtils;
-import common.Timer2;
+import lang.time.Timer2;
 import promhx.Promise;
 import common.ByteArrayUtils;
 import common.event.Event2;
 import common.imaging.BitmapData8;
 import common.imaging.BmpColor;
 import common.imaging.Palette;
-import common.MathEx;
-import common.PathUtils;
+import lang.MathEx;
 import engines.tlove.Game;
 import engines.tlove.GameState;
 import engines.tlove.mrs.MRS;
@@ -671,7 +671,7 @@ class DAT_OP
 	{
 		var promise = PromiseUtils.create();
 		MUSIC_STOP().then(function(?e) {
-			game.midi.getBytesAsync(PathUtils.addExtensionIfMissing(name, "mid").toUpperCase()).then(function(bytes:ByteArray) {
+			game.midi.getBytesAsync(Path.withExtension(name, "mid").toUpperCase()).then(function(bytes:ByteArray) {
 				//var sound:Sound = new Sound();
 				//sound.loadCompressedDataFromByteArray(bytes, bytes.length);
 				//game.musicChannel = sound.play();
@@ -702,7 +702,7 @@ class DAT_OP
 			game.musicChannel.stop();
 			game.musicChannel = null;
 		}
-		return Timer2.waitAsync(10);
+		return Timer2.waitAsync(0.01);
 	}
 	
 	/**
@@ -714,7 +714,7 @@ class DAT_OP
 	function SOUND_PLAY(name:String)
 	{
 		throw(new Error("SOUND_PLAY"));
-		return Timer2.waitAsync(10);
+		return Timer2.waitAsync(0.01);
 	}
 
 	/**
@@ -725,7 +725,7 @@ class DAT_OP
 	function SOUND_STOP()
 	{
 		throw(new Error("SOUND_STOP"));
-		return Timer2.waitAsync(10);
+		return Timer2.waitAsync(0.01);
 	}
 	
 	/**

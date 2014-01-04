@@ -1,10 +1,11 @@
 package engines.brave;
 
+import lang.time.Timer2;
 import common.tween.Easing;
 import common.tween.Tween;
-import common.MathEx;
+import lang.MathEx;
 import common.script.ScriptOpcodes;
-import common.SpriteUtils;
+import common.display.SpriteUtils;
 import common.StageReference;
 import engines.brave.map.GameMap;
 import engines.brave.script.Script;
@@ -104,9 +105,7 @@ class GameState
 	
 	static public function waitClickOrKeyPress(done:Void -> Void):Void {
 		if (keyPress.exists(17)) {
-			Timer.delay(function() {
-				done();
-			}, 1);
+			Timer2.waitAsync(0.001).then(function(?e){ done(); });
 			return;
 		}
 		var onClick = null;

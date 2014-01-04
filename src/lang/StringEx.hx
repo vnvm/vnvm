@@ -1,4 +1,4 @@
-package common;
+package lang;
 import flash.errors.Error;
 
 /**

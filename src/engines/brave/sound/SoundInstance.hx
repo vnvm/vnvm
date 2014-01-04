@@ -1,5 +1,5 @@
 package engines.brave.sound;
-import common.ByteUtils;
+import common.ByteArrayUtils;
 import haxe.io.Bytes;
 import haxe.io.BytesData;
 import haxe.io.BytesInput;
@@ -94,8 +94,9 @@ class SoundInstance
 	}
 	*/
 	
-	private function loadData():Void  {
-		sound.loadPCMFromByteArray(ByteUtils.BytesToByteArray(soundEntry.bytes), Std.int(soundEntry.bytes.length / 2 / fromChannels), "short", (fromChannels == 2) ? true : false, FromRate);
+	private function loadData():Void
+	{
+		sound.loadPCMFromByteArray(ByteArrayUtils.BytesToByteArray(soundEntry.bytes), Std.int(soundEntry.bytes.length / 2 / fromChannels), "short", (fromChannels == 2) ? true : false, FromRate);
 	}
 	
 	/*

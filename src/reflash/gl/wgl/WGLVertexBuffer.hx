@@ -1,20 +1,21 @@
 package reflash.gl.wgl;
 
+import lang.IDisposable;
 import openfl.gl.GLBuffer;
 import openfl.utils.Float32Array;
 import openfl.gl.GL;
 
-class WGLVertexBuffer
+class WGLVertexBuffer implements IDisposable
 {
 	private var vertexBuffer:GLBuffer;
-	private var vertexDescriptor:WGLVertexDescriptor;
+	private var vertexDescriptor:IGLVertexDescriptor;
 
-	static public function create(vertexDescriptor:WGLVertexDescriptor):WGLVertexBuffer
+	static public function create(vertexDescriptor:IGLVertexDescriptor):WGLVertexBuffer
 	{
 		return new WGLVertexBuffer(vertexDescriptor);
 	}
 
-	public function new(vertexDescriptor:WGLVertexDescriptor)
+	public function new(vertexDescriptor:IGLVertexDescriptor)
 	{
 		this.vertexBuffer = GL.createBuffer();
 		this.vertexDescriptor = vertexDescriptor;

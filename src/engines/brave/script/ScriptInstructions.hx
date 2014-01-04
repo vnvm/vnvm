@@ -1,7 +1,7 @@
 package engines.brave.script;
 import promhx.Promise;
 import common.PromiseUtils;
-import common.StringEx;
+import lang.StringEx;
 import engines.brave.BraveAssets;
 import engines.brave.GameState;
 import engines.brave.sprites.map.Character;

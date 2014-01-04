@@ -1,9 +1,9 @@
 package engines.brave.formats;
 
+import common.ByteArrayUtils;
 import haxe.Log;
-import common.Timer2;
+import lang.time.Timer2;
 import common.imaging.format.pixel.PixelFormat565;
-import common.ByteUtils;
 import haxe.io.Bytes;
 import flash.display.BitmapData;
 import flash.errors.Error;
@@ -34,6 +34,13 @@ class BraveImage
 	static private var decodeImageKey:Array<Int> = [
 		0x84, 0x41, 0xDE, 0x48, 0x08, 0xCF, 0xCF, 0x6F, 0x62, 0x51, 0x64, 0xDF, 0x41, 0xDF, 0xE2, 0xE1
 	];
+
+	static public function decode(dataCompressed:ByteArray):BitmapData
+	{
+		var braveImage = new BraveImage();
+		braveImage.load(dataCompressed);
+		return braveImage.bitmapData;
+	}
 
 	
 	static private function decryptChunk(input:ByteArray, key:Bytes):ByteArray {
@@ -77,8 +84,8 @@ class BraveImage
 		data.readBytes(key, 0, 8);
 		data.readBytes(header, 0, 16);
 		
-		header = decryptChunk(header, ByteUtils.ArrayToBytes(decodeImageKey));
-		header = decryptChunk(header, ByteUtils.ByteArrayToBytes(key));
+		header = decryptChunk(header, ByteArrayUtils.ArrayToBytes(decodeImageKey));
+		header = decryptChunk(header, ByteArrayUtils.ByteArrayToBytes(key));
 		//for (n in 0 ... 0x10) header[n] = Decrypt.decryptPrimitive(header[n], decodeImageKey[n]);
 		//for (n in 0 ... 0x10) header[n] = Decrypt.decryptPrimitive(header[n], key[n % 8]);
 		

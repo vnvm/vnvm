@@ -1,4 +1,4 @@
-package common;
+package common.input;
 
 import haxe.Log;
 import flash.events.Event;

@@ -1,4 +1,4 @@
-package common;
+package common.display;
 import haxe.Log;
 import flash.display.DisplayObject;
 import flash.display.Graphics;

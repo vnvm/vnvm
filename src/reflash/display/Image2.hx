@@ -1,15 +1,13 @@
 package reflash.display;
 
-import haxe.Log;
-import reflash.gl.wgl.WGLTexture;
-import reflash.gl.wgl.WGLTextureBase;
+import reflash.gl.IGLTexture;
 import reflash.display.shader.TextureShader;
-import reflash.display.shader.SolidColorShader;
+
 class Image2 extends DisplayObject2
 {
-	private var texture:WGLTexture;
+	private var texture:IGLTexture;
 
-	public function new(texture:WGLTexture)
+	public function new(texture:IGLTexture)
 	{
 		super();
 		this.texture = texture;

@@ -1,8 +1,8 @@
 package reflash.display.shader;
 
-import common.MathEx;
+import reflash.gl.IGLTextureBase;
+import lang.MathEx;
 import openfl.gl.GL;
-import reflash.gl.wgl.WGLTextureBase;
 import reflash.gl.wgl.WGLType;
 import reflash.gl.wgl.WGLVertexDescriptor;
 import reflash.gl.wgl.WGLProgram;
@@ -47,8 +47,8 @@ class TransitionShader extends PlaneShader
 		);
 
 		vertexDescriptor = WGLVertexDescriptor.create(program);
-		vertexDescriptor.addField("vertexPosition", WGLType.FLOAT, 2);
-		vertexDescriptor.addField("aTexCoord", WGLType.FLOAT, 2);
+		vertexDescriptor.addField("vertexPosition", 2);
+		vertexDescriptor.addField("aTexCoord", 2);
 	}
 
 	static private var instance:TransitionShader;
@@ -59,21 +59,21 @@ class TransitionShader extends PlaneShader
 		return instance;
 	}
 
-	public function setColorTexture1(value:WGLTextureBase):TransitionShader
+	public function setColorTexture1(value:IGLTextureBase):TransitionShader
 	{
 		flush();
 		program.getUniform("uSampler1").setTexture(1, value);
 		return this;
 	}
 
-	public function setColorTexture2(value:WGLTextureBase):TransitionShader
+	public function setColorTexture2(value:IGLTextureBase):TransitionShader
 	{
 		flush();
 		program.getUniform("uSampler2").setTexture(2, value);
 		return this;
 	}
 
-	public function setMaskTexture(value:WGLTextureBase):TransitionShader
+	public function setMaskTexture(value:IGLTextureBase):TransitionShader
 	{
 		flush();
 		program.getUniform("uSamplerMask").setTexture(0, value);

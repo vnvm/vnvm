@@ -2,7 +2,7 @@ package reflash.gl.wgl;
 
 import lang.LangMacros;
 import reflash.display.HtmlColors;
-import common.MathEx;
+import lang.MathEx;
 import reflash.display.Color2;
 import reflash.display.Image2;
 import reflash.display.IDrawable;
@@ -16,11 +16,11 @@ import openfl.gl.GLFramebuffer;
 import openfl.gl.GLTexture;
 import openfl.gl.GL;
 
-class WGLFrameBuffer implements IDrawable
+class WGLFrameBuffer implements IGLFrameBuffer
 {
 	//private var renderbuffer:GLRenderbuffer;
-	public var texture(default, null):WGLTexture;
-	private var temporalTexture:WGLTexture;
+	public var texture(default, null):IGLTexture;
+	private var temporalTexture:IGLTexture;
 	private var frameBuffer:GLFramebuffer = null;
 	private var _width:Int;
 	private var _height:Int;
@@ -44,15 +44,15 @@ class WGLFrameBuffer implements IDrawable
 	{
 	}
 
-	static private var screen:WGLFrameBuffer;
+	static private var screen:IGLFrameBuffer;
 
-	static public function getScreen():WGLFrameBuffer
+	static public function getScreen():IGLFrameBuffer
 	{
 		if (screen == null) screen = new WGLFrameBuffer();
 		return screen;
 	}
 
-	private function createFrameBuffer(width:Int, height:Int):WGLFrameBuffer
+	private function createFrameBuffer(width:Int, height:Int):IGLFrameBuffer
 	{
 		this._width = width;
 		this._height = height;
@@ -70,7 +70,7 @@ class WGLFrameBuffer implements IDrawable
 		return this;
 	}
 
-	static public function create(width:Int, height:Int):WGLFrameBuffer
+	static public function create(width:Int, height:Int):IGLFrameBuffer
 	{
 		var frameBuffer = new WGLFrameBuffer();
 		return frameBuffer.createFrameBuffer(width, height).clear(HtmlColors.transparent).finish();
@@ -94,7 +94,7 @@ class WGLFrameBuffer implements IDrawable
 		setViewport();
 	}
 
-	public function clear(color:Color2):WGLFrameBuffer
+	public function clear(color:Color2):IGLFrameBuffer
 	{
 		bindAndSetViewport();
 		GL.clearColor(color.r, color.g, color.b, color.a);
@@ -104,7 +104,7 @@ class WGLFrameBuffer implements IDrawable
 		return this;
 	}
 
-	public function draw(drawable:IDrawable, x:Int = 0, y:Int = 0):WGLFrameBuffer
+	public function draw(drawable:IDrawable, x:Int = 0, y:Int = 0):IGLFrameBuffer
 	{
 		var rect = getRectangle();
 
@@ -169,7 +169,7 @@ class WGLFrameBuffer implements IDrawable
 	}
 	*/
 
-	static private var lastFrameBuffer:WGLFrameBuffer;
+	static private var lastFrameBuffer:IGLFrameBuffer;
 
 	private function bind()
 	{
@@ -190,7 +190,7 @@ class WGLFrameBuffer implements IDrawable
 		//GL.renderbufferStorage(GL.RENDERBUFFER, GL.DEPTH_COMPONENT16, width, height);
 	}
 
-	public function finish():WGLFrameBuffer
+	public function finish():IGLFrameBuffer
 	{
 		if (!isScreenBuffer())
 		{

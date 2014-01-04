@@ -1,52 +1,15 @@
 package ;
-import engines.will.WIPLayer;
-import common.imaging.BitmapDataBuilder;
-import reflash.display.HtmlColors;
-import vfs.SubVirtualFileSystem;
-import common.tween.Easing;
-import common.tween.Tween;
+
 import reflash.display.Stage2;
-import flash.display.BitmapData;
-import reflash.gl.wgl.WGLTexture;
-import flash.display.BitmapData;
-import common.imaging.BitmapDataUtils;
-import reflash.gl.wgl.WGLTextureBase;
-import reflash.display.Image2;
-import reflash.display.Color2;
-import reflash.display.Sprite2;
-import reflash.display.Sprite2;
-import reflash.display.Quad2;
-import reflash.display.DrawContext;
-import reflash.display.DisplayObject2;
-import reflash.gl.wgl.WGLFrameBuffer;
-import reflash.gl.wgl.WGLVertexBuffer;
-import reflash.gl.wgl.WGLType;
-import reflash.gl.wgl.WGLProgram;
-import flash.geom.Matrix3D;
-import openfl.utils.Float32Array;
-import flash.geom.Rectangle;
-import openfl.display.OpenGLView;
-import openfl.gl.GL;
 import common.encoding.Encoding;
-import flash.display.Shape;
-import engines.will.RIO;
-import engines.will.WillResourceManager;
-import haxe.Serializer;
-import engines.tlove.GameState;
-import flash.display.PixelSnapping;
-import common.GameScalerSprite;
-import engines.will.formats.wip.WIP;
-import vfs.Stream;
-import engines.will.formats.arc.ARC;
-import flash.display.Bitmap;
 import flash.display.StageAlign;
 import flash.display.StageScaleMode;
 import common.assets.AssetsFileSystem;
-import common.GameInput;
+import common.input.GameInput;
 import common.StageReference;
 import haxe.Log;
 import vfs.VirtualFileSystem;
-import common.StringEx;
+import lang.StringEx;
 import flash.display.Sprite;
 import flash.display.Stage;
 import flash.errors.Error;
@@ -100,6 +63,8 @@ class Main extends Sprite
 		GameInput.init();
 
 		Stage2.createAndInitializeStage2(stage);
+
+		//new CommandLineMain().extractAllImages(); return;
 
 		/*
 		var texture1 = WGLTexture.fromBitmapData(BitmapDataBuilder.create(512, 512).noise().bitmapData);

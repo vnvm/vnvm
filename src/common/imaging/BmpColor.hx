@@ -1,5 +1,5 @@
 package common.imaging;
-import common.MathEx;
+import lang.MathEx;
 
 /**
  * ...
