@@ -36,7 +36,7 @@ class EngineMain extends Sprite
 			var ab:AB = new AB(game);
 			addChild(new GameScalerSprite(640, 480, game.gameSprite));
 			ab.loadScriptAsync(scriptName, scriptPos).then(function(success:Bool):Void {
-				ab.execute();
+				ab.executeAsync();
 			});
 			/*
 			gameState.sg.openAndReadAllAsync("I_98.BMP", function(byteArray:ByteArray) {

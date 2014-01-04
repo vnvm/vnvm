@@ -1,16 +1,14 @@
 package engines.dividead;
+
+import common.IteratorUtilities;
+import common.script.Instruction2;
 import engines.dividead.script.AB_OP;
 import promhx.Promise;
 import common.Animation;
 import common.ByteArrayUtils;
 import common.GraphicUtils;
-import common.IteratorUtilities;
-import common.Log2;
 import common.MathEx;
-import common.script.Instruction;
 import common.script.Opcode;
-import common.StringEx;
-import haxe.Log;
 import haxe.Timer;
 import flash.display.Sprite;
 import flash.geom.ColorTransform;
@@ -45,9 +43,8 @@ class AB
 		});
 	}
 	
-	private function parseParam(continueCallback:Void -> Void, type:String):Dynamic {
+	private function parseParam(type:String):Dynamic {
 		switch (type) {
-			case '<': return continueCallback;
 			case 'F': return Std.int(MathEx.clamp(script.readShort(), 0, 999));
 			case '2': return script.readShort();
 			case 'T', 'S', 's': return ByteArrayUtils.readStringz(script);
@@ -57,40 +54,67 @@ class AB
 		}
 	}
 		
-	private function parseParams(continueCallback:Void -> Void, format:String):Array<Dynamic>
+	private function parseParams(format:String):Array<Dynamic>
 	{
 		var params:Array<Dynamic> = [];
 		for (n in 0 ... format.length) {
 			var type:String = format.charAt(n);
-			params.push(parseParam(continueCallback, type));
+			params.push(parseParam(type));
 		}
 		//Log.trace("Params: " + params);
 		return params;
 	}
 	
-	private function executeSingle(continueCallback:Void -> Void):Bool
+	private function executeSingleAsync():Promise<Dynamic>
 	{
-		var opcodePosition:Int = script.position;
-		var opcodeId:Int = script.readUnsignedShort();
-		var opcode:Opcode = game.scriptOpcodes.getOpcodeWithId(opcodeId);
+		var promise = new Promise<Dynamic>();
+		var opcodePosition = this.script.position;
+		var opcodeId = this.script.readUnsignedShort();
+		var opcode = game.scriptOpcodes.getOpcodeWithId(opcodeId);
 		
-		var params:Array<Dynamic> = parseParams(continueCallback, opcode.format);
-		var isAsync:Bool = (opcode.format.indexOf("<") != -1);
-		var instruction:Instruction = new Instruction(scriptName, opcode, params, isAsync, opcodePosition, script.position - opcodePosition);
-		instruction.call(this.abOp);
-		return isAsync;
+		var params:Array<Dynamic> = parseParams(opcode.format);
+		var instruction = new Instruction2(scriptName, opcode, params, opcodePosition, this.script.position - opcodePosition);
+		var result = instruction.call(this.abOp);
+
+		//Log.trace(result);
+		if (Std.is(result, Promise))
+		{
+			result.then(function(e)
+			{
+				promise.resolve(null);
+			});
+		}
+		else
+		{
+			promise.resolve(null);
+		}
+		return promise;
 	}
 	
 	private function hasMore():Bool {
-		return script.position < script.length;
+		return this.script.position < this.script.length;
 	}
-	
+
+	/*
 	public function execute():Void
 	{
 		while (running && hasMore())
 		{
-			if (executeSingle(execute)) return;
+			if (executeSingleAsync(execute)) return;
 		}
+	}
+	*/
+
+	public function executeAsync(?e):Promise<Dynamic>
+	{
+		var promise = new Promise<Dynamic>();
+		function executeStep() {
+			executeSingleAsync().then(function(?e) {
+				executeStep();
+			});
+		}
+		executeStep();
+		return promise;
 	}
 	
 	/*
@@ -163,10 +187,8 @@ class AB
 		}
 		
 		switch (type) {
-			default: {
-				addFlipSet(function(rects:Array<Rectangle>) { rects.push(new Rectangle(0, 0, 640, 480)); } );
-			}
-			case 4: { // Rows
+			case 4: // Rows
+			{
 				var block_size:Int = 16;
 				for (n in 0 ... block_size) {
 					addFlipSet(function(rects:Array<Rectangle>) { 
@@ -194,6 +216,8 @@ class AB
 					});
 				}
 			}
+			default:
+				addFlipSet(function(rects:Array<Rectangle>) { rects.push(new Rectangle(0, 0, 640, 480)); } );
 		}
 		
 		var step = null;

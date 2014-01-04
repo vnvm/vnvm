@@ -1,4 +1,5 @@
 package ;
+import engines.will.WIPLayer;
 import common.imaging.BitmapDataBuilder;
 import reflash.display.HtmlColors;
 import vfs.SubVirtualFileSystem;
@@ -148,17 +149,26 @@ class Main extends Sprite
 
 		/*
 		WillResourceManager.createFromFileSystemAsync(SubVirtualFileSystem.fromSubPath(fs, "pw")).then(function(willResourceManager:WillResourceManager) {
-			var rio = new RIO(willResourceManager);
+			//
+			//var rio = new RIO(willResourceManager);
+//
+			//rio.loadAsync('PW0001').then(function(e) {
+			//	rio.executeAsync().then(function(e) {
+			//		Log.trace('END!');
+			//	});
+			//});
+			//
+			//
+			//willResourceManager.getWipWithMaskAsync("CLKWAIT").then(function(wip:WIP) {
+			//	var bitmapData = wip.get(0).bitmapData;
+			//	Stage2.instance.addChild(new Image2(WGLTexture.fromBitmapData(bitmapData)));
+			//});
+			//
 
-			rio.loadAsync('PW0001').then(function(e) {
-				rio.executeAsync().then(function(e) {
-					Log.trace('END!');
-				});
+			willResourceManager.getWipWithMaskAsync("WINBASE0").then(function(wip:WIP) {
+				Stage2.instance.addChild(WIPLayer.fromWIP(wip));
 			});
-			willResourceManager.getWipWithMaskAsync("EV_P1A").then(function(wip:WIP) {
-				var bitmapData = wip.get(0).bitmapData;
-				Stage2.instance.addChild(new Image2(WGLTexture.createWithBitmapData(bitmapData)));
-			});
+
 		});
 
 		return;

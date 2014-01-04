@@ -40,7 +40,7 @@ class TransitionShader extends PlaneShader
 					vec3 color1 = texture2D(uSampler1, vTexCoord).rgb;
 					vec3 color2 = texture2D(uSampler2, vTexCoord).rgb;
 					float step1 = texture2D(uSamplerMask, vTexCoord).r;
-					gl_FragColor.rgb = mix(color1, color2, clamp(step1 + step, 0, 1));
+					gl_FragColor.rgb = mix(color1, color2, clamp(step1 + step, 0.0, 1.0));
 					gl_FragColor.a = alpha;
 				}
 			"

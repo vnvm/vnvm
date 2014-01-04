@@ -293,7 +293,7 @@ class EngineMain extends Sprite2 implements IScene
 			willResourceManager.getWipWithMaskAsync(anm.wipName).then(function(wip:WIP)
 			{
 				menuLayer.removeChildren();
-				for (n in 0 ... wip.getLength())
+				for (n in 0 ... wip.length)
 				{
 					var wipEntry = wip.get(n);
 					var bitmap = new Image2(WGLTexture.fromBitmapData(wipEntry.bitmapData));

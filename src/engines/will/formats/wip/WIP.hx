@@ -17,6 +17,7 @@ class WIP
 	private var count:Int;
 	private var bpp:Int;
 	private var entries:Array<WipEntry>;
+	public var length(get, null):Int;
 
 	private function new()
 	{
@@ -62,7 +63,7 @@ class WIP
 		}
 	}
 
-	public function getLength():Int
+	private function get_length():Int
 	{
 		return entries.length;
 	}
@@ -83,7 +84,7 @@ class WIP
 
 		if (alphaWip != null)
 		{
-			for (n in 0 ... colorWip.getLength())
+			for (n in 0 ... colorWip.length)
 			{
 				var colorEntry = colorWip.get(n);
 				var alphaEntry = alphaWip.get(n);
