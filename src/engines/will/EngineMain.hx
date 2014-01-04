@@ -1,6 +1,9 @@
 package engines.will;
 
-import engines.will.display.GameLayer;
+import engines.will.display.IGameElementsLayer;
+import engines.will.display.WIPLayer;
+import engines.will.display.GameInterfaceLayerList;
+import engines.will.display.GameElementsLayer;
 import common.display.GameScalerSprite2;
 import haxe.io.Path;
 import reflash.gl.wgl.WGLTexture;
@@ -57,24 +60,6 @@ class EngineMain extends Sprite2 implements IScene
 	private var initScriptPos:Int;
 	private var willResourceManager:WillResourceManager;
 
-	public function getMaskValueAt(point:Point):Int
-	{
-		var x = Std.int(point.x);
-		var y = Std.int(point.y);
-
-		if (tblMask != null)
-		{
-			if (x < 0 || y < 0 || x >= tblMask.width || y >= tblMask.height) return 0;
-			return tblMask.getPixel(x, y) & 0xFF;
-		}
-		return 0;
-	}
-
-	public function getMousePosition():Point
-	{
-		return gameSprite.globalToLocal(GameInput.mouseCurrent);
-	}
-
 	private var emptyTexture:IGLTexture;
 	private var previousBitmap:IGLFrameBuffer;
 	private var renderedBitmap:IGLFrameBuffer;
@@ -86,11 +71,9 @@ class EngineMain extends Sprite2 implements IScene
 	private var contentContainer:Sprite2;
 
 	//private var textLayer:TextField;
-	private var menuLayer:Sprite2;
-	private var objectsLayer:GameLayer;
-	private var layer1Layer:GameLayer;
-	private var layer2Layer:GameLayer;
-	private var backgroundLayer:GameLayer;
+	//private var menuLayer:Sprite2;
+	private var gameLayerList:GameInterfaceLayerList;
+
 
 	private var screenRect:Rectangle;
 
@@ -132,40 +115,17 @@ class EngineMain extends Sprite2 implements IScene
 		//var centerPoint = Anchor.centerCenter.getPointInRect(screenRect);
 		//var zeroPoint = Anchor.topLeft.getPointInRect(screenRect);
 
-		this.contentContainer.addChild(this.backgroundLayer = new GameLayer(willResourceManager, Anchor.centerCenter));
-		this.contentContainer.addChild(this.layer1Layer = new GameLayer(willResourceManager, Anchor.topLeft));
-		this.contentContainer.addChild(this.layer2Layer = new GameLayer(willResourceManager, Anchor.topLeft));
-		this.contentContainer.addChild(this.objectsLayer = new GameLayer(willResourceManager, Anchor.topLeft));
-		this.contentContainer.addChild(this.menuLayer = new Sprite2());
+		this.contentContainer.addChild(this.gameLayerList = new GameInterfaceLayerList(willResourceManager));
 
 		this.emptyTexture = WGLTexture.fromEmpty(800, 600);
 		this.previousBitmap = WGLFrameBuffer.create(800, 600).clear(HtmlColors.black).finish();
 		this.renderedBitmap = WGLFrameBuffer.create(800, 600).clear(HtmlColors.black).finish();
 		this.currentBitmap = WGLFrameBuffer.create(800, 600).clear(HtmlColors.black).finish();
 
-		//this.previousBitmap = WGLFrameBuffer.create(1024, 1024);
-		//this.currentBitmap = WGLFrameBuffer.create(1024, 1024);
-
-		/*
-		var test = WGLFrameBuffer.create(512, 512);
-		test.clear(HtmlColors.blue);
-		//test.draw(new Quad2(200, 200, HtmlColors.red));
-		Stage2.instance.addChild(new Image2(test.texture).setZIndex(1));
-		*/
-
-		//test.drawElement();
-		//test.draw(new Quad2(200, 200, HtmlColors.red));
-		//Stage2.instance.addChild(new Image2(test.texture).setAnchor(0, 0).setZIndex(1));
-
 		this.gameSprite.addChild(previousBitmapImage = new Image2(previousBitmap.texture));
 		this.gameSprite.addChild(currentBitmapImage = new Image2(currentBitmap.texture));
 
-		//this.gameSprite.addChild(this.textLayer = new TextField());
-		//textLayer.selectable = false;
-
-		//addChild(new GameScalerSprite(800, 600, this.gameSprite));
 		addChild(new GameScalerSprite2(800, 600, this.gameSprite));
-		//addChild(this.gameSprite);
 
 		gameState = new GameState();
 		var rio = new RIO(this, willResourceManager, gameState);
@@ -230,15 +190,9 @@ class EngineMain extends Sprite2 implements IScene
 		}).animateAsync();
 	}
 
-	public function getLayerWithName(name:String):GameLayer
+	public function getLayerWithName(name:String):IGameElementsLayer
 	{
-		return switch (name) {
-			case 'layer2': layer2Layer;
-			case 'layer1': layer1Layer;
-			case 'objects': objectsLayer;
-			case 'background': backgroundLayer;
-			default: throw('Can\'t find layer $name');
-		}
+		return gameLayerList.getLayerWithName(name);
 	}
 
 	public function getBtyeArrayAsync(name:String):Promise<ByteArray>
@@ -289,6 +243,9 @@ class EngineMain extends Sprite2 implements IScene
 			{
 				var sound = new Sound();
 				var playAsMusic = (channelName == 'music');
+
+				if (playAsMusic) return;
+
 				sound.loadCompressedDataFromByteArray(data, data.length, playAsMusic);
 				var channel:SoundChannel = channels[channelName] = sound.play();
 				channel.soundTransform = new SoundTransform(getChannelVolume(channelName));
@@ -296,64 +253,31 @@ class EngineMain extends Sprite2 implements IScene
 		}
 	}
 
-	private var menuItems:Array<DisplayObject2>;
-
 	public function animLoadAsync(name:String):Promise<Dynamic>
 	{
-		if (menuItems == null) menuItems = [];
-
 		var promise = new Promise<Dynamic>();
 		getBtyeArrayAsync(Path.withExtension(name, 'anm')).then(function(data:ByteArray)
 		{
 			var anm = ANM.fromByteArray(data);
 			willResourceManager.getWipWithMaskAsync(anm.wipName).then(function(wip:WIP)
 			{
-				menuLayer.removeChildren();
-				for (n in 0 ... wip.length)
-				{
-					var wipEntry = wip.get(n);
-					var bitmap = new Image2(WGLTexture.fromBitmapData(wipEntry.bitmapData));
-					bitmap.x = wipEntry.x;
-					bitmap.y = wipEntry.y;
-					bitmap.visible = false;
-					bitmap.zIndex = 0;
-					menuItems.push(bitmap);
-					menuLayer.addChild(bitmap);
-				}
+				gameLayerList.getMenuLayer().setAnmAndWip(anm, wip);
+
 				promise.resolve(null);
 			});
 		});
 		return promise;
 	}
 
-	private function updateMenuEnable()
-	{
-		menuLayer.getChildAt(0).visible = true;
-		for (n in 0 ... tbl.count)
-		{
-			var enableFlag = tbl.enable_flags[n];
-			var enable = gameState.getFlag(enableFlag) != 0;
-//Log.trace(enableFlag);
-//menuLayer.getChildAt(n + 1).visible = enable;
-		}
-	}
-
-	private var tbl:TBL;
-
-	private var tblMask:BitmapData;
-
 	public function tableLoadAsync(name:String):Promise<Dynamic>
 	{
 		var promise = new Promise<Dynamic>();
 		getBtyeArrayAsync(Path.withExtension(name, 'TBL')).then(function(data:ByteArray)
 		{
-			tbl = TBL.fromByteArray(data);
-
+			var tbl = TBL.fromByteArray(data);
 			willResourceManager.getWipAsync(tbl.mskName + '.MSK').then(function(msk:WIP):Void
 			{
-				tblMask = msk.get(0).bitmapData;
-//File.saveBytes('c:/temp/lol2.png', msk.get(0).bitmapData.encode('png'));
-				updateMenuEnable();
+				gameLayerList.getMenuLayer().setTableMask(tbl, msk.get(0).bitmapData);
 				promise.resolve(null);
 			});
 		});
@@ -363,19 +287,40 @@ class EngineMain extends Sprite2 implements IScene
 	public function setDirectMode(directMode:Bool):Void
 	{
 		if (gameSprite.contains(contentContainer) == directMode) return;
-
 		if (gameSprite.contains(contentContainer)) gameSprite.removeChild(contentContainer);
 		if (directMode) gameSprite.addChild(contentContainer);
-		if (!directMode) menuLayer.removeChildren();
+		if (!directMode) gameLayerList.getMenuLayer().setAnmAndWip(null, null);
 	}
 
 	public function setAnimObjectVisibility(index:Int, visible:Bool):Promise<Dynamic>
 	{
-		var index1 = index + 1;
-		menuItems[index1].visible = visible;
-//Log.trace('@@@@@@@@@@@ index: $index1 -> $visible');
-//menuLayer.getChildAt(index1).visible = visible;
-//return new Promise<Dynamic>();
+		var menuWipLayer = gameLayerList.getMenuLayer().getWipLayer();
+		if (menuWipLayer != null)
+		{
+			var index1 = index + 1;
+			menuWipLayer.setLayerVisibility(index1, visible);
+		}
 		return Promise.promise(null);
+	}
+
+	public function isEnabledKind(kind:Int):Bool
+	{
+		var menuWipLayer = gameLayerList.getMenuLayer().getWipLayer();
+		if (menuWipLayer != null)
+		{
+			//return true;
+			return menuWipLayer.isLayerEnabled(kind);
+		}
+		return false;
+	}
+
+	public function getMaskValueAt(point:Point):Int
+	{
+		return gameLayerList.getMenuLayer().getTableAt(Std.int(point.x), Std.int(point.y));
+	}
+
+	public function getMousePosition():Point
+	{
+		return gameSprite.globalToLocal(GameInput.mouseCurrent);
 	}
 }

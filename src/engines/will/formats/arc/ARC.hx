@@ -32,6 +32,11 @@ class ARC extends VirtualFileSystem
 		return Promise.promise(cast SliceStream.fromAll(files[name]));
 	}
 
+	public function getFileNames():Iterator<String>
+	{
+		return files.keys();
+	}
+
 	public function contains(name:String):Bool
 	{
 		name = normalizeName(name);

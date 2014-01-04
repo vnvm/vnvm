@@ -1,12 +1,16 @@
 package reflash.gl.wgl;
 
+import reflash.gl.wgl.util.IWGLObject;
+import reflash.gl.wgl.util._WGLInstances;
+import reflash.gl.wgl.util.WGLCommon;
+import reflash.gl.wgl.type.WGLShaderType;
 import openfl.gl.GLUniformLocation;
 import haxe.Log;
 import openfl.gl.GLProgram;
 import openfl.gl.GLShader;
 import openfl.gl.GL;
 
-class WGLProgram implements IGLProgram
+class WGLProgram implements IGLProgram implements IWGLObject
 {
 	private var vertexShader:WGLShader;
 	private var fragmentShader:WGLShader;
@@ -23,8 +27,16 @@ class WGLProgram implements IGLProgram
 	{
 		this.vertexShaderSource = vertexShaderSource;
 		this.fragmentShaderSource = fragmentShaderSource;
-
 		__recreate();
+		_WGLInstances.getInstance().add(this);
+	}
+
+	public function dispose()
+	{
+		_WGLInstances.getInstance().remove(this);
+		if (vertexShader != null) { vertexShader.dispose(); vertexShader = null; }
+		if (fragmentShader != null) { fragmentShader.dispose(); fragmentShader = null; }
+		GL.deleteProgram(programHandle); WGLCommon.check();
 	}
 
 	public function __recreate()
@@ -41,25 +53,13 @@ class WGLProgram implements IGLProgram
 		WGLCommon.check();
 	}
 
-	private function __check()
-	{
-		//if (programHandle == null) return;
-
-		if (!GL.isProgram(programHandle))
-		{
-			__recreate();
-		}
-	}
-
 	public function use()
 	{
-		__check();
 		GL.useProgram(programHandle); WGLCommon.check();
 	}
 
 	public function getAttribute(name:String):IGLAttribute
 	{
-		__check();
 		var location = GL.getAttribLocation(programHandle, name);
 		WGLCommon.check();
 		if (location < 0) {
@@ -76,20 +76,11 @@ class WGLProgram implements IGLProgram
 
 	public function getUniform(name:String):IGLUniform
 	{
-		__check();
 		var location = GL.getUniformLocation(programHandle, name); WGLCommon.check();
 		if (location < 0) {
 			//throw('Can\'t find uniform "$name""');
 			Log.trace('Can\'t find uniform "$name""');
 		}
 		return new WGLUniform(this, location);
-	}
-
-	public function dispose()
-	{
-
-		if (vertexShader != null) { vertexShader.dispose(); vertexShader = null; }
-		if (fragmentShader != null) { fragmentShader.dispose(); fragmentShader = null; }
-		GL.deleteProgram(programHandle); WGLCommon.check();
 	}
 }

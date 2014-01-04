@@ -1,4 +1,4 @@
-package reflash.gl.wgl;
+package reflash.gl.wgl.type;
 
 enum WGLType
 {

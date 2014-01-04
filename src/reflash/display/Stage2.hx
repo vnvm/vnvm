@@ -1,5 +1,6 @@
 package reflash.display;
 
+import reflash.gl.wgl.util._WGLInstances;
 import haxe.Log;
 import reflash.gl.wgl.WGLFrameBuffer;
 import flash.geom.Rectangle;
@@ -36,6 +37,7 @@ class Stage2 extends Sprite2
 	private function onContextRestored(?e)
 	{
 		Log.trace('OpenGLView.CONTEXT_RESTORED');
+		_WGLInstances.getInstance().restore();
 	}
 
 	private function render(rect:Rectangle)

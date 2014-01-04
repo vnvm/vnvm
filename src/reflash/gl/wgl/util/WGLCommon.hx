@@ -1,7 +1,8 @@
-package reflash.gl.wgl;
+package reflash.gl.wgl.util;
 import haxe.Log;
 import haxe.PosInfos;
 import openfl.gl.GL;
+
 class WGLCommon
 {
 	 static public function check(?posInfos:PosInfos):Void

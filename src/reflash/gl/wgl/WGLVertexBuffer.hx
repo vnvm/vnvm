@@ -1,39 +1,46 @@
 package reflash.gl.wgl;
 
+import reflash.gl.wgl.util.IWGLObject;
+import reflash.gl.wgl.util._WGLInstances;
+import reflash.gl.wgl.util.WGLCommon;
 import lang.IDisposable;
 import openfl.gl.GLBuffer;
 import openfl.utils.Float32Array;
 import openfl.gl.GL;
 
-class WGLVertexBuffer implements IDisposable
+class WGLVertexBuffer implements IDisposable implements IWGLObject
 {
 	private var vertexBuffer:GLBuffer;
 	private var vertexDescriptor:IGLVertexDescriptor;
 	private var data:Array<Float>;
+
+	public function new(vertexDescriptor:IGLVertexDescriptor)
+	{
+		this.vertexDescriptor = vertexDescriptor;
+		__recreate();
+		_WGLInstances.getInstance().add(this);
+	}
+
+	public function dispose()
+	{
+		_WGLInstances.getInstance().remove(this);
+		if (vertexBuffer != null)
+		{
+			GL.deleteBuffer(vertexBuffer);
+			WGLCommon.check();
+			vertexBuffer = null;
+		}
+	}
 
 	static public function create(vertexDescriptor:IGLVertexDescriptor):WGLVertexBuffer
 	{
 		return new WGLVertexBuffer(vertexDescriptor);
 	}
 
-	public function new(vertexDescriptor:IGLVertexDescriptor)
-	{
-		this.vertexDescriptor = vertexDescriptor;
-		__recreate();
-	}
-
-	private function __recreate()
+	public function __recreate()
 	{
 		this.vertexBuffer = GL.createBuffer();
 		_setData();
-	}
-
-	private function _check()
-	{
-		if (!GL.isBuffer(this.vertexBuffer))
-		{
-			__recreate();
-		}
 	}
 
 	private function _setData()
@@ -50,7 +57,6 @@ class WGLVertexBuffer implements IDisposable
 	{
 		this.data = vertices.slice(0);
 		//this.data = vertices;
-		this._check();
 		_setData();
 		return this;
 	}
@@ -63,22 +69,11 @@ class WGLVertexBuffer implements IDisposable
 
 	public function draw(first:Int, count:Int):WGLVertexBuffer
 	{
-		this._check();
 		this._bind();
 		this.vertexDescriptor.use();
 		GL.drawArrays(GL.TRIANGLE_STRIP, first, count);
 		WGLCommon.check();
 		this.vertexDescriptor.unuse();
 		return this;
-	}
-
-	public function dispose()
-	{
-		if (vertexBuffer != null)
-		{
-			GL.deleteBuffer(vertexBuffer);
-			WGLCommon.check();
-			vertexBuffer = null;
-		}
 	}
 }

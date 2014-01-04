@@ -75,7 +75,7 @@ class LzDecoder
 		var elapsed = Timer2.measure(function() {
 			new LzDecoder()._decode(input, output, options);
 		});
-		Log.trace('Decompressed: ${input.length} -> ${maxUncompressedData}: $elapsed');
+		//Log.trace('Decompressed: ${input.length} -> ${maxUncompressedData}: $elapsed');
 		return output;
 	}
 }

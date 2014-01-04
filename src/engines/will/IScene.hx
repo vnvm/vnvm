@@ -1,6 +1,7 @@
 package engines.will;
 
-import engines.will.display.GameLayer;
+import engines.will.display.IGameElementsLayer;
+import engines.will.display.GameElementsLayer;
 import reflash.display.Sprite2;
 import flash.geom.Point;
 import flash.utils.ByteArray;
@@ -15,7 +16,7 @@ interface IScene
 	function getBtyeArrayAsync(name:String):Promise<ByteArray>;
 	function setTransitionMaskAsync(name:String):Promise<Dynamic>;
 
-	function getLayerWithName(name:String):GameLayer;
+	function getLayerWithName(name:String):IGameElementsLayer;
 
 	function performTransitionAsync(kind:Int, time:Int):Promise<Dynamic>;
 
@@ -26,4 +27,5 @@ interface IScene
 
 	function setAnimObjectVisibility(index:Int, visible:Bool):Promise<Dynamic>;
 	function setDirectMode(directMode:Bool):Void;
+	function isEnabledKind(kind:Int):Bool;
 }

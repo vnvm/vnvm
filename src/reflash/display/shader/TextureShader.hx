@@ -1,7 +1,7 @@
 package reflash.display.shader;
 
 import reflash.gl.IGLTextureBase;
-import reflash.gl.wgl.WGLType;
+import reflash.gl.wgl.type.WGLType;
 import reflash.gl.wgl.WGLVertexDescriptor;
 import reflash.gl.wgl.WGLProgram;
 

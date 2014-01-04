@@ -1,5 +1,8 @@
 package reflash.gl.wgl;
 
+import reflash.gl.wgl.util.IWGLObject;
+import reflash.gl.wgl.util._WGLInstances;
+import reflash.gl.wgl.util.WGLCommon;
 import lang.LangMacros;
 import reflash.display.HtmlColors;
 import lang.MathEx;
@@ -16,7 +19,7 @@ import openfl.gl.GLFramebuffer;
 import openfl.gl.GLTexture;
 import openfl.gl.GL;
 
-class WGLFrameBuffer implements IGLFrameBuffer
+class WGLFrameBuffer implements IGLFrameBuffer implements IWGLObject
 {
 	//private var renderbuffer:GLRenderbuffer;
 	public var texture(default, null):IGLTexture;
@@ -25,24 +28,18 @@ class WGLFrameBuffer implements IGLFrameBuffer
 	private var _width:Int;
 	private var _height:Int;
 
-	private function isScreenBuffer():Bool
-	{
-		return (frameBuffer == null);
-	}
-
-	private function getWidth():Int
-	{
-		return isScreenBuffer() ? Std.int(StageReference.stage.stageWidth) : _width;
-	}
-
-	private function getHeight():Int
-	{
-		return isScreenBuffer() ? Std.int(StageReference.stage.stageHeight) : _height;
-	}
-
 	private function new()
 	{
 	}
+
+	public function dispose()
+	{
+		_WGLInstances.getInstance().remove(this);
+		if (frameBuffer != null) { GL.deleteFramebuffer(frameBuffer); WGLCommon.check(); frameBuffer = null; }
+		if (texture != null) { texture.textureBase.dispose(); texture = null; }
+		if (temporalTexture != null) { temporalTexture.textureBase.dispose(); temporalTexture = null; }
+	}
+
 
 	static private var screen:IGLFrameBuffer;
 
@@ -59,10 +56,12 @@ class WGLFrameBuffer implements IGLFrameBuffer
 
 		__recreate();
 
+		_WGLInstances.getInstance().add(this);
+
 		return this;
 	}
 
-	private function __recreate()
+	public function __recreate()
 	{
 		frameBuffer = GL.createFramebuffer(); WGLCommon.check();
 		//renderbuffer = GL.createRenderbuffer();
@@ -76,15 +75,9 @@ class WGLFrameBuffer implements IGLFrameBuffer
 		//GL.framebufferRenderbuffer(GL.FRAMEBUFFER, GL.DEPTH_ATTACHMENT, GL.RENDERBUFFER, renderbuffer);
 	}
 
-	private function __check()
-	{
-		if (frameBuffer == null) return;
-		//return;
-		if (!GL.isFramebuffer(frameBuffer))
-		{
-			__recreate();
-		}
-	}
+	private function isScreenBuffer():Bool { return (frameBuffer == null); }
+	private function getWidth():Int { return isScreenBuffer() ? Std.int(StageReference.stage.stageWidth) : _width; }
+	private function getHeight():Int { return isScreenBuffer() ? Std.int(StageReference.stage.stageHeight) : _height; }
 
 	static public function create(width:Int, height:Int):IGLFrameBuffer
 	{
@@ -149,7 +142,6 @@ class WGLFrameBuffer implements IGLFrameBuffer
 
 	public function drawElement(drawContext:DrawContext):Void
 	{
-		__check();
 		new Image2(texture).setAnchor(0, 0).drawElement(drawContext);
 	}
 
@@ -193,7 +185,6 @@ class WGLFrameBuffer implements IGLFrameBuffer
 
 	private function bind()
 	{
-		__check();
 		// no change
 		if (lastFrameBuffer == this) return;
 
@@ -213,8 +204,6 @@ class WGLFrameBuffer implements IGLFrameBuffer
 
 	public function finish():IGLFrameBuffer
 	{
-		__check();
-
 		if (!isScreenBuffer())
 		{
 			GL.bindFramebuffer(GL.FRAMEBUFFER, frameBuffer); WGLCommon.check();
@@ -223,13 +212,6 @@ class WGLFrameBuffer implements IGLFrameBuffer
 			GL.bindTexture(GL.TEXTURE_2D, null); WGLCommon.check();
 		}
 		return this;
-	}
-
-	public function dispose()
-	{
-		if (frameBuffer != null) { GL.deleteFramebuffer(frameBuffer); WGLCommon.check(); frameBuffer = null; }
-		if (texture != null) { texture.textureBase.dispose(); texture = null; }
-		if (temporalTexture != null) { temporalTexture.textureBase.dispose(); temporalTexture = null; }
 	}
 
 	/*

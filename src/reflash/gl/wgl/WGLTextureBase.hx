@@ -1,5 +1,8 @@
 package reflash.gl.wgl;
 
+import reflash.gl.wgl.util.IWGLObject;
+import reflash.gl.wgl.util._WGLInstances;
+import reflash.gl.wgl.util.WGLCommon;
 import haxe.Log;
 import flash.utils.Endian;
 import common.ByteArrayUtils;
@@ -13,7 +16,7 @@ import openfl.gl.GLTexture;
 import flash.display.BitmapData;
 import openfl.gl.GL;
 
-class WGLTextureBase implements IGLTextureBase
+class WGLTextureBase implements IGLTextureBase implements IWGLObject
 {
 	public var textureId(default, null):GLTexture;
 	public var width(default, null):Int;
@@ -25,10 +28,12 @@ class WGLTextureBase implements IGLTextureBase
 	{
 		this.referenceCounter = new ReferenceCounter(this);
 		this.__recreate();
+		_WGLInstances.getInstance().add(this);
 	}
 
 	public function dispose()
 	{
+		_WGLInstances.getInstance().remove(this);
 		if (textureId != null)
 		{
 			GL.deleteTexture(textureId); WGLCommon.check();
@@ -47,7 +52,6 @@ class WGLTextureBase implements IGLTextureBase
 
 	public function bindToUnit(unit:Int):IGLTextureBase
 	{
-		__check();
 		_bindToUnit(unit);
 		return this;
 	}
@@ -62,7 +66,7 @@ class WGLTextureBase implements IGLTextureBase
 		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE); WGLCommon.check();
 	}
 
-	private function __recreate()
+	public function __recreate()
 	{
 		this.textureId = GL.createTexture();
 		WGLCommon.check();
@@ -78,14 +82,6 @@ class WGLTextureBase implements IGLTextureBase
 	{
 		_bindToUnit(0);
 		GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, GL.UNSIGNED_BYTE, new UInt8Array(data));
-	}
-
-	private function __check()
-	{
-		if (!GL.isTexture(this.textureId))
-		{
-			__recreate();
-		}
 	}
 
 	@:noStack public function setRgbaBytes(width:Int, height:Int, data:ByteArray):IGLTextureBase

@@ -16,7 +16,7 @@ import engines.will.formats.wip.WIP;
 import promhx.Promise;
 import flash.display.Sprite;
 
-class GameLayer extends Sprite2
+class GameElementsLayer extends Sprite2 implements IGameElementsLayer
 {
 	private var layerChilds:Map<Int, DisplayObject2>;
 	private var willResourceManager:WillResourceManager;
@@ -53,7 +53,7 @@ class GameLayer extends Sprite2
 		});
 	}
 
-	public function setObjectPos(index:Int, x:Int, y:Int):GameLayer
+	public function setObjectPos(index:Int, x:Int, y:Int):GameElementsLayer
 	{
 		if (this.layerChilds.exists(index))
 		{
@@ -64,7 +64,7 @@ class GameLayer extends Sprite2
 		return this;
 	}
 
-	public function setObjectSizeRotation(index:Int, scale:Float, rotation:Float):GameLayer
+	public function setObjectSizeRotation(index:Int, scale:Float, rotation:Float):GameElementsLayer
 	{
 		if (this.layerChilds.exists(index))
 		{
@@ -76,7 +76,7 @@ class GameLayer extends Sprite2
 		return this;
 	}
 
-	public function setLayerViewPort(scale:Float, x:Int, y:Int):GameLayer
+	public function setLayerViewPort(scale:Float, x:Int, y:Int):GameElementsLayer
 	{
 		this.scaleX = scale;
 		this.scaleY = scale;

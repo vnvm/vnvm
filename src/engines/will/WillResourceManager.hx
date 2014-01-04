@@ -62,6 +62,19 @@ class WillResourceManager
 		return promise;
 	}
 
+	public function getFileNames():Array<String>
+	{
+		var array:Array<String> = [];
+		for (arc in arcList)
+		{
+			for (name in arc.getFileNames())
+			{
+				array.push(name);
+			}
+		}
+		return array;
+	}
+
 	public function readAllBytesAsync(name:String):Promise<ByteArray>
 	{
 		for (arc in arcList)

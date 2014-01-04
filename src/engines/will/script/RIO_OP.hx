@@ -233,7 +233,9 @@ class RIO_OP
 
 		var promise = new Promise<Dynamic>();
 		var mousePosition:Point = scene.getMousePosition();
-		var overKind:Int = scene.getMaskValueAt(mousePosition);
+		var overKind1:Int = scene.getMaskValueAt(mousePosition);
+		var overKind:Int = scene.isEnabledKind(overKind1) ? overKind1 : 0;
+		//Log.trace('$mousePosition: $overKind1: $overKind');
 
 		function onClick() {
 			//throw(new Error("onClick!"));

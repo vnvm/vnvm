@@ -39,6 +39,15 @@ class WGLTexture implements IGLTexture
 		*/
 	}
 
+	public function dispose()
+	{
+		if (textureBase != null)
+		{
+			textureBase.referenceCounter.decrement();
+			textureBase = null;
+		}
+	}
+
 	public function slice(x:Int, y:Int, width:Int, height:Int):IGLTexture
 	{
 		var nx = Std.int(Math.min(this.x + x, this.width));
@@ -61,15 +70,6 @@ class WGLTexture implements IGLTexture
 	static public function fromBitmapData(bitmapData:BitmapData):IGLTexture
 	{
 		return fromTextureBase(WGLTextureBase.createWithBitmapData(bitmapData), bitmapData.width, bitmapData.height);
-	}
-
-	public function dispose()
-	{
-		if (textureBase != null)
-		{
-			textureBase.referenceCounter.decrement();
-			textureBase = null;
-		}
 	}
 
 	/*

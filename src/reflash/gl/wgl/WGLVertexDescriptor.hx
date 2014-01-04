@@ -1,5 +1,7 @@
 package reflash.gl.wgl;
 
+import reflash.gl.wgl.util.WGLCommon;
+import reflash.gl.wgl.type.WGLType;
 import haxe.Log;
 import openfl.gl.GL;
 
