@@ -1,9 +1,8 @@
 package engines.brave.sprites;
-import common.Animation;
+import common.tween.Tween;
 import common.SpriteUtils;
 import common.StringEx;
 import engines.brave.BraveAssets;
-import haxe.Log;
 import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.PixelSnapping;
@@ -82,9 +81,16 @@ class TextSprite extends Sprite
 		{
 			var obj:Dynamic = { showChars : 0 };
 			var time:Float = text.length * 0.01;
-			Animation.animate(done, time, obj, { showChars : text.length } , Animation.Linear, function(step:Float) {
-				_setText(text.substr(0, Std.int(obj.showChars)));
-			} );
+
+			Tween.forTime(time)
+				.interpolateTo(obj, { showChars : text.length })
+				.onStep(function(step:Float) {
+					_setText(text.substr(0, Std.int(obj.showChars)));
+				})
+				.animateAsync().then(function(?e) {
+					done();
+				})
+			;
 		}
 		else
 		{
@@ -113,9 +119,12 @@ class TextSprite extends Sprite
 		}
 	}
 
-	public function enable(done:Void -> Void):Void {
+	public function enable(done:Void -> Void):Void
+	{
 		if (alpha != 1) {
-			Animation.animate(done, 0.3, this, { alpha : 1 } );
+			Tween.forTime(0.3).interpolateTo(this, { alpha : 1 }).animateAsync().then(function(?e) {
+				done();
+			});
 		} else {
 			done();
 		}
@@ -131,7 +140,9 @@ class TextSprite extends Sprite
 			done();
 		};
 		if (alpha != 0) {
-			Animation.animate(done2, 0.1, this, { alpha : 0 } );
+			Tween.forTime(0.1).interpolateTo(this, { alpha : 0 }).animateAsync().then(function(?e) {
+				done2();
+			});
 		} else {
 			done2();
 		}

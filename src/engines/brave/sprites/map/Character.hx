@@ -1,10 +1,9 @@
 package engines.brave.sprites.map;
-import common.Animation;
+import common.tween.Tween;
 import common.GraphicUtils;
 import common.MathEx;
 import common.StageReference;
 import engines.brave.AsyncList;
-import engines.brave.BraveAssets;
 import common.GameInput;
 import engines.brave.GameThreadState;
 import common.Keys;
@@ -12,7 +11,6 @@ import engines.brave.map.Cell;
 import engines.brave.map.GameMap;
 import engines.brave.map.Tileset;
 import engines.brave.script.ScriptThread;
-import haxe.Log;
 import haxe.Timer;
 import flash.display.Sprite;
 import flash.events.Event;
@@ -191,14 +189,18 @@ class Character
 	}
 	
 	public function actionMoveTo(destX:Int, destY:Int):Void {
-		this.actions.addAction(function(done:Void -> Void) {
+		this.actions.addAction(function(done:Void -> Void)
+		{
 			if (Math.abs(x - destX) > Math.abs(y - destY)) {
 				this.direction = (destX < x) ? 1 : 3;
 			} else {
 				this.direction = (destY < y) ? 2 : 0;
 			}
-			Animation.animate(done, 1, this, { x : destX, y : destY }, Animation.Linear, function(v:Float) {
+
+			Tween.forTime(1).onStep(function(step:Float) {
 				frame++;
+			}).interpolateTo(this, { x : destX, y : destY }).animateAsync().then(function(?e) {
+				done();
 			});
 		});
 	}

@@ -1,6 +1,7 @@
 package engines.brave;
 
-import common.Animation;
+import common.tween.Easing;
+import common.tween.Tween;
 import common.MathEx;
 import common.script.ScriptOpcodes;
 import common.SpriteUtils;
@@ -184,12 +185,16 @@ class GameState
 		rootClip.backgroundBack.visible = true;
 		
 		//rootClip.backgroundBack.transform.colorTransform = new ColorTransform(1, 0.6, 0.3, 1.0, 0, 0, 0, 0);
-		
-		Animation.animate(function() {
-			rootClip.backgroundFront.alpha = 1;
-			SpriteUtils.swapSpriteChildren(rootClip.backgroundFront, rootClip.backgroundBack);
-			done();
-		}, time, rootClip.backgroundFront, { alpha : 0 }, Animation.Sin);
+
+		Tween.forTime(time)
+			.interpolateTo(rootClip.backgroundFront, { alpha : 0 }, Easing.easeInOutQuad)
+			.animateAsync()
+			.then(function(?e) {
+				rootClip.backgroundFront.alpha = 1;
+				SpriteUtils.swapSpriteChildren(rootClip.backgroundFront, rootClip.backgroundBack);
+				done();
+			})
+		;
 	}
 	
 	public function fadeToMap(done:Void -> Void, time:Int):Void {
@@ -197,9 +202,13 @@ class GameState
 		
 		rootClip.mapSprite.visible = true;
 		rootClip.backgroundBack.visible = false;
-		
-		Animation.animate(function() {
-			done();
-		}, time, rootClip.background, { alpha : 0 }, Animation.Sin);
+
+		Tween.forTime(time)
+			.interpolateTo(rootClip.background, { alpha : 0 }, Easing.easeInOutQuad)
+			.animateAsync()
+			.then(function(?e) {
+				done();
+			})
+		;
 	}
 }

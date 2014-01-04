@@ -1,8 +1,8 @@
 package engines.tlove.script;
+import common.tween.Tween;
 import common.PromiseUtils;
 import common.Timer2;
 import promhx.Promise;
-import common.Animation;
 import common.ByteArrayUtils;
 import common.Event2;
 import common.imaging.BitmapData8;
@@ -318,96 +318,50 @@ class DAT_OP
 		//throw(new Error("UNKNOWN_34"));
 	}
 
-	/**
-	 * 
-	 */
-	@Opcode({ id:0x32, format:"", description:"???" })
+	@Opcode({ id:0x32, format:"", description:"Fade In" })
 	//@Unimplemented
 	function FADE_IN()
 	{
-		var promise = new Promise<Dynamic>();
 		// TODO: Perform the fading changing the palette?
-		if (delayEnabled)
-		{
-			Animation.animate(function() {
-				promise.resolve(null);
-			}, 0.5, game.blackOverlay, { alpha : 0 }, Animation.Linear);
-		}
-		else
-		{
-			game.blackOverlay.alpha = 0;
-			promise.resolve(null);
-		}
-		return promise;
+		return Tween.forTime(delayEnabled ? 0.5 : 0).interpolateTo(game.blackOverlay, { alpha: 0 }).animateAsync();
 	}
 
-	/**
-	 * 
-	 */
-	@Opcode({ id:0x35, format:"", description:"???" })
+	@Opcode({ id:0x35, format:"", description:"Fade Out" })
 	//@Unimplemented
 	function FADE_OUT()
 	{
-		var promise = new Promise<Dynamic>();
-		// TODO: Perform the fading changing the palette?
-		if (delayEnabled) {
-			Animation.animate(function() {
-				promise.resolve(null);
-			}, 0.5, game.blackOverlay, { alpha : 1 }, Animation.Linear);
-		} else {
-			game.blackOverlay.alpha = 1;
-			promise.resolve(null);
-		}
-		return promise;
+		return Tween.forTime(delayEnabled ? 0.5 : 0).interpolateTo(game.blackOverlay, { alpha: 1 }).animateAsync();
 	}
 
-	/**
-	 * Copy a rect from one layer to other
-	 * 
-	 * @param	effect
-	 * @param	transparentColor
-	 * @param	srcLayer
-	 * @param	srcX
-	 * @param	srcY
-	 * @param	srcWidth
-	 * @param	srcHeight
-	 * @param	dstLayer
-	 * @param	dstX
-	 * @param	dstY
-	 */
 	@Opcode( { id:0x36, format:"1112222122", description:"Copy an slice of buffer into another" } )
 	//@Unimplemented
-	function COPY_RECT(effect:Int, transparentColor:Int, srcLayer:Int, srcX:Int, srcY:Int, srcWidth:Int, srcHeight:Int, dstLayer:Int, dstX:Int = 0, dstY:Int = 0) {
+	function COPY_RECT(effect:Int, transparentColor:Int, srcLayer:Int, srcX:Int, srcY:Int, srcWidth:Int, srcHeight:Int, dstLayer:Int, dstX:Int = 0, dstY:Int = 0)
+	{
 		var src:BitmapData8 = dat.game.layers[srcLayer];
 		var dst:BitmapData8 = dat.game.layers[dstLayer];
-
-		var promise = new Promise<Dynamic>();
 
 		switch (effect)
 		{
 			case 0:
 				BitmapData8.copyRect(src, new Rectangle(srcX, srcY, srcWidth, srcHeight), dst, new Point(dstX, dstY));
 				if (dstLayer == 0) dat.game.updateImage(new Rectangle(dstX, dstY, srcWidth, srcHeight));
-				Timer.delay(function() {
-					promise.resolve(null);
-				}, 0);
+				return Timer2.waitAsync(0);
 			//case 29:
 			default:
-				if (delayEnabled) {
-					Animation.animate(function() {
-						promise.resolve(null);
-					}, 0.4, { }, { }, Animation.Linear, function(step:Float) {
+				if (delayEnabled)
+				{
+					return Tween.forTime(0.4).onStep(function(step:Float) {
 						BitmapData8.copyRectTransition(src, new Rectangle(srcX, srcY, srcWidth, srcHeight), dst, new Point(dstX, dstY), step, effect, transparentColor);
 						if (dstLayer == 0) dat.game.updateImage(new Rectangle(dstX, dstY, srcWidth, srcHeight));
-					});
-				} else {
+					}).animateAsync();
+				}
+				else
+				{
 					BitmapData8.copyRectTransition(src, new Rectangle(srcX, srcY, srcWidth, srcHeight), dst, new Point(dstX, dstY), 1, effect, transparentColor);
 					if (dstLayer == 0) dat.game.updateImage(new Rectangle(dstX, dstY, srcWidth, srcHeight));
-					promise.resolve(null);
+					return Timer2.waitAsync(0);
 				}
 		}
-
-		return promise;
 	}
 
 	/**
@@ -460,54 +414,44 @@ class DAT_OP
 	function PALETTE_ACTION(mode:Int, index:Int, b:Int, r:Int, g:Int)
 	{
 		var color:BmpColor = new BmpColor(r, g, b, 0xFF);
-		var promise = new Promise<Dynamic>();
 
 		switch (mode) {
 			case 0:
 				// SET_WORK_PALETTE_COLOR
 				game.workPalette.colors[index] = new BmpColor(r, g, b, 0xFF);
-				promise.resolve(null);
+				return PromiseUtils.createResolved();
 			case 1:
 				// APPLY_PALETTE
 				Palette.copy(game.workPalette, game.currentPalette);
 				game.updateImage();
-				promise.resolve(null);
+				return PromiseUtils.createResolved();
 			case 2:
 				// BACKUP_PALETTE
 				Palette.copy(game.workPalette, game.backupPalette);
-				promise.resolve(null);
+				return PromiseUtils.createResolved();
 			case 3:
 				// RESTORE_PALETTE
 				Palette.copy(game.backupPalette, game.workPalette);
-				promise.resolve(null);
+				return PromiseUtils.createResolved();
 			case 4:
 				// ANIMATE_PALETTE
-				if (delayEnabled) {
-					var src = game.workPalette.clone();
-					var dst = game.currentPalette.clone();
-					Animation.animate(function() {
-						promise.resolve(null);
-					}, 1, { }, { }, Animation.Linear, function(step:Float) {
-						game.workPalette.interpolate(src, dst, step);
-						game.updateImage();
-					});
-				} else {
-					Palette.copy(game.currentPalette, game.workPalette);
+				var src = game.workPalette.clone();
+				var dst = game.currentPalette.clone();
+
+				return Tween.forTime(delayEnabled ? 1 : 0).onStep(function(step:Float) {
+					game.workPalette.interpolate(src, dst, step);
 					game.updateImage();
-					promise.resolve(null);
-				}
+				}).animateAsync();
 			case 5:
 				// COPY_PALETTE
 				Palette.copy(game.lastLoadedPalette, game.workPalette);
-				promise.resolve(null);
+				return PromiseUtils.createResolved();
 			case 6:
 				// FADE_PALETTE
 				throw(new Error("FADE_PALETTE"));
 			default:
 				throw(new Error("PALETTE_ACTION: " + mode));
 		}
-
-		return promise;
 	}
 	
 	/**

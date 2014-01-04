@@ -1,11 +1,11 @@
 package engines.dividead;
 
+import common.tween.Tween;
 import common.PromiseUtils;
 import common.IteratorUtilities;
 import common.script.Instruction2;
 import engines.dividead.script.AB_OP;
 import promhx.Promise;
-import common.Animation;
 import common.ByteArrayUtils;
 import common.GraphicUtils;
 import common.MathEx;
@@ -125,34 +125,11 @@ class AB
 	{
 		var sprite:Sprite = new Sprite();
 		GraphicUtils.drawSolidFilledRectWithBounds(sprite.graphics, 0, 0, 640, 480, 0x000000, 1.0);
-		var promise = new Promise<Dynamic>();
-		
-		Animation.animate(function() {
-			promise.resolve(null);
-		}, time, { }, { }, Animation.Linear, function(step:Float):Void {
-			game.front.copyPixels(game.back, game.back.rect, new Point(0, 0));
-			//sprite.alpha = step;
-			game.front.draw(sprite, null, new ColorTransform(1, 1, 1, step, 0, 0, 0, 0));
-		});
-		/*
-		if (throttle) return;
 
-		var steps = 60.0;
-		
-		var screen2 = ::screen.dup();
-		
-		for (local n = 0; n < steps; n++) {
-			::screen.clear(color);
-			screen2.draw(screen, 0, 0, 1.0 - (n.tofloat() / steps));
-			Screen.flip();
-			Screen.frame(60);
-		}
-		
-		::screen.clear(color);
-		Screen.flip();
-		Screen.frame(60);
-		*/
-		return promise;
+		return Tween.forTime(time).onStep(function(step:Float) {
+			game.front.copyPixels(game.back, game.back.rect, new Point(0, 0));
+			game.front.draw(sprite, null, new ColorTransform(1, 1, 1, step, 0, 0, 0, 0));
+		}).animateAsync();
 	}
 	
 	public function paintAsync(pos:Int, type:Int):Promise<Dynamic>

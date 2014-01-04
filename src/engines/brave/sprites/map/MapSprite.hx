@@ -1,5 +1,6 @@
 package engines.brave.sprites.map;
-import common.Animation;
+import common.tween.Easing;
+import common.tween.Tween;
 import common.LangUtils;
 import common.MathEx;
 import common.SpriteUtils;
@@ -81,11 +82,13 @@ class MapSprite extends Sprite
 	public function moveCameraTo(destX:Float, destY:Float, time:Float, ?done:Void -> Void):Void {
 		destX = MathEx.clamp(destX, 0, map.width * 40 - 640);
 		destY = MathEx.clamp(destY, 0, map.height * 40 - 480);
-		
-		Animation.animate(done, time, this, { cameraX : destX, cameraY : destY }, Animation.Sin, function(step) {
-			//BraveLog.trace(Std.format("step! $cameraX, $cameraY"));
-			//updateCamera();
-		});
+
+		Tween.forTime(time)
+			.interpolateTo(this, { cameraX : destX, cameraY : destY }, Easing.easeInOutQuad)
+			.animateAsync().then(function(?e) {
+				done();
+			})
+		;
 	}
 	
 	private var followingCharacter:Character;

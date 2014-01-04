@@ -1,5 +1,6 @@
 package common.tween;
 
+import lang.ObjectUtils;
 import haxe.Log;
 import common.signal.Signal;
 import flash.events.Event;
@@ -32,17 +33,14 @@ class Tween
 	public function interpolateTo(object:Dynamic, dstProperties:Dynamic, easing:Float -> Float = null):Tween
 	{
 		if (easing == null) easing = Easing.linear;
-		var srcProperties = {};
 
-		for (property in Reflect.fields(dstProperties))
-		{
-			Reflect.setField(srcProperties, property, Reflect.field(object, property));
-		}
+		var propertyList = Reflect.fields(dstProperties);
+		var srcProperties = ObjectUtils.extractFields(object, propertyList);
 
 		onStep(function(step:Float)
 		{
 			step = easing(step);
-			for (property in Reflect.fields(dstProperties))
+			for (property in propertyList)
 			{
 				var src = Reflect.field(srcProperties, property);
 				var dst = Reflect.field(dstProperties, property);
