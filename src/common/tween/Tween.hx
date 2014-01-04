@@ -33,6 +33,7 @@ class Tween
 	{
 		if (easing == null) easing = Easing.linear;
 		var srcProperties = {};
+
 		for (property in Reflect.fields(dstProperties))
 		{
 			Reflect.setField(srcProperties, property, Reflect.field(object, property));
@@ -50,6 +51,7 @@ class Tween
 				Reflect.setField(object, property, interpolated);
 			}
 		});
+
 		return this;
 	}
 
@@ -69,7 +71,7 @@ class Tween
 		{
 			var current = Timer.stamp();
 			var elapsed = current - start;
-			var ratio = MathEx.clamp(elapsed / totalTime, 0, 1);
+			var ratio = (totalTime > 0) ? MathEx.clamp(elapsed / totalTime, 0, 1) : 1;
 
 			//Log.trace('********************* animateAsync: $start, $current, $elapsed, $totalTime, $ratio');
 

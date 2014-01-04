@@ -8,6 +8,7 @@ PRINCESS WALTZ:
 	sub_406F00
 */
 
+import common.Keys;
 import flash.events.MouseEvent;
 import flash.geom.Point;
 import flash.events.Event;
@@ -325,9 +326,15 @@ class RIO_OP
 		return this.scene.setTransitionMaskAsync(name);
 	}
 
+	private function isSkipping():Bool
+	{
+		return GameInput.isPressing(Keys.Control);
+	}
+
 	@Opcode({ id:0x4A, format:"121", description:"" })
 	public function TRANSITION(kind:Int, ms_time:Int, unk1:Int)
 	{
+		if (this.isSkipping()) ms_time = Std.int(ms_time / 10);
 		Log.trace('TRANSITION: $kind, $ms_time');
 
 		scene.setDirectMode(false);

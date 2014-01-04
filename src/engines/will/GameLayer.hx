@@ -48,6 +48,7 @@ class GameLayer extends Sprite2
 		{
 			//var bitmapData = new BitmapData(800, 600); bitmapData.noise(0);
 			var bitmapData = wip.get(0).bitmapData;
+			/*
 			var sprite = new Sprite2();
 			var bitmap = new Image2(WGLTexture.fromBitmapData(bitmapData));
 			bitmap.x = -bitmap.width * anchor.sx;
@@ -56,6 +57,10 @@ class GameLayer extends Sprite2
 			sprite.x = x;
 			sprite.y = y;
 			//sprite.zIndex = index;
+			this.layerChilds.set(index, sprite);
+			addChild(sprite);
+			*/
+			var sprite = new Image2(WGLTexture.fromBitmapData(bitmapData)).setAnchor(anchor.sx, anchor.sy).setPosition(x, y);
 			this.layerChilds.set(index, sprite);
 			addChild(sprite);
 		});
