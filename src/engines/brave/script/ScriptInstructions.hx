@@ -1,4 +1,6 @@
 package engines.brave.script;
+import promhx.Promise;
+import common.PromiseUtils;
 import common.StringEx;
 import engines.brave.BraveAssets;
 import engines.brave.GameState;
@@ -26,7 +28,8 @@ class ScriptInstructions
 	}
 
 	@Opcode(0x01, "SL")
-	public function FUNCTION_DEF(functionName:String, nextFunctionOffset:Int):Void {
+	public function FUNCTION_DEF(functionName:String, nextFunctionOffset:Int)
+	{
 		BraveLog.trace('FUNCTION_DEF: $functionName, $nextFunctionOffset');
 	}
 	
@@ -42,7 +45,8 @@ class ScriptInstructions
 	 */
 	@Opcode(0x02, "PP9L")
 	//@Unimplemented(1)
-	public function JUMP_IF(left:Int, right:Int, operation:Int, jumpOffset:Int):Void {
+	public function JUMP_IF(left:Int, right:Int, operation:Int, jumpOffset:Int)
+	{
 		var result:Bool = false;
 		
 		switch (operation) {
@@ -73,7 +77,8 @@ class ScriptInstructions
 	 * @param	a
 	 */
 	@Opcode(0x04, "L")
-	public function JUMP_ALWAYS(jumpOffset:Int):Void {
+	public function JUMP_ALWAYS(jumpOffset:Int)
+	{
 		scriptThread.jump(jumpOffset);
 	}
 
@@ -82,12 +87,13 @@ class ScriptInstructions
 	 * @param	done
 	 * @param	value
 	 */
-	@Opcode(0x05, "<4") // Return?
-	public function BLOCK_ENDIF(done:Void -> Void, value:Int) {
+	@Opcode(0x05, "4") // Return?
+	public function BLOCK_ENDIF(value:Int)
+	{
 		//scriptThread.jump(scriptThread.popStack());
 		//scriptThread.jump(8);
 
-		ANIMATION_WAIT(done);
+		return ANIMATION_WAIT();
 	}
 
 	/**
@@ -98,7 +104,8 @@ class ScriptInstructions
 	 * @param	d
 	 */
 	@Opcode(0x03, "ss1L")
-	public function OP_03(a, b, c, d) {
+	public function OP_03(a, b, c, d)
+	{
 		
 	}
 	
@@ -107,7 +114,8 @@ class ScriptInstructions
 	 */
 	@Opcode(0x08, "")
 	@Unimplemented(1)
-	public function DEBUG_MESSAGE() {
+	public function DEBUG_MESSAGE()
+	{
 		
 	}
 
@@ -116,7 +124,8 @@ class ScriptInstructions
 	 */
 	@Opcode(0x09, "")
 	@Unimplemented(1)
-	public function OP_09() {
+	public function OP_09()
+	{
 		
 	}
 	
@@ -126,7 +135,8 @@ class ScriptInstructions
 	 */
 	@Opcode(0x0A, "P")
 	@Unimplemented(1)
-	public function OP_0A(a) {
+	public function OP_0A(a)
+	{
 		
 	}
 	
@@ -169,7 +179,8 @@ class ScriptInstructions
 	 */
 	@Opcode(0x0F, "v7P")
 	@Unimplemented(1)
-	public function ARITMETIC_OP(variable:Variable, operator:Int, rightValue:Int) {
+	public function ARITMETIC_OP(variable:Variable, operator:Int, rightValue:Int)
+	{
 		
 	}
 	
@@ -188,7 +199,8 @@ class ScriptInstructions
 	 */
 	@Opcode(0x11, "v")
 	@Unimplemented(1)
-	public function VAR_INCREMENT(variable:Variable):Void {
+	public function VAR_INCREMENT(variable:Variable)
+	{
 		variable.setValue(variable.getValue() + 1);
 	}
 	
@@ -198,7 +210,8 @@ class ScriptInstructions
 	 */
 	@Opcode(0x12, "v")
 	@Unimplemented(1)
-	public function VAR_DECREMENT(variable:Variable):Void {
+	public function VAR_DECREMENT(variable:Variable)
+	{
 		variable.setValue(variable.getValue() - 1);
 	}
 	
@@ -239,9 +252,13 @@ class ScriptInstructions
 	 * 
 	 * @param	index
 	 */
-	@Opcode(0x17, "<P")
+	@Opcode(0x17, "P")
 	@Unimplemented(1)
-	public function MUSIC_PLAY(done:Void -> Void, index:Int) {
+	public function MUSIC_PLAY(index:Int)
+	{
+		return PromiseUtils.createResolved();
+		/*
+		return;
 		var music:Sound;
 		MUSIC_STOP();
 		var fileName:String = StringEx.sprintf('bgm%02dgm', [index]);
@@ -250,6 +267,7 @@ class ScriptInstructions
 			scriptThread.gameState.musicChannel = music.play(0, -1, new SoundTransform(1, 0));
 			done();
 		});
+		*/
 	}
 	
 	/**
@@ -299,8 +317,10 @@ class ScriptInstructions
 	 */
 	@Opcode(0x1C, "")
 	@Unimplemented(1)
-	public function MUSIC_STOP():Void {
-		if (scriptThread.gameState.musicChannel != null) {
+	public function MUSIC_STOP()
+	{
+		if (scriptThread.gameState.musicChannel != null)
+		{
 			scriptThread.gameState.musicChannel.stop();
 		}		
 	}
@@ -311,7 +331,8 @@ class ScriptInstructions
 	 */
 	@Opcode(0x1D, "s")
 	@Unimplemented(1)
-	public function COMMENT(text:String) {
+	public function COMMENT(text:String)
+	{
 		BraveLog.trace('COMMENT: \'${text}\'');
 	}
 	
@@ -328,13 +349,16 @@ class ScriptInstructions
 	
 
 	// 20-33
-	@Opcode(0x21, "<s") // Delay?
-	public function SCRIPT(done:Void -> Void, scriptName:String) {
+	@Opcode(0x21, "s") // Delay?
+	public function SCRIPT(scriptName:String)
+	{
+		var promise = PromiseUtils.create();
 		BraveLog.trace('SCRIPT(\'${scriptName}\')');
 		Script.getScriptWithNameAsync(scriptName, function(script:Script) {
 			scriptThread.setScript(script);
-			done();
+			promise.resolve(null);
 		});
+		return promise;
 	}
 	
 	@Opcode(0x22, "")
@@ -353,10 +377,15 @@ class ScriptInstructions
 	 * 
 	 * @param	mapName
 	 */
-	@Opcode(0x24, "<s")
+	@Opcode(0x24, "s")
 	@Unimplemented
-	public function MAP_SET(done:Void -> Void, mapName:String):Void {
-		scriptThread.gameState.setMapAsync(mapName, done);
+	public function MAP_SET(mapName:String)
+	{
+		var promise = PromiseUtils.create();
+		scriptThread.gameState.setMapAsync(mapName, function() {
+			promise.resolve(null);
+		});
+		return promise;
 	}
 	
 	/**
@@ -386,9 +415,14 @@ class ScriptInstructions
 	 * 
 	 * @param	imageName
 	 */
-	@Opcode(0x28, "<s")
-	public function BACKGROUND_SET_IMAGE(done:Void -> Void, imageName:String):Void {
-		scriptThread.gameState.setBackgroundImageAsync(imageName, done);
+	@Opcode(0x28, "s")
+	public function BACKGROUND_SET_IMAGE(imageName:String)
+	{
+		var promise = PromiseUtils.create();
+		scriptThread.gameState.setBackgroundImageAsync(imageName, function() {
+			promise.resolve(null);
+		});
+		return promise;
 	}
 	
 	/**
@@ -457,11 +491,11 @@ class ScriptInstructions
 	 * @param	title
 	 * @param	text
 	 */
-	@Opcode(0x2F, "<sss")
-	public function TEXT_PUT(done:Void -> Void, voice:String, title:String, text:String) {
+	@Opcode(0x2F, "sss")
+	public function TEXT_PUT(voice:String, title:String, text:String) {
 		//BraveLog.trace(Std.format("TEXT_PUT(${voice}, ${title}, ${text})"));
 		
-		this.TEXT_PUT_WITH_FACE(done, -2, voice, title, text);
+		return this.TEXT_PUT_WITH_FACE(-2, voice, title, text);
 	}
 	
 	/**
@@ -469,9 +503,13 @@ class ScriptInstructions
 	 * @param	done
 	 * @param	type
 	 */
-	@Opcode(0x30, "<P")
-	public function TRANSITION(done:Void -> Void, type:Int) {
-		scriptThread.gameState.transition(done, type);
+	@Opcode(0x30, "P")
+	public function TRANSITION(type:Int) {
+		var promise = PromiseUtils.create();
+		scriptThread.gameState.transition(function() {
+			promise.resolve(null);
+		}, type);
+		return promise;
 	}
 	
 	/**
@@ -479,9 +517,14 @@ class ScriptInstructions
 	 * @param	done
 	 * @param	time
 	 */
-	@Opcode(0x31, "<P")
-	public function FADE_TO_MAP(done:Void -> Void, time:Int) {
-		scriptThread.gameState.fadeToMap(done, time);
+	@Opcode(0x31, "P")
+	public function FADE_TO_MAP(time:Int)
+	{
+		var promise = PromiseUtils.create();
+		scriptThread.gameState.fadeToMap(function() {
+			promise.resolve(null);
+		}, time);
+		return promise;
 	}
 	
 
@@ -510,9 +553,10 @@ class ScriptInstructions
 		
 	}
 
-	@Opcode(0x39, "<Psss")
-	public function TEXT_PUT_WITH_FACE(done:Void -> Void, faceId:Int, voiceName:String, title:String, text:String) {
+	@Opcode(0x39, "Psss")
+	public function TEXT_PUT_WITH_FACE(faceId:Int, voiceName:String, title:String, text:String) {
 
+		var promise = PromiseUtils.create();
 		var voiceChannel:SoundChannel = null;
 		
 		function internal() {
@@ -522,7 +566,9 @@ class ScriptInstructions
 				GameState.waitClickOrKeyPress(function() {
 					textSprite.endText();
 					if (voiceChannel != null) voiceChannel.stop();
-					Timer.delay(done, 1);
+					Timer.delay(function() {
+						promise.resolve(null);
+					}, 1);
 				});
 			});
 		};
@@ -535,6 +581,8 @@ class ScriptInstructions
 		} else {
 			internal();
 		}
+
+		return promise;
 	}
 	
 	@Opcode(0x3A, "PPPsss")
@@ -560,9 +608,10 @@ class ScriptInstructions
 	 */
 	@Opcode(0x92, "")
 	@Unimplemented
-	public function END():Int {
+	public function END()
+	{
 		scriptThread.clearStack();
-		return -2;
+		scriptThread.enablePlay();
 	}
 
 	@Opcode(0x07, "") // FLOW. Return?
@@ -572,31 +621,39 @@ class ScriptInstructions
 			
 		});
 		scriptThread.gameState.getCharacter(0).enableMovement = true;
-		return -2;
+		scriptThread.enablePlay();
 	}
 	
 	/**
 	 * 
 	 */
-	@Opcode(0x3D, "<")
+	@Opcode(0x3D, "")
 	@Unimplemented
-	public function ANIMATION_WAIT(done:Void -> Void) {
-		scriptThread.gameState.rootClip.ui.textSprite.disable(function() {
+	public function ANIMATION_WAIT()
+	{
+		var promise = PromiseUtils.create();
+		scriptThread.gameState.rootClip.ui.textSprite.disable(function()
+		{
 			var count = 0;
 			
-			for (character in scriptThread.gameState.getAllCharacters()) {
+			for (character in scriptThread.gameState.getAllCharacters())
+			{
 				count++;
 			}
-			for (character in scriptThread.gameState.getAllCharacters()) {
-				character.actionDone(function() {
+			for (character in scriptThread.gameState.getAllCharacters())
+			{
+				character.actionDone(function()
+				{
 					count--;
-					if (count == 0) {
+					if (count == 0)
+					{
 						BraveLog.trace("ANIMATION_WAIT.Done!");
-						done();
+						promise.resolve(null);
 					}
 				});
 			}
 		});
+		return promise;
 	}
 	
 	/**
@@ -762,19 +819,34 @@ class ScriptInstructions
 		
 	}
 	
-	@Opcode(0x53, "<PPPPP") // Id, 0, X, Y, Direction
-	public function PLAYER_SPAWN(done:Void -> Void, charaId:Int, unk:Int, x:Int, y:Int, direction:Int) {
-		scriptThread.gameState.charaSpawnAsync(charaId, 0, unk, x, y, direction, done);
+	@Opcode(0x53, "PPPPP") // Id, 0, X, Y, Direction
+	public function PLAYER_SPAWN(charaId:Int, unk:Int, x:Int, y:Int, direction:Int)
+	{
+		var promise = PromiseUtils.create();
+		scriptThread.gameState.charaSpawnAsync(charaId, 0, unk, x, y, direction, function() {
+			promise.resolve(null);
+		});
+		return promise;
 	}
 	
-	@Opcode(0x57, "<PPPPP") // Id, 0, X, Y, Direction
-	public function CHARA_SPAWN(done:Void -> Void, charaId:Int, unk:Int, x:Int, y:Int, direction:Int) {
-		scriptThread.gameState.charaSpawnAsync(charaId, 0, unk, x, y, direction, done);
+	@Opcode(0x57, "PPPPP") // Id, 0, X, Y, Direction
+	public function CHARA_SPAWN(charaId:Int, unk:Int, x:Int, y:Int, direction:Int)
+	{
+		var promise = PromiseUtils.create();
+		scriptThread.gameState.charaSpawnAsync(charaId, 0, unk, x, y, direction, function() {
+			promise.resolve(null);
+		});
+		return promise;
 	}
 	
-	@Opcode(0x67, "<PPPPPP") // Id, ???, 0, X, Y, Direction
-	public function ENEMY_SPAWN(done:Void -> Void, charaId:Int, type:Int, unk:Int, x:Int, y:Int, direction:Int) {
-		scriptThread.gameState.charaSpawnAsync(charaId, type, unk, x, y, direction, done);
+	@Opcode(0x67, "PPPPPP") // Id, ???, 0, X, Y, Direction
+	public function ENEMY_SPAWN(charaId:Int, type:Int, unk:Int, x:Int, y:Int, direction:Int)
+	{
+		var promise = PromiseUtils.create();
+		scriptThread.gameState.charaSpawnAsync(charaId, type, unk, x, y, direction, function() {
+			promise.resolve(null);
+		});
+		return promise;
 	}
 	
 	@Opcode(0x58, "")
@@ -932,7 +1004,7 @@ class ScriptInstructions
 	}
 	
 	@Opcode(0x90, "P")
-	public function CHARA_DONE(charaId:Int):Void {
+	public function CHARA_DONE(charaId:Int) {
 		var chara:Character = scriptThread.gameState.getCharacter(charaId);
 		chara.actionDone(function() {
 			
@@ -971,7 +1043,7 @@ class ScriptInstructions
 	
 	@Opcode(0x8F, "P")
 	@Unimplemented
-	public function CHARA_STOP(charaId:Int):Void {
+	public function CHARA_STOP(charaId:Int) {
 		
 	}
 	

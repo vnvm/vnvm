@@ -1,4 +1,7 @@
 package engines.tlove.script;
+import common.PromiseUtils;
+import common.Timer2;
+import promhx.Promise;
 import common.Animation;
 import common.ByteArrayUtils;
 import common.Event2;
@@ -47,7 +50,7 @@ class DAT_OP
 	 */
 	@Opcode({ id:0x00, format:"", description:"End of file" })
 	@Unimplemented
-	function EOF():Void
+	function EOF()
 	{
 		throw(new Error("Reached End Of File"));
 	}
@@ -59,22 +62,22 @@ class DAT_OP
 	 */
 	@Opcode( { id:0x16, format:"s1", description:"Interface (0x16)" } )
 	@Unimplemented
-	function INTERFACE1(file:String, unk:Int):Void {
+	function INTERFACE1(file:String, unk:Int) {
 		Log.trace("INTERFACE1: " + file);
 	}
 
 	/**
 	 * 
-	 * @param	done
 	 * @param	leftClickLabel
 	 * @param	rightClickLabel
 	 */
-	@Opcode({ id:0xA6, format:"<22", description:"Wait?" })
+	@Opcode({ id:0xA6, format:"22", description:"Wait?" })
 	@Unimplemented
-	function MOUSE_WAIT_CLICK_EVERYWHERE(done:Void -> Void, leftClickLabel:Int, rightClickLabel:Int):Void {
-		var e:MouseEvent;
+	function MOUSE_WAIT_CLICK_EVERYWHERE(leftClickLabel:Int, rightClickLabel:Int)
+	{
+		var promise = new Promise<Dynamic>();
 		
-		Event2.registerOnceAny([game.onMouseLeftClick, game.onMouseRightClick], function(e:MouseEvent):Void {
+		Event2.registerOnceAny([game.onMouseLeftClick, game.onMouseRightClick], function(e:MouseEvent) {
 			//e.type = MouseEvent.CLICK;
 			if (e.type == MouseEvent.CLICK) {
 				dat.jumpLabel(leftClickLabel);
@@ -83,24 +86,28 @@ class DAT_OP
 			} else {
 				throw(new Error('Invalid event for MOUSE_WAIT_CLICK_EVERYWHERE $e'));
 			}
-			done();
+			promise.resolve(null);
 		});
+		return promise;
 	}
 	
 	/**
 	 * 
 	 * @param	v
 	 */
-	@Opcode( { id:0x17, format:"<1", description:"Unknown??" } )
+	@Opcode( { id:0x17, format:"1", description:"Unknown??" } )
 	//@Unimplemented
-	function MOUSE_WAIT_EVENT(done:Void -> Void, v:Int):Void {
-		var e:MouseEvent;
+	function MOUSE_WAIT_EVENT(v:Int)
+	{
+		var promise = new Promise<Dynamic>();
 
 		Event2.registerOnceAny([game.onMouseLeftClick, game.onMouseRightClick, game.onMouseMove], function(e:MouseEvent) {
 			game.lastMouseEvent = e;
 			
-			done();
+			promise.resolve(null);
 		});
+
+		return promise;
 	}
 	
 	/**
@@ -112,7 +119,7 @@ class DAT_OP
 	 */
 	@Opcode({ id:0xAD, format:"2221", description:"" })
 	//@Unimplemented
-	function MOUSE_JUMP_IF_EVENT(leftClickLabel:Int, rightClickLabel:Int, missLabel:Int, rectCount:Int):Void {
+	function MOUSE_JUMP_IF_EVENT(leftClickLabel:Int, rightClickLabel:Int, missLabel:Int, rectCount:Int) {
 		if (game.lastMouseEvent.type == MouseEvent.CLICK) {
 			dat.jumpLabel(leftClickLabel);
 		} else if (game.lastMouseEvent.type == "rightClick") {
@@ -141,7 +148,7 @@ class DAT_OP
 	 */
 	@Opcode({ id:0xA7, format:"22222", description:"" })
 	@Unimplemented
-	function MOUSE_JUMP_IF_IN(x1:Int, y1:Int, x2:Int, y2:Int, label:Int):Void {
+	function MOUSE_JUMP_IF_IN(x1:Int, y1:Int, x2:Int, y2:Int, label:Int) {
 		var rect:Rectangle = new Rectangle(x1, y1, x2 - x1, y2 - y1);
 		
 		//game.mouseRects.push({ rect: rect, label : label, flagType : flagType, flagIndex : flagIndex });
@@ -166,7 +173,7 @@ class DAT_OP
 	 */
 	@Opcode({ id:0xAE, format:"2222212", description:"" })
 	//@Unimplemented
-	function MOUSE_JUMP_IF_CLICK_IN_AND_FLAG(x1:Int, y1:Int, x2:Int, y2:Int, label:Int, flagType:Int, flagIndex:Int):Void {
+	function MOUSE_JUMP_IF_CLICK_IN_AND_FLAG(x1:Int, y1:Int, x2:Int, y2:Int, label:Int, flagType:Int, flagIndex:Int) {
 		var rect:Rectangle = new Rectangle(x1, y1, x2 - x1, y2 - y1);
 		
 		//game.mouseRects.push({ rect: rect, label : label, flagType : flagType, flagIndex : flagIndex });
@@ -191,13 +198,13 @@ class DAT_OP
 	 * @param	s
 	 * @param	unk
 	 */
-	@Opcode( { id:0x19, format:"<1s1", description:"Set NAME_L" } )
+	@Opcode( { id:0x19, format:"1s1", description:"Set NAME_L" } )
 	@Unimplemented
-	function NAME_L(done:Void -> Void, v:Int, name:String, unk:Int):Void {
+	function NAME_L(v:Int, name:String, unk:Int)
+	{
 		//Log.trace("-----------------------------------------------------------------------------");
 		//throw(new Error("CALL_SCRIPT_POS"));
 		//dat.callScriptAsync(name, true, -1, done);
-		done();
 	}
 
 	/**
@@ -207,7 +214,7 @@ class DAT_OP
 	 */
 	@Opcode({ id:0x1B, format:"111", description:"??" })
 	@Unimplemented
-	function RENDER_NEW_NAME(nameIndex:Int, count:Int, varStart:Int):Void {
+	function RENDER_NEW_NAME(nameIndex:Int, count:Int, varStart:Int) {
 		var name = '';
 		for (varIndex in varStart ... varStart + count) {
 			name += String.fromCharCode(state.getLSW(varIndex));
@@ -223,7 +230,7 @@ class DAT_OP
 	 */
 	@Opcode( { id:0x23, format:"111", description:"??" } )
 	@Unimplemented
-	function GAME_SAVE(index:Int, _unk1:Int, _unk2:Int):Void {
+	function GAME_SAVE(index:Int, _unk1:Int, _unk2:Int) {
 		//throw(new Error("GAME_SAVE"));
 	}
 
@@ -235,20 +242,20 @@ class DAT_OP
 	 */
 	@Opcode( { id:0x24, format:"111", description:"??" } )
 	@Unimplemented
-	function GAME_LOAD(index:Int, _unk1:Int, _unk2:Int):Void {
+	function GAME_LOAD(index:Int, _unk1:Int, _unk2:Int) {
 		//throw(new Error("GAME_LOAD"));
 	}
 
 	/**
 	 * 
-	 * @param	done
 	 * @param	label
 	 */
-	@Opcode( { id:0x28, format:"<2", description:"Jumps to an address" } )
+	@Opcode( { id:0x28, format:"2", description:"Jumps to an address" } )
 	//@Unimplemented
-	function JUMP(done:Void -> Void, label:Int):Void {
+	function JUMP(label:Int)
+	{
 		dat.jumpLabel(label);
-		Timer.delay(done, 0);
+		return Timer2.waitAsync(0);
 	}
 	
 	/**
@@ -257,7 +264,8 @@ class DAT_OP
 	 */
 	@Opcode( { id:0x2B, format:"2", description:"Jumps to an address" } )
 	//@Unimplemented
-	function CALL_LOCAL(label:Int):Void {
+	function CALL_LOCAL(label:Int)
+	{
 		dat.callLabel(label);
 	}
 
@@ -266,7 +274,8 @@ class DAT_OP
 	 */
 	@Opcode( { id:0x30, format:"", description:"???" } )
 	@Unimplemented
-	function CLEAR_IMAGE_SCREEN() {
+	function CLEAR_IMAGE_SCREEN()
+	{
 		game.layers[0].fillRect(0, game.layers[0].rect);
 		//throw(new Error("CLEAR_IMAGE_SCREEN"));
 	}
@@ -282,19 +291,21 @@ class DAT_OP
 
 	/**
 	 * 
-	 * @param	done
 	 * @param	name
 	 * @param	layer
 	 */
-	@Opcode({ id:0x33, format:"<s1", description:"Loads an image in a buffer" })
-	function IMG_LOAD(done:Void -> Void, name:String, layer:Int):Void {
+	@Opcode({ id:0x33, format:"s1", description:"Loads an image in a buffer" })
+	function IMG_LOAD(name:String, layer:Int)
+	{
 		var mrs:MRS;
+		var promise = new Promise<Dynamic>();
 		game.getMrsAsync(name, function(mrs:MRS) {
 			Palette.copy(mrs.image.palette, game.lastLoadedPalette);
 			mrs.image.drawToBitmapData8(game.layers[layer], 0, 0);
 			if (layer == 0) game.updateImage();
-			done();
+			promise.resolve(null);
 		});
+		return promise;
 	}
 
 	/**
@@ -302,46 +313,57 @@ class DAT_OP
 	 */
 	@Opcode({ id:0x34, format:"", description:"???" })
 	@Unimplemented
-	function UNKNOWN_34() {
+	function UNKNOWN_34()
+	{
 		//throw(new Error("UNKNOWN_34"));
 	}
 
 	/**
 	 * 
-	 * @param	done
 	 */
-	@Opcode({ id:0x32, format:"<", description:"???" })
+	@Opcode({ id:0x32, format:"", description:"???" })
 	//@Unimplemented
-	function FADE_IN(done:Void -> Void):Void {
+	function FADE_IN()
+	{
+		var promise = new Promise<Dynamic>();
 		// TODO: Perform the fading changing the palette?
-		if (delayEnabled) {
-			Animation.animate(done, 0.5, game.blackOverlay, { alpha : 0 }, Animation.Linear);
-		} else {
-			game.blackOverlay.alpha = 0;
-			done();
+		if (delayEnabled)
+		{
+			Animation.animate(function() {
+				promise.resolve(null);
+			}, 0.5, game.blackOverlay, { alpha : 0 }, Animation.Linear);
 		}
+		else
+		{
+			game.blackOverlay.alpha = 0;
+			promise.resolve(null);
+		}
+		return promise;
 	}
 
 	/**
 	 * 
-	 * @param	done
 	 */
-	@Opcode({ id:0x35, format:"<", description:"???" })
+	@Opcode({ id:0x35, format:"", description:"???" })
 	//@Unimplemented
-	function FADE_OUT(done:Void -> Void):Void {
+	function FADE_OUT()
+	{
+		var promise = new Promise<Dynamic>();
 		// TODO: Perform the fading changing the palette?
 		if (delayEnabled) {
-			Animation.animate(done, 0.5, game.blackOverlay, { alpha : 1 }, Animation.Linear);
+			Animation.animate(function() {
+				promise.resolve(null);
+			}, 0.5, game.blackOverlay, { alpha : 1 }, Animation.Linear);
 		} else {
 			game.blackOverlay.alpha = 1;
-			done();
+			promise.resolve(null);
 		}
+		return promise;
 	}
 
 	/**
 	 * Copy a rect from one layer to other
 	 * 
-	 * @param	done
 	 * @param	effect
 	 * @param	transparentColor
 	 * @param	srcLayer
@@ -353,29 +375,39 @@ class DAT_OP
 	 * @param	dstX
 	 * @param	dstY
 	 */
-	@Opcode( { id:0x36, format:"<1112222122", description:"Copy an slice of buffer into another" } )
+	@Opcode( { id:0x36, format:"1112222122", description:"Copy an slice of buffer into another" } )
 	//@Unimplemented
-	function COPY_RECT(done:Void -> Void, effect:Int, transparentColor:Int, srcLayer:Int, srcX:Int, srcY:Int, srcWidth:Int, srcHeight:Int, dstLayer:Int, dstX:Int = 0, dstY:Int = 0):Void {
+	function COPY_RECT(effect:Int, transparentColor:Int, srcLayer:Int, srcX:Int, srcY:Int, srcWidth:Int, srcHeight:Int, dstLayer:Int, dstX:Int = 0, dstY:Int = 0) {
 		var src:BitmapData8 = dat.game.layers[srcLayer];
 		var dst:BitmapData8 = dat.game.layers[dstLayer];
-		switch (effect) {
+
+		var promise = new Promise<Dynamic>();
+
+		switch (effect)
+		{
 			case 0:
 				BitmapData8.copyRect(src, new Rectangle(srcX, srcY, srcWidth, srcHeight), dst, new Point(dstX, dstY));
 				if (dstLayer == 0) dat.game.updateImage(new Rectangle(dstX, dstY, srcWidth, srcHeight));
-				Timer.delay(done, 0);
+				Timer.delay(function() {
+					promise.resolve(null);
+				}, 0);
 			//case 29:
 			default:
 				if (delayEnabled) {
-					Animation.animate(done, 0.4, { }, { }, Animation.Linear, function(step:Float):Void {
+					Animation.animate(function() {
+						promise.resolve(null);
+					}, 0.4, { }, { }, Animation.Linear, function(step:Float) {
 						BitmapData8.copyRectTransition(src, new Rectangle(srcX, srcY, srcWidth, srcHeight), dst, new Point(dstX, dstY), step, effect, transparentColor);
 						if (dstLayer == 0) dat.game.updateImage(new Rectangle(dstX, dstY, srcWidth, srcHeight));
 					});
 				} else {
 					BitmapData8.copyRectTransition(src, new Rectangle(srcX, srcY, srcWidth, srcHeight), dst, new Point(dstX, dstY), 1, effect, transparentColor);
 					if (dstLayer == 0) dat.game.updateImage(new Rectangle(dstX, dstY, srcWidth, srcHeight));
-					done();
+					promise.resolve(null);
 				}
 		}
+
+		return promise;
 	}
 
 	/**
@@ -409,7 +441,7 @@ class DAT_OP
 	 */
 	@Opcode( { id:0x3A, format:"112222", description:"Fills a rect" } )
 	//@Unimplemented
-	function FILL_RECT(color:Int, unk:Int, x:Int, y:Int, w:Int, h:Int):Void {
+	function FILL_RECT(color:Int, unk:Int, x:Int, y:Int, w:Int, h:Int) {
 		var rect:Rectangle = new Rectangle(state.getVal(x), state.getVal(y), state.getVal(w), state.getVal(h));
 		game.layers[0].fillRect(color, rect);
 		game.updateImage(rect);
@@ -417,43 +449,44 @@ class DAT_OP
 
 	/**
 	 * 
-	 * @param	done
 	 * @param	mode
 	 * @param	index
 	 * @param	b
 	 * @param	r
 	 * @param	g
 	 */
-	@Opcode( { id:0x3C, format:"<11111", description:"???" } )
+	@Opcode( { id:0x3C, format:"11111", description:"???" } )
 	//@Unimplemented
-	function PALETTE_ACTION(done:Void -> Void, mode:Int, index:Int, b:Int, r:Int, g:Int) {
+	function PALETTE_ACTION(mode:Int, index:Int, b:Int, r:Int, g:Int)
+	{
 		var color:BmpColor = new BmpColor(r, g, b, 0xFF);
+		var promise = new Promise<Dynamic>();
 
 		switch (mode) {
 			case 0:
 				// SET_WORK_PALETTE_COLOR
 				game.workPalette.colors[index] = new BmpColor(r, g, b, 0xFF);
-				done();
+				promise.resolve(null);
 			case 1:
 				// APPLY_PALETTE
 				Palette.copy(game.workPalette, game.currentPalette);
 				game.updateImage();
-				done();
+				promise.resolve(null);
 			case 2:
 				// BACKUP_PALETTE
 				Palette.copy(game.workPalette, game.backupPalette);
-				done();
+				promise.resolve(null);
 			case 3:
 				// RESTORE_PALETTE
 				Palette.copy(game.backupPalette, game.workPalette);
-				done();
+				promise.resolve(null);
 			case 4:
 				// ANIMATE_PALETTE
 				if (delayEnabled) {
 					var src = game.workPalette.clone();
 					var dst = game.currentPalette.clone();
 					Animation.animate(function() {
-						done();
+						promise.resolve(null);
 					}, 1, { }, { }, Animation.Linear, function(step:Float) {
 						game.workPalette.interpolate(src, dst, step);
 						game.updateImage();
@@ -461,18 +494,20 @@ class DAT_OP
 				} else {
 					Palette.copy(game.currentPalette, game.workPalette);
 					game.updateImage();
-					done();
+					promise.resolve(null);
 				}
 			case 5:
 				// COPY_PALETTE
 				Palette.copy(game.lastLoadedPalette, game.workPalette);
-				done();
+				promise.resolve(null);
 			case 6:
 				// FADE_PALETTE
 				throw(new Error("FADE_PALETTE"));
 			default:
 				throw(new Error("PALETTE_ACTION: " + mode));
 		}
+
+		return promise;
 	}
 	
 	/**
@@ -529,18 +564,21 @@ class DAT_OP
 	 * @param	imm
 	 * @param	label
 	 */
-	@Opcode({ id:0x44, format:"<1122", description:"Jumps conditionally" })
+	@Opcode({ id:0x44, format:"1122", description:"Jumps conditionally" })
 	@Unimplemented
-	function JUMP_IF_LSW(done:Void -> Void, flag:Int, op:Int, imm:Int, label:Int) {
+	function JUMP_IF_LSW(flag:Int, op:Int, imm:Int, label:Int)
+	{
         var f = state.getLSW(flag);
         if (this.condition(f, op, imm)) {
 			dat.jumpLabel(label);
         }
-		Timer.delay(done, 0);
+		return Timer2.waitAsync(0);
 	}
 	
-	function condition(left, operator, right) {
-		return switch (operator) {
+	function condition(left, operator, right)
+	{
+		return switch (operator)
+		{
 			case 0: left <= right;
 			case 1: left == right;
 			case 2: left >= right;
@@ -553,7 +591,8 @@ class DAT_OP
 	 */
 	@Opcode({ id:0x45, format:"", description:"????" })
 	@Unimplemented
-	function JUMP_SETTINGS() {
+	function JUMP_SETTINGS()
+	{
 		throw(new Error("JUMP_SETTINGS"));
 	}
 
@@ -564,7 +603,8 @@ class DAT_OP
 	 */
 	@Opcode({ id:0x48, format:"11", description:"???" })
 	@Unimplemented
-	function SET_MENU_VAR_BITS(index:Int, value:Int) {
+	function SET_MENU_VAR_BITS(index:Int, value:Int)
+	{
 		state.setMV(index, state.getMV(index) | value);
 	}
 
@@ -575,7 +615,8 @@ class DAT_OP
 	 */
 	@Opcode({ id:0x49, format:"21", description:"???" })
 	@Unimplemented
-	function FLAG_SET_BITS(index:Int, value:Int) {
+	function FLAG_SET_BITS(index:Int, value:Int)
+	{
 		var byteIndex:Int = Std.int(index / 8);
 		var bitIndex:Int = Std.int(index % 8);
 		if (value != 0) {
@@ -592,7 +633,7 @@ class DAT_OP
 	 */
 	@Opcode({ id:0x4A, format:"21", description:"???" })
 	@Unimplemented
-	function SET_SEQUENCE(a, b) {
+	function SET_SEQUENCE(a:Int, b:Int) {
 		throw(new Error("SET_SEQUENCE"));
 	}
 	
@@ -603,7 +644,7 @@ class DAT_OP
 	 */
 	@Opcode({ id:0x4B, format:"21", description:"???" })
 	@Unimplemented
-	function ADD_OR_RESET_LSB(a, b) {
+	function ADD_OR_RESET_LSB(a:Int, b:Int) {
 		throw(new Error("ADD_OR_RESET_LSB"));
 	}
 
@@ -629,21 +670,22 @@ class DAT_OP
 	 */
 	@Opcode( { id:0x4D, format:"11", description:"???" } )
 	@Unimplemented
-	function SET_SET(index:Int, value:Int):Void {
+	function SET_SET(index:Int, value:Int)
+	{
 		state.setSettings(index, value);
 	}
 
 	/**
 	 * 
-	 * @param	done
 	 * @param	name
 	 * @param	_always_0
 	 */
-	@Opcode( { id:0x52, format:"<s1", description:"Loads a script and starts executing it" } )
+	@Opcode( { id:0x52, format:"s1", description:"Loads a script and starts executing it" } )
 	@Unimplemented
-	function CALL_SCRIPT(done:Void -> Void, name:String, _always_0:Int) {
+	function CALL_SCRIPT(name:String, _always_0:Int)
+	{
 		Log.trace("-----------------------------------------------------------------------------");
-		dat.callScriptAsync(name, -1, done);
+		return dat.callScriptAsync(name, -1);
 	}
 
 	/**
@@ -653,7 +695,8 @@ class DAT_OP
 	 * @param	_ff
 	 */
 	@Opcode({ id:0x53, format:"111", description:"Ani play" })
-	function SAVE_SYS_FLAG(flagIndex:Int, value:Int, _ff) {
+	function SAVE_SYS_FLAG(flagIndex:Int, value:Int, _ff)
+	{
 		state.setSysFlag(flagIndex, value);
 		// TODO: Save Sys Flag
 		//throw(new Error("SAVE_SYS_FLAG"));
@@ -665,32 +708,33 @@ class DAT_OP
 	 * @param	value
 	 * @param	label
 	 */
-	@Opcode({ id:0x54, format:"<212", description:"???" })
+	@Opcode({ id:0x54, format:"212", description:"???" })
 	//@Unimplemented
-	function JUMP_COND_SYS_FLAG(done:Void -> Void, flagIndex:Int, value:Int, label:Int) {
-		if (this.state.getSysFlag(flagIndex) == value) {
-			dat.jumpLabel(label);
-		}
-		Timer.delay(done, 0);
+	function JUMP_COND_SYS_FLAG(flagIndex:Int, value:Int, label:Int)
+	{
+		if (this.state.getSysFlag(flagIndex) == value) dat.jumpLabel(label);
+		return Timer2.waitAsync(0);
 	}
 
 	/**
 	 * 
-	 * @param	done
 	 * @param	name
 	 * @param	loop
 	 */
-	@Opcode({ id:0x61, format:"<s2", description:"Plays a midi file" })
+	@Opcode({ id:0x61, format:"s2", description:"Plays a midi file" })
 	//@Unimplemented
-	function MUSIC_PLAY(done:Void -> Void, name:String, loop:Int):Void {
-		MUSIC_STOP(function():Void {
+	function MUSIC_PLAY(name:String, loop:Int)
+	{
+		var promise = PromiseUtils.create();
+		MUSIC_STOP().then(function(?e) {
 			game.midi.getBytesAsync(PathUtils.addExtensionIfMissing(name, "mid").toUpperCase()).then(function(bytes:ByteArray) {
 				//var sound:Sound = new Sound();
 				//sound.loadCompressedDataFromByteArray(bytes, bytes.length);
 				//game.musicChannel = sound.play();
-				done();
+				promise.resolve(null);
 			});
 		});
+		return promise;
 	}
 
 	/**
@@ -705,35 +749,39 @@ class DAT_OP
 	/**
 	 * 
 	 */
-	@Opcode( { id:0x63, format:"<", description:"Music stop" } )
+	@Opcode( { id:0x63, format:"", description:"Music stop" } )
 	//@Unimplemented
-	function MUSIC_STOP(done:Void -> Void) {
-		if (game.musicChannel != null) {
+	function MUSIC_STOP()
+	{
+		if (game.musicChannel != null)
+		{
 			game.musicChannel.stop();
 			game.musicChannel = null;
 		}
-		Timer.delay(done, 10);
+		return Timer2.waitAsync(10);
 	}
 	
 	/**
 	 * 
 	 * @param	name
 	 */
-	@Opcode( { id:0x66, format:"<s", description:"Plays a sound" } )
+	@Opcode( { id:0x66, format:"s", description:"Plays a sound" } )
 	@Unimplemented
-	function SOUND_PLAY(done:Void -> Void, name:String):Void {
+	function SOUND_PLAY(name:String)
+	{
 		throw(new Error("SOUND_PLAY"));
-		Timer.delay(done, 10);
+		return Timer2.waitAsync(10);
 	}
 
 	/**
 	 * 
 	 */
-	@Opcode( { id:0x67, format:"<", description:"???" } )
+	@Opcode( { id:0x67, format:"", description:"???" } )
 	@Unimplemented
-	function SOUND_STOP(done:Void -> Void):Void {
+	function SOUND_STOP()
+	{
 		throw(new Error("SOUND_STOP"));
-		Timer.delay(done, 10);
+		return Timer2.waitAsync(10);
 	}
 	
 	/**
@@ -742,7 +790,8 @@ class DAT_OP
 	 */
 	@Opcode({ id:0x70, format:"?", description:"Put text (dialog)" })
 	@Unimplemented
-	function PUT_TEXT_DIALOG(text:ByteArray) {
+	function PUT_TEXT_DIALOG(text:ByteArray)
+	{
 		var outText = getProcessText(text);
 		Log.trace(outText);
 		game.putTextRectangle(state.textRectangle, outText);
@@ -755,7 +804,8 @@ class DAT_OP
 		//}
 	}
 
-	function getProcessText(text:ByteArray):String {
+	function getProcessText(text:ByteArray):String
+	{
 		var out = '';
 		for (command in processText(text)) {
 			out += command;
@@ -763,7 +813,8 @@ class DAT_OP
 		return out;
 	}
 
-	function processText(text:ByteArray):Array<String> {
+	function processText(text:ByteArray):Array<String>
+	{
 		var parts:Array<String> = [];
 		try {
 			while (text.bytesAvailable > 0) {
@@ -845,7 +896,7 @@ class DAT_OP
 	 */
 	@Opcode({ id:0x72, format:"b", description:"???" })
 	@Unimplemented
-	function SET_DIALOG_TEXT_VISIBLE(visible:Bool):Void {
+	function SET_DIALOG_TEXT_VISIBLE(visible:Bool) {
 		state.textVisible = visible;
 	}
 
@@ -881,7 +932,7 @@ class DAT_OP
 	 */
 	@Opcode({ id:0x82, format:"22221", description:"????" })
 	@Unimplemented
-	function SET_TEXT_WINDOW_RECTANGLE(x:Int, y:Int, width:Int, height:Int, _unk:Int):Void {
+	function SET_TEXT_WINDOW_RECTANGLE(x:Int, y:Int, width:Int, height:Int, _unk:Int) {
 		x = state.getVal(x) + 8;
 		y = state.getVal(y) + 8;
 		width = state.getVal(width) - 16;
@@ -894,17 +945,21 @@ class DAT_OP
 	
 	/**
 	 * 
-	 * @param	done
 	 * @param	time
 	 */
-	@Opcode({ id:0x83, format:"<2", description:"????" })
+	@Opcode({ id:0x83, format:"2", description:"????" })
 	@Unimplemented
-	function DELAY_83(done:Void -> Void, time:Int):Void {
+	function DELAY_83(time:Int)
+	{
+		var promise = PromiseUtils.create();
 		if (delayEnabled) {
-			game.delay(done, time);
+			game.delay(function() {
+				promise.resolve(null);
+			}, time);
 		} else {
-			done();
+			promise.resolve(null);
 		}
+		return promise;
 	}
 
 	/**
@@ -914,7 +969,7 @@ class DAT_OP
 	 */
 	@Opcode({ id:0x84, format:"s1", description:"Interface (0x84)" })
 	@Unimplemented
-	function INTERFACE2(file:String, _0:Int):Void {
+	function INTERFACE2(file:String, _0:Int) {
 		Log.trace("INTERFACE2: " + file);
 		//throw(new Error("INTERFACE2"));
 	}
@@ -924,7 +979,7 @@ class DAT_OP
 	 */
 	@Opcode({ id:0x85, format:"", description:"" })
 	@Unimplemented
-	function UNKNOWN_85():Void {
+	function UNKNOWN_85() {
 		//throw(new Error("UNKNOWN_85"));
 	}
 
@@ -935,7 +990,7 @@ class DAT_OP
 	 */
 	@Opcode({ id:0x86, format:"22", description:"" })
 	@Unimplemented
-	function SET_PUSH_BUTTON_POSITION(x:Int, y:Int):Void {
+	function SET_PUSH_BUTTON_POSITION(x:Int, y:Int) {
 		//throw(new Error("SET_PUSH_BUTTON_POSITION"));
 	}
 
@@ -946,20 +1001,24 @@ class DAT_OP
 	 */
 	@Opcode({ id:0x87, format:"s1", description:"Interface (0x87)" })
 	@Unimplemented
-	function INTERFACE3(file:String, _0:Int):Void {
+	function INTERFACE3(file:String, _0:Int) {
 		Log.trace("INTERFACE3: " + file);
 		//throw(new Error("INTERFACE3"));
 	}
 
 	/**
 	 * 
-	 * @param	done
 	 * @param	time
 	 */
-	@Opcode( { id:0x89, format:"<2", description:"Delay" } )
+	@Opcode( { id:0x89, format:"2", description:"Delay" } )
 	@Unimplemented
-	function DELAY_89(done:Void -> Void, time:Int):Void {
-		game.delay(done, time * 1);
+	function DELAY_89(time:Int)
+	{
+		var promise = PromiseUtils.create();
+		game.delay(function() {
+			promise.resolve(null);
+		}, time * 1);
+		return promise;
 	}
 
 	/**
@@ -967,7 +1026,7 @@ class DAT_OP
 	 */
 	@Opcode({ id:0x8A, format:"", description:"Updates" })
 	@Unimplemented
-	function UPDATE():Void {
+	function UPDATE() {
 		//throw(new Error("UPDATE"));
 	}
 
@@ -976,17 +1035,18 @@ class DAT_OP
 	 */
 	@Opcode({ id:0x91, format:"", description:"Return from a CALL" })
 	//@Unimplemented
-	function RETURN_LOCAL():Void {
+	function RETURN_LOCAL() {
 		dat.returnLabel();
 	}
 
 	/**
 	 * 
 	 */
-	@Opcode({ id:0x92, format:"<", description:"???" })
+	@Opcode({ id:0x92, format:"", description:"???" })
 	@Unimplemented
-	function RETURN_SCRIPT(done:Void -> Void):Void {
-		dat.returnScriptAsync(done);
+	function RETURN_SCRIPT()
+	{
+		return dat.returnScriptAsync();
 	}
 
 	/**
@@ -994,7 +1054,8 @@ class DAT_OP
 	 */
 	@Opcode({ id:0x94, format:"111", description:"???" })
 	@Unimplemented
-	function SET_LS_RAND(type:Int, index:Int, maxValue:Int):Void {
+	function SET_LS_RAND(type:Int, index:Int, maxValue:Int)
+	{
 		if (type > 0) {
 			state.setLSW(index, MathEx.randomInt(0, maxValue));
 		} else {
@@ -1011,7 +1072,7 @@ class DAT_OP
 	 */
 	@Opcode({ id:0x95, format:"1221", description:"Sets a range of flags" })
 	@Unimplemented
-	function FLAG_SET_RANGE(type:Int, start:Int, count:Int, value:Int):Void {
+	function FLAG_SET_RANGE(type:Int, start:Int, count:Int, value:Int) {
 		for (flag in start ... start + count) {
 			state.setFlag(type, flag, value);
 		}
@@ -1023,7 +1084,7 @@ class DAT_OP
 	 */
 	@Opcode({ id:0x98, format:"?", description:"Sets a flag" })
 	//@Unimplemented
-	function SET_LSW(params:ByteArray):Void {
+	function SET_LSW(params:ByteArray) {
 		var flag:Int = params.readUnsignedShort() & 0x7FFF;
 		var edi:Int = 0;
 		var ebp:Int = 0;
@@ -1069,7 +1130,7 @@ class DAT_OP
 	 */
 	@Opcode({ id:0x99, format:"?", description:"Sets a flag (related)" })
 	@Unimplemented
-	function JUMP_SET_LSW_ROUTINE(s:ByteArray):Void {
+	function JUMP_SET_LSW_ROUTINE(s:ByteArray) {
 		var left:Int, right:Int;
 		var comparison:Int, operation:Int;
 		var comparisonResult:Bool;
@@ -1112,7 +1173,7 @@ class DAT_OP
 	 */
 	@Opcode({ id:0x9D, format:"2", description:"????" })
 	@Unimplemented
-	function UNKNOWN_9D(v:Int):Void {
+	function UNKNOWN_9D(v:Int) {
 		Log.trace("UNKNOWN_9D: " + v);
 		//throw(new Error("UNKNOWN_9D"));
 	}
@@ -1126,7 +1187,7 @@ class DAT_OP
 	 */
 	@Opcode({ id:0xAA, format:"2222", description:"????" })
 	@Unimplemented
-	function DISABLED_SET_AREA_HEIGHT(x1, y1, x2, y2):Void {
+	function DISABLED_SET_AREA_HEIGHT(x1, y1, x2, y2) {
 		throw(new Error("DISABLED_SET_AREA_HEIGHT"));
 	}
 
@@ -1135,7 +1196,7 @@ class DAT_OP
 	 */
 	@Opcode({ id:0xF0, format:"", description:"" })
 	@Unimplemented
-	function FLASH_IN():Void {
+	function FLASH_IN() {
 		throw(new Error("FLASH_IN"));
 	}
 
@@ -1144,7 +1205,7 @@ class DAT_OP
 	 */
 	@Opcode({ id:0xF1, format:"", description:"" })
 	@Unimplemented
-	function FLASH_OUT():Void {
+	function FLASH_OUT() {
 		throw(new Error("FLASH_OUT"));
 	}
 
@@ -1153,7 +1214,7 @@ class DAT_OP
 	 */
 	@Opcode({ id:0xF5, format:"1s", description:"" })
 	@Unimplemented
-	function ASSIGN_NAME(nameIndex:Int, name:String):Void {
+	function ASSIGN_NAME(nameIndex:Int, name:String) {
 		state.setName(nameIndex, name);
 	}
 
@@ -1162,7 +1223,7 @@ class DAT_OP
 	 */
 	@Opcode({ id:0xFF, format:"", description:"Exits the game" })
 	@Unimplemented
-	function GAME_END():Void {
+	function GAME_END() {
 		throw("GAME_END");
 	}
 }

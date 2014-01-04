@@ -76,13 +76,13 @@ class AB_OP
 			case '=': state.flags[flag] = value;
 			case '+': state.flags[flag] += value;
 			case '-': state.flags[flag] -= value;
-			default: throw('Unknown SET operation \'$op\'');
+			default: throw('Unknown SET operation "$op"');
 		}
 	}
 
 	@Opcode({ id:0x18, format:"S", description:"Loads and executes a script" })
 	//@Unimplemented
-	public function SCRIPT(done:Void -> Void, name:String)
+	public function SCRIPT(name:String)
 	{
 		Log.trace('SCRIPT(\'$name\')');
 		return ab.loadScriptAsync(name, 0);
@@ -191,7 +191,7 @@ class AB_OP
 
 	@Opcode({ id:0x41, format:"", description:"Shows the map and waits for selecting an option" })
 	@Unimplemented
-	public function MAP_OPTION_SHOW(done:Void -> Void)
+	public function MAP_OPTION_SHOW()
 	{
 		throw(new Error("MAP_OPTION_SHOW not implemented"));
 /*
@@ -205,7 +205,6 @@ class AB_OP
 
 		jump(option.pointer);
 		*/
-		done();
 	}
 
 	@Opcode({ id:0x11, format:"2", description:"Wait `time` milliseconds" })

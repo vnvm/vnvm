@@ -1,10 +1,10 @@
 package engines.tlove.script;
+import common.PromiseUtils;
+import promhx.Promise;
+import common.script.Instruction2;
 import common.ByteArrayUtils;
-import common.script.Instruction;
 import common.script.Opcode;
-import common.StringEx;
 import engines.tlove.Game;
-import haxe.Log;
 import flash.errors.Error;
 import flash.utils.ByteArray;
 import flash.utils.Endian;
@@ -57,9 +57,10 @@ class DAT
 		//this.scriptStack = new ScriptStack();
 	}
 	
-	public function loadAsync(name:String, done:Void -> Void):Void {
-		var data:ByteArray;
-		game.date.getBytesAsync('$name.DAT').then(function(data:ByteArray):Void {
+	public function loadAsync(name:String):Promise<Dynamic>
+	{
+		return game.date.getBytesAsync('$name.DAT').then(function(data:ByteArray):Void
+		{
 			data.position = 0;
 			this.scriptName = name;
 			data.endian = Endian.BIG_ENDIAN;
@@ -74,46 +75,43 @@ class DAT
 			this.script = ByteArrayUtils.readByteArray(data, data.bytesAvailable);
 			this.script.endian = Endian.BIG_ENDIAN;
 			this.script.position = 0;
-			
-			done();
 		});
 	}
 
 	public function callLabel(label:Int):Void
 	{
-		callStack.jumps.push(new StackItem(scriptName, script.position));
+		callStack.jumps.push(new StackItem(scriptName, this.script.position));
 		jumpLabel(label);
 	}
 	
 	public function returnLabel():Void {
 		var item:StackItem = callStack.jumps.pop();
-		script.position = item.position;
+		this.script.position = item.position;
 	}
 
-	public function callScriptAsync(name:String, label:Int, done:Void -> Void):Void
+	public function callScriptAsync(name:String, label:Int):Promise<Dynamic>
 	{
-		callStack.jumps.push(new StackItem(scriptName, script.position));
+		callStack.jumps.push(new StackItem(scriptName, this.script.position));
 		//scriptStack.calls.push(callStack);
 		//callStack = new CallStack();
-		loadAsync(name, function():Void {
+		return loadAsync(name).then(function(?e){
 			if (label >= 0) jumpLabel(label);
-			done();
 		});
 	}
 
-	public function returnScriptAsync(done:Void -> Void):Void {
+	public function returnScriptAsync():Promise<Dynamic>
+	{
 		var item:StackItem = callStack.jumps.pop();
 		callStack.jumps = [];
 
-		loadAsync(item.script, function():Void {
+		return loadAsync(item.script).then(function(?e) {
 			script.position = item.position;
-			done();
 		});
 	}
 
 	public function jumpRawAddress(address:Int)
 	{
-		script.position = address;
+		this.script.position = address;
 	}
 
 	public function jumpLabel(label:Int)
@@ -138,10 +136,11 @@ class DAT
 		jump(0);
 		*/
 	}
-	
+
+	/*
 	public function execute():Void
 	{
-		while (script.position < script.length)
+		while (this.script.position < this.script.length)
 		{
 			//Log.trace(StringEx.sprintf("Script.single : %08X, %08X", [script.position, script.length]));
 			if (executeSingle(execute)) {
@@ -152,32 +151,44 @@ class DAT
 		
 		//Log.trace(StringEx.sprintf("Script.done : %08X, %08X", [script.position, script.length]));
 	}
+	*/
 
-	private function executeSingle(done:Void -> Void):Bool
+	public function executeAsync(?e):Promise<Dynamic>
 	{
-		var instruction:Instruction = readInstruction(done);
-		instruction.call(this.datOp);
-		return instruction.async;
+		var promise = new Promise<Dynamic>();
+		function executeStep() {
+			executeSingleAsync().then(function(?e) {
+				executeStep();
+			});
+		}
+		executeStep();
+		return promise;
 	}
 
-	private function readInstruction(done:Void -> Void):Instruction
+	private function executeSingleAsync():Promise<Dynamic>
 	{
-		var instructionPosition:Int = script.position;
-		var opcodeId:Int = script.readUnsignedByte();
+		var instruction = readInstruction();
+		var result = instruction.call(this.datOp);
+		return PromiseUtils.returnPromiseOrResolvedPromise(result);
+	}
+
+	private function readInstruction():Instruction2
+	{
+		var instructionPosition:Int = this.script.position;
+		var opcodeId:Int = this.script.readUnsignedByte();
 		var instructionDataLength:Int = script.readUnsignedByte();
 		if ((instructionDataLength & 0x80) != 0) {
-			var newByte:Int = script.readUnsignedByte();
+			var newByte:Int = this.script.readUnsignedByte();
 			instructionDataLength = newByte | ((instructionDataLength & 0x7F) << 8);
 		}
-		var params:ByteArray = ByteArrayUtils.readByteArray(script, instructionDataLength);
+		var params:ByteArray = ByteArrayUtils.readByteArray(this.script, instructionDataLength);
 		params.endian = Endian.BIG_ENDIAN;
 		var opcode:Opcode = game.scriptOpcodes.getOpcodeWithId(opcodeId);
-		var parameters:Array<Dynamic> = readParameters(params, opcode, done);
-		var async:Bool = (opcode.format.indexOf('<') >= 0);
-		return new Instruction(scriptName, opcode, parameters, async, instructionPosition, params.length + 1);
+		var parameters:Array<Dynamic> = readParameters(params, opcode);
+		return new Instruction2(scriptName, opcode, parameters, instructionPosition, params.length + 1);
 	}
 	
-	private function readParameters(paramsByteArray:ByteArray, opcode:Opcode, done:Void -> Void):Array<Dynamic>
+	private function readParameters(paramsByteArray:ByteArray, opcode:Opcode):Array<Dynamic>
 	{
 		var format:String = opcode.format;
 		var params:Array<Dynamic> = [];
@@ -189,7 +200,6 @@ class DAT
 			}
 			
 			switch (type) {
-				case '<': params.push(done);
 				case 'b': params.push(paramsByteArray.readUnsignedByte() != 0);
 				case '1': params.push(paramsByteArray.readUnsignedByte());
 				case '2': params.push(paramsByteArray.readUnsignedShort());

@@ -1,5 +1,6 @@
 package engines.dividead;
 
+import common.PromiseUtils;
 import common.IteratorUtilities;
 import common.script.Instruction2;
 import engines.dividead.script.AB_OP;
@@ -67,7 +68,6 @@ class AB
 	
 	private function executeSingleAsync():Promise<Dynamic>
 	{
-		var promise = new Promise<Dynamic>();
 		var opcodePosition = this.script.position;
 		var opcodeId = this.script.readUnsignedShort();
 		var opcode = game.scriptOpcodes.getOpcodeWithId(opcodeId);
@@ -76,19 +76,7 @@ class AB
 		var instruction = new Instruction2(scriptName, opcode, params, opcodePosition, this.script.position - opcodePosition);
 		var result = instruction.call(this.abOp);
 
-		//Log.trace(result);
-		if (Std.is(result, Promise))
-		{
-			result.then(function(e)
-			{
-				promise.resolve(null);
-			});
-		}
-		else
-		{
-			promise.resolve(null);
-		}
-		return promise;
+		return PromiseUtils.returnPromiseOrResolvedPromise(result);
 	}
 	
 	private function hasMore():Bool {

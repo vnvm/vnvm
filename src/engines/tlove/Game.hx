@@ -152,10 +152,10 @@ class Game
 		if (script == null) script = "MAIN";
 		Log.trace('run');
 		
-		dat.loadAsync(script, function() {
+		dat.loadAsync(script).then(function(?e) {
 			Log.trace('loaded : ' + script);
 			dat.jumpRawAddress(scriptPos);
-			dat.execute();
+			dat.executeAsync();
 		});
 	}
 	

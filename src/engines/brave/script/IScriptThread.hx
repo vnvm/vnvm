@@ -5,9 +5,10 @@ package engines.brave.script;
  * @author 
  */
 
-interface IScriptThread 
+import promhx.Promise;
+interface IScriptThread
 {
-	function execute():Void;
+	function executeAsync():Promise<Dynamic>;
 	function getSpecial(index:Int):Dynamic;
 	function getVariable(index:Int):Variable;
 }

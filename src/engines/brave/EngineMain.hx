@@ -105,7 +105,7 @@ class EngineMain extends Sprite
 			var gameState:GameState = new GameState(gameSprite);
 			Script.getScriptWithNameAsync(startScriptName, function(script:Script) {
 				var scriptThread:ScriptThread = gameState.spawnThreadWithScript(script);
-				scriptThread.execute();
+				scriptThread.executeAsync();
 			});
 		}
 	}

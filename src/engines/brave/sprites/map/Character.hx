@@ -109,15 +109,17 @@ class Character
 		return cy * 1000 + cx;
 	}
 	
-	private function checkEventWithKey(index:Int):Void {
-		if (events.exists(index)) {
+	private function checkEventWithKey(index:Int):Void
+	{
+		if (events.exists(index))
+		{
 			var event = events.get(index);
 			var scriptThread:ScriptThread = event[0];
 			var eventId:Int = event[1];
 			scriptThread.gameThreadState.eventId = eventId;
 			enableMovement = false;
 			scriptThread.jump(8);
-			scriptThread.execute();
+			scriptThread.executeAsync();
 		}
 	}
 	

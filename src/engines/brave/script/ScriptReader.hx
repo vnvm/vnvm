@@ -1,6 +1,6 @@
 package engines.brave.script;
+import common.script.Instruction2;
 import common.ByteArrayUtils;
-import common.script.Instruction;
 import common.script.Opcode;
 import common.script.ScriptOpcodes;
 import haxe.Log;
@@ -26,7 +26,7 @@ class ScriptReader
 	
 	public function readAllInstructions():Void {
 		while (hasMoreInstructions()) {
-			var instruction:Instruction = readInstruction(null);
+			var instruction = readInstruction(null);
 			Log.trace(instruction);
 		}
 	}
@@ -36,18 +36,19 @@ class ScriptReader
 		return script.data.position < script.data.length;
 	}
 	
-	public function readInstruction(scriptThread:IScriptThread):Instruction {
+	public function readInstruction(scriptThread:IScriptThread):Instruction2
+	{
 		script.data.position = position;
 		var opcodePosition:Int = position;
 		var opcodeId:Int = read2();
 		var opcode:Opcode = scriptOpcodes.getOpcodeWithId(opcodeId);
 		var parameters:Array<Dynamic> = readFormat(opcode.format, scriptThread);
-		var async:Bool = (opcode.format.indexOf("<") != -1);
 		position = script.data.position;
-		return new Instruction(script.name, opcode, parameters, async, opcodePosition, opcodePosition - position);
+		return new Instruction2(script.name, opcode, parameters, opcodePosition, opcodePosition - position);
 	}
 	
-	private function readFormat(format:String, scriptThread:IScriptThread):Array<Dynamic> {
+	private function readFormat(format:String, scriptThread:IScriptThread):Array<Dynamic>
+	{
 		var params = new Array<Dynamic>();
 
 		//Log.trace("readFormat : '" + format + "'");
@@ -61,9 +62,9 @@ class ScriptReader
 		return params;
 	}
 	
-	private function readFormatChar(char:String, scriptThread:IScriptThread):Dynamic {
+	private function readFormatChar(char:String, scriptThread:IScriptThread):Dynamic
+	{
 		switch (char) {
-			case '<': return (scriptThread != null) ? scriptThread.execute : null;
 			case 's': return readString();
 			case 'S': return readStringz();
 			case 'L': return read4();
@@ -85,7 +86,8 @@ class ScriptReader
 		}
 	}
 
-	private function readParam(scriptThread:IScriptThread):Dynamic {
+	private function readParam(scriptThread:IScriptThread):Dynamic
+	{
 		var paramType:Int = read1();
 		
 		switch (paramType) {
@@ -111,24 +113,25 @@ class ScriptReader
 		}
 	}
 
-	private function readString():String {
+	private function readString():String
+	{
 		var v:Int = read1();
-		if (v == 0) {
-			return readStringz();
-		} else {
-			throw(new Error("Unimplemented"));
-		}
+		if (v != 0) throw(new Error("Unimplemented"));
+		return readStringz();
 	}
 
-	private function readStringz():String {
+	private function readStringz():String
+	{
 		return StringTools.replace(ByteArrayUtils.readStringz(script.data), "@n;", "\n");
 	}
 
-	private function read1():Int {
+	private function read1():Int
+	{
 		return script.data.readUnsignedByte();
 	}
 
-	private function read1Signed():Int {
+	private function read1Signed():Int
+	{
 		//return script.data.readByte();
 		var byte:Int = script.data.readUnsignedByte();
 		if ((byte & 0x80) != 0) {
@@ -138,11 +141,13 @@ class ScriptReader
 		}
 	}
 
-	private function read2():Int {
+	private function read2():Int
+	{
 		return script.data.readUnsignedShort();
 	}
 
-	private function read4():Int {
+	private function read4():Int
+	{
 		return script.data.readUnsignedInt();
 	}
 }
