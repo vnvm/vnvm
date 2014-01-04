@@ -22,7 +22,8 @@ class CgDbEntry
 		this.tileHeight = tileHeight;
 	}
 	
-	public function toString():String {
+	public function toString():String
+	{
 		return 'CgDbEntry(Type = ${type}, Name = \'${name}\', ImageId = ${imageId}, TileSize = ${tileWidth}x${tileHeight})';
 	}
 }

@@ -32,7 +32,7 @@ import engines.will.formats.wip.WIP;
 import promhx.Promise;
 import haxe.Log;
 import common.GameScalerSprite;
-import common.BitmapDataUtils;
+import common.imaging.BitmapDataUtils;
 import vfs.SubVirtualFileSystem;
 import vfs.VirtualFileSystem;
 import flash.display.Bitmap;

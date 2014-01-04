@@ -1,11 +1,11 @@
-package common;
+package common.assets;
 
+import flash.filesystem.File;
 import flash.errors.Error;
 import vfs.VirtualFileSystem;
 import vfs.LocalFileSystem;
 import sys.FileSystem;
 import haxe.Log;
-import flash.filesystem.File;
 
 class AssetsFileSystemCpp implements IAssetsFileSystem
 {

@@ -5,7 +5,7 @@ import flash.events.Event;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.geom.Point;
-import common.Event2;
+import common.event.Event2;
 
 /**
  * ...

@@ -129,7 +129,8 @@ class GameState
 		rootClip.backgroundBack.addChild(SpriteUtils.createSolidRect(color));
 	}
 
-	public function setBackgroundEffect(effectType:Int):Void {
+	@:noStack public function setBackgroundEffect(effectType:Int):Void
+	{
 		var out:BitmapData = new BitmapData(640, 480);
 		
 		rootClip.backgroundBack.visible = true;
@@ -144,13 +145,14 @@ class GameState
 		Memory.select(pixels);
 		
 		var offset:Int = 0;
-		for (n in 0 ... Std.int(pixels.length / 4)) {
-			var grey:Int = MathEx.fastUintConstDivShort((pixels[offset + 1] + pixels[offset + 2] + pixels[offset + 3]), 3);
+		for (n in 0 ... Std.int(pixels.length / 4))
+		{
+			var grey:Int = MathEx.int_div((pixels[offset + 1] + pixels[offset + 2] + pixels[offset + 3]), 3);
 			
 			Memory.setByte(offset + 0, 0xFF);
-			Memory.setByte(offset + 1, MathEx.fastUintConstDivShort(grey * 100, 100));
-			Memory.setByte(offset + 2, MathEx.fastUintConstDivShort(grey * 80, 100));
-			Memory.setByte(offset + 3, MathEx.fastUintConstDivShort(grey * 60, 100));
+			Memory.setByte(offset + 1, MathEx.int_div(grey * 100, 100));
+			Memory.setByte(offset + 2, MathEx.int_div(grey * 80, 100));
+			Memory.setByte(offset + 3, MathEx.int_div(grey * 60, 100));
 			
 			offset += 4;
 		}

@@ -1,5 +1,5 @@
 package engines.tlove;
-import common.LangUtils;
+import lang.LangUtils;
 import flash.errors.Error;
 import flash.geom.Rectangle;
 import haxe.Log;

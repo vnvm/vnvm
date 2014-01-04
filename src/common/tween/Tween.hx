@@ -1,5 +1,6 @@
 package common.tween;
 
+import common.event.EventListenerGroup;
 import lang.ObjectUtils;
 import haxe.Log;
 import common.signal.Signal;

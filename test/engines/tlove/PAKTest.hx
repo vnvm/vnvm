@@ -1,5 +1,5 @@
 package engines.tlove;
-import common.AssetsFileSystem;
+import common.assets.AssetsFileSystem;
 import common.ByteArrayUtils;
 import common.io.Stream;
 import common.io.SubVirtualFileSystem;

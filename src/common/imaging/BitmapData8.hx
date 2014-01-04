@@ -1,6 +1,6 @@
 package common.imaging;
 import common.ByteArrayUtils;
-import common.LangUtils;
+import lang.LangUtils;
 import common.MathEx;
 import haxe.io.Bytes;
 import haxe.Log;

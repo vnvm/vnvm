@@ -1,4 +1,4 @@
-package common;
+package common.event;
 
 import flash.events.IEventDispatcher;
 

@@ -3,7 +3,7 @@
 #pw:PW0001
 #pw:START
 #dividead
-#pw:PW0001:122F
+pw:PW0001:122F
 #dividead
 #tlove
-brave
+#brave

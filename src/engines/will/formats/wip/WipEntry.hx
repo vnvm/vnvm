@@ -1,6 +1,6 @@
 package engines.will.formats.wip;
 import flash.display.BitmapData;
-import common.LangUtils;
+import lang.LangUtils;
 import flash.utils.ByteArray;
 
 class WipEntry

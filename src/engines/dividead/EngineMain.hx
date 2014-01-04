@@ -1,5 +1,5 @@
 package engines.dividead;
-import common.AssetsFileSystem;
+import common.assets.AssetsFileSystem;
 import common.GameScalerSprite;
 import vfs.SubVirtualFileSystem;
 import vfs.VirtualFileSystem;

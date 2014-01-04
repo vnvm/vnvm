@@ -1,5 +1,5 @@
 package engines.ethornell;
-import common.AssetsFileSystem;
+import common.assets.AssetsFileSystem;
 import common.io.FileStream;
 import common.io.Stream;
 import common.io.SubVirtualFileSystem;

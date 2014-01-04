@@ -1,7 +1,7 @@
 package engines.brave.sprites.map;
 import common.tween.Easing;
 import common.tween.Tween;
-import common.LangUtils;
+import lang.LangUtils;
 import common.MathEx;
 import common.SpriteUtils;
 import common.GameInput;

@@ -1,4 +1,4 @@
-package common;
+package common.assets;
 import vfs.HttpFileSystem;
 import vfs.VirtualFileSystem;
 import haxe.Log;
@@ -16,9 +16,9 @@ class AssetsFileSystem
 		if (_assetsFileSystem == null)
 		{
 			#if (cpp || neko)
-				_assetsFileSystem = new common.AssetsFileSystemCpp();
+				_assetsFileSystem = new common.assets.AssetsFileSystemCpp();
 			#else
-				_assetsFileSystem = new common.AssetsFileSystemAs3();
+				_assetsFileSystem = new AssetsFileSystemAs3();
 			#end
 		}
 		return _assetsFileSystem;

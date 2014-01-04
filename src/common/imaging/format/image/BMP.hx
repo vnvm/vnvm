@@ -1,4 +1,5 @@
-package common.imaging;
+package common.imaging.format.image;
+
 import common.ByteArrayUtils;
 import haxe.Log;
 import flash.display.BitmapData;

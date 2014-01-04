@@ -6,7 +6,7 @@ import engines.dividead.script.AB_OP;
 import vfs.SubVirtualFileSystem;
 import haxe.Log;
 import promhx.Promise;
-import common.BitmapDataUtils;
+import common.imaging.BitmapDataUtils;
 import common.display.OptionList;
 import common.GameInput;
 import common.GraphicUtils;

@@ -1,8 +1,8 @@
 package engines.ethornell;
 import common.ByteArrayUtils;
 import common.imaging.BmpColor;
-import common.LangUtils;
-import common.Reference;
+import lang.LangUtils;
+import lang.Reference;
 import common.StringEx;
 import common.Timer2;
 import haxe.io.Bytes;

@@ -1,6 +1,8 @@
 package engines.brave.formats;
 
-import common.BitUtils;
+import haxe.Log;
+import common.Timer2;
+import common.imaging.format.pixel.PixelFormat565;
 import common.ByteUtils;
 import haxe.io.Bytes;
 import flash.display.BitmapData;
@@ -45,12 +47,20 @@ class BraveImage
 		output.position = 0;
 		return output;
 	}
-	
+
+	@:noStack public function load(dataCompressed:ByteArray):Void
+	{
+		var elapsed = Timer2.measure(function() {
+			_load(dataCompressed);
+		});
+		Log.trace('Decoded image ${dataCompressed.length} ... ${elapsed}s');
+	}
+
 	/**
 	 * 
 	 * @param	data
 	 */
-	@:noStack public function load(dataCompressed:ByteArray):Void
+	@:noStack private function _load(dataCompressed:ByteArray):Void
 	{
 		var data:ByteArray = LZ.decode(dataCompressed);
 		if (data.readUTFBytes(13) != "(C)CROWD ARPG") throw (new Error("Invalid file"));
@@ -85,14 +95,16 @@ class BraveImage
 		var rgba:ByteArray = new ByteArray();
 		//var n:Int = 0;
 		//rgba.length = 4 * width * height;
+
+		var pixelFormat = new PixelFormat565();
 		
 		for (y in 0 ... height) {
 			for (x in 0 ... width) {
 				var pixelData:Int = data.readUnsignedShort();
-				var b:Int = BitUtils.extractScaled(pixelData, 0, 5, 0xFF);
-				var g:Int = BitUtils.extractScaled(pixelData, 5, 6, 0xFF);
-				var r:Int = BitUtils.extractScaled(pixelData, 11, 5, 0xFF);
-				var a:Int = 0xFF;
+				var b:Int = pixelFormat.extractBlue(pixelData);
+				var g:Int = pixelFormat.extractGreen(pixelData);
+				var r:Int = pixelFormat.extractRed(pixelData);
+				var a:Int = pixelFormat.extractAlpha(pixelData);
 				if ((r == 0xFF) && (g == 0x00) && (b == 0xFF))
 				{
 					r = g = b = a = 0x00;

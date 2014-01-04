@@ -12,7 +12,7 @@ import common.Keys;
 import flash.events.MouseEvent;
 import flash.geom.Point;
 import flash.events.Event;
-import common.Event2;
+import common.event.Event2;
 import common.GameInput;
 import common.geom.Anchor;
 import haxe.Log;

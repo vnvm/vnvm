@@ -1,5 +1,5 @@
 package engines.ethornell;
-import common.Reference;
+import lang.Reference;
 import common.StringEx;
 import haxe.Int64;
 import flash.errors.Error;
@@ -24,7 +24,8 @@ class Utils
 	 * @param	hash_val
 	 * @return
 	 */
-	@:noStack static public function hash_update(hash_val:Reference<Int>):Int {
+	@:noStack static public function hash_update(hash_val:Reference<Int>):Int
+	{
 		#if neko
 		var eax:Int;
 		var ebx:Int;

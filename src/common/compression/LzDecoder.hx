@@ -71,9 +71,9 @@ class LzDecoder
 		var output:ByteArray = ByteArrayUtils.newByteArrayWithLength(maxUncompressedData, Endian.LITTLE_ENDIAN);
 		output.position = 0;
 
-		var start = Timer.stamp();
-		new LzDecoder()._decode(input, output, options);
-		var elapsed = (Timer.stamp() - start);
+		var elapsed = Timer2.measure(function() {
+			new LzDecoder()._decode(input, output, options);
+		});
 		Log.trace('Decompressed: ${input.length} -> ${maxUncompressedData}: $elapsed');
 		return output;
 	}

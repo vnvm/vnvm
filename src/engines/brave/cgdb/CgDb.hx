@@ -16,11 +16,13 @@ class CgDb
 		if (data != null) load(data);
 	}
 	
-	public function get(name:String):CgDbEntry {
+	public function get(name:String):CgDbEntry
+	{
 		return entries.get(name.toLowerCase());
 	}
 	
-	private function readEntry(data:ByteArray):CgDbEntry {
+	private function readEntry(data:ByteArray):CgDbEntry
+	{
 		data.endian = Endian.LITTLE_ENDIAN;
 		var startPosition:Int = data.position;
 		var type:Int = data.readInt();
@@ -35,10 +37,12 @@ class CgDb
 		return new CgDbEntry(type, name, imageId, tileWidth, tileHeight);
 	}
 	
-	public function load(data:ByteArray):Void {
+	public function load(data:ByteArray):Void
+	{
 		entries = new Map<String, CgDbEntry>();
 		data.position = 8;
-		while (data.bytesAvailable > 0) {
+		while (data.bytesAvailable > 0)
+		{
 			var entry:CgDbEntry = readEntry(data);
 			entries.set(entry.name.toLowerCase(), entry);
 		}

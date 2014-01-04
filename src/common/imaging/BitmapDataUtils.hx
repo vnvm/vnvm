@@ -1,4 +1,5 @@
-package common;
+package common.imaging;
+import haxe.io.Bytes;
 import lang.exceptions.OutOfBoundsException;
 import flash.Vector;
 import haxe.io.BytesData;
@@ -40,7 +41,7 @@ class BitmapDataUtils
 		while (totalPixels-- > 0)
 		{
 			//Log.trace('$writeOffset, $readOffset');
-			var value = MathEx.clampInt(cast(maskDataData[readOffset], Int) + offset, 0, 255);
+			var value = MathEx.clampInt(cast(Bytes.fastGet(maskDataData, readOffset), Int) + offset, 0, 255);
 			if (reverse) value = 255 - value;
 			colorDataData[writeOffset] = cast value;
 			readOffset += 4;

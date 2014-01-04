@@ -1,4 +1,5 @@
 package common;
+import common.event.Event2;
 import promhx.Promise;
 import haxe.Log;
 import haxe.PosInfos;
@@ -23,15 +24,27 @@ class Timer2
 		}, Std.int(seconds / 1000));
 	}
 	
-	static public function createAndStart(seconds:Float):Timer2 {
+	static public function createAndStart(seconds:Float):Timer2
+	{
 		return new Timer2(seconds);
 	}
-	
-	static public function measure(func:Void -> Void, ?pos:PosInfos) {
+
+	static public function measure(func:Void -> Void, ?pos:PosInfos)
+	{
 		var start:Float = Timer.stamp();
 		func();
-		var end:Float = Timer.stamp();
-		trace(pos.className + "." + pos.methodName + ": " + (end - start));
+		return Timer.stamp() - start;
+	}
+
+	static public function measureAndTrace(func:Void -> Void, ?pos:PosInfos)
+	{
+		var elapsed = measure(func, pos);
+		trace(pos.className + "." + pos.methodName + ": " + elapsed);
+	}
+
+	static public function stamp():Float
+	{
+		return Timer.stamp();
 	}
 
 	static public function waitAsync(timeMilliseconds:Int):Promise<Dynamic>

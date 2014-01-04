@@ -1,5 +1,5 @@
 package engines.ethornell;
-import common.BitmapDataUtils;
+import common.imaging.BitmapDataUtils;
 import haxe.Log;
 import vfs.SubVirtualFileSystem;
 import vfs.VirtualFileSystem;

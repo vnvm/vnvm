@@ -1,6 +1,6 @@
 package engines.brave.map;
 import common.ByteArrayUtils;
-import common.LangUtils;
+import lang.LangUtils;
 import engines.brave.BraveAssets;
 import engines.brave.formats.Decrypt;
 import haxe.Log;

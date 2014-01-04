@@ -1,13 +1,13 @@
 package engines.tlove;
 
 import promhx.Promise;
-import common.Event2;
+import common.event.Event2;
 import common.GraphicUtils;
 import common.imaging.BitmapData8;
 import common.imaging.Palette;
 import vfs.Stream;
 import vfs.VirtualFileSystem;
-import common.LangUtils;
+import lang.LangUtils;
 import common.PathUtils;
 import common.script.ScriptOpcodes;
 import engines.tlove.mrs.MRS;

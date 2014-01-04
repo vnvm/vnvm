@@ -1,4 +1,4 @@
-package common;
+package common.assets;
 
 import vfs.HttpFileSystem;
 import haxe.Log;

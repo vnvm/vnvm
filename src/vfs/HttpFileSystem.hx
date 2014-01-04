@@ -1,6 +1,6 @@
 package vfs;
 import flash.utils.Endian;
-import common.EventListenerOnce;
+import common.event.EventListenerOnce;
 import promhx.Promise;
 import flash.errors.Error;
 import flash.events.Event;
@@ -13,8 +13,8 @@ import flash.net.URLRequest;
 import flash.net.URLRequestHeader;
 import flash.net.URLRequestMethod;
 import flash.utils.ByteArray;
-import common.EventUtils;
-import common.LangUtils;
+import common.event.EventUtils;
+import lang.LangUtils;
 
 /**
  * ...

@@ -1,7 +1,7 @@
 package engines.dividead.script;
 import promhx.Promise;
 import common.display.OptionSelectedEvent;
-import common.Event2;
+import common.event.Event2;
 import common.GameInput;
 import common.Timer2;
 import engines.dividead.AB;

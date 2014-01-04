@@ -2,7 +2,7 @@ package engines.will.formats.wip;
 
 import flash.display.BitmapDataChannel;
 import flash.geom.Point;
-import common.BitmapDataUtils;
+import common.imaging.BitmapDataUtils;
 import common.compression.LzOptions;
 import common.imaging.BitmapDataSerializer;
 import common.compression.LzDecoder;

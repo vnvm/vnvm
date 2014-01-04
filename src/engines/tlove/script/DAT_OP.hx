@@ -4,7 +4,7 @@ import common.PromiseUtils;
 import common.Timer2;
 import promhx.Promise;
 import common.ByteArrayUtils;
-import common.Event2;
+import common.event.Event2;
 import common.imaging.BitmapData8;
 import common.imaging.BmpColor;
 import common.imaging.Palette;
