@@ -8,6 +8,10 @@ PRINCESS WALTZ:
 	sub_406F00
 */
 
+import common.tween.Easing;
+import lang.promise.Promise;
+import lang.promise.IPromise;
+import common.tween.Tween;
 import reflash.display.HtmlColors;
 import lang.signal.Signal;
 import lang.promise.Deferred;
@@ -295,6 +299,7 @@ class RIO_OP
 	@Opcode({ id:0x23, format:"12112s", description:"" })
 	public function VOICE_PLAY(channel:Int, u2:Int, u3:Int, kind:Int, unk4:Int, voice_file:String)
 	{
+		if (isSkipping()) return null;
 		return this.scene.soundPlayStopAsync('voice', voice_file, 0);
 	}
 
@@ -333,7 +338,7 @@ class RIO_OP
 
 	private function isSkipping():Bool
 	{
-		return GameInput.isPressing(Keys.Control);
+		return scene.isSkiping();
 	}
 
 	@Opcode({ id:0x4A, format:"121", description:"" })
@@ -603,33 +608,35 @@ class RIO_OP
 	*/
 	}
 
+	private var animations:Array<Void -> IPromise<Dynamic>>;
+
 	@Opcode({ id:0x4B, format:"1222221", description:"" })
-	public function ANIMATE_ADD(object_id, inc_x, inc_y, time, unk0, alpha, unk2)
+	public function ANIMATE_ADD(object_id:Int, inc_x:Int, inc_y:Int, timeMs:Int, unk0:Int, alpha:Int, unk2:Int)
 	{
-		throw(new NotImplementedException());
-		/*
-		if (this.skipping()) {
-			time /= 5;
-		}
-		local object = this.scene.get(object_id);
-		local anim = object.animation;
-		anim.reset(time);
+		var time = timeMs / 1000;
 
-		if (object_id == 0) {
-			inc_x = -inc_x;
-			inc_y = -inc_y;
-		}
+		if (isSkipping()) time /= 10;
 
-		anim.increment("x", inc_x);
-		anim.increment("y", inc_y);
-		if (alpha == -1) {
-			anim.set("alpha", 1.0, 0.0);
-		} else if (alpha == 1) {
-			anim.set("alpha", 0.0, 1.0);
+		var layer = if (object_id == 0) {
+			this.scene.getLayerWithName("background").getObject(0);
+		} else {
+			this.scene.getLayerWithName("layer2").getObject(object_id - 1);
 		}
+		if (layer != null)
+		{
+			if (animations == null) animations = [];
+			animations.push(Tween.forTime(time).interpolateTo(layer, { x: layer.x + inc_x, y: layer.y + inc_y, alpha: layer.alpha + alpha }).withEasing(Easing.linear).animateAsync);
+		}
+	}
 
-		this.TODO();
-		*/
+	@Opcode({ id:0x4C, format:"1.", description:"" })
+	public function ANIMATE_PLAY(can_skip:Int)
+	{
+		scene.setDirectMode(true);
+		//return Promise.createDeferred().promise;
+		return Promise.parallel(animations).then(function(e) {
+			animations = null;
+		});
 	}
 
 	@Opcode({ id:0x4D, format:"1121", description:"" })
@@ -856,34 +863,11 @@ class RIO_OP
 	}
 
 	@Opcode({ id:0x8B, format:".", description:"" })
-	public function RUN_CONFIG()
+	@Unimplemented
+	public function RUN_CONFIG():Void
 	{
-		throw(new NotImplementedException());
-		/*
-		local cfgbg = resman.get_image("CFGBG");
-		local mask  = resman.get_mask("CFG_P1M");
-		while (1) {
-			this.input_update();
-
-			//this.frame_draw();
-			//if (draw_interface) this.frame_draw_interface(0);
-
-			cfgbg.drawTo(screen, 0);
-			cfgbg.drawTo(screen, 1); // return button
-			cfgbg.drawTo(screen, 3); // yes/no options
-			cfgbg.drawTo(screen, 6); // volume on
-			cfgbg.drawTo(screen, 9); // numeric options
-
-			local hover_kind = mask.images[0].getpixel(mouse.x, mouse.y);
-
-			if (pressedNext()) {
-				break;
-			}
-
-			this.frame_tick();
-		}
-		this.TODO();
-		*/
+		// CFGBG
+		// CFG_P1M
 	}
 
 	@Opcode({ id:0xE2, format:".", description:"" })
@@ -1061,42 +1045,24 @@ class RIO_OP
 	// TEXT                                                                            //
 	/////////////////////////////////////////////////////////////////////////////////////
 
+	private var lastText:String;
+	private var lastTitle:String;
+
 	public function TEXT_COMMON(text_id:Int, text:String, ?title:String)
 	{
 		var deferred = new Deferred<Dynamic>();
-		scene.setTextAsync(text, isSkipping() ? 0 : 0.05).then(function(?e)
+		this.lastText = text;
+		this.lastTitle = title;
+		scene.setTextAsync(text, title, isSkipping() ? 0 : 0.05).then(function(?e)
 		{
 			Signal.addAnyOnce([GameInput.onClick, GameInput.onKeyPress], function(e:Event) {
-				scene.setTextAsync('', 0).then(function(?e)
+				scene.setTextAsync('', null, 0).then(function(?e)
 				{
 					deferred.resolve(null);
 				});
 			});
 		});
 		return deferred.promise;
-
-		/*
-		if (reset) {
-			this.interface.text_title = "";
-			this.interface.text_body = "";
-		}
-		local trans = translation.get(text_id, text, title);
-		this.interface.textProgress = this.interface.text_body.len();
-		this.interface.enabled     = true;
-		this.interface.text_id     = text_id;
-		this.interface.text_title += trans.title;
-		this.interface.text_body  += trans.text;
-		this.interface.text_title_ori = title;
-		this.interface.text_body_ori  = text;
-		this.interface.skip = false;
-
-		this.interface.waitingSkip = true;
-		this.loopUntilAnimationEnds();
-		this.interface.waitingSkip = false;
-
-		//this.TODO();
-		Audio.channelStop(this.voice_channel);
-		*/
 	}
 
 	@Opcode({ id:0x41, format:"2.t", description:"" })
@@ -1112,10 +1078,9 @@ class RIO_OP
 	}
 
 	@Opcode({ id:0xB6, format:"2t", description:"" })
-	public function TEXT_ADD(text_id, text)
+	public function TEXT_ADD(text_id:Int, text:String)
 	{
-		throw(new NotImplementedException());
-		//RIO_OP_TEXT.TEXT_COMMON(text_id, "", text, 0);
+		return TEXT_COMMON(text_id, lastText + text, lastTitle);
 	}
 
 	@Opcode({ id:0x08, format:"2", description:"Sets the size of the text (00=small, 01=big)" })

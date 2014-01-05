@@ -42,6 +42,11 @@ class GameElementsLayer extends Sprite2 implements IGameElementsLayer
 		}
 	}
 
+	public function getObject(index:Int):DisplayObject2
+	{
+		return this.layerChilds.get(index);
+	}
+
 	public function putColor(index:Int, x:Int, y:Int, width:Int, height:Int, color:Color2, anchor:Anchor):Void
 	{
 		removeObject(index);

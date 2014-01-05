@@ -1,11 +1,13 @@
 package engines.will.display;
 
+import reflash.display.DisplayObject2;
 import reflash.display.Color2;
 import lang.promise.IPromise;
 import common.geom.Anchor;
 
 interface IGameElementsLayer
 {
+	function getObject(index:Int):DisplayObject2;
 	function removeObject(index:Int):Void;
 	function putObjectAsync(index:Int, x:Int, y:Int, name:String, anchor:Anchor):IPromise<Dynamic>;
 	function putColor(index:Int, x:Int, y:Int, width:Int, height:Int, color:Color2, anchor:Anchor):Void;

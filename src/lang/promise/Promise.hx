@@ -28,10 +28,10 @@ class Promise
 		}
 	}
 
-	static public function sequence(promises:Array<Void -> IPromise<Dynamic>>):IPromise<Dynamic>
+	static public function sequence(promiseGeneratorList:Array<Void -> IPromise<Dynamic>>):IPromise<Dynamic>
 	{
 		var deferred = new Deferred<Dynamic>();
-		var list = promises.slice(0);
+		var list = promiseGeneratorList.slice(0);
 		function step()
 		{
 			if (list.length == 0) {
@@ -43,6 +43,11 @@ class Promise
 		}
 		step();
 		return deferred.promise;
+	}
+
+	static public function parallel(promiseGeneratorList:Array<Void -> IPromise<Dynamic>>):IPromise<Dynamic>
+	{
+		return whenAll(Lambda.array(Lambda.map(promiseGeneratorList, function(promiseGenerator) { return promiseGenerator(); })));
 	}
 
 	static public function whenAll(promises:Array<IPromise<Dynamic>>):IPromise<Dynamic>

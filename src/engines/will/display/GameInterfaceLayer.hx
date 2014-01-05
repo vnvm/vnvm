@@ -26,7 +26,8 @@ class GameInterfaceLayer extends Sprite2
 {
 	private var willResourceManager:WillResourceManager;
 	private var wipLayer:WIPLayer;
-	private var textField2:TextField2;
+	private var textFieldContent:TextField2;
+	private var textFieldTitle:TextField2;
 	private var waitingLayer:DisplayObject2;
 
 	public function new(willResourceManager:WillResourceManager)
@@ -53,8 +54,12 @@ class GameInterfaceLayer extends Sprite2
 				wipLayer.setPosition(400, 600 - 8);
 				wipLayer.setAnchor(0.5, 1);
 				addChild(wipLayer);
-				wipLayer.addChild(textField2 = new TextField2());
-				textField2.setPosition(50, 56);
+
+				wipLayer.addChild(textFieldContent = new TextField2());
+				textFieldContent.setPosition(50, 58);
+
+				wipLayer.addChild(textFieldTitle = new TextField2());
+				textFieldTitle.setPosition(50, 26);
 
 				wipLayer.addChild(this.waitingLayer = new AnimatedImage2(clkwaitFrames, 30).setPosition(650, 120));
 				this.waitingLayer.visible = false;
@@ -79,22 +84,35 @@ class GameInterfaceLayer extends Sprite2
 		return deferred.promise;
 	}
 
-	public function setTextAsync(text:String, timePerCharacter:Float = 0.05):IPromise<Dynamic>
+	public function setTextAsync(text:String, title:String, timePerCharacter:Float = 0.05):IPromise<Dynamic>
 	{
 		var totalTime = timePerCharacter * text.length;
 		this.waitingLayer.visible = false;
 
 		var disposable = DisposableGroup.create();
 
+		if (title != null && title != '')
+		{
+			wipLayer.setLayerVisibility(31, true);
+			textFieldTitle.text = title;
+			textFieldTitle.visible = true;
+		}
+		else
+		{
+			wipLayer.setLayerVisibility(31, false);
+			textFieldTitle.text = '';
+			textFieldTitle.visible = false;
+		}
+
 		var promise = Tween.forTime(totalTime).onStep(function(step:Float) {
-			textField2.text = text.substr(0, Math.round(text.length * step));
+			textFieldContent.text = text.substr(0, Math.round(text.length * step));
 		}).animateAsync().then(function(e) {
 			waitingLayer.visible = true;
 			Log.trace('Completed text! $text');
 			disposable.dispose();
 		});
 
-		disposable.add(Signal.addAnyOnce([GameInput.onClick], function(e) {
+		disposable.add(Signal.addAnyOnce([GameInput.onClick, GameInput.onKeyPress], function(e) {
 			promise.cancel();
 		}));
 
@@ -106,6 +124,7 @@ class GameInterfaceLayer extends Sprite2
 		if (wipLayer.alpha == 0) return Promise.createResolved();
 
 		this.waitingLayer.visible = false;
+		wipLayer.setLayerVisibility(31, false);
 
 		return Tween.forTime(time)
 			.interpolateTo(wipLayer.getLayer(0), { scaleY: 0 })
@@ -120,6 +139,7 @@ class GameInterfaceLayer extends Sprite2
 		if (wipLayer.alpha == 1) return Promise.createResolved();
 
 		this.waitingLayer.visible = false;
+		//wipLayer.setLayerVisibility(31, false);
 
 		return Tween.forTime(time)
 			.interpolateTo(wipLayer.getLayer(0), { scaleY: 1 })

@@ -9,6 +9,8 @@ import flash.utils.ByteArray;
 
 interface IScene
 {
+	function isSkiping():Bool;
+
 	function getMaskValueAt(point:Point):Int;
 	function getMousePosition():Point;
 
@@ -20,7 +22,7 @@ interface IScene
 
 	function performTransitionAsync(kind:Int, time:Int):IPromise<Dynamic>;
 
-	function setTextAsync(text:String, timePerCharacter:Float):IPromise<Dynamic>;
+	function setTextAsync(text:String, title:String, timePerCharacter:Float):IPromise<Dynamic>;
 
 	function animLoadAsync(name:String):IPromise<Dynamic>;
 	function tableLoadAsync(name:String):IPromise<Dynamic>;

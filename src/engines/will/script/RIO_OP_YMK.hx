@@ -4,18 +4,6 @@ import haxe.Log;
 import lang.exceptions.NotImplementedException;
 class RIO_OP_YMK extends RIO_OP
 {
-	@Opcode({ id:0x4C, format:"1", description:"" })
-	public function ANIMATE_PLAY(can_skip)
-	{
-		throw(new NotImplementedException());
-		/*
-		//anim.start();
-		this.loopUntilAnimationEnds(can_skip);
-
-		this.TODO();
-		*/
-	}
-
 	@Opcode({ id:0x21, format:"12s", description:"" })
 	public function MUSIC_PLAY(repeats, fadein_ms, bgm_file)
 	{

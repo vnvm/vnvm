@@ -1,5 +1,6 @@
 package engines.will;
 
+import common.input.Keys;
 import lang.promise.Deferred;
 import lang.promise.Promise;
 import lang.promise.IPromise;
@@ -164,7 +165,7 @@ class EngineMain extends Sprite2 implements IScene
 	{
 		var deferred = Promise.createDeferred();
 
-		interfaceLayer.hideAsync().then(function(?e)
+		interfaceLayer.hideAsync(isSkiping() ? 0 : 0.3).then(function(?e)
 		{
 			previousBitmap.clear(HtmlColors.black).draw(renderedBitmap).finish();
 			renderedBitmap.clear(HtmlColors.black).draw(contentContainer).finish();
@@ -182,10 +183,34 @@ class EngineMain extends Sprite2 implements IScene
 					case 28, 29, 30, 31: // EFFECT BOTTOM->TOP, TOP->BOTTOM, RIGHT->LEFT, LEFT->RIGHT // @TODO
 						currentBitmapImage.alpha = ratio;
 
+					case 5, 22, 34: // ZOOM IN // @TODO: pw:pw0001:EB42
+						currentBitmapImage.alpha = ratio;
+
+					case 21: // PIXELATE // @TODO: pw:pw0001:EB42
+						currentBitmapImage.alpha = ratio;
+
 					case 25: // TRANSITION NORMAL FADE IN (alpha)
 						currentBitmapImage.alpha = ratio;
 
 					case 26: // TRANSITION NORMAL FADE IN BURN (alpha) // @TODO
+						currentBitmapImage.alpha = ratio;
+
+					case 35: // ZOOM OUT // @TODO: pw:pw0001:BFB7
+						currentBitmapImage.alpha = ratio;
+
+					case 36: // WAVE // @TODO: pw:pw0001:BC81
+						currentBitmapImage.alpha = ratio;
+
+					case 27: // UNKNOWN : CHECK // @TODO: pw:pw0001:1105A
+						currentBitmapImage.alpha = ratio;
+
+					case 39: // UNKNOWN : CHECK // @TODO: pw:pw0001:F445
+						currentBitmapImage.alpha = ratio;
+
+					case 43: // STRETCHING EFFECT @TODO: pw:pw0002_1:A5D2
+						currentBitmapImage.alpha = ratio;
+
+					case 45: // UNKNOWN : CHECK // @TODO: pw:pw0001:23848
 						currentBitmapImage.alpha = ratio;
 
 					case 42, 44, 23, 24: // TRANSITION MASK (blend) (42: normal, 44: reverse), TRANSITION MASK (no blend) (23: normal, 24: reverse)
@@ -225,14 +250,15 @@ class EngineMain extends Sprite2 implements IScene
 		}
 	}
 
-	public function setTextAsync(text:String, timePerCharacter:Float):IPromise<Dynamic>
+	public function setTextAsync(text:String, title:String, timePerCharacter:Float):IPromise<Dynamic>
 	{
 		text = StringTools.replace(text, '\\n', '\n');
+		title = StringTools.replace(title, '\\n', '\n');
 
 		var deferred = Promise.createDeferred();
-		interfaceLayer.showAsync().then(function(?e)
+		interfaceLayer.showAsync(isSkiping() ? 0 : 0.3).then(function(?e)
 		{
-			interfaceLayer.setTextAsync(text, timePerCharacter).then(function(?e)
+			interfaceLayer.setTextAsync(text, title, timePerCharacter).then(function(?e)
 			{
 				deferred.resolve(null);
 			});
@@ -310,6 +336,10 @@ class EngineMain extends Sprite2 implements IScene
 		if (gameSprite.contains(contentContainer)) gameSprite.removeChild(contentContainer);
 		if (directMode) gameSprite.addChild(contentContainer);
 		if (!directMode) gameLayerList.getMenuLayer().setAnmAndWip(null, null);
+		if (!directMode)
+		{
+			renderedBitmap.clear(HtmlColors.black).draw(contentContainer).finish();
+		}
 	}
 
 	public function setAnimObjectVisibility(index:Int, visible:Bool):IPromise<Dynamic>
@@ -343,4 +373,10 @@ class EngineMain extends Sprite2 implements IScene
 	{
 		return gameSprite.globalToLocal(GameInput.mouseCurrent);
 	}
+
+	public function isSkiping():Bool
+	{
+		return GameInput.isPressing(Keys.Control);
+	}
+
 }

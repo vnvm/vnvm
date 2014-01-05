@@ -60,7 +60,7 @@ class WGLTexture implements IGLTexture
 		var newRect = new Rectangle(this.x + x, this.y + y, width, height);
 		var intersectedRectangle = newRect.intersection(this.rectangle);
 
-		Log.trace('$this, $newRect, $intersectedRectangle');
+		//Log.trace('$this, $newRect, $intersectedRectangle');
 
 		return new WGLTexture(this.textureBase, intersectedRectangle);
 	}
