@@ -224,16 +224,20 @@ class EngineMain extends Sprite2 implements IScene
 		}
 	}
 
-	public function setTextAsync(text:String):Promise<Dynamic>
+	public function setTextAsync(text:String, timePerCharacter:Float):Promise<Dynamic>
 	{
-		/*
-		textLayer.defaultTextFormat = new TextFormat("Arial", 16, 0xFFFFFFFF);
-		textLayer.selectable = false;
-		textLayer.width = 800;
-		textLayer.height = 600;
-		textLayer.text = StringTools.replace(text, '\\n', '\n');
-		*/
-		return interfaceLayer.showAsync();
+		text = StringTools.replace(text, '\\n', '\n');
+
+		var promise = PromiseUtils.create();
+		interfaceLayer.showAsync().then(function(?e)
+		{
+			interfaceLayer.setTextAsync(text, timePerCharacter).then(function(?e)
+			{
+				promise.resolve(null);
+			});
+
+		});
+		return promise;
 	}
 
 	public function soundPlayStopAsync(channelName:String, name:String, fadeInOutMs:Int):Promise<Dynamic>

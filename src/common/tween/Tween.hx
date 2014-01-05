@@ -4,7 +4,7 @@ import lang.MathEx;
 import common.event.EventListenerGroup;
 import lang.ObjectUtils;
 import haxe.Log;
-import common.signal.Signal;
+import lang.signal.Signal;
 import flash.events.Event;
 import haxe.Timer;
 import promhx.Promise;

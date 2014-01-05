@@ -1,5 +1,7 @@
 package reflash.gl.wgl;
 
+import flash.geom.Rectangle;
+import haxe.Log;
 import reflash.display.IDrawable;
 import lang.IDisposable;
 import flash.display.BitmapData;
@@ -13,19 +15,24 @@ class WGLTexture implements IGLTexture
 	public var width(default, null):Int;
 	public var height(default, null):Int;
 
+	private var rectangle:Rectangle;
+
 	public var px1(default, null):Float;
 	public var py1(default, null):Float;
 	public var px2(default, null):Float;
 	public var py2(default, null):Float;
 
-	private function new(textureBase:IGLTextureBase, x:Int, y:Int, width:Int, height:Int)
+	private function new(textureBase:IGLTextureBase, rectangle:Rectangle)
 	{
 		textureBase.referenceCounter.increment();
 		this.textureBase = textureBase;
-		this.x = x;
-		this.y = y;
-		this.width = width;
-		this.height = height;
+
+		this.rectangle = rectangle;
+
+		this.x = Std.int(rectangle.x);
+		this.y = Std.int(rectangle.y);
+		this.width = Std.int(rectangle.width);
+		this.height = Std.int(rectangle.height);
 
 		this.px1 = (this.x) / textureBase.width;
 		this.py1 = (this.y) / textureBase.height;
@@ -50,16 +57,30 @@ class WGLTexture implements IGLTexture
 
 	public function slice(x:Int, y:Int, width:Int, height:Int):IGLTexture
 	{
-		var nx = Std.int(Math.min(this.x + x, this.width));
-		var ny = Std.int(Math.min(this.y + y, this.height));
-		var nw = Std.int(Math.max(this.width - x - width, 0));
-		var nh = Std.int(Math.max(this.height - y - height, 0));
-		return new WGLTexture(this.textureBase, nx, ny, nw, nh);
+		var newRect = new Rectangle(this.x + x, this.y + y, width, height);
+		var intersectedRectangle = newRect.intersection(this.rectangle);
+
+		Log.trace('$this, $newRect, $intersectedRectangle');
+
+		return new WGLTexture(this.textureBase, intersectedRectangle);
+	}
+
+	public function split(width:Int, height:Int):Array<IGLTexture>
+	{
+		var list:Array<IGLTexture> = [];
+		for (x in 0 ... Math.floor(this.width / width))
+		{
+			for (y in 0 ... Math.floor(this.height / height))
+			{
+				list.push(slice(x * width, y * height, width, height));
+			}
+		}
+		return list;
 	}
 
 	static public function fromTextureBase(textureBase:IGLTextureBase, width:Int, height:Int):IGLTexture
 	{
-		return new WGLTexture(textureBase, 0, 0, width, height);
+		return new WGLTexture(textureBase, new Rectangle(0, 0, width, height));
 	}
 
 	static public function fromEmpty(width:Int, height:Int):IGLTexture
@@ -78,4 +99,9 @@ class WGLTexture implements IGLTexture
 		new Image2(drawContext).setAnchor(0, 0).setPosition(0, 0).drawElement(drawContext);
 	}
 	*/
+
+	public function toString():String
+	{
+		return 'WGLTexture($textureBase, ($x, $y, $width, $height))';
+	}
 }

@@ -16,4 +16,5 @@ interface IGLTexture extends IDisposable
 	public var py2(default, null):Float;
 
 	function slice(x:Int, y:Int, width:Int, height:Int):IGLTexture;
+	function split(width:Int, height:Int):Array<IGLTexture>;
 }

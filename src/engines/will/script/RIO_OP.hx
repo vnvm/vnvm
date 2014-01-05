@@ -1093,10 +1093,10 @@ class RIO_OP
 	public function TEXT_COMMON(text_id:Int, text:String, ?title:String)
 	{
 		var promise = new Promise<Dynamic>();
-		scene.setTextAsync(text).then(function(?e)
+		scene.setTextAsync(text, isSkipping() ? 0 : 0.05).then(function(?e)
 		{
 			Event2.registerOnceAny([GameInput.onClick, GameInput.onKeyPress], function(e:Event) {
-				scene.setTextAsync('').then(function(?e)
+				scene.setTextAsync('', 0).then(function(?e)
 				{
 					promise.resolve(null);
 				});

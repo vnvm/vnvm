@@ -1,4 +1,4 @@
-package common.signal;
+package lang.signal;
 
 class Signal<T>
 {

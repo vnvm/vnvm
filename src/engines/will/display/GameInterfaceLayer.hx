@@ -1,5 +1,14 @@
 package engines.will.display;
 
+import reflash.display.DisplayObject2;
+import reflash.display.AnimatedImage2;
+import reflash.display.TextField2;
+import flash.text.TextFormat;
+import reflash.gl.wgl.WGLTexture;
+import reflash.display.Image2;
+import reflash.display.Stage2;
+import flash.display.BitmapData;
+import flash.text.TextField;
 import common.tween.Easing;
 import common.tween.Tween;
 import haxe.Log;
@@ -12,6 +21,8 @@ class GameInterfaceLayer extends Sprite2
 {
 	private var willResourceManager:WillResourceManager;
 	private var wipLayer:WIPLayer;
+	private var textField2:TextField2;
+	private var waitingLayer:DisplayObject2;
 
 	public function new(willResourceManager:WillResourceManager)
 	{
@@ -24,36 +35,61 @@ class GameInterfaceLayer extends Sprite2
 	{
 		// QLOAD, QSAVE, LOAD, SAVE, LOG, AUTO, SKIP, STATUS, SYSTEM
 		var promise = PromiseUtils.create();
-		willResourceManager.getWipWithMaskAsync("WINBASE0").then(function(wip:WIP)
+		willResourceManager.getWipWithMaskAsync("CLKWAIT").then(function(clkWaitWip:WIP)
 		{
-			//wip.save('c:/temp');
-			//Log.trace("$wip");
-			wipLayer = WIPLayer.fromWIP(wip);
-			wipLayer.setPosition(400, 600);
-			wipLayer.setAnchor(0.5, 1);
-			addChild(wipLayer);
-
-			setButtonState(Buttons.QLOAD, 1);
-			setButtonState(Buttons.QSAVE, 1);
-			setButtonState(Buttons.LOAD, 1);
-			setButtonState(Buttons.SAVE, 1);
-			setButtonState(Buttons.LOG, 1);
-			setButtonState(Buttons.AUTO, 1);
-			setButtonState(Buttons.SKIP, 1);
-			setButtonState(Buttons.STATUS, 1);
-			setButtonState(Buttons.SYSTEM, 1);
-
-			hideAsync(0).then(function(?e)
+			willResourceManager.getWipWithMaskAsync("WINBASE0").then(function(winBase0Wip:WIP)
 			{
-				promise.resolve(null);
+				var clkwaitTexture = WGLTexture.fromBitmapData(clkWaitWip.get(0).bitmapData);
+				var clkwaitFrames = clkwaitTexture.split(55, clkwaitTexture.height);
+
+				//wip.save('c:/temp');
+				//Log.trace("$wip");
+				wipLayer = WIPLayer.fromWIP(winBase0Wip);
+				wipLayer.setPosition(400, 600 - 8);
+				wipLayer.setAnchor(0.5, 1);
+				addChild(wipLayer);
+				wipLayer.addChild(textField2 = new TextField2());
+				textField2.setPosition(50, 56);
+
+				wipLayer.addChild(this.waitingLayer = new AnimatedImage2(clkwaitFrames, 30).setPosition(650, 120));
+				this.waitingLayer.visible = false;
+				//wipLayer.addChild(new Image2(clkwaitTexture));
+
+				setButtonState(Buttons.QLOAD, 1);
+				setButtonState(Buttons.QSAVE, 1);
+				setButtonState(Buttons.LOAD, 1);
+				setButtonState(Buttons.SAVE, 1);
+				setButtonState(Buttons.LOG, 1);
+				setButtonState(Buttons.AUTO, 1);
+				setButtonState(Buttons.SKIP, 1);
+				setButtonState(Buttons.STATUS, 1);
+				setButtonState(Buttons.SYSTEM, 1);
+
+				hideAsync(0).then(function(?e)
+				{
+					promise.resolve(null);
+				});
 			});
 		});
 		return promise;
 	}
 
-	public function hideAsync(time:Float = 0.5):Promise<Dynamic>
+	public function setTextAsync(text:String, timePerCharacter:Float = 0.05):Promise<Dynamic>
+	{
+		var totalTime = timePerCharacter * text.length;
+		this.waitingLayer.visible = false;
+		return Tween.forTime(totalTime).onStep(function(step:Float) {
+			textField2.text = text.substr(0, Math.round(text.length * step));
+		}).animateAsync().then(function(?e) {
+			this.waitingLayer.visible = true;
+		});
+	}
+
+	public function hideAsync(time:Float = 0.3):Promise<Dynamic>
 	{
 		if (wipLayer.alpha == 0) return PromiseUtils.createResolved();
+
+		this.waitingLayer.visible = false;
 
 		return Tween.forTime(time)
 			.interpolateTo(wipLayer.getLayer(0), { scaleY: 0 })
@@ -63,9 +99,11 @@ class GameInterfaceLayer extends Sprite2
 		;
 	}
 
-	public function showAsync(time:Float = 0.5):Promise<Dynamic>
+	public function showAsync(time:Float = 0.3):Promise<Dynamic>
 	{
 		if (wipLayer.alpha == 1) return PromiseUtils.createResolved();
+
+		this.waitingLayer.visible = false;
 
 		return Tween.forTime(time)
 			.interpolateTo(wipLayer.getLayer(0), { scaleY: 1 })
