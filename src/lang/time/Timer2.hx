@@ -1,7 +1,7 @@
 package lang.time;
+import lang.signal.Signal;
 import lang.promise.IPromise;
 import lang.promise.Deferred;
-import common.event.Event2;
 import haxe.PosInfos;
 import haxe.Timer;
 import flash.events.Event;
@@ -13,14 +13,14 @@ import flash.events.Event;
 
 class Timer2 
 {
-	public var onTick:Event2<Event>;
+	public var onTick:Signal<Event>;
 
 	private function new(seconds:Float) 
 	{
-		this.onTick = new Event2<Event>();
+		this.onTick = new Signal<Event>();
 
 		Timer.delay(function():Void {
-			onTick.trigger(new Event("tick"));
+			onTick.dispatch(new Event("tick"));
 		}, Std.int(seconds / 1000));
 	}
 	

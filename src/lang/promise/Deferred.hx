@@ -5,6 +5,7 @@ import lang.signal.Signal;
 class Deferred<T> implements IDeferred<T>
 {
 	public var promise(default, null):IPromise<T>;
+	public var onCancel(default, null):Signal<Dynamic>;
 
 	private var promiseImpl:PromiseImpl<T>;
 
@@ -12,6 +13,7 @@ class Deferred<T> implements IDeferred<T>
 	{
 		this.promiseImpl = new PromiseImpl<T>();
 		this.promise = this.promiseImpl;
+		this.onCancel = this.promiseImpl.onCancel;
 	}
 
 	public function resolve(?value:T):Void
@@ -23,11 +25,6 @@ class Deferred<T> implements IDeferred<T>
 	{
 		this.promiseImpl.reject(error);
 	}
-
-	public function onCancel(callback:Void -> Void):Void
-	{
-		this.promiseImpl.onCancel(callback);
-	}
 }
 
 private class PromiseImpl<T> implements IPromise<T>
@@ -36,16 +33,13 @@ private class PromiseImpl<T> implements IPromise<T>
 	private var rejectedError:Dynamic;
 	private var state:State;
 	private var listeners:Array<PromiseListener<T>>;
-
-	public function onCancel(callback:Void -> Void):Void
-	{
-		listeners.push({ cancelCallback: callback });
-	}
+	public var onCancel(default, null):Signal<Dynamic>;
 
 	public function new()
 	{
 		this.listeners = [];
 		this.state = State.CREATED;
+		this.onCancel = new Signal<Dynamic>();
 	}
 
 	private function checkNotCreated()
@@ -53,9 +47,14 @@ private class PromiseImpl<T> implements IPromise<T>
 		if (this.state != State.CREATED) throw('Promise already completed');
 	}
 
+	private function isCompleted():Bool
+	{
+		return this.state != State.CREATED;
+	}
+
 	public function resolve(?value:T):Void
 	{
-		if (this.state != State.CREATED) return;
+		if (isCompleted()) return;
 		this.resolvedValue = value;
 		this.state = State.RESOLVED;
 		this.callPending();
@@ -63,23 +62,30 @@ private class PromiseImpl<T> implements IPromise<T>
 
 	public function reject(rejectedError:Dynamic):Void
 	{
-		if (this.state != State.CREATED) return;
+		if (isCompleted()) return;
 		this.rejectedError = rejectedError;
 		this.state = State.REJECTED;
 		this.callPending();
 	}
 
-	public function then<A>(successCallback:T -> A, ?errorCallback:Dynamic -> Void, ?cancelCallback:Void -> Void):IPromise<A>
+	public function cancel():Void
+	{
+		if (isCompleted()) return;
+		this.onCancel.dispatch(null);
+		this.onCancel.dispose();
+	}
+
+	public function then<A>(successCallback:T -> A, ?errorCallback:Dynamic -> Void):IPromise<A>
 	{
 		var deferred = new Deferred<A>();
 
 		listeners.push({
-		successCallback: function(value:T) {
-			var result = successCallback(value);
-			deferred.resolve(result);
-		},
-		errorCallback: errorCallback,
-		cancelCallback: cancelCallback
+			successCallback: function(value:T) { deferred.resolve(successCallback(value)); },
+			errorCallback: errorCallback
+		});
+
+		deferred.onCancel.add(function(e) {
+			cancel();
 		});
 
 		callPending();
@@ -87,16 +93,11 @@ private class PromiseImpl<T> implements IPromise<T>
 		return deferred.promise;
 	}
 
-	public function cancel():Void
-	{
-		if (this.state != State.CREATED) return;
-		this.state = State.CANCELLED;
-		this.callPending();
-	}
-
 	private function callPending()
 	{
-		if (state == State.CREATED) return;
+		if (!isCompleted()) return;
+
+		this.onCancel.dispose();
 
 		while (listeners.length > 0)
 		{
@@ -106,10 +107,6 @@ private class PromiseImpl<T> implements IPromise<T>
 			{
 				case State.REJECTED: if (listener.errorCallback != null) listener.errorCallback(rejectedError);
 				case State.RESOLVED: if (listener.successCallback != null) listener.successCallback(resolvedValue);
-				case State.CANCELLED: {
-					if (listener.cancelCallback != null) listener.cancelCallback();
-					if (listener.successCallback != null) listener.successCallback(null);
-				}
 				default: throw('Invalid state');
 			}
 			if (listener.anyCallback != null) listener.anyCallback();
@@ -122,7 +119,6 @@ private typedef PromiseListener<T> =
 {
 	@:optional var successCallback:T -> Void;
 	@:optional var errorCallback:Dynamic -> Void;
-	@:optional var cancelCallback:Void -> Void;
 	@:optional var anyCallback:Void -> Void;
 }
 
@@ -131,5 +127,4 @@ private enum State
 	CREATED;
 	REJECTED;
 	RESOLVED;
-	CANCELLED;
 }

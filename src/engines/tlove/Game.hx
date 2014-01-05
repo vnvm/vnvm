@@ -1,9 +1,9 @@
 package engines.tlove;
 
+import lang.signal.Signal;
 import lang.promise.IPromise;
 import lang.promise.Deferred;
 import haxe.io.Path;
-import common.event.Event2;
 import common.imaging.GraphicUtils;
 import common.imaging.BitmapData8;
 import common.imaging.Palette;
@@ -54,11 +54,11 @@ class Game
 	public var state:GameState;
 	static inline public var fps:Int = 60;
 	
-	public var onMouseLeftClick:Event2<MouseEvent>;
-	public var onMouseRightClick:Event2<MouseEvent>;
-	public var onMouseMove:Event2<MouseEvent>;
-	public var onMouseDown:Event2<MouseEvent>;
-	public var onMouseUp:Event2<MouseEvent>;
+	public var onMouseLeftClick:Signal<MouseEvent>;
+	public var onMouseRightClick:Signal<MouseEvent>;
+	public var onMouseMove:Signal<MouseEvent>;
+	public var onMouseDown:Signal<MouseEvent>;
+	public var onMouseUp:Signal<MouseEvent>;
 	public var mousePosition:Point;
 	public var blackOverlay:Sprite;
 	public var uiSprite:Sprite;
@@ -84,11 +84,11 @@ class Game
 		this.updatedBitmap = new BitmapData(640, 400);
 		this.sprite = new Sprite();
 		
-		this.onMouseLeftClick = new Event2<MouseEvent>();
-		this.onMouseRightClick = new Event2<MouseEvent>();
-		this.onMouseMove = new Event2<MouseEvent>();
-		this.onMouseDown = new Event2<MouseEvent>();
-		this.onMouseUp = new Event2<MouseEvent>();
+		this.onMouseLeftClick = new Signal<MouseEvent>();
+		this.onMouseRightClick = new Signal<MouseEvent>();
+		this.onMouseMove = new Signal<MouseEvent>();
+		this.onMouseDown = new Signal<MouseEvent>();
+		this.onMouseUp = new Signal<MouseEvent>();
 		this.mousePosition = new Point( -1, -1);
 		
 		this.uiSprite = new Sprite();
@@ -110,23 +110,23 @@ class Game
 		
 		this.sprite.addEventListener(MouseEvent.CLICK, function(e:MouseEvent) {
 			updateMousePos(e);
-			this.onMouseLeftClick.trigger(e);
+			this.onMouseLeftClick.dispatch(e);
 		});
 		this.sprite.addEventListener("rightClick", function(e:MouseEvent) {
 			updateMousePos(e);
-			this.onMouseRightClick.trigger(e);
+			this.onMouseRightClick.dispatch(e);
 		});
 		this.sprite.addEventListener(MouseEvent.MOUSE_MOVE, function(e:MouseEvent) {
 			updateMousePos(e);
-			this.onMouseMove.trigger(e);
+			this.onMouseMove.dispatch(e);
 		});
 		this.sprite.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent) {
 			updateMousePos(e);
-			this.onMouseDown.trigger(e);
+			this.onMouseDown.dispatch(e);
 		});
 		this.sprite.addEventListener(MouseEvent.MOUSE_UP, function(e:MouseEvent) {
 			updateMousePos(e);
-			this.onMouseUp.trigger(e);
+			this.onMouseUp.dispatch(e);
 		});
 	}
 	

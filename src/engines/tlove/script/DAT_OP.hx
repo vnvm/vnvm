@@ -1,11 +1,11 @@
 package engines.tlove.script;
+import lang.signal.Signal;
 import lang.promise.Promise;
 import lang.promise.Deferred;
 import haxe.io.Path;
 import common.tween.Tween;
 import lang.time.Timer2;
 import common.ByteArrayUtils;
-import common.event.Event2;
 import common.imaging.BitmapData8;
 import common.imaging.BmpColor;
 import common.imaging.Palette;
@@ -76,8 +76,8 @@ class DAT_OP
 	function MOUSE_WAIT_CLICK_EVERYWHERE(leftClickLabel:Int, rightClickLabel:Int)
 	{
 		var deferred = new Deferred<Dynamic>();
-		
-		Event2.registerOnceAny([game.onMouseLeftClick, game.onMouseRightClick], function(e:MouseEvent) {
+
+		Signal.addAnyOnce([game.onMouseLeftClick, game.onMouseRightClick], function(e:MouseEvent) {
 			//e.type = MouseEvent.CLICK;
 			if (e.type == MouseEvent.CLICK) {
 				dat.jumpLabel(leftClickLabel);
@@ -101,7 +101,7 @@ class DAT_OP
 	{
 		var deferred = new Deferred<Dynamic>();
 
-		Event2.registerOnceAny([game.onMouseLeftClick, game.onMouseRightClick, game.onMouseMove], function(e:MouseEvent) {
+		Signal.addAnyOnce([game.onMouseLeftClick, game.onMouseRightClick, game.onMouseMove], function(e:MouseEvent) {
 			game.lastMouseEvent = e;
 			
 			deferred.resolve(null);

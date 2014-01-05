@@ -92,8 +92,9 @@ class Tween
 
 		stageGroup.addEventListener(Event.ENTER_FRAME, step);
 
-		deferred.onCancel(function()
+		deferred.onCancel.add(function(e)
 		{
+			Log.trace('cancelled!');
 			stepRatio(1);
 		});
 

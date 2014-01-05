@@ -1,8 +1,9 @@
 package engines.dividead.script;
+import lang.IDisposable;
+import lang.signal.Signal;
 import lang.promise.Promise;
 import lang.promise.Deferred;
 import common.display.OptionSelectedEvent;
-import common.event.Event2;
 import common.input.GameInput;
 import lang.time.Timer2;
 import engines.dividead.AB;
@@ -110,7 +111,7 @@ class AB_OP
 
 		var deferred = new Deferred<Dynamic>();
 
-		Event2.registerOnceAny([GameInput.onClick, GameInput.onKeyPress], function(e:Event)
+		Signal.addAnyOnce([GameInput.onClick, GameInput.onKeyPress], function(e)
 		{
 			game.textField.text = '';
 			if (game.voiceChannel != null)
@@ -154,7 +155,7 @@ class AB_OP
 		var deferred = new Deferred<Dynamic>();
 		var e:OptionSelectedEvent;
 		game.optionList.visible = true;
-		game.optionList.onSelected.registerOnce(function(e:OptionSelectedEvent)
+		game.optionList.onSelected.addOnce(function(e:OptionSelectedEvent)
 		{
 			game.optionList.visible = false;
 			ab.jump(e.selectedOption.data.pointer);
@@ -219,8 +220,7 @@ class AB_OP
 		}
 		else
 		{
-			Event2.registerOnceAny([Timer2.createAndStart(time / 1000).onTick], function(e:Event)
-			{
+			Signal.addAnyOnce([Timer2.createAndStart(time / 1000).onTick], function(e:Event) {
 				deferred.resolve(null);
 			});
 		}

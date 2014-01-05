@@ -1,5 +1,5 @@
 package common.display;
-import common.event.Event2;
+import lang.signal.Signal;
 import common.input.GameInput;
 import common.StageReference;
 import haxe.Log;
@@ -29,7 +29,7 @@ class OptionList
 	private function get_visible():Bool { return sprite.visible; }
 	private function set_visible(value:Bool):Bool { return sprite.visible = value; }
 	
-	public var onSelected:Event2<OptionSelectedEvent>;
+	public var onSelected:Signal<OptionSelectedEvent>;
 	
 
 	public function new(width:Int, height:Int, rows:Int, columns:Int, fillRowsThenColumns:Bool) 
@@ -39,7 +39,7 @@ class OptionList
 		this.rows = rows;
 		this.columns = columns;
 		this.fillRowsThenColumns = fillRowsThenColumns;
-		this.onSelected = new Event2<OptionSelectedEvent>();
+		this.onSelected = new Signal<OptionSelectedEvent>();
 		this.sprite = new Sprite();
 		StageReference.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseUpdate);
 		StageReference.stage.addEventListener(MouseEvent.MOUSE_OUT, onMouseUpdate);
@@ -60,7 +60,7 @@ class OptionList
 		var pos:Point = sprite.globalToLocal(new Point(e.stageX, e.stageY));
 		var index:Int = getIndexForPoint(pos);
 		if (index >= 0) {
-			onSelected.trigger(new OptionSelectedEvent(options[index]));
+			onSelected.dispatch(new OptionSelectedEvent(options[index]));
 		}
 	}
 	

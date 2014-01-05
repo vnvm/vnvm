@@ -7,6 +7,6 @@ interface IDeferred<T>
 {
 	function resolve(?value:T):Void;
 	function reject(error:Dynamic):Void;
-	function onCancel(callback:Void -> Void):Void;
+	var onCancel(default, null):Signal<Dynamic>;
 	var promise(default, null):IPromise<T>;
 }

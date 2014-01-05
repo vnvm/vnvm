@@ -8,12 +8,12 @@ PRINCESS WALTZ:
 	sub_406F00
 */
 
+import lang.signal.Signal;
 import lang.promise.Deferred;
 import common.input.Keys;
 import flash.events.MouseEvent;
 import flash.geom.Point;
 import flash.events.Event;
-import common.event.Event2;
 import common.input.GameInput;
 import common.geom.Anchor;
 import haxe.Log;
@@ -34,7 +34,7 @@ class RIO_OP
 		this.scene = scene;
 		this.state = state;
 		this.script = script;
-		GameInput.onClick.register(function(e) {
+		GameInput.onClick.add(function(e) {
 			clicked = true;
 		});
 	}
@@ -258,7 +258,7 @@ class RIO_OP
 		}
 		else
 		{
-			Event2.registerOnceAny([GameInput.onClick, GameInput.onMouseMoveEvent], function(e:MouseEvent) {
+			Signal.addAnyOnce([GameInput.onClick, GameInput.onMouseMoveEvent], function(e:MouseEvent) {
 				if (e.type == MouseEvent.CLICK || e.type == MouseEvent.MOUSE_DOWN) {
 					onClick();
 				} else {
@@ -1095,7 +1095,7 @@ class RIO_OP
 		var deferred = new Deferred<Dynamic>();
 		scene.setTextAsync(text, isSkipping() ? 0 : 0.05).then(function(?e)
 		{
-			Event2.registerOnceAny([GameInput.onClick, GameInput.onKeyPress], function(e:Event) {
+			Signal.addAnyOnce([GameInput.onClick, GameInput.onKeyPress], function(e:Event) {
 				scene.setTextAsync('', 0).then(function(?e)
 				{
 					deferred.resolve(null);

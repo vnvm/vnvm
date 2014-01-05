@@ -38,7 +38,7 @@ class Promise
 				deferred.resolve(null);
 			} else {
 				var promiseGenerator = list.shift();
-				promiseGenerator().then(function(e) { step(); }, function(e) { step(); }, step);
+				promiseGenerator().then(function(e) { step(); }, function(e) { step(); });
 			}
 		}
 		step();
@@ -57,7 +57,7 @@ class Promise
 			}
 		}
 
-		for (promise in promises) promise.then(function(e) { step(); }, function(e) { step(); }, step);
+		for (promise in promises) promise.then(function(e) { step(); }, function(e) { step(); });
 		return deferred.promise;
 	}
 }

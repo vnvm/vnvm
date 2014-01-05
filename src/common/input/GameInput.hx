@@ -1,11 +1,11 @@
 package common.input;
 
+import lang.signal.Signal;
 import haxe.Log;
 import flash.events.Event;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.geom.Point;
-import common.event.Event2;
 
 /**
  * ...
@@ -20,9 +20,9 @@ class GameInput
 	{
 	}
 	
-	static public var onClick:Event2<MouseEvent>;
-	static public var onMouseMoveEvent:Event2<MouseEvent>;
-	static public var onKeyPress:Event2<KeyboardEvent>;
+	static public var onClick:Signal<MouseEvent>;
+	static public var onMouseMoveEvent:Signal<MouseEvent>;
+	static public var onKeyPress:Signal<KeyboardEvent>;
 	
 	static public function init() {
 		pressing = new Map<Int,Void>();
@@ -33,7 +33,7 @@ class GameInput
 		StageReference.stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
 		StageReference.stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
 		StageReference.stage.addEventListener(MouseEvent.CLICK, function(e:MouseEvent) {
-			onClick.trigger(e);
+			onClick.dispatch(e);
 		});
 		StageReference.stage.addEventListener(MouseEvent.MOUSE_DOWN, function(e:MouseEvent) {
 			//onClick.trigger(e);
@@ -42,14 +42,14 @@ class GameInput
 		mouseCurrent = new Point(-1, -1);
 		mouseCurrentClick = new Point( -1, -1);
 		mouseStart = new Point(-1, -1);
-		onClick = new Event2<MouseEvent>();
-		onMouseMoveEvent = new Event2<MouseEvent>();
-		onKeyPress = new Event2<KeyboardEvent>();
+		onClick = new Signal<MouseEvent>();
+		onMouseMoveEvent = new Signal<MouseEvent>();
+		onKeyPress = new Signal<KeyboardEvent>();
 	}
 	
 	static public function onEnterFrame(e:Event):Void {
 		for (key in pressing.keys()) {
-			onKeyPress.trigger(new KeyboardEvent("onPress", true, false, 0, key));
+			onKeyPress.dispatch(new KeyboardEvent("onPress", true, false, 0, key));
 		}
 	}
 	
@@ -110,6 +110,6 @@ class GameInput
 			setKey(Keys.Down, (offset.y > deltaThresold));
 		}
 
-		onMouseMoveEvent.trigger(e);
+		onMouseMoveEvent.dispatch(e);
 	}
 }

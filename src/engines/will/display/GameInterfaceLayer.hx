@@ -1,5 +1,9 @@
 package engines.will.display;
 
+import lang.time.Timer2;
+import lang.DisposableGroup;
+import lang.IDisposable;
+import lang.signal.Signal;
 import common.input.GameInput;
 import lang.promise.Promise;
 import lang.promise.IPromise;
@@ -79,9 +83,23 @@ class GameInterfaceLayer extends Sprite2
 	{
 		var totalTime = timePerCharacter * text.length;
 		this.waitingLayer.visible = false;
+
+		var disposable = DisposableGroup.create();
+
 		var promise = Tween.forTime(totalTime).onStep(function(step:Float) {
 			textField2.text = text.substr(0, Math.round(text.length * step));
-		}).animateAsync();
+		}).animateAsync().then(function(e) {
+			waitingLayer.visible = true;
+			Log.trace('Completed text! $text');
+			disposable.dispose();
+		});
+
+		disposable.add(Signal.addAnyOnce([GameInput.onClick], function(e) {
+			//Timer2.waitAsync(0.1).then(function(e) {
+				promise.cancel();
+			//});
+
+		}));
 
 		//GameInput.onClick.register
 
