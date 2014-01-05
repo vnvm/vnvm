@@ -1,27 +1,33 @@
 package lang.signal;
 
-class Signal<T>
+class Signal<T> implements IDisposable
 {
-	private var handlers:Array<T -> Void>;
+	private var slots:Array<Slot<T>>;
 
 	public function new()
 	{
-		handlers = new Array<T -> Void>();
 	}
 
-	public function add(handler:T -> Void):Signal<T>
+	public function add(handler:T -> Void):IDisposable
 	{
-		handlers.push(handler);
-		return this;
+		if (slots == null) slots = [];
+		var slot = new Slot(this, handler);
+		slots.push(slot);
+		return slot;
+	}
+
+	public function __removeSlot(slot: Slot<T>)
+	{
+		slots.remove(slot);
 	}
 
 	public function dispatch(value:T)
 	{
-		for (handler in handlers) handler(value);
+		if (slots != null) for (slot in slots) slot.callback(value);
 	}
 
 	public function dispose()
 	{
-		handlers = null;
+		slots = null;
 	}
 }

@@ -69,12 +69,8 @@ class Tween
 		var start = Timer.stamp();
 		var stageGroup = new EventListenerGroup(StageReference.stage);
 
-		function step(?e)
+		function stepRatio(ratio:Float)
 		{
-			var current = Timer.stamp();
-			var elapsed = current - start;
-			var ratio = (totalTime > 0) ? MathEx.clamp(elapsed / totalTime, 0, 1) : 1;
-
 			//Log.trace('********************* animateAsync: $start, $current, $elapsed, $totalTime, $ratio');
 
 			stepSignal.dispatch(easing(ratio));
@@ -86,7 +82,20 @@ class Tween
 			}
 		}
 
+		function step(?e)
+		{
+			var current = Timer.stamp();
+			var elapsed = current - start;
+			var ratio = (totalTime > 0) ? MathEx.clamp(elapsed / totalTime, 0, 1) : 1;
+			stepRatio(ratio);
+		}
+
 		stageGroup.addEventListener(Event.ENTER_FRAME, step);
+
+		deferred.onCancel(function()
+		{
+			stepRatio(1);
+		});
 
 		step();
 

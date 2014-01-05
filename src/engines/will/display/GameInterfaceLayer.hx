@@ -1,5 +1,6 @@
 package engines.will.display;
 
+import common.input.GameInput;
 import lang.promise.Promise;
 import lang.promise.IPromise;
 import reflash.display.DisplayObject2;
@@ -78,9 +79,15 @@ class GameInterfaceLayer extends Sprite2
 	{
 		var totalTime = timePerCharacter * text.length;
 		this.waitingLayer.visible = false;
-		return Tween.forTime(totalTime).onStep(function(step:Float) {
+		var promise = Tween.forTime(totalTime).onStep(function(step:Float) {
 			textField2.text = text.substr(0, Math.round(text.length * step));
 		}).animateAsync();
+
+		//GameInput.onClick.register
+
+		//promise.cancel();
+
+		return promise;
 	}
 
 	public function hideAsync(time:Float = 0.3):IPromise<Dynamic>

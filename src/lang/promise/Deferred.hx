@@ -4,11 +4,38 @@ import lang.signal.Signal;
 
 class Deferred<T> implements IDeferred<T>
 {
+	public var promise(default, null):IPromise<T>;
+
+	private var promiseImpl:PromiseImpl<T>;
+
+	public function new()
+	{
+		this.promiseImpl = new PromiseImpl<T>();
+		this.promise = this.promiseImpl;
+	}
+
+	public function resolve(?value:T):Void
+	{
+		this.promiseImpl.resolve(value);
+	}
+
+	public function reject(error:Dynamic):Void
+	{
+		this.promiseImpl.reject(error);
+	}
+
+	public function onCancel(callback:Void -> Void):Void
+	{
+		this.promiseImpl.onCancel(callback);
+	}
+}
+
+private class PromiseImpl<T> implements IPromise<T>
+{
 	private var resolvedValue:T;
 	private var rejectedError:Dynamic;
 	private var state:State;
 	private var listeners:Array<PromiseListener<T>>;
-	public var promise(default, null):IPromise<T>;
 
 	public function onCancel(callback:Void -> Void):Void
 	{
@@ -17,7 +44,6 @@ class Deferred<T> implements IDeferred<T>
 
 	public function new()
 	{
-		this.promise = new PromiseImpl<T>(this);
 		this.listeners = [];
 		this.state = State.CREATED;
 	}
@@ -29,7 +55,7 @@ class Deferred<T> implements IDeferred<T>
 
 	public function resolve(?value:T):Void
 	{
-		checkNotCreated();
+		if (this.state != State.CREATED) return;
 		this.resolvedValue = value;
 		this.state = State.RESOLVED;
 		this.callPending();
@@ -37,7 +63,7 @@ class Deferred<T> implements IDeferred<T>
 
 	public function reject(rejectedError:Dynamic):Void
 	{
-		checkNotCreated();
+		if (this.state != State.CREATED) return;
 		this.rejectedError = rejectedError;
 		this.state = State.REJECTED;
 		this.callPending();
@@ -48,12 +74,12 @@ class Deferred<T> implements IDeferred<T>
 		var deferred = new Deferred<A>();
 
 		listeners.push({
-			successCallback: function(value:T) {
-				var result = successCallback(value);
-				deferred.resolve(result);
-			},
-			errorCallback: errorCallback,
-			cancelCallback: cancelCallback
+		successCallback: function(value:T) {
+			var result = successCallback(value);
+			deferred.resolve(result);
+		},
+		errorCallback: errorCallback,
+		cancelCallback: cancelCallback
 		});
 
 		callPending();
@@ -63,7 +89,7 @@ class Deferred<T> implements IDeferred<T>
 
 	public function cancel():Void
 	{
-		checkNotCreated();
+		if (this.state != State.CREATED) return;
 		this.state = State.CANCELLED;
 		this.callPending();
 	}
@@ -79,10 +105,11 @@ class Deferred<T> implements IDeferred<T>
 			switch (this.state)
 			{
 				case State.REJECTED: if (listener.errorCallback != null) listener.errorCallback(rejectedError);
-				case State.RESOLVED: if (listener.successCallback != null) {
-					listener.successCallback(resolvedValue);
+				case State.RESOLVED: if (listener.successCallback != null) listener.successCallback(resolvedValue);
+				case State.CANCELLED: {
+					if (listener.cancelCallback != null) listener.cancelCallback();
+					if (listener.successCallback != null) listener.successCallback(null);
 				}
-				case State.CANCELLED: if (listener.cancelCallback != null) listener.cancelCallback();
 				default: throw('Invalid state');
 			}
 			if (listener.anyCallback != null) listener.anyCallback();
@@ -90,27 +117,8 @@ class Deferred<T> implements IDeferred<T>
 	}
 }
 
-class PromiseImpl<T> implements IPromise<T>
-{
-	private var deferred:Deferred<T>;
 
-	public function new(deferred:Deferred<T>)
-	{
-		this.deferred = deferred;
-	}
-
-	public function then<A>(successCallback:T -> A, ?errorCallback:Dynamic -> Void, ?cancelCallback:Void -> Void):IPromise<A>
-	{
-		return this.deferred.then(successCallback, errorCallback, cancelCallback);
-	}
-
-	public function cancel():Void
-	{
-		this.deferred.cancel();
-	}
-}
-
-typedef PromiseListener<T> =
+private typedef PromiseListener<T> =
 {
 	@:optional var successCallback:T -> Void;
 	@:optional var errorCallback:Dynamic -> Void;
@@ -118,7 +126,7 @@ typedef PromiseListener<T> =
 	@:optional var anyCallback:Void -> Void;
 }
 
-enum State
+private enum State
 {
 	CREATED;
 	REJECTED;
