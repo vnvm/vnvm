@@ -71,8 +71,6 @@ class Tween
 
 		function stepRatio(ratio:Float)
 		{
-			//Log.trace('********************* animateAsync: $start, $current, $elapsed, $totalTime, $ratio');
-
 			stepSignal.dispatch(easing(ratio));
 
 			if (ratio >= 1)
@@ -94,7 +92,6 @@ class Tween
 
 		deferred.onCancel.add(function(e)
 		{
-			Log.trace('cancelled!');
 			stepRatio(1);
 		});
 

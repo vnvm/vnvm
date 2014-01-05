@@ -95,15 +95,8 @@ class GameInterfaceLayer extends Sprite2
 		});
 
 		disposable.add(Signal.addAnyOnce([GameInput.onClick], function(e) {
-			//Timer2.waitAsync(0.1).then(function(e) {
-				promise.cancel();
-			//});
-
+			promise.cancel();
 		}));
-
-		//GameInput.onClick.register
-
-		//promise.cancel();
 
 		return promise;
 	}

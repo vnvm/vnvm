@@ -1,5 +1,9 @@
 package ;
 
+import flash.text.TextFormat;
+import flash.text.TextField;
+import flash.text.TextFieldAutoSize;
+import openfl.Assets;
 import reflash.display.Stage2;
 import common.encoding.Encoding;
 import flash.display.StageAlign;
@@ -62,6 +66,17 @@ class Main extends Sprite
 		GameInput.init();
 
 		Stage2.createAndInitializeStage2(stage);
+
+		/*
+		var textField = new TextField();
+		textField.defaultTextFormat = new TextFormat("fonts/Anonymous.ttf", 32, 0xFF0000);
+		textField.autoSize = TextFieldAutoSize.LEFT;
+		textField.text = 'hello';
+		addChild(textField);
+
+		Log.trace(Assets.getFont("fonts/Anonymous.ttf"));
+		return;
+		*/
 
 		//Sandbox.test();
 		//return;

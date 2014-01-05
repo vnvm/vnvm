@@ -35,8 +35,9 @@ class TextField2 extends DisplayObject2
 			textField.autoSize = TextFieldAutoSize.LEFT;
 			textField.multiline = true;
 			var format = new TextFormat();
-			format.font = "Lucida Console";
-			format.size = 19;
+			//format.font = "Lucida Console";
+			format.font = "fonts/Anonymous.ttf";
+			format.size = 18;
 			format.color = 0xFFFFFFFF;
 			format.leading = 14;
 			textField.defaultTextFormat = format;

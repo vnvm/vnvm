@@ -1,5 +1,7 @@
 package engines.will.display;
 
+import reflash.display.Color2;
+import reflash.display.Quad2;
 import lang.promise.IPromise;
 import flash.display.BitmapData;
 import reflash.display.DisplayObject2;
@@ -40,6 +42,14 @@ class GameElementsLayer extends Sprite2 implements IGameElementsLayer
 		}
 	}
 
+	public function putColor(index:Int, x:Int, y:Int, width:Int, height:Int, color:Color2, anchor:Anchor):Void
+	{
+		removeObject(index);
+		var sprite = new Quad2(width, height, color).setAnchor(anchor.sx, anchor.sy).setPosition(x, y).setZIndex(index);
+		this.layerChilds.set(index, sprite);
+		addChild(sprite);
+	}
+
 	public function putObjectAsync(index:Int, x:Int, y:Int, name:String, anchor:Anchor):IPromise<Dynamic>
 	{
 		removeObject(index);
@@ -47,7 +57,7 @@ class GameElementsLayer extends Sprite2 implements IGameElementsLayer
 		return willResourceManager.getWipWithMaskAsync(name).then(function(wip:WIP)
 		{
 			var bitmapData = wip.get(0).bitmapData;
-			var sprite = new Image2(WGLTexture.fromBitmapData(bitmapData)).setAnchor(anchor.sx, anchor.sy).setPosition(x, y);
+			var sprite = new Image2(WGLTexture.fromBitmapData(bitmapData)).setAnchor(anchor.sx, anchor.sy).setPosition(x, y).setZIndex(index);
 			this.layerChilds.set(index, sprite);
 			addChild(sprite);
 		});

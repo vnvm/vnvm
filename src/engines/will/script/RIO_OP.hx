@@ -8,6 +8,7 @@ PRINCESS WALTZ:
 	sub_406F00
 */
 
+import reflash.display.HtmlColors;
 import lang.signal.Signal;
 import lang.promise.Deferred;
 import common.input.Keys;
@@ -308,9 +309,10 @@ class RIO_OP
 	}
 
 	@Opcode({ id:0x52, format:"2", description:"" })
-	public function SOUND_WAIT(idx)
+	@Unimplemented
+	public function SOUND_WAIT(channel:Int)
 	{
-		throw(new NotImplementedException());
+		//throw(new NotImplementedException());
 		/*
 		while (Audio.channelProgress(idx) < 0.25) {
 			//printf("%f\n", Audio.channelProgress(idx));
@@ -972,47 +974,16 @@ class RIO_OP
 	public function BACKGROUND(x:Int, y:Int, unk1:Int, unk2:Int, index:Int, name:String)
 	{
 		return scene.getLayerWithName('background').putObjectAsync(0, x, y, name, Anchor.centerCenter);
-		//Log.trace('TODO:BACKGROUND: $x, $y, $index, $name');
-		//throw(new NotImplementedException());
-
-		/*
-		local background = this.scene.background;
-		if (background.name != name) {
-			// Background changed.
-			this.interface.enabled = false;
-		}
-
-		background.x = -x;
-		background.y = -y;
-		background.index = index;
-		background.alpha = 1.0;
-		background.name = name;
-		background.color = null;
-		background.enabled = true;
-		this.scene.table.enabled = false;
-		this.TODO();
-		*/
 	}
 
 	@Opcode({ id:0x47, format:"11", description:"" })
-	public function BACKGROUND_COLOR(color:Int, param:Int)
+	public function BACKGROUND_COLOR(colorIndex:Int, param:Int)
 	{
-		throw(new NotImplementedException());
-
-		/*
-		switch (color) {
-			case 0:
-				//this.state.background_color = [0, 0, 0, 1];
-				//this.state.background = "";
-				local background = this.scene.background;
-				background.color = [0, 0, 0, 1];
-				background.enabled = true;
-				this.scene.table.enabled = false;
-				this.TODO();
-			default:
-				this.TODO();
-		}
-		*/
+		var color = switch(colorIndex) {
+			case 0: HtmlColors.black;
+			default: throw('Unknown colorIndex: $colorIndex');
+		};
+		scene.getLayerWithName('background').putColor(0, 400, 300, 800, 600, color, Anchor.centerCenter);
 	}
 
 	@Opcode({ id:0x68, format:"2221", description:"Sets background size and position x and y coords are the center points of the viewport." })

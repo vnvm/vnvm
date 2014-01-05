@@ -50,6 +50,8 @@
 	<assets path="assets/img" rename="img" />
 	-->
 	
+	<assets path="assets" rename="fonts" include="*.ttf" />
+	
 	<!-- DLLs -->
     <!--
 	<ndll name="std" />
