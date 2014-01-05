@@ -1,6 +1,8 @@
 package engines.brave;
 
-import promhx.Promise;
+import lang.promise.Deferred;
+import lang.promise.Promise;
+import lang.promise.IPromise;
 import vfs.Stream;
 import vfs.VirtualFileSystem;
 import engines.brave.cgdb.CgDb;
@@ -41,9 +43,9 @@ class BraveAssets
 
 	}
 
-	static public function getCgDbEntryAsync(name:String):Promise<CgDbEntry>
+	static public function getCgDbEntryAsync(name:String):IPromise<CgDbEntry>
 	{
-		if (cgDb != null) return Promise.promise(cgDb.get(name));
+		if (cgDb != null) return Promise.createResolved(cgDb.get(name));
 
 		return BraveAssets.getBytesAsync("cgdb.dat").then(function(data:ByteArray)
 		{
@@ -52,7 +54,7 @@ class BraveAssets
 		});
 	}
 
-	static public function getBitmapAsync(name:String):Promise<Bitmap>
+	static public function getBitmapAsync(name:String):IPromise<Bitmap>
 	{
 		return BraveAssets.getBitmapDataAsync(name).then(function(bitmapData:BitmapData)
 		{
@@ -60,7 +62,7 @@ class BraveAssets
 		});
 	}
 
-	@:noStack static public function getBitmapDataWithAlphaCombinedAsync(name:String):Promise<BitmapData>
+	@:noStack static public function getBitmapDataWithAlphaCombinedAsync(name:String):IPromise<BitmapData>
 	{
 		return BraveAssets.getBitmapDataAsync(name).then(function(mixed:BitmapData)
 		{
@@ -93,7 +95,7 @@ class BraveAssets
 	}
 	*/
 
-	static public function getBitmapDataAsync(name:String):Promise<BitmapData>
+	static public function getBitmapDataAsync(name:String):IPromise<BitmapData>
 	{
 		name = name.toUpperCase();
 
@@ -105,11 +107,11 @@ class BraveAssets
 		});
 	}
 
-	static public function getSoundAsync(name:String):Promise<Sound>
+	static public function getSoundAsync(name:String):IPromise<Sound>
 	{
 		if (soundPack != null) return soundPack.getSoundAsync(name);
 
-		var promise = new Promise<Sound>();
+		var deferred = new Deferred<Sound>();
 		getStreamAsync("sound.pck").then(function(stream:Stream):Void
 		{
 			SoundPack.newAsync(1, stream).then(function(_soundPack:SoundPack)
@@ -117,18 +119,18 @@ class BraveAssets
 				BraveAssets.soundPack = _soundPack;
 				BraveAssets.soundPack.getSoundAsync(name).then(function(sound:Sound)
 				{
-					promise.resolve(sound);
+					deferred.resolve(sound);
 				});
 			});
 		});
-		return promise;
+		return deferred.promise;
 	}
 
-	static public function getVoiceAsync(name:String):Promise<Sound>
+	static public function getVoiceAsync(name:String):IPromise<Sound>
 	{
 		if (voicePack != null) return voicePack.getSoundAsync(name);
 
-		var promise = new Promise<Sound>();
+		var deferred = new Deferred<Sound>();
 
 		getStreamAsync("voice/voice.pck").then(function(stream:Stream):Void
 		{
@@ -137,15 +139,15 @@ class BraveAssets
 				BraveAssets.voicePack = _voicePack;
 				BraveAssets.voicePack.getSoundAsync(name).then(function(sound:Sound):Void
 				{
-					promise.resolve(sound);
+					deferred.resolve(sound);
 				});
 			});
 		});
 
-		return promise;
+		return deferred.promise;
 	}
 
-	static public function getMusicAsync(name:String):Promise<Sound>
+	static public function getMusicAsync(name:String):IPromise<Sound>
 	{
 		return BraveAssets.getBytesAsync("midi/" + name + ".mid").then(function(bytes:ByteArray)
 		{
@@ -163,12 +165,12 @@ class BraveAssets
 		});
 	}
 
-	static public function getBytesAsync(name:String):Promise<ByteArray>
+	static public function getBytesAsync(name:String):IPromise<ByteArray>
 	{
 		return fs.openAndReadAllAsync(name);
 	}
 
-	static private function getStreamAsync(name:String):Promise<Stream>
+	static private function getStreamAsync(name:String):IPromise<Stream>
 	{
 		return fs.openAsync(name);
 	}

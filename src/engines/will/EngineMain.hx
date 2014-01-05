@@ -1,6 +1,8 @@
 package engines.will;
 
-import common.PromiseUtils;
+import lang.promise.Deferred;
+import lang.promise.Promise;
+import lang.promise.IPromise;
 import engines.will.display.GameInterfaceLayer;
 import engines.will.display.IGameElementsLayer;
 import engines.will.display.WIPLayer;
@@ -38,7 +40,6 @@ import flash.media.SoundTransform;
 import flash.media.Sound;
 import flash.display.PixelSnapping;
 import engines.will.formats.wip.WIP;
-import promhx.Promise;
 import haxe.Log;
 import common.display.GameScalerSprite;
 import common.imaging.BitmapDataUtils;
@@ -149,7 +150,7 @@ class EngineMain extends Sprite2 implements IScene
 		});
 	}
 
-	public function setTransitionMaskAsync(name:String):Promise<Dynamic>
+	public function setTransitionMaskAsync(name:String):IPromise<Dynamic>
 	{
 		return getBtyeArrayAsync('$name.MSK').then(function(data:ByteArray)
 		{
@@ -159,9 +160,9 @@ class EngineMain extends Sprite2 implements IScene
 		});
 	}
 
-	public function performTransitionAsync(kind:Int, time:Int):Promise<Dynamic>
+	public function performTransitionAsync(kind:Int, time:Int):IPromise<Dynamic>
 	{
-		var promise = PromiseUtils.create();
+		var deferred = Promise.createDeferred();
 
 		interfaceLayer.hideAsync().then(function(?e)
 		{
@@ -197,11 +198,11 @@ class EngineMain extends Sprite2 implements IScene
 				}
 			}).animateAsync().then(function(?e)
 			{
-				promise.resolve(null);
+				deferred.resolve(null);
 			});
 		});
 
-		return promise;
+		return deferred.promise;
 	}
 
 	public function getLayerWithName(name:String):IGameElementsLayer
@@ -209,7 +210,7 @@ class EngineMain extends Sprite2 implements IScene
 		return gameLayerList.getLayerWithName(name);
 	}
 
-	public function getBtyeArrayAsync(name:String):Promise<ByteArray>
+	public function getBtyeArrayAsync(name:String):IPromise<ByteArray>
 	{
 		return willResourceManager.readAllBytesAsync(name);
 	}
@@ -224,23 +225,23 @@ class EngineMain extends Sprite2 implements IScene
 		}
 	}
 
-	public function setTextAsync(text:String, timePerCharacter:Float):Promise<Dynamic>
+	public function setTextAsync(text:String, timePerCharacter:Float):IPromise<Dynamic>
 	{
 		text = StringTools.replace(text, '\\n', '\n');
 
-		var promise = PromiseUtils.create();
+		var deferred = Promise.createDeferred();
 		interfaceLayer.showAsync().then(function(?e)
 		{
 			interfaceLayer.setTextAsync(text, timePerCharacter).then(function(?e)
 			{
-				promise.resolve(null);
+				deferred.resolve(null);
 			});
 
 		});
-		return promise;
+		return deferred.promise;
 	}
 
-	public function soundPlayStopAsync(channelName:String, name:String, fadeInOutMs:Int):Promise<Dynamic>
+	public function soundPlayStopAsync(channelName:String, name:String, fadeInOutMs:Int):IPromise<Dynamic>
 	{
 		//return Promise.promise(null);
 
@@ -254,7 +255,7 @@ class EngineMain extends Sprite2 implements IScene
 
 		if (name == null || name.length == 0)
 		{
-			return Promise.promise(null);
+			return Promise.createResolved(null);
 		}
 		else
 		{
@@ -272,9 +273,9 @@ class EngineMain extends Sprite2 implements IScene
 		}
 	}
 
-	public function animLoadAsync(name:String):Promise<Dynamic>
+	public function animLoadAsync(name:String):IPromise<Dynamic>
 	{
-		var promise = new Promise<Dynamic>();
+		var deferred = new Deferred<Dynamic>();
 		getBtyeArrayAsync(Path.withExtension(name, 'anm')).then(function(data:ByteArray)
 		{
 			var anm = ANM.fromByteArray(data);
@@ -282,25 +283,25 @@ class EngineMain extends Sprite2 implements IScene
 			{
 				gameLayerList.getMenuLayer().setAnmAndWip(anm, wip);
 
-				promise.resolve(null);
+				deferred.resolve(null);
 			});
 		});
-		return promise;
+		return deferred.promise;
 	}
 
-	public function tableLoadAsync(name:String):Promise<Dynamic>
+	public function tableLoadAsync(name:String):IPromise<Dynamic>
 	{
-		var promise = new Promise<Dynamic>();
+		var deferred = new Deferred<Dynamic>();
 		getBtyeArrayAsync(Path.withExtension(name, 'TBL')).then(function(data:ByteArray)
 		{
 			var tbl = TBL.fromByteArray(data);
 			willResourceManager.getWipAsync(tbl.mskName + '.MSK').then(function(msk:WIP):Void
 			{
 				gameLayerList.getMenuLayer().setTableMask(tbl, msk.get(0).bitmapData);
-				promise.resolve(null);
+				deferred.resolve(null);
 			});
 		});
-		return promise;
+		return deferred.promise;
 	}
 
 	public function setDirectMode(directMode:Bool):Void
@@ -311,7 +312,7 @@ class EngineMain extends Sprite2 implements IScene
 		if (!directMode) gameLayerList.getMenuLayer().setAnmAndWip(null, null);
 	}
 
-	public function setAnimObjectVisibility(index:Int, visible:Bool):Promise<Dynamic>
+	public function setAnimObjectVisibility(index:Int, visible:Bool):IPromise<Dynamic>
 	{
 		var menuWipLayer = gameLayerList.getMenuLayer().getWipLayer();
 		if (menuWipLayer != null)
@@ -319,7 +320,7 @@ class EngineMain extends Sprite2 implements IScene
 			var index1 = index + 1;
 			menuWipLayer.setLayerVisibility(index1, visible);
 		}
-		return Promise.promise(null);
+		return Promise.createResolved();
 	}
 
 	public function isEnabledKind(kind:Int):Bool

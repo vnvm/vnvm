@@ -1,5 +1,6 @@
 package engines.will.formats.wip;
 
+import lang.promise.IPromise;
 import sys.io.File;
 import lang.MathEx;
 import flash.display.BitmapDataChannel;
@@ -12,7 +13,6 @@ import haxe.Log;
 import common.ByteArrayUtils;
 import flash.utils.ByteArray;
 import vfs.Stream;
-import promhx.Promise;
 
 class WIP
 {
@@ -122,7 +122,7 @@ class WIP
 		return colorWip;
 	}
 
-	static public function fromStreamAsync(stream:Stream):Promise<WIP>
+	static public function fromStreamAsync(stream:Stream):IPromise<WIP>
 	{
 		return stream.readAllBytesAsync().then(function(data:ByteArray)
 		{

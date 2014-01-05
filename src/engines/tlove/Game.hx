@@ -1,7 +1,8 @@
 package engines.tlove;
 
+import lang.promise.IPromise;
+import lang.promise.Deferred;
 import haxe.io.Path;
-import promhx.Promise;
 import common.event.Event2;
 import common.imaging.GraphicUtils;
 import common.imaging.BitmapData8;
@@ -231,15 +232,15 @@ class Game
 		});
 	}
 	
-	static private function openAndCreatePakAsync(fs:VirtualFileSystem, name:String):Promise<PAK>
+	static private function openAndCreatePakAsync(fs:VirtualFileSystem, name:String):IPromise<PAK>
 	{
 		var stream:Stream;
-		var promise = new Promise<PAK>();
+		var deferred = new Deferred<PAK>();
 		fs.openAsync(name).then(function(stream:Stream) {
 			PAK.newPakAsync(stream).then(function(pak:PAK) {
-				promise.resolve(pak);
+				deferred.resolve(pak);
 			});
 		});
-		return promise;
+		return deferred.promise;
 	}
 }

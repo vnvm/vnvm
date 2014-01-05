@@ -1,11 +1,13 @@
 package engines.will.formats.arc;
 
+import lang.promise.Promise;
+import lang.promise.Deferred;
+import lang.promise.IPromise;
 import haxe.Log;
 import vfs.SliceStream;
 import vfs.VirtualFileSystem;
 import common.ByteArrayUtils;
 import flash.utils.ByteArray;
-import promhx.Promise;
 import vfs.Stream;
 
 class ARC extends VirtualFileSystem
@@ -24,12 +26,12 @@ class ARC extends VirtualFileSystem
 		return name.toUpperCase();
 	}
 
-	override public function openAsync(name:String):Promise<Stream>
+	override public function openAsync(name:String):IPromise<Stream>
 	{
 		name = normalizeName(name);
 		//for (name in files.keys()) Log.trace(name);
 		if (!files.exists(name)) throw('Can\'t find file "$name"');
-		return Promise.promise(cast SliceStream.fromAll(files[name]));
+		return Promise.createResolved(cast SliceStream.fromAll(files[name]));
 	}
 
 	public function getFileNames():Iterator<String>
@@ -43,14 +45,14 @@ class ARC extends VirtualFileSystem
 		return files.exists(name.toUpperCase());
 	}
 
-	override public function existsAsync(name:String):Promise<Bool>
+	override public function existsAsync(name:String):IPromise<Bool>
 	{
-		return Promise.promise(contains(name));
+		return Promise.createResolved(contains(name));
 	}
 
-	private function readHeaderAsync():Promise<Dynamic>
+	private function readHeaderAsync():IPromise<Dynamic>
 	{
-		var promise = new Promise<Dynamic>();
+		var deferred = new Deferred<Dynamic>();
 		stream.readBytesAsync(4).then(function(data:ByteArray)
 		{
 			var typesCount = data.readUnsignedInt();
@@ -60,15 +62,15 @@ class ARC extends VirtualFileSystem
 				promises.push(readTypeAsync(n));
 			}
 			Promise.whenAll(promises).then(function(e) {
-				promise.resolve(null);
+				deferred.resolve(null);
 			});
 		});
-		return promise;
+		return deferred.promise;
 	}
 
-	private function readTypeAsync(index:Int):Promise<Dynamic>
+	private function readTypeAsync(index:Int):IPromise<Dynamic>
 	{
-		var promise = new Promise<Dynamic>();
+		var deferred = new Deferred<Dynamic>();
 		stream.position = 4 + index * (4 + 4 + 4);
 		stream.readBytesAsync(12).then(function(data:ByteArray)
 		{
@@ -90,15 +92,14 @@ class ARC extends VirtualFileSystem
 					files[fullFileName] = SliceStream.fromLength(stream, fileStart, fileSize);
 				}
 
-				promise.resolve(null);
+				deferred.resolve(null);
 			});
 		});
-		return promise;
+		return deferred.promise;
 	}
 
-	static public function fromStreamAsync(stream:Stream):Promise<ARC>
+	static public function fromStreamAsync(stream:Stream):IPromise<ARC>
 	{
-		var promise = new Promise<ARC>();
 		var arc = new ARC();
 		arc.stream = stream;
 

@@ -1,12 +1,11 @@
 package lang.promise;
 
 import lang.signal.Signal;
-import flash.errors.Error;
 
 class Deferred<T> implements IDeferred<T>
 {
 	private var resolvedValue:T;
-	private var rejectedError:Error;
+	private var rejectedError:Dynamic;
 	private var state:State;
 	private var listeners:Array<PromiseListener<T>>;
 	public var promise(default, null):IPromise<T>;
@@ -36,7 +35,7 @@ class Deferred<T> implements IDeferred<T>
 		this.callPending();
 	}
 
-	public function reject(rejectedError:Error):Void
+	public function reject(rejectedError:Dynamic):Void
 	{
 		checkNotCreated();
 		this.rejectedError = rejectedError;
@@ -44,7 +43,7 @@ class Deferred<T> implements IDeferred<T>
 		this.callPending();
 	}
 
-	public function then<A>(successCallback:T -> A, ?errorCallback:Error -> Void, ?cancelCallback:Void -> Void):IPromise<A>
+	public function then<A>(successCallback:T -> A, ?errorCallback:Dynamic -> Void, ?cancelCallback:Void -> Void):IPromise<A>
 	{
 		var deferred = new Deferred<A>();
 
@@ -100,7 +99,7 @@ class PromiseImpl<T> implements IPromise<T>
 		this.deferred = deferred;
 	}
 
-	public function then<A>(successCallback:T -> A, ?errorCallback:Error -> Void, ?cancelCallback:Void -> Void):IPromise<A>
+	public function then<A>(successCallback:T -> A, ?errorCallback:Dynamic -> Void, ?cancelCallback:Void -> Void):IPromise<A>
 	{
 		return this.deferred.then(successCallback, errorCallback, cancelCallback);
 	}
@@ -114,7 +113,7 @@ class PromiseImpl<T> implements IPromise<T>
 typedef PromiseListener<T> =
 {
 	@:optional var successCallback:T -> Void;
-	@:optional var errorCallback:Error -> Void;
+	@:optional var errorCallback:Dynamic -> Void;
 	@:optional var cancelCallback:Void -> Void;
 	@:optional var anyCallback:Void -> Void;
 }

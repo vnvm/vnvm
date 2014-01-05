@@ -1,9 +1,9 @@
 package engines.tlove.script;
+import lang.promise.Promise;
+import lang.promise.Deferred;
 import haxe.io.Path;
 import common.tween.Tween;
-import common.PromiseUtils;
 import lang.time.Timer2;
-import promhx.Promise;
 import common.ByteArrayUtils;
 import common.event.Event2;
 import common.imaging.BitmapData8;
@@ -75,7 +75,7 @@ class DAT_OP
 	@Unimplemented
 	function MOUSE_WAIT_CLICK_EVERYWHERE(leftClickLabel:Int, rightClickLabel:Int)
 	{
-		var promise = new Promise<Dynamic>();
+		var deferred = new Deferred<Dynamic>();
 		
 		Event2.registerOnceAny([game.onMouseLeftClick, game.onMouseRightClick], function(e:MouseEvent) {
 			//e.type = MouseEvent.CLICK;
@@ -86,9 +86,9 @@ class DAT_OP
 			} else {
 				throw(new Error('Invalid event for MOUSE_WAIT_CLICK_EVERYWHERE $e'));
 			}
-			promise.resolve(null);
+			deferred.resolve(null);
 		});
-		return promise;
+		return deferred.promise;
 	}
 	
 	/**
@@ -99,15 +99,15 @@ class DAT_OP
 	//@Unimplemented
 	function MOUSE_WAIT_EVENT(v:Int)
 	{
-		var promise = new Promise<Dynamic>();
+		var deferred = new Deferred<Dynamic>();
 
 		Event2.registerOnceAny([game.onMouseLeftClick, game.onMouseRightClick, game.onMouseMove], function(e:MouseEvent) {
 			game.lastMouseEvent = e;
 			
-			promise.resolve(null);
+			deferred.resolve(null);
 		});
 
-		return promise;
+		return deferred.promise;
 	}
 	
 	/**
@@ -298,14 +298,14 @@ class DAT_OP
 	function IMG_LOAD(name:String, layer:Int)
 	{
 		var mrs:MRS;
-		var promise = new Promise<Dynamic>();
+		var deferred = new Deferred<Dynamic>();
 		game.getMrsAsync(name, function(mrs:MRS) {
 			Palette.copy(mrs.image.palette, game.lastLoadedPalette);
 			mrs.image.drawToBitmapData8(game.layers[layer], 0, 0);
 			if (layer == 0) game.updateImage();
-			promise.resolve(null);
+			deferred.resolve(null);
 		});
-		return promise;
+		return deferred.promise;
 	}
 
 	/**
@@ -419,20 +419,20 @@ class DAT_OP
 			case 0:
 				// SET_WORK_PALETTE_COLOR
 				game.workPalette.colors[index] = new BmpColor(r, g, b, 0xFF);
-				return PromiseUtils.createResolved();
+				return Promise.createResolved();
 			case 1:
 				// APPLY_PALETTE
 				Palette.copy(game.workPalette, game.currentPalette);
 				game.updateImage();
-				return PromiseUtils.createResolved();
+				return Promise.createResolved();
 			case 2:
 				// BACKUP_PALETTE
 				Palette.copy(game.workPalette, game.backupPalette);
-				return PromiseUtils.createResolved();
+				return Promise.createResolved();
 			case 3:
 				// RESTORE_PALETTE
 				Palette.copy(game.backupPalette, game.workPalette);
-				return PromiseUtils.createResolved();
+				return Promise.createResolved();
 			case 4:
 				// ANIMATE_PALETTE
 				var src = game.workPalette.clone();
@@ -445,7 +445,7 @@ class DAT_OP
 			case 5:
 				// COPY_PALETTE
 				Palette.copy(game.lastLoadedPalette, game.workPalette);
-				return PromiseUtils.createResolved();
+				return Promise.createResolved();
 			case 6:
 				// FADE_PALETTE
 				throw(new Error("FADE_PALETTE"));
@@ -669,7 +669,7 @@ class DAT_OP
 	//@Unimplemented
 	function MUSIC_PLAY(name:String, loop:Int)
 	{
-		var promise = PromiseUtils.create();
+		var promise = Promise.createDeferred();
 		MUSIC_STOP().then(function(?e) {
 			game.midi.getBytesAsync(Path.withExtension(name, "mid").toUpperCase()).then(function(bytes:ByteArray) {
 				//var sound:Sound = new Sound();
@@ -895,7 +895,7 @@ class DAT_OP
 	@Unimplemented
 	function DELAY_83(time:Int)
 	{
-		var promise = PromiseUtils.create();
+		var promise = Promise.createDeferred();
 		if (delayEnabled) {
 			game.delay(function() {
 				promise.resolve(null);
@@ -958,7 +958,7 @@ class DAT_OP
 	@Unimplemented
 	function DELAY_89(time:Int)
 	{
-		var promise = PromiseUtils.create();
+		var promise = Promise.createDeferred();
 		game.delay(function() {
 			promise.resolve(null);
 		}, time * 1);

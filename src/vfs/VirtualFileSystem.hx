@@ -1,6 +1,7 @@
 package vfs;
 
-import promhx.Promise;
+import lang.promise.IPromise;
+import lang.promise.Deferred;
 import vfs.Stream;
 import haxe.Timer;
 import flash.errors.Error;
@@ -14,7 +15,7 @@ import flash.utils.ByteArray;
 class VirtualFileSystem extends VirtualFileSystemBase
 {
 	/*
-	public function openBatchAsync(_names:Array<String>):Promise<Stream>
+	public function openBatchAsync(_names:Array<String>):IPromise<Stream>
 	{
 		var count:Int = _names.length;
 		var names:Array<String> = _names.copy();
@@ -37,26 +38,26 @@ class VirtualFileSystem extends VirtualFileSystemBase
 	}
 	*/
 
-	public function openAndReadAllAsync(name:String):Promise<ByteArray> {
+	public function openAndReadAllAsync(name:String):IPromise<ByteArray> {
 		var stream:Stream;	
-		var promise:Promise<ByteArray> = new Promise<ByteArray>();
+		var deferred = new Deferred<ByteArray>();
 		
 		openAsync(name).then(function(stream:Stream):Void {
-			stream.readBytesAsync(stream.length).then(promise.resolve);
+			stream.readBytesAsync(stream.length).then(deferred.resolve);
 		});
 		
-		return promise;
+		return deferred.promise;
 	}
 
-	public function tryOpenAndReadAllAsync(name:String):Promise<ByteArray> {
-		var promise = new Promise<ByteArray>();
+	public function tryOpenAndReadAllAsync(name:String):IPromise<ByteArray> {
+		var deferred = new Deferred<ByteArray>();
 		existsAsync(name).then(function(exists:Bool) {
 			if (!exists) {
-				promise.reject('Not exists');
+				deferred.reject('Not exists');
 			} else {
 				openAndReadAllAsync(name);
 			}
 		});
-		return promise;
+		return deferred.promise;
 	}
 }

@@ -1,6 +1,7 @@
 package engines.tlove;
 
-import promhx.Promise;
+import lang.promise.Deferred;
+import lang.promise.IPromise;
 import common.ByteArrayUtils;
 import vfs.SliceStream;
 import vfs.Stream;
@@ -15,7 +16,8 @@ class PAK
 		this.items = new Map<String, SliceStream>();
 	}
 
-	public function getBytesAsync(name:String):Promise<ByteArray> {
+	public function getBytesAsync(name:String):IPromise<ByteArray>
+	{
 		var stream:Stream = get(name);
 		return stream.readAllBytesAsync();
 	}
@@ -32,12 +34,12 @@ class PAK
 		return a;
 	}
 	
-	static public function newPakAsync(pakStream:Stream):Promise<PAK>
+	static public function newPakAsync(pakStream:Stream):IPromise<PAK>
 	{
 		var pak:PAK = new PAK();
 		var countByteArray:ByteArray;
 		var headerByteArray:ByteArray;
-		var promise = new Promise<PAK>();
+		var deferred = new Deferred<PAK>();
 		
 		pakStream.readBytesAsync(2).then(function(countByteArray:ByteArray):Void {
 			var headerSize:Int = countByteArray.readUnsignedShort();
@@ -57,10 +59,10 @@ class PAK
 					pak.items.set(names[n], SliceStream.fromBounds(pakStream, offsets[n], offsets[n + 1]));
 				}
 				
-				promise.resolve(pak);
+				deferred.resolve(pak);
 			});
 		});
 		
-		return promise;
+		return deferred.promise;
 	}
 }

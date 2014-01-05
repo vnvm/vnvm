@@ -1,6 +1,7 @@
 package engines.brave.sound;
 //import haxe.io.Input;
-import promhx.Promise;
+import lang.promise.Deferred;
+import lang.promise.IPromise;
 import common.ByteArrayUtils;
 import vfs.Stream;
 import haxe.Log;
@@ -28,21 +29,21 @@ class SoundPack
 		this.numberOfChannels = numberOfChannels;
 	}
 	
-	static public function newAsync(numberOfChannels:Int = 1, stream:Stream):Promise<SoundPack> {
+	static public function newAsync(numberOfChannels:Int = 1, stream:Stream):IPromise<SoundPack> {
 		var soundPack:SoundPack = new SoundPack(numberOfChannels);
 		return soundPack.loadAsync(stream).then(function(empty) {
 			return soundPack;
 		});
 	}
 	
-	public function getSoundAsync(soundFile:String):Promise<Sound> {
+	public function getSoundAsync(soundFile:String):IPromise<Sound> {
 		var entry:SoundEntry = entries.get(soundFile);
 		if (entry == null) throw(new Error('Can\'t find sound \'${soundFile}\''));
-		var promise = new Promise<Sound>();
+		var deferred = new Deferred<Sound>();
 		entry.getSoundAsync(function(sound:Sound) {
-			promise.resolve(sound);
+			deferred.resolve(sound);
 		});
-		return promise;
+		return deferred.promise;
 	}
 	
 	private function readEntry(stream:ByteArray):SoundEntry {
@@ -54,13 +55,13 @@ class SoundPack
 		return new SoundEntry(this, name, position, length);
 	}
 	
-	public function loadAsync(stream:Stream):Promise<Dynamic> {
+	public function loadAsync(stream:Stream):IPromise<Dynamic> {
 		this.stream = stream;
 		
 		var header1:ByteArray;
 		var header2:ByteArray;
 		
-		var promise = new Promise();
+		var deferred = new Deferred<Dynamic>();
 		stream.readBytesAsync(8).then(function(header1:ByteArray):Void {
 			header1.readInt();
 			var headerBlocks:Int = header1.readUnsignedShort();
@@ -76,9 +77,9 @@ class SoundPack
 					//BraveLog.trace(entry.name);
 				}
 				
-				promise.resolve(null);
+				deferred.resolve(null);
 			});
 		});
-		return promise;
+		return deferred.promise;
 	}
 }

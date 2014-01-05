@@ -1,6 +1,5 @@
 package engines.brave.script;
-import promhx.Promise;
-import common.PromiseUtils;
+import lang.promise.Promise;
 import lang.StringEx;
 import engines.brave.BraveAssets;
 import engines.brave.GameState;
@@ -256,7 +255,7 @@ class ScriptInstructions
 	@Unimplemented(1)
 	public function MUSIC_PLAY(index:Int)
 	{
-		return PromiseUtils.createResolved();
+		return Promise.createResolved();
 		/*
 		return;
 		var music:Sound;
@@ -352,7 +351,7 @@ class ScriptInstructions
 	@Opcode(0x21, "s") // Delay?
 	public function SCRIPT(scriptName:String)
 	{
-		var promise = PromiseUtils.create();
+		var promise = Promise.createDeferred();
 		BraveLog.trace('SCRIPT(\'${scriptName}\')');
 		Script.getScriptWithNameAsync(scriptName, function(script:Script) {
 			scriptThread.setScript(script);
@@ -381,7 +380,7 @@ class ScriptInstructions
 	@Unimplemented
 	public function MAP_SET(mapName:String)
 	{
-		var promise = PromiseUtils.create();
+		var promise = Promise.createDeferred();
 		scriptThread.gameState.setMapAsync(mapName, function() {
 			promise.resolve(null);
 		});
@@ -418,7 +417,7 @@ class ScriptInstructions
 	@Opcode(0x28, "s")
 	public function BACKGROUND_SET_IMAGE(imageName:String)
 	{
-		var promise = PromiseUtils.create();
+		var promise = Promise.createDeferred();
 		scriptThread.gameState.setBackgroundImageAsync(imageName, function() {
 			promise.resolve(null);
 		});
@@ -505,7 +504,7 @@ class ScriptInstructions
 	 */
 	@Opcode(0x30, "P")
 	public function TRANSITION(type:Int) {
-		var promise = PromiseUtils.create();
+		var promise = Promise.createDeferred();
 		scriptThread.gameState.transition(function() {
 			promise.resolve(null);
 		}, type);
@@ -520,7 +519,7 @@ class ScriptInstructions
 	@Opcode(0x31, "P")
 	public function FADE_TO_MAP(time:Int)
 	{
-		var promise = PromiseUtils.create();
+		var promise = Promise.createDeferred();
 		scriptThread.gameState.fadeToMap(function() {
 			promise.resolve(null);
 		}, time);
@@ -556,7 +555,7 @@ class ScriptInstructions
 	@Opcode(0x39, "Psss")
 	public function TEXT_PUT_WITH_FACE(faceId:Int, voiceName:String, title:String, text:String) {
 
-		var promise = PromiseUtils.create();
+		var promise = Promise.createDeferred();
 		var voiceChannel:SoundChannel = null;
 		
 		function internal() {
@@ -631,7 +630,7 @@ class ScriptInstructions
 	@Unimplemented
 	public function ANIMATION_WAIT()
 	{
-		var promise = PromiseUtils.create();
+		var promise = Promise.createDeferred();
 		scriptThread.gameState.rootClip.ui.textSprite.disable(function()
 		{
 			var count = 0;
@@ -822,7 +821,7 @@ class ScriptInstructions
 	@Opcode(0x53, "PPPPP") // Id, 0, X, Y, Direction
 	public function PLAYER_SPAWN(charaId:Int, unk:Int, x:Int, y:Int, direction:Int)
 	{
-		var promise = PromiseUtils.create();
+		var promise = Promise.createDeferred();
 		scriptThread.gameState.charaSpawnAsync(charaId, 0, unk, x, y, direction, function() {
 			promise.resolve(null);
 		});
@@ -832,7 +831,7 @@ class ScriptInstructions
 	@Opcode(0x57, "PPPPP") // Id, 0, X, Y, Direction
 	public function CHARA_SPAWN(charaId:Int, unk:Int, x:Int, y:Int, direction:Int)
 	{
-		var promise = PromiseUtils.create();
+		var promise = Promise.createDeferred();
 		scriptThread.gameState.charaSpawnAsync(charaId, 0, unk, x, y, direction, function() {
 			promise.resolve(null);
 		});
@@ -842,7 +841,7 @@ class ScriptInstructions
 	@Opcode(0x67, "PPPPPP") // Id, ???, 0, X, Y, Direction
 	public function ENEMY_SPAWN(charaId:Int, type:Int, unk:Int, x:Int, y:Int, direction:Int)
 	{
-		var promise = PromiseUtils.create();
+		var promise = Promise.createDeferred();
 		scriptThread.gameState.charaSpawnAsync(charaId, type, unk, x, y, direction, function() {
 			promise.resolve(null);
 		});

@@ -1,12 +1,12 @@
 package common.compression;
 
+import lang.promise.IPromise;
 import lang.exceptions.NotImplementedException;
-import promhx.Promise;
 import flash.utils.ByteArray;
 import cpp.vm.Thread;
 class LzDecoderAsync
 {
-	static public function decodeAsync(input:ByteArray):Promise<ByteArray>
+	static public function decodeAsync(input:ByteArray):IPromise<ByteArray>
 	{
 		throw(new NotImplementedException());
 		/*

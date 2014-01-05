@@ -1,6 +1,7 @@
 package vfs;
+import lang.promise.Promise;
+import lang.promise.IPromise;
 import common.ByteArrayUtils;
-import promhx.Promise;
 import haxe.io.Bytes;
 import haxe.Log;
 import flash.errors.Error;
@@ -33,7 +34,7 @@ class FileStream extends Stream
 		this.length = fileStat.size;
 	}
 	
-	override public function readBytesAsync(length:Int):Promise<ByteArray> 
+	override public function readBytesAsync(length:Int):IPromise<ByteArray>
 	{
 		var bytes:Bytes = null;
 		
@@ -54,7 +55,7 @@ class FileStream extends Stream
 			Log.trace("Error in readBytesAsync: " + e);
 		}
 			
-		return Promise.promise(ByteArrayUtils.BytesToByteArray(bytes));
+		return Promise.createResolved(ByteArrayUtils.BytesToByteArray(bytes));
 	}
 	
 }

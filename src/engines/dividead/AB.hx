@@ -1,11 +1,12 @@
 package engines.dividead;
 
+import lang.promise.Promise;
+import lang.promise.Deferred;
+import lang.promise.IPromise;
 import common.tween.Tween;
-import common.PromiseUtils;
 import common.IteratorUtilities;
 import common.script.Instruction2;
 import engines.dividead.script.AB_OP;
-import promhx.Promise;
 import common.ByteArrayUtils;
 import common.imaging.GraphicUtils;
 import lang.MathEx;
@@ -34,7 +35,7 @@ class AB
 		this.running = true;
 	}
 	
-	public function loadScriptAsync(scriptName:String, scriptPos:Int = 0):Promise<Bool>
+	public function loadScriptAsync(scriptName:String, scriptPos:Int = 0):IPromise<Bool>
 	{
 		return game.sg.openAndReadAllAsync('${scriptName}.ab').then(function(script:ByteArray):Bool {
 			this.scriptName = scriptName;
@@ -66,7 +67,7 @@ class AB
 		return params;
 	}
 	
-	private function executeSingleAsync():Promise<Dynamic>
+	private function executeSingleAsync():IPromise<Dynamic>
 	{
 		var opcodePosition = this.script.position;
 		var opcodeId = this.script.readUnsignedShort();
@@ -76,7 +77,7 @@ class AB
 		var instruction = new Instruction2(scriptName, opcode, params, opcodePosition, this.script.position - opcodePosition);
 		var result = instruction.call(this.abOp);
 
-		return PromiseUtils.returnPromiseOrResolvedPromise(result);
+		return Promise.returnPromiseOrResolvedPromise(result);
 	}
 	
 	private function hasMore():Bool {
@@ -93,16 +94,16 @@ class AB
 	}
 	*/
 
-	public function executeAsync(?e):Promise<Dynamic>
+	public function executeAsync(?e):IPromise<Dynamic>
 	{
-		var promise = new Promise<Dynamic>();
+		var deferred = new Deferred<Dynamic>();
 		function executeStep() {
 			executeSingleAsync().then(function(?e) {
 				executeStep();
 			});
 		}
 		executeStep();
-		return promise;
+		return deferred.promise;
 	}
 	
 	/*
@@ -121,7 +122,7 @@ class AB
 		this.running = false;
 	}
 	
-	public function paintToColorAsync(color:Array<Int>, time:Float):Promise<Dynamic>
+	public function paintToColorAsync(color:Array<Int>, time:Float):IPromise<Dynamic>
 	{
 		var sprite:Sprite = new Sprite();
 		GraphicUtils.drawSolidFilledRectWithBounds(sprite.graphics, 0, 0, 640, 480, 0x000000, 1.0);
@@ -132,17 +133,17 @@ class AB
 		}).animateAsync();
 	}
 	
-	public function paintAsync(pos:Int, type:Int):Promise<Dynamic>
+	public function paintAsync(pos:Int, type:Int):IPromise<Dynamic>
 	{
 		var allRects:Array<Array<Rectangle>> = [];
-		var promise = new Promise<Dynamic>();
+		var deferred = new Deferred<Dynamic>();
 		
 		if ((type == 0) || game.isSkipping()) {
 			game.front.copyPixels(game.back, new Rectangle(0, 0, 640, 480), new Point(0, 0));
 			Timer.delay(function() {
-				promise.resolve(null);
+				deferred.resolve(null);
 			}, 4);
-			return promise;
+			return deferred.promise;
 		}
 
 		function addFlipSet(action:Array<Rectangle> -> Void):Void {
@@ -207,12 +208,12 @@ class AB
 				
 				Timer.delay(step, frameTime);
 			} else {
-				promise.resolve(null);
+				deferred.resolve(null);
 			}
 		};
 		
 		step();
 
-		return promise;
+		return deferred.promise;
 	}
 }

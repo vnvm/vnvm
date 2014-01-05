@@ -1,6 +1,6 @@
 package vfs;
 
-import promhx.Promise;
+import lang.promise.IPromise;
 import lang.LangUtils;
 import flash.utils.ByteArray;
 import vfs.Stream;
@@ -20,7 +20,7 @@ class SliceStream extends Stream
 		this.parent = parent;
 	}
 	
-	override public function readBytesAsync(length:Int):Promise<ByteArray> 
+	override public function readBytesAsync(length:Int):IPromise<ByteArray>
 	{
 		var parentOldPosition:Int = parent.position;
 		

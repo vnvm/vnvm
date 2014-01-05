@@ -1,7 +1,9 @@
 package engines.dividead.formats;
 
+import lang.promise.Promise;
+import lang.promise.Deferred;
+import lang.promise.IPromise;
 import flash.utils.Endian;
-import promhx.Promise;
 import vfs.SliceStream;
 import vfs.Stream;
 import vfs.VirtualFileSystem;
@@ -17,12 +19,12 @@ class DL1 extends VirtualFileSystem
 		this.entries = new Map<String, Stream>();
 	}
 	
-	static public function loadAsync(stream:Stream):Promise<DL1>
+	static public function loadAsync(stream:Stream):IPromise<DL1>
 	{
 		var header:ByteArray;
 		var entriesByteArray:ByteArray;
 		var dl1:DL1 = new DL1();
-		var promise = new Promise<DL1>();
+		var deferred = new Deferred<DL1>();
 
 		// Read header
 		stream.readBytesAsync(0x10).then(function(header:ByteArray)
@@ -54,18 +56,18 @@ class DL1 extends VirtualFileSystem
 					pos += size;
 				}
 
-				promise.resolve(dl1);
+				deferred.resolve(dl1);
 			});
 		});
 
-		return promise;
+		return deferred.promise;
 	}
 	
-	override public function openAsync(name:String):Promise<Stream> 
+	override public function openAsync(name:String):IPromise<Stream>
 	{
 		name = name.toUpperCase();
 		var entry:Stream = entries.get(name);
 		if (entry == null) throw('Can\'t find \'$name\'');
-		return Promise.promise(entry);
+		return Promise.createResolved(entry);
 	}
 }

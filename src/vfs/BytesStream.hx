@@ -1,5 +1,6 @@
 package vfs;
-import promhx.Promise;
+import lang.promise.Promise;
+import lang.promise.IPromise;
 import common.ByteArrayUtils;
 import flash.errors.Error;
 import flash.utils.ByteArray;
@@ -19,13 +20,13 @@ class BytesStream extends Stream
 		this.length = byteArray.length;
 	}
 	
-	override public function readBytesAsync(length:Int):Promise<ByteArray>
+	override public function readBytesAsync(length:Int):IPromise<ByteArray>
 	{
 		var data:ByteArray;
 		byteArray.position = this.position;
 		data = ByteArrayUtils.readByteArray(byteArray, length);
 		data.position = 0;
 		this.position += length;
-		return Promise.promise(data);
+		return Promise.createResolved(data);
 	}
 }

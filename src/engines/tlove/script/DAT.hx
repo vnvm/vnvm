@@ -1,6 +1,7 @@
 package engines.tlove.script;
-import common.PromiseUtils;
-import promhx.Promise;
+import lang.promise.Promise;
+import lang.promise.Deferred;
+import lang.promise.IPromise;
 import common.script.Instruction2;
 import common.ByteArrayUtils;
 import common.script.Opcode;
@@ -57,7 +58,7 @@ class DAT
 		//this.scriptStack = new ScriptStack();
 	}
 	
-	public function loadAsync(name:String):Promise<Dynamic>
+	public function loadAsync(name:String):IPromise<Dynamic>
 	{
 		return game.date.getBytesAsync('$name.DAT').then(function(data:ByteArray):Void
 		{
@@ -89,7 +90,7 @@ class DAT
 		this.script.position = item.position;
 	}
 
-	public function callScriptAsync(name:String, label:Int):Promise<Dynamic>
+	public function callScriptAsync(name:String, label:Int):IPromise<Dynamic>
 	{
 		callStack.jumps.push(new StackItem(scriptName, this.script.position));
 		//scriptStack.calls.push(callStack);
@@ -99,7 +100,7 @@ class DAT
 		});
 	}
 
-	public function returnScriptAsync():Promise<Dynamic>
+	public function returnScriptAsync():IPromise<Dynamic>
 	{
 		var item:StackItem = callStack.jumps.pop();
 		callStack.jumps = [];
@@ -153,23 +154,23 @@ class DAT
 	}
 	*/
 
-	public function executeAsync(?e):Promise<Dynamic>
+	public function executeAsync(?e):IPromise<Dynamic>
 	{
-		var promise = new Promise<Dynamic>();
+		var deferred = new Deferred<Dynamic>();
 		function executeStep() {
 			executeSingleAsync().then(function(?e) {
 				executeStep();
 			});
 		}
 		executeStep();
-		return promise;
+		return deferred.promise;
 	}
 
-	private function executeSingleAsync():Promise<Dynamic>
+	private function executeSingleAsync():IPromise<Dynamic>
 	{
 		var instruction = readInstruction();
 		var result = instruction.call(this.datOp);
-		return PromiseUtils.returnPromiseOrResolvedPromise(result);
+		return Promise.returnPromiseOrResolvedPromise(result);
 	}
 
 	private function readInstruction():Instruction2

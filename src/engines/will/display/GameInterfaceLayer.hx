@@ -1,5 +1,7 @@
 package engines.will.display;
 
+import lang.promise.Promise;
+import lang.promise.IPromise;
 import reflash.display.DisplayObject2;
 import reflash.display.AnimatedImage2;
 import reflash.display.TextField2;
@@ -13,8 +15,6 @@ import common.tween.Easing;
 import common.tween.Tween;
 import haxe.Log;
 import engines.will.formats.wip.WIP;
-import common.PromiseUtils;
-import promhx.Promise;
 import reflash.display.Sprite2;
 
 class GameInterfaceLayer extends Sprite2
@@ -31,10 +31,10 @@ class GameInterfaceLayer extends Sprite2
 		this.willResourceManager = willResourceManager;
 	}
 
-	public function initAsync():Promise<Dynamic>
+	public function initAsync():IPromise<Dynamic>
 	{
 		// QLOAD, QSAVE, LOAD, SAVE, LOG, AUTO, SKIP, STATUS, SYSTEM
-		var promise = PromiseUtils.create();
+		var deferred = Promise.createDeferred();
 		willResourceManager.getWipWithMaskAsync("CLKWAIT").then(function(clkWaitWip:WIP)
 		{
 			willResourceManager.getWipWithMaskAsync("WINBASE0").then(function(winBase0Wip:WIP)
@@ -67,14 +67,14 @@ class GameInterfaceLayer extends Sprite2
 
 				hideAsync(0).then(function(?e)
 				{
-					promise.resolve(null);
+					deferred.resolve(null);
 				});
 			});
 		});
-		return promise;
+		return deferred.promise;
 	}
 
-	public function setTextAsync(text:String, timePerCharacter:Float = 0.05):Promise<Dynamic>
+	public function setTextAsync(text:String, timePerCharacter:Float = 0.05):IPromise<Dynamic>
 	{
 		var totalTime = timePerCharacter * text.length;
 		this.waitingLayer.visible = false;
@@ -83,9 +83,9 @@ class GameInterfaceLayer extends Sprite2
 		}).animateAsync();
 	}
 
-	public function hideAsync(time:Float = 0.3):Promise<Dynamic>
+	public function hideAsync(time:Float = 0.3):IPromise<Dynamic>
 	{
-		if (wipLayer.alpha == 0) return PromiseUtils.createResolved();
+		if (wipLayer.alpha == 0) return Promise.createResolved();
 
 		this.waitingLayer.visible = false;
 
@@ -97,9 +97,9 @@ class GameInterfaceLayer extends Sprite2
 		;
 	}
 
-	public function showAsync(time:Float = 0.3):Promise<Dynamic>
+	public function showAsync(time:Float = 0.3):IPromise<Dynamic>
 	{
-		if (wipLayer.alpha == 1) return PromiseUtils.createResolved();
+		if (wipLayer.alpha == 1) return Promise.createResolved();
 
 		this.waitingLayer.visible = false;
 

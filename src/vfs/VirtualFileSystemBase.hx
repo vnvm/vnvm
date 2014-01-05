@@ -1,7 +1,6 @@
 package vfs;
+import lang.promise.IPromise;
 import flash.errors.Error;
-import promhx.Promise;
-import promhx.Promise.Promise;
 
 /**
  * ...
@@ -10,13 +9,13 @@ import promhx.Promise.Promise;
 
 class VirtualFileSystemBase 
 {
-	public function openAsync(name:String):Promise<Stream>
+	public function openAsync(name:String):IPromise<Stream>
 	{
 		throw(new Error("Not implemented VirtualFileSystem.openAsync"));
 		return null;
 	}
 	
-	public function existsAsync(name:String):Promise<Bool>
+	public function existsAsync(name:String):IPromise<Bool>
 	{
 		throw(new Error("Not implemented"));
 		return null;

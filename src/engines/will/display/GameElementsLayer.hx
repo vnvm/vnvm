@@ -1,5 +1,6 @@
 package engines.will.display;
 
+import lang.promise.IPromise;
 import flash.display.BitmapData;
 import reflash.display.DisplayObject2;
 import reflash.gl.wgl.WGLTexture;
@@ -13,7 +14,6 @@ import flash.display.PixelSnapping;
 import flash.display.DisplayObject;
 import flash.utils.ByteArray;
 import engines.will.formats.wip.WIP;
-import promhx.Promise;
 import flash.display.Sprite;
 
 class GameElementsLayer extends Sprite2 implements IGameElementsLayer
@@ -40,7 +40,7 @@ class GameElementsLayer extends Sprite2 implements IGameElementsLayer
 		}
 	}
 
-	public function putObjectAsync(index:Int, x:Int, y:Int, name:String, anchor:Anchor):Promise<Dynamic>
+	public function putObjectAsync(index:Int, x:Int, y:Int, name:String, anchor:Anchor):IPromise<Dynamic>
 	{
 		removeObject(index);
 

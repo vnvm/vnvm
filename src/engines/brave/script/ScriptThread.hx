@@ -1,6 +1,7 @@
 package engines.brave.script;
-import promhx.Promise;
-import common.PromiseUtils;
+import lang.promise.Promise;
+import lang.promise.Deferred;
+import lang.promise.IPromise;
 import engines.brave.GameState;
 import engines.brave.GameThreadState;
 import haxe.Log;
@@ -58,9 +59,9 @@ class ScriptThread implements IScriptThread
 		//BraveLog.trace("/execute(0)");
 	}
 	*/
-	public function executeAsync():Promise<Dynamic>
+	public function executeAsync():IPromise<Dynamic>
 	{
-		var promise = new Promise<Dynamic>();
+		var deferred = new Deferred<Dynamic>();
 		function executeStep() {
 			if (scriptReader.hasMoreInstructions())
 			{
@@ -70,18 +71,18 @@ class ScriptThread implements IScriptThread
 			}
 			else
 			{
-				promise.resolve(null);
+				deferred.resolve(null);
 			}
 		}
 		executeStep();
-		return promise;
+		return deferred.promise;
 	}
 
-	private function executeSingleAsync():Promise<Dynamic>
+	private function executeSingleAsync():IPromise<Dynamic>
 	{
 		var instruction = scriptReader.readInstruction(this);
 		var result:Dynamic = instruction.call(scriptInstructions);
-		return PromiseUtils.returnPromiseOrResolvedPromise(result);
+		return Promise.returnPromiseOrResolvedPromise(result);
 
 		/*
 		// End Script

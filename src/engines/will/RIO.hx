@@ -1,10 +1,12 @@
 package engines.will;
 
+import lang.promise.Promise;
+import lang.promise.Deferred;
+import lang.promise.IPromise;
 import common.script.Instruction2;
 import haxe.Json;
 import common.script.Opcode;
 import lang.exceptions.NotImplementedException;
-import promhx.Promise;
 import haxe.Log;
 import common.script.ScriptOpcodes;
 import engines.will.script.RIO_OP;
@@ -31,21 +33,20 @@ class RIO implements IScript
 		this.opcodeReader = new OpcodeReader();
 	}
 
-	public function executeAsync(?e):Promise<Dynamic>
+	public function executeAsync(?e):IPromise<Dynamic>
 	{
-		var promise = new Promise<Dynamic>();
+		var deferred = new Deferred<Dynamic>();
 		function executeStep() {
 			executeSingleAsync().then(function(?e) {
 				executeStep();
 			});
 		}
 		executeStep();
-		return promise;
+		return deferred.promise;
 	}
 
-	public function executeSingleAsync():Promise<Dynamic>
+	public function executeSingleAsync():IPromise<Dynamic>
 	{
-		var promise = new Promise<Dynamic>();
 		var opcodePosition = this.scriptBytes.position;
 		var opcodeId = this.scriptBytes.readUnsignedByte();
 		var opcode = scriptOpcodes.getOpcodeWithId(opcodeId);
@@ -58,18 +59,7 @@ class RIO implements IScript
 		//Log.trace(instruction);
 		var result = instruction.call(opcodes);
 		//Log.trace(result);
-		if (Std.is(result, Promise))
-		{
-			result.then(function(e)
-			{
-				promise.resolve(null);
-			});
-		}
-		else
-		{
-			promise.resolve(null);
-		}
-		return promise;
+		return Promise.returnPromiseOrResolvedPromise(result);
 	}
 
 	public function loadFromByteArray(encryptedScript:ByteArray, name:String, position:Int = 0)
@@ -79,7 +69,7 @@ class RIO implements IScript
 		this.scriptBytes.position = position;
 	}
 
-	public function loadAsync(name:String, position:Int = 0):Promise<Dynamic>
+	public function loadAsync(name:String, position:Int = 0):IPromise<Dynamic>
 	{
 		return willResourceManager.readAllBytesAsync('$name.WSC').then(function(data:ByteArray) {
 			loadFromByteArray(data, name, position);

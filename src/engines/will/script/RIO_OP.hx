@@ -8,6 +8,7 @@ PRINCESS WALTZ:
 	sub_406F00
 */
 
+import lang.promise.Deferred;
 import common.input.Keys;
 import flash.events.MouseEvent;
 import flash.geom.Point;
@@ -19,7 +20,6 @@ import haxe.Log;
 import lang.time.Timer2;
 import lang.MathEx;
 import common.BitUtils;
-import promhx.Promise;
 import lang.exceptions.NotImplementedException;
 import flash.errors.Error;
 class RIO_OP
@@ -231,7 +231,7 @@ class RIO_OP
 	{
 		scene.setDirectMode(true);
 
-		var promise = new Promise<Dynamic>();
+		var deferred = new Deferred<Dynamic>();
 		var mousePosition:Point = scene.getMousePosition();
 		var overKind1:Int = scene.getMaskValueAt(mousePosition);
 		var overKind:Int = scene.isEnabledKind(overKind1) ? overKind1 : 0;
@@ -242,14 +242,14 @@ class RIO_OP
 			this.state.setFlag(flagMaskClick, (overKind != 0) ? 1 : 0);
 			this.state.setFlag(flagMaskOver, overKind);
 			clicked = false;
-			promise.resolve(null);
+			deferred.resolve(null);
 		}
 
 		function onMove() {
 			this.state.setFlag(flagMaskClick, 0);
 			this.state.setFlag(flagMaskOver, overKind);
 			clicked = false;
-			promise.resolve(null);
+			deferred.resolve(null);
 		}
 
 		if (clicked)
@@ -267,7 +267,7 @@ class RIO_OP
 			});
 		}
 
-		return promise;
+		return deferred.promise;
 		//throw(new NotImplementedException());
 		/*
 		this._interface.enabled = false;
@@ -1092,17 +1092,17 @@ class RIO_OP
 
 	public function TEXT_COMMON(text_id:Int, text:String, ?title:String)
 	{
-		var promise = new Promise<Dynamic>();
+		var deferred = new Deferred<Dynamic>();
 		scene.setTextAsync(text, isSkipping() ? 0 : 0.05).then(function(?e)
 		{
 			Event2.registerOnceAny([GameInput.onClick, GameInput.onKeyPress], function(e:Event) {
 				scene.setTextAsync('', 0).then(function(?e)
 				{
-					promise.resolve(null);
+					deferred.resolve(null);
 				});
 			});
 		});
-		return promise;
+		return deferred.promise;
 
 		/*
 		if (reset) {

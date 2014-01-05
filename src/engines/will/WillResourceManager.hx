@@ -1,9 +1,11 @@
 package engines.will;
 
+import lang.promise.Promise;
+import lang.promise.IPromise;
+import lang.promise.Deferred;
 import engines.will.formats.wip.WIP;
 import vfs.Stream;
 import flash.utils.ByteArray;
-import promhx.Promise;
 import flash.errors.Error;
 import engines.will.formats.arc.ARC;
 import vfs.VirtualFileSystem;
@@ -37,13 +39,13 @@ class WillResourceManager
 			//null
 		];
 
-		var promise = new Promise<WillResourceManager>();
+		var deferred = new Deferred<WillResourceManager>();
 		var _this = this;
 
 		function nextStep()
 		{
 			if (arcNameList.length == 0) {
-				promise.resolve(_this);
+				deferred.resolve(_this);
 				return;
 			}
 			var arcName = arcNameList.pop();
@@ -59,7 +61,7 @@ class WillResourceManager
 
 		nextStep();
 
-		return promise;
+		return deferred.promise;
 	}
 
 	public function getFileNames():Array<String>
@@ -75,7 +77,7 @@ class WillResourceManager
 		return array;
 	}
 
-	public function readAllBytesAsync(name:String):Promise<ByteArray>
+	public function readAllBytesAsync(name:String):IPromise<ByteArray>
 	{
 		for (arc in arcList)
 		{
@@ -84,13 +86,13 @@ class WillResourceManager
 				return arc.openAndReadAllAsync(name);
 			}
 		}
-		return Promise.promise(null);
+		return Promise.createResolved(null);
 		//throw(new Error('Can\'t find "$name"'));
 	}
 
-	public function getWipWithMaskAsync(name:String):Promise<WIP>
+	public function getWipWithMaskAsync(name:String):IPromise<WIP>
 	{
-		var promise = new Promise<WIP>();
+		var deferred = new Deferred<WIP>();
 
 		getWipAsync('$name.WIP').then(function(colorWip:WIP)
 		{
@@ -98,13 +100,13 @@ class WillResourceManager
 			getWipAsync('$name.MSK', true).then(function(alphaWip:WIP)
 			{
 				colorWip.mergeAlpha(alphaWip);
-				promise.resolve(colorWip);
+				deferred.resolve(colorWip);
 			});
 		});
-		return promise;
+		return deferred.promise;
 	}
 
-	public function getWipAsync(name:String, optional:Bool = false):Promise<WIP>
+	public function getWipAsync(name:String, optional:Bool = false):IPromise<WIP>
 	{
 		return readAllBytesAsync(name).then(function(data:ByteArray):WIP
 		{

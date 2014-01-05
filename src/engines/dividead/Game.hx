@@ -1,11 +1,13 @@
 package engines.dividead;
 
+import lang.promise.Promise;
+import lang.promise.IPromise;
+import lang.promise.Deferred;
 import engines.dividead.formats.SG;
 import engines.dividead.formats.DL1;
 import engines.dividead.script.AB_OP;
 import vfs.SubVirtualFileSystem;
 import haxe.Log;
-import promhx.Promise;
 import common.imaging.BitmapDataUtils;
 import common.display.OptionList;
 import common.input.GameInput;
@@ -174,36 +176,36 @@ class Game
 	 * @param	imageName
 	 * @param	done
 	 */
-	public function getImageCachedAsync(imageName:String):Promise<BitmapData> {
-		var promise = new Promise<BitmapData>();
+	public function getImageCachedAsync(imageName:String):IPromise<BitmapData> {
+		var deferred = new Deferred<BitmapData>();
 		imageName = addExtensionsWhenRequired(imageName, "bmp").toUpperCase();
 		
 		if (imageCache.exists(imageName)) {
-			promise.resolve(imageCache.get(imageName));
+			deferred.resolve(imageCache.get(imageName));
 		} else {
 			sg.openAndReadAllAsync(imageName).then(function(byteArray:ByteArray):Void {
 				imageCache.set(imageName, SG.getImage(byteArray));
-				promise.resolve(imageCache.get(imageName));
+				deferred.resolve(imageCache.get(imageName));
 			});
 		}
-		return promise;
+		return deferred.promise;
 	}
 
-	public function getImageMaskCachedAsync(imageNameColor:String, imageNameMask:String):Promise<BitmapData> {
+	public function getImageMaskCachedAsync(imageNameColor:String, imageNameMask:String):IPromise<BitmapData> {
 		var imageName:String = '${imageNameColor}${imageNameMask}';
-		var promise = new Promise<BitmapData>();
+		var deferred = new Deferred<BitmapData>();
 		
 		if (imageCache.exists(imageName)) {
-			promise.resolve(imageCache.get(imageName));
+			deferred.resolve(imageCache.get(imageName));
 		} else {
 			getImageCachedAsync(imageNameColor).then(function(color:BitmapData) {
 			getImageCachedAsync(imageNameMask).then(function(mask:BitmapData) {
 				imageCache.set(imageName, BitmapDataUtils.combineColorMask(color, mask));
-				promise.resolve(imageCache.get(imageName));
+				deferred.resolve(imageCache.get(imageName));
 			});
 			});
 		}
-		return promise;
+		return deferred.promise;
 	}
 
 	/**
@@ -211,12 +213,12 @@ class Game
 	 * @param	soundName
 	 * @param	done
 	 */
-	public function getSoundAsync(soundName:String):Promise<Sound>
+	public function getSoundAsync(soundName:String):IPromise<Sound>
 	{
 		return getSoundMusicAsync('wav', wv, soundName);
 	}
 	
-	public function getMusicAsync(musicName:String):Promise<Sound>
+	public function getMusicAsync(musicName:String):IPromise<Sound>
 	{
 		return getSoundMusicAsync('mid', mid, musicName);
 	}
@@ -226,7 +228,7 @@ class Game
 		name = addExtensionsWhenRequired(name, extension).toUpperCase();
 
 		var byteArray:ByteArray;
-		var promise = new Promise<Sound>();
+		var deferred = new Deferred<Sound>();
 		vfs.openAndReadAllAsync(name).then(function(byteArray:ByteArray):Void {
 			var sound:Sound = new Sound();
 			try {
@@ -234,9 +236,9 @@ class Game
 			} catch (e:Dynamic) {
 				Log.trace('Error: ' + e);
 			}
-			promise.resolve(sound);
+			deferred.resolve(sound);
 		});
-		return promise;
+		return deferred.promise;
 	}
 	
 	/**
@@ -244,29 +246,29 @@ class Game
 	 * @param	fileSystem
 	 * @param	done
 	 */
-	static public function newAsync(fileSystem:VirtualFileSystem):Promise<Game>
+	static public function newAsync(fileSystem:VirtualFileSystem):IPromise<Game>
 	{
-		var promise = new Promise<Game>();
+		var deferred = new Deferred<Game>();
 		getDl1Async(fileSystem, "SG.DL1").then(function(sg:DL1)
 		{
 			getDl1Async(fileSystem, "WV.DL1").then(function(wv:DL1)
 			{
-				promise.resolve(new Game(fileSystem, sg, wv));
+				deferred.resolve(new Game(fileSystem, sg, wv));
 			});
 		});
-		return promise;
+		return deferred.promise;
 	}
 
-	static private function getDl1Async(fileSystem:VirtualFileSystem, name:String):Promise<DL1>
+	static private function getDl1Async(fileSystem:VirtualFileSystem, name:String):IPromise<DL1>
 	{
-		var promise = new Promise<DL1>();
+		var deferred = new Deferred<DL1>();
 		fileSystem.openAsync(name).then(function(stream:Stream):Void
 		{
 			DL1.loadAsync(stream).then(function(dl1:DL1)
 			{
-				promise.resolve(dl1);
+				deferred.resolve(dl1);
 			});
 		});
-		return promise;
+		return deferred.promise;
 	}
 }

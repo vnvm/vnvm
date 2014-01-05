@@ -1,5 +1,7 @@
 package common.tween;
 
+import lang.promise.Deferred;
+import lang.promise.IPromise;
 import lang.MathEx;
 import common.event.EventListenerGroup;
 import lang.ObjectUtils;
@@ -7,7 +9,7 @@ import haxe.Log;
 import lang.signal.Signal;
 import flash.events.Event;
 import haxe.Timer;
-import promhx.Promise;
+
 class Tween
 {
 	private var totalTime:Float;
@@ -61,9 +63,9 @@ class Tween
 		return this;
 	}
 
-	public function animateAsync():Promise<Dynamic>
+	public function animateAsync():IPromise<Dynamic>
 	{
-		var promise = new Promise<Dynamic>();
+		var deferred = new Deferred<Dynamic>();
 		var start = Timer.stamp();
 		var stageGroup = new EventListenerGroup(StageReference.stage);
 
@@ -80,7 +82,7 @@ class Tween
 			if (ratio >= 1)
 			{
 				stageGroup.dispose();
-				promise.resolve(null);
+				deferred.resolve(null);
 			}
 		}
 
@@ -88,6 +90,6 @@ class Tween
 
 		step();
 
-		return promise;
+		return deferred.promise;
 	}
 }

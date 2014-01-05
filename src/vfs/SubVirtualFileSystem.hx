@@ -1,12 +1,11 @@
 package vfs;
 
-import promhx.Promise;
-
 /**
  * ...
  * @author soywiz
  */
 
+import lang.promise.IPromise;
 class SubVirtualFileSystem extends VirtualFileSystem
 {
 	var parent:VirtualFileSystem;
@@ -17,12 +16,12 @@ class SubVirtualFileSystem extends VirtualFileSystem
 		this.path = path;
 	}
 	
-	override public function openAsync(name:String):Promise<Stream> 
+	override public function openAsync(name:String):IPromise<Stream>
 	{
 		return parent.openAsync(this.path + "/" + name);
 	}
 	
-	override public function existsAsync(name:String):Promise<Bool>
+	override public function existsAsync(name:String):IPromise<Bool>
 	{
 		return parent.existsAsync(this.path + "/" + name);
 	}

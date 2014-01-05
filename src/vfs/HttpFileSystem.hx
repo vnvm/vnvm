@@ -1,7 +1,9 @@
 package vfs;
+import lang.promise.Deferred;
+import lang.promise.IPromise;
+import lang.promise.Promise;
 import flash.utils.Endian;
 import common.event.EventListenerOnce;
-import promhx.Promise;
 import flash.errors.Error;
 import flash.events.Event;
 import flash.events.HTTPStatusEvent;
@@ -33,7 +35,7 @@ class HttpFileSystem extends VirtualFileSystem
 		return ~/\/*$/.replace(baseUrl, '') + '/' + name;
 	}
 	
-	override public function openAsync(name:String):Promise<Stream>
+	override public function openAsync(name:String):IPromise<Stream>
 	{
 		var loader:URLLoader = new URLLoader();
 		var urlRequest:URLRequest = new URLRequest(getAbsolutePath(name));
@@ -42,7 +44,7 @@ class HttpFileSystem extends VirtualFileSystem
 		//urlRequest.req
 		//new URLRequestHeader();
 		
-		var promise = new Promise<Stream>();
+		var deferred = new Deferred<Stream>();
 		//done = LangUtils.callOnce(done);
 
 		var loaderEventListener = new EventListenerOnce(loader);
@@ -50,28 +52,28 @@ class HttpFileSystem extends VirtualFileSystem
 		loaderEventListener.addEventListener(Event.COMPLETE, function(e:Event):Void {
 			loader.close();
 			loader.data.endian = Endian.LITTLE_ENDIAN;
-			promise.resolve(new BytesStream(loader.data));
+			deferred.resolve(new BytesStream(loader.data));
 		});
 		loaderEventListener.addEventListener(SecurityErrorEvent.SECURITY_ERROR, function(e:SecurityErrorEvent):Void {
 			var error:Error = new Error("SECURITY_ERROR: " + name + " # " + baseUrl);
 			throw(error);
 			loader.close();
-			promise.reject(error);
+			deferred.reject(error);
 		});
 		loaderEventListener.addEventListener(IOErrorEvent.IO_ERROR, function(e:IOErrorEvent):Void {
 			var error = new Error("IO_ERROR: " + name + " # " + baseUrl);
 			throw(error);
 			loader.close();
-			promise.reject(error);
+			deferred.reject(error);
 		});
 		
 		loader.load(urlRequest);
 		//throw(new Error("Not implemented VirtualFileSystem.openAsync"));
 		
-		return promise;
+		return deferred.promise;
 	}
 	
-	override public function existsAsync(name:String):Promise<Bool>
+	override public function existsAsync(name:String):IPromise<Bool>
 	{
 		var loader:URLLoader = new URLLoader();
 		var urlRequest:URLRequest = new URLRequest(getAbsolutePath(name));
@@ -79,27 +81,27 @@ class HttpFileSystem extends VirtualFileSystem
 		//urlRequest.method = URLRequestMethod.HEAD;
 		urlRequest.method = URLRequestMethod.GET;
 		//done = LangUtils.callOnce(done);
-		var promise = new Promise<Bool>();
+		var deferred = new Deferred<Bool>();
 		
 		EventUtils.addEventListenerWeak(loader, Event.COMPLETE, function(e:Event):Void {
 			loader.close();
-			promise.resolve(true);
+			deferred.resolve(true);
 		});
 		EventUtils.addEventListenerWeak(loader, "httpResponseStatus", function(e:HTTPStatusEvent):Void {
 			loader.close();
-			promise.resolve(true);
+			deferred.resolve(true);
 		});
 		EventUtils.addEventListenerWeak(loader, SecurityErrorEvent.SECURITY_ERROR, function(e:Event):Void {
 			loader.close();
-			promise.resolve(false);
+			deferred.resolve(false);
 		});
 		EventUtils.addEventListenerWeak(loader, IOErrorEvent.IO_ERROR, function(e:Event):Void {
 			loader.close();
-			promise.resolve(false);
+			deferred.resolve(false);
 		});
 		
 		loader.load(urlRequest);
 		
-		return promise;
+		return deferred.promise;
 	}
 }

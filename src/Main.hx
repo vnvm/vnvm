@@ -16,7 +16,6 @@ import flash.errors.Error;
 import flash.events.Event;
 import flash.Lib;
 import flash.utils.ByteArray;
-import promhx.Promise;
 
 /**
  * ...
@@ -64,8 +63,8 @@ class Main extends Sprite
 
 		Stage2.createAndInitializeStage2(stage);
 
-		Sandbox.test();
-		return;
+		//Sandbox.test();
+		//return;
 
 		//new CommandLineMain().extractAllImages(); return;
 

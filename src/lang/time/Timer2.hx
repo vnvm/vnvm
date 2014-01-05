@@ -1,7 +1,7 @@
 package lang.time;
+import lang.promise.IPromise;
+import lang.promise.Deferred;
 import common.event.Event2;
-import promhx.Promise;
-import haxe.Log;
 import haxe.PosInfos;
 import haxe.Timer;
 import flash.events.Event;
@@ -47,12 +47,12 @@ class Timer2
 		return Timer.stamp();
 	}
 
-	static public function waitAsync(seconds:Float):Promise<Dynamic>
+	static public function waitAsync(seconds:Float):IPromise<Dynamic>
 	{
-		var promise = new Promise<Dynamic>();
+		var deferred = new Deferred<Dynamic>();
 		Timer.delay(function() {
-			promise.resolve(null);
+			deferred.resolve(null);
 		}, Std.int(seconds * 1000));
-		return promise;
+		return deferred.promise;
 	}
 }

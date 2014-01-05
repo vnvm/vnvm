@@ -1,6 +1,7 @@
 package vfs;
 
-import promhx.Promise;
+import lang.promise.Promise;
+import lang.promise.IPromise;
 import haxe.Log;
 
 import sys.FileSystem;
@@ -24,18 +25,18 @@ class LocalFileSystem extends VirtualFileSystem
 		return this.path + "/" + name;
 	}
 	
-	override public function openAsync(name:String):Promise<Stream> 
+	override public function openAsync(name:String):IPromise<Stream>
 	{
 		var fullPath:String = getFullPath(name);
 		Log.trace('openAsync: "' + fullPath + '"');
-		return Promise.promise(cast(new FileStream(fullPath), Stream));
+		return Promise.createResolved(cast(new FileStream(fullPath), Stream));
 	}
 	
-	override public function existsAsync(name:String):Promise<Bool> 
+	override public function existsAsync(name:String):IPromise<Bool>
 	{
 		var fullPath:String = getFullPath(name);
 		var exists = FileSystem.exists(fullPath);
 		Log.trace('existsAsync: "' + fullPath + '": ' + exists);
-		return Promise.promise(exists);
+		return Promise.createResolved(exists);
 	}
 }

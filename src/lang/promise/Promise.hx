@@ -4,20 +4,28 @@ import haxe.Timer;
 import lang.time.Timer2;
 class Promise
 {
-	static public function createResolved<T>(value:T):IPromise<T>
+	static public function createDeferred():IDeferred<Dynamic>
+	{
+		return new Deferred<Dynamic>();
+	}
+
+	static public function createResolved<T>(?value:T):IPromise<T>
 	{
 		var deferred = new Deferred<T>();
 		deferred.resolve(value);
 		return deferred.promise;
 	}
 
-	static public function waitTimeAsync(seconds:Float):IPromise<Dynamic>
+	static public function returnPromiseOrResolvedPromise(possiblePromise:IPromise<Dynamic>):IPromise<Dynamic>
 	{
-		var deferred = new Deferred<Dynamic>();
-		Timer.delay(function() {
-			deferred.resolve(null);
-		}, Std.int(seconds * 1000));
-		return deferred.promise;
+		if (Std.is(possiblePromise, IPromise))
+		{
+			return possiblePromise;
+		}
+		else
+		{
+			return createResolved();
+		}
 	}
 
 	static public function sequence(promises:Array<Void -> IPromise<Dynamic>>):IPromise<Dynamic>
@@ -37,7 +45,7 @@ class Promise
 		return deferred.promise;
 	}
 
-	static public function whenAllDone(promises:Array<IPromise<Dynamic>>):IPromise<Dynamic>
+	static public function whenAll(promises:Array<IPromise<Dynamic>>):IPromise<Dynamic>
 	{
 		var deferred = new Deferred<Dynamic>();
 		var count = promises.length;

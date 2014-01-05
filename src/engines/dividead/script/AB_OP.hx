@@ -1,5 +1,6 @@
 package engines.dividead.script;
-import promhx.Promise;
+import lang.promise.Promise;
+import lang.promise.Deferred;
 import common.display.OptionSelectedEvent;
 import common.event.Event2;
 import common.input.GameInput;
@@ -107,7 +108,7 @@ class AB_OP
 	{
 		game.textField.text = StringTools.replace(text, '@', '"');
 
-		var promise = new Promise<Dynamic>();
+		var deferred = new Deferred<Dynamic>();
 
 		Event2.registerOnceAny([GameInput.onClick, GameInput.onKeyPress], function(e:Event)
 		{
@@ -117,10 +118,10 @@ class AB_OP
 				game.voiceChannel.stop();
 				game.voiceChannel = null;
 			}
-			promise.resolve(null);
+			deferred.resolve(null);
 		});
 
-		return promise;
+		return deferred.promise;
 	}
 
 	@Opcode({ id:0x50, format:"T", description:"Sets the title for the save" })
@@ -150,16 +151,16 @@ class AB_OP
 //@Unimplemented
 	public function OPTION_SHOW()
 	{
-		var promise = new Promise<Dynamic>();
+		var deferred = new Deferred<Dynamic>();
 		var e:OptionSelectedEvent;
 		game.optionList.visible = true;
 		game.optionList.onSelected.registerOnce(function(e:OptionSelectedEvent)
 		{
 			game.optionList.visible = false;
 			ab.jump(e.selectedOption.data.pointer);
-			promise.resolve(null);
+			deferred.resolve(null);
 		});
-		return promise;
+		return deferred.promise;
 	}
 
 	@Opcode({ id:0x0A, format:"", description:"Shows again a list of options" })
@@ -211,19 +212,19 @@ class AB_OP
 //@Unimplemented
 	public function WAIT(time:Int)
 	{
-		var promise = new Promise<Dynamic>();
+		var deferred = new Deferred<Dynamic>();
 		if (game.isSkipping())
 		{
-			promise.resolve(null);
+			deferred.resolve(null);
 		}
 		else
 		{
 			Event2.registerOnceAny([Timer2.createAndStart(time / 1000).onTick], function(e:Event)
 			{
-				promise.resolve(null);
+				deferred.resolve(null);
 			});
 		}
-		return promise;
+		return deferred.promise;
 	}
 
 // ---------------
@@ -352,7 +353,7 @@ class AB_OP
 		var name2Color = name2;
 		var name2Mask = name2.split('_')[0] + '_0' ;
 
-		var promise = new Promise<Dynamic>();
+		var deferred = new Deferred<Dynamic>();
 
 		game.getImageMaskCachedAsync(name1Color, name1Mask).then(function(bitmapData1:BitmapData)
 		{
@@ -367,11 +368,11 @@ class AB_OP
 				matrix.translate(Std.int(640 * 2 / 3 - bitmapData2.width / 2), Std.int(385 - bitmapData2.height));
 				game.back.draw(bitmapData2, matrix);
 
-				promise.resolve(null);
+				deferred.resolve(null);
 			});
 		});
 
-		return promise;
+		return deferred.promise;
 	}
 
 // ----------------------
@@ -382,21 +383,21 @@ class AB_OP
 	@Unimplemented
 	public function ANIMATION(type:Int)
 	{
-		return Promise.promise(null);
+		return Promise.createResolved(null);
 	}
 
 	@Opcode({ id:0x4E, format:"", description:"Makes an scroll to the bottom with the current image" })
 	@Unimplemented
 	public function SCROLL_DOWN(type:Int)
 	{
-		return Promise.promise(null);
+		return Promise.createResolved(null);
 	}
 
 	@Opcode({ id:0x4F, format:"", description:"Makes an scroll to the top with the current image" })
 	@Unimplemented
 	public function SCROLL_UP(type:Int)
 	{
-		return Promise.promise(null);
+		return Promise.createResolved(null);
 	}
 
 // ----------------------
