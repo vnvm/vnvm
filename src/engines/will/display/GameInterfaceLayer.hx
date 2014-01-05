@@ -80,9 +80,7 @@ class GameInterfaceLayer extends Sprite2
 		this.waitingLayer.visible = false;
 		return Tween.forTime(totalTime).onStep(function(step:Float) {
 			textField2.text = text.substr(0, Math.round(text.length * step));
-		}).animateAsync().then(function(?e) {
-			this.waitingLayer.visible = true;
-		});
+		}).animateAsync();
 	}
 
 	public function hideAsync(time:Float = 0.3):Promise<Dynamic>

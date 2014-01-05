@@ -64,6 +64,9 @@ class Main extends Sprite
 
 		Stage2.createAndInitializeStage2(stage);
 
+		Sandbox.test();
+		return;
+
 		//new CommandLineMain().extractAllImages(); return;
 
 		/*
