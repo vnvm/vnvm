@@ -1,0 +1,40 @@
+/*
+ * config.h.win
+ *
+ * Configuration information for compiling on Windows.  This must
+ * be renamed to config.h before compiling!
+ *
+ * $Id: config.h.win,v 1.2 1999/08/01 00:03:08 greg Rel $
+ */
+
+#define NDEBUG 1
+#define ENABLE_DITHER 1
+#define STDC_HEADERS 1
+#define HAVE_SYS_TIME_H 1
+#define HAVE_UNISTD_H 1
+#define TIME_WITH_SYS_TIME 1
+#define HAVE_VPRINTF 1
+#define HAVE_STRTOD 1
+#define HAVE_STRTOL 1
+#define HAVE_RANDOM 0
+#define HAVE_RAND 1
+#define HAVE_LRAND48 0
+#define HAVE_GETRUSAGE 0
+#undef CLK_TCK
+#undef _HPUX_SOURCE
+
+#ifdef DMALLOC
+# define DMALLOC_FUNC_CHECK
+# define strdup(str) xstrdup(str)
+#endif
+
+#ifdef __BORLANDC__
+# pragma warn -8004
+# pragma warn -8057
+# pragma warn -8066
+# pragma warn -8012
+#endif
+
+#ifdef _MSC_VER
+# pragma warning(disable:4761)
+#endif

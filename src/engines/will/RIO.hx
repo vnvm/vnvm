@@ -14,6 +14,12 @@ import engines.will.script.RIO_OP_PW;
 import common.ByteArrayUtils;
 import flash.utils.ByteArray;
 
+typedef ScriptStackInfo =
+{
+	var file:String;
+	var offset:Int;
+}
+
 class RIO implements IScript
 {
 	private var willResourceManager:WillResourceManager;
@@ -23,6 +29,7 @@ class RIO implements IScript
 	private var opcodes:RIO_OP_PW;
 	private var scriptOpcodes:ScriptOpcodes;
 	private var opcodeReader:OpcodeReader;
+	private var scriptStack:Array<ScriptStackInfo>;
 
 	public function new(scene:IScene, willResourceManager:WillResourceManager, gameState:GameState)
 	{
@@ -31,6 +38,7 @@ class RIO implements IScript
 		this.opcodes = new RIO_OP_PW(scene, gameState, this);
 		this.scriptOpcodes = ScriptOpcodes.createWithClass(RIO_OP_PW);
 		this.opcodeReader = new OpcodeReader();
+		this.scriptStack = [];
 	}
 
 	public function executeAsync(?e):IPromise<Dynamic>
@@ -75,6 +83,19 @@ class RIO implements IScript
 			loadFromByteArray(data, name, position);
 		});
 	}
+
+	public function scriptCallAsync(name:String, position:Int = 0):IPromise<Dynamic>
+	{
+		this.scriptStack.push({ file: this.scriptName, offset: this.scriptBytes.position });
+		return loadAsync(name, position);
+	}
+
+	public function scriptReturnAsync():IPromise<Dynamic>
+	{
+		var info = this.scriptStack.pop();
+		return loadAsync(info.file, info.offset);
+	}
+
 
 	public function jumpAbsolute(position:Int):Void
 	{

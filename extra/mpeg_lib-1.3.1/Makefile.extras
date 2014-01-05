@@ -1,0 +1,20 @@
+# Makefile fragment to compile stuff in extras/ (regardless of 
+# whether it can be built or not -- that's decided in the main
+# Makefile)
+
+mpegtest:	extras/mpegtest libmpeg.a
+		rm -f mpegtest
+		ln -s extras/mpegtest .
+
+extras/mpegtest:extras
+		(cd extras ; $(MAKE) mpegtest)
+
+easympeg:	extras/easympeg libmpeg.a
+		rm -f easympeg
+		ln -s extras/easympeg .
+
+extras/easympeg:extras
+		(cd extras ; $(MAKE) easympeg)
+
+check:		mpegtest
+		./mpegtest -checksum test.mpg

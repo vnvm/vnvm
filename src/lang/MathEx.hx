@@ -56,6 +56,7 @@ class MathEx
 		return (v0 * bDist) + bMin;
 	}
 
+	// http://haxe.org/manual/tips_and_tricks#cpp-specific-metadata
 	#if cpp @:functionCode("return numerator / denominator;") #end
 	@:noStack static public function int_div(numerator:Int, denominator:Int):Int
 	{

@@ -1,5 +1,6 @@
 package common;
 
+import haxe.io.BytesData;
 import haxe.io.Bytes;
 import flash.utils.ByteArray;
 import flash.utils.Endian;
@@ -142,6 +143,14 @@ class ByteArrayUtils
 		{
 			bytes.set(n, value);
 		}
+	}
+
+	@:noStack static public function sliceByteArray(byteArray:ByteArray, start:Int, end:Int = -1):ByteArray
+	{
+		if (end < 0) end = byteArray.length;
+		var output = newByteArrayWithLength(end - start, byteArray.endian);
+		output.writeBytes(byteArray, start, end - start);
+		return output;
 	}
 
 }

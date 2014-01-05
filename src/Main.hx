@@ -1,5 +1,14 @@
 package ;
 
+import common.media.container.MpegPs;
+import common.media.audio.MP2Native;
+import common.media.audio.AudioStreamSound;
+import haxe.io.Bytes;
+import haxe.io.BytesData;
+import common.ArrayUtils;
+import haxe.Log;
+import common.ByteArrayUtils;
+import sys.io.File;
 import flash.text.TextFormat;
 import flash.text.TextField;
 import flash.text.TextFieldAutoSize;
@@ -66,6 +75,38 @@ class Main extends Sprite
 		GameInput.init();
 
 		Stage2.createAndInitializeStage2(stage);
+
+		//new AudioStreamSound(MP2Native.createWithStream(File.read("c:/temp/mp2/angela.mp2", true))).play();
+
+		//var data = ByteArrayUtils.BytesToByteArray();
+		//var data = File.getBytes("c:/temp/mp2/angela.mp2").getData();
+
+		/*
+		var file = File.read('c:/temp/anglea.mpg', true);
+		var mpeg = new MpegPs(file);
+		var audioStream = mpeg.getAudioStream(0);
+
+		new AudioStreamSound(MP2Native.createWithStream(audioStream)).play();
+
+		return;
+		*/
+
+		/*
+		var data = ByteArrayUtils.BytesToByteArray(File.getBytes("c:/temp/mp2/angela.mp2"));
+
+		var mp2 = new MP2();
+		Log.trace(mp2.kjmp2_get_sample_rate(data));
+		var pcm = ArrayUtils.array1D(0x100, 0);
+		var data_offset = 0;
+		for (n in 0 ... 10)
+		{
+			var offset = mp2.kjmp2_decode_frame(data, 0, pcm);
+			//data_offset += offset;
+			Log.trace(offset);
+			Log.trace(pcm);
+		}
+		return;
+		*/
 
 		/*
 		var textField = new TextField();

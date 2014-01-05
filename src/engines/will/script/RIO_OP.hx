@@ -96,6 +96,7 @@ class RIO_OP
 	}
 
 	@Opcode({ id:0x61, format:"1s", description:"" })
+	@Unimplemented
 	public function MOVIE(can_stop:Int, name:String)
 	{
 		throw(new NotImplementedException());
@@ -794,23 +795,19 @@ class RIO_OP
 	@Opcode({ id:0x07, format:"s", description:"Switches to an script" })
 	public function SCRIPT(name:String)
 	{
-		return script.loadAsync(name);
+		return this.script.loadAsync(name);
 	}
 
 	@Opcode({ id:0x09, format:"s", description:"Calls a script" })
-	public function SCRIPT_CALL(name)
+	public function SCRIPT_CALL(name:String)
 	{
-		throw(new NotImplementedException());
-
-		//this.load(name, 1);
+		return this.script.scriptCallAsync(name);
 	}
 
 	@Opcode({ id:0x0A, format:"1", description:"Returns from a script" })
-	public function SCRIPT_RET(param)
+	public function SCRIPT_RET(param:Int)
 	{
-		throw(new NotImplementedException());
-
-		//this.script_return();
+		return this.script.scriptReturnAsync();
 	}
 
 	@Opcode({ id:0xFF, format:"", description:"" })
