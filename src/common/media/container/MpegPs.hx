@@ -28,7 +28,12 @@ class MpegPsStream extends Input
 
 	private function fill(expected:Int):Void
 	{
-		while (getAvailable() < expected) this.mpegPs.fillStream(streamIndex);
+		try {
+			while (getAvailable() < expected) this.mpegPs.fillStream(streamIndex);
+		} catch (e:Dynamic)
+		{
+
+		}
 	}
 
 	public function getAvailable():Int
@@ -107,12 +112,18 @@ class MpegPs
 			var streamPacket = readStreamPacket();
 			var data = streamPacket.data.getData();
 			var skip:Int = 7;
-			/*
-			if (data[0] & 0x40)
+
+			if (streamPacket.streamType == StreamType.Video)
 			{
-				skip += 6;
+				skip += 5;
 			}
-			*/
+
+/*
+		if (data[0] & 0x40)
+		{
+			skip += 6;
+		}
+		*/
 
 			getStream(streamPacket.streamIndex).writeBytes(ByteArrayUtils.BytesToByteArray(Bytes.ofData(data.slice(skip))));
 
@@ -143,6 +154,9 @@ class MpegPs
 				{
 					//var streamIndex = packet.type - chunk[0];
 					var streamIndex = packet.type;
+
+					//Log.trace(StringEx.sprintf("%s, %02X", [Std.string(streamType), cast(packet.data.getData()[0], Int)]));
+
 					return new StreamPacket(streamType, streamIndex, packet.data);
 				}
 			}

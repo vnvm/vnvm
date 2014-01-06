@@ -67,19 +67,24 @@ class MP2Native implements IAudioStream
 
 	public function decodeFrame():BytesData
 	{
-		if (this.buffer.length < 1440)
-		{
-			writeBytes(this.stream.read(1440).getData());
-		}
+		try {
+			if (this.buffer.length < 1440)
+			{
+				writeBytes(this.stream.read(1440).getData());
+			}
 
-		if (this.buffer.length > 3)
-		{
-			var data = Bytes.alloc(1152 * 4).getData();
-			var decoded = _decodeFrame(this.buffer, data);
-			this.consumeBytes(decoded);
-			return data;
-		}
-		else
+			if (this.buffer.length > 3)
+			{
+				var data = Bytes.alloc(1152 * 4).getData();
+				var decoded = _decodeFrame(this.buffer, data);
+				this.consumeBytes(decoded);
+				return data;
+			}
+			else
+			{
+				return null;
+			}
+		} catch (e:Dynamic)
 		{
 			return null;
 		}

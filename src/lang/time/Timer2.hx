@@ -55,4 +55,10 @@ class Timer2
 		}, Std.int(seconds * 1000));
 		return deferred.promise;
 	}
+
+	static public function setInterval(callback: Void -> Void, seconds:Float)
+	{
+		var timer = new Timer(seconds * 1000);
+		timer.run = callback;
+	}
 }

@@ -67,7 +67,8 @@
 /* Universal global variables -- those needed by the decoding engine: */
 
 DitherEnum  ditherType = FULL_COLOR_DITHER;
-FILE       *input;		/* file pointer to incoming data. */
+//FILE       *input;		/* file pointer to incoming data. */
+FILE2       *input2;		/* file pointer to incoming data. */
 
 /* Global variables used only in this source file: */
 
@@ -140,7 +141,8 @@ get_more_data(unsigned int *buf_start, int max_length, int *length_ptr, unsigned
 
   request = (max_length-length)*4;
   
-  num_read = fread( mark, 1, request, input);
+  num_read = input2->read(input2, mark, request);
+  //num_read = fread( mark, 1, request, input);
 
   /* Paulo Villegas - 26/1/1993: Correction for 4-byte alignment */
   {

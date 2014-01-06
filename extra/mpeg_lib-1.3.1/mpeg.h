@@ -35,6 +35,12 @@
 typedef unsigned int Boolean;
 #endif
 
+typedef struct FILE2
+{
+	void* context;
+	int (*read)(struct FILE2* context, unsigned char *buffer, int len);
+} FILE2;
+
 typedef struct
 {
    short red, green, blue;
@@ -106,9 +112,9 @@ extern "C" {
 
 /* Function prototypes (all are defined in wrapper.c) */
 
-Boolean OpenMPEG PROTO((FILE *MPEGfile, ImageDesc *ImgInfo));
+Boolean OpenMPEG PROTO((FILE2 *MPEGfile, ImageDesc *ImgInfo));
 void    CloseMPEG PROTO((void));
-Boolean RewindMPEG PROTO((FILE *MPEGfile, ImageDesc *Image));
+//Boolean RewindMPEG PROTO((FILE2 *MPEGfile, ImageDesc *Image));
 void    SetMPEGOption PROTO((MPEGOptionEnum Option, int value));
 Boolean GetMPEGFrame PROTO((char *Frame));
 

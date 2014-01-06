@@ -33,12 +33,12 @@
 #endif
 
 extern DitherEnum ditherType;
-extern FILE *input;
+//extern FILE *input;
+extern FILE2 *input2;
 
 extern Boolean EOF_flag;
 extern unsigned int curBits;
 extern int bitOffset, bufLength;
 extern unsigned int *bitBuffer;
-
 
 #endif

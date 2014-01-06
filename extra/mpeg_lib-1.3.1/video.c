@@ -148,13 +148,8 @@ static unsigned char cropTbl[NUM_CROP_ENTRIES];
  *
  *--------------------------------------------------------------
  */
-
-VidStream *
-NewVidStream(int bufLength)
-{
-  int i, j;
-  VidStream *_new;
-  static unsigned char default_intra_matrix[64] = {
+ 
+   static unsigned char default_intra_matrix[64] = {
     8, 16, 19, 22, 26, 27, 29, 34,
     16, 16, 22, 24, 27, 29, 34, 37,
     19, 22, 26, 27, 29, 34, 34, 38,
@@ -163,9 +158,33 @@ NewVidStream(int bufLength)
     26, 27, 29, 32, 35, 40, 48, 58,
     26, 27, 29, 34, 38, 46, 56, 69,
   27, 29, 35, 38, 46, 56, 69, 83};
+  
+void fill_crop_table()
+{
+  for (int i = (-MAX_NEG_CROP); i < NUM_CROP_ENTRIES - MAX_NEG_CROP; i++)
+  {
+	int value = 0;
+    if (i <= 0) {
+		value = 0;
+    } else if (i >= 255) {
+		value = 255;
+    } else {
+		value = i;
+    }
+      cropTbl[i + MAX_NEG_CROP] = value;
+  }
+
+}
+
+VidStream *
+NewVidStream(int bufLength)
+{
+  int i, j;
+  VidStream *_new;
+
 
   /* Check for legal buffer length. */
-
+    
   if (bufLength < 4)
     return NULL;
 
@@ -174,7 +193,7 @@ NewVidStream(int bufLength)
   bufLength = (bufLength + 3) >> 2;
 
   /* Allocate memory for new structure. */
-
+  
   _new = (VidStream *) malloc(sizeof(VidStream));
 
   /* Initialize pointers to extension and user data. */
@@ -183,7 +202,7 @@ NewVidStream(int bufLength)
     _new->picture.extra_info = _new->picture.user_data =
     _new->picture.ext_data = _new->slice.extra_info =
     _new->ext_data = _new->user_data = NULL;
-
+	
   /* Copy default intra matrix. */
 
   for (i = 0; i < 8; i++) {
@@ -191,19 +210,11 @@ NewVidStream(int bufLength)
       _new->intra_quant_matrix[j][i] = default_intra_matrix[i * 8 + j];
     }
   }
-
+  
   /* Initialize crop table. */
 
-  for (i = (-MAX_NEG_CROP); i < NUM_CROP_ENTRIES - MAX_NEG_CROP; i++) {
-    if (i <= 0) {
-      cropTbl[i + MAX_NEG_CROP] = 0;
-    } else if (i >= 255) {
-      cropTbl[i + MAX_NEG_CROP] = 255;
-    } else {
-      cropTbl[i + MAX_NEG_CROP] = i;
-    }
-  }
-
+  fill_crop_table();
+  
   /* Initialize non intra quantization matrix. */
 
   for (i = 0; i < 8; i++) {
@@ -211,7 +222,7 @@ NewVidStream(int bufLength)
       _new->non_intra_quant_matrix[j][i] = 16;
     }
   }
-
+  
   /* Initialize pointers to image spaces. */
 
   _new->current = _new->past = _new->future = NULL;
@@ -222,7 +233,7 @@ NewVidStream(int bufLength)
   /* Create buffer. */
 
   _new->buf_start = (unsigned int *) malloc(bufLength * 4);
-
+  
   /*
    * Set max_buf_length to one less than actual length to deal with messy
    * data without proper seq. end codes.
@@ -235,7 +246,7 @@ NewVidStream(int bufLength)
   _new->bit_offset = 0;
   _new->buf_length = 0;
   _new->buffer = _new->buf_start;
-
+  
 
   /* Return structure. */
 

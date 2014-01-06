@@ -105,7 +105,7 @@ void GetMPEGInfo (VidStream *vid_stream, ImageDesc *Info);
               Berkeley source)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
-Boolean OpenMPEG (FILE *MPEGfile, ImageDesc *ImgInfo)
+Boolean OpenMPEG (FILE2 *MPEGfile, ImageDesc *ImgInfo)
 {
    /* 
     * First reinitialize these globals in case we're opening a second
@@ -116,7 +116,6 @@ Boolean OpenMPEG (FILE *MPEGfile, ImageDesc *ImgInfo)
    curBits = bitOffset = bufLength = 0;
    EOF_flag = FALSE;
 
-
    /* 
     * Create the video stream and read the first chunk to get movie
     * stats -- width and height in particular.
@@ -125,19 +124,19 @@ Boolean OpenMPEG (FILE *MPEGfile, ImageDesc *ImgInfo)
    theStream = NewVidStream(BUF_LENGTH);
    if (theStream == NULL)
    {
-      fprintf (stderr, "Error creating video stream\n");
+      printf ("Error creating video stream\n");
       return (FALSE);
    }
-   
-   input = MPEGfile;
+      
+   input2 = MPEGfile;
    if (mpegVidRsrc(0, theStream) == NULL)
    {
       fprintf (stderr, "Error reading video stream, or stream empty\n");
       return (FALSE);
    }
-
+   
    GetMPEGInfo (theStream, ImgInfo);
-
+   
    /* Allocate/initialize tables used for dithering (?) */
 
    lum_values = (int *) malloc(LUM_RANGE*sizeof(int));
@@ -149,6 +148,7 @@ Boolean OpenMPEG (FILE *MPEGfile, ImageDesc *ImgInfo)
    InitDither (ImgInfo);	/* initializes dithering structures and */
 				/* colormap (i.e. this is where we do */
 				/* all dither-specific stuff) */
+								
    return (TRUE);
 }     /* OpenMPEG () */
 
@@ -218,15 +218,18 @@ void CloseMPEG (void)
               globals.c; curBits, bitOffset, bufLength, and bitBuffer
               from util.c; and totNumFrames is defined in this file.
 ---------------------------------------------------------------------------- */
-Boolean RewindMPEG (FILE *MPEGfile, ImageDesc *Image)
+/*
+Boolean RewindMPEG (FILE2 *MPEGfile, ImageDesc *Image)
 {
    CloseMPEG ();
+   MPEGfile->rewind
    rewind (MPEGfile);
    bitBuffer = NULL;
    totNumFrames = 0;
 
    return (OpenMPEG (MPEGfile, Image));
 }
+*/
 
 
 

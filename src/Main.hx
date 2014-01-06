@@ -1,5 +1,8 @@
 package ;
 
+import common.media.MpegVideo;
+import lang.time.Timer2;
+import flash.display.Bitmap;
 import common.media.video.Mpeg1Native;
 import common.media.container.MpegPs;
 import common.media.audio.MP2Native;
@@ -77,7 +80,16 @@ class Main extends Sprite
 
 		Stage2.createAndInitializeStage2(stage);
 
-		//var mpeg = new Mpeg1Native(); mpeg.play(); return;
+
+		/*
+		var mpegVideo = new MpegVideo();
+		mpegVideo.loadAndPlayAsync(File.read('c:/temp/anglea.mpg', true)).then(function(e) {
+			Log.trace('ENDED!');
+		});
+		addChild(mpegVideo);
+
+		return;
+		*/
 
 		//new AudioStreamSound(MP2Native.createWithStream(File.read("c:/temp/mp2/angela.mp2", true))).play();
 
@@ -85,7 +97,6 @@ class Main extends Sprite
 		//var data = File.getBytes("c:/temp/mp2/angela.mp2").getData();
 
 		/*
-		var file = File.read('c:/temp/anglea.mpg', true);
 		var mpeg = new MpegPs(file);
 		var audioStream = mpeg.getAudioStream(0);
 
