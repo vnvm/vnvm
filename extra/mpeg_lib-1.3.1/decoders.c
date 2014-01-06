@@ -26,7 +26,7 @@
  *
  */
 
-#include <config.h>
+#include "config.h"
 #include <stdio.h>
 #include <assert.h>
 #include "decoders.h"
@@ -665,8 +665,7 @@ init_tables(void)
  *--------------------------------------------------------------
  */        
 void
-decodeDCTDCSizeLum(value)
-unsigned int *value;
+decodeDCTDCSizeLum(unsigned int *value)
 {
   unsigned int index;
 
@@ -700,8 +699,7 @@ unsigned int *value;
  *--------------------------------------------------------------
  */    
 void    
-decodeDCTDCSizeChrom(value)
-unsigned int *value;
+decodeDCTDCSizeChrom(unsigned int *value)
 {
   unsigned int index;
 
@@ -897,9 +895,7 @@ decodeDCTCoeff(unsigned short int *dct_coeff_tbl, unsigned int *run, int *level)
  *--------------------------------------------------------------
  */        
 void
-decodeDCTCoeffFirst(run, level)
-unsigned int *run;
-int *level;
+decodeDCTCoeffFirst(unsigned int *run, int *level)
 {
   decodeDCTCoeff(dct_coeff_first, run, level);
 }
@@ -927,9 +923,7 @@ int *level;
  *--------------------------------------------------------------
  */ 
 void       
-decodeDCTCoeffNext(run, level)
-unsigned int *run;
-int *level;
+decodeDCTCoeffNext(unsigned int *run, int *level)
 {
   decodeDCTCoeff(dct_coeff_next, run, level);
 }

@@ -19,6 +19,9 @@
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  */
 
+#ifndef __FS4_H
+#define __FS4_H
+
 typedef struct {
   unsigned char value;
   int e1;
@@ -27,3 +30,4 @@ typedef struct {
   int e4; 
 } FS4Dither;
 
+#endif

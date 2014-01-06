@@ -20,7 +20,7 @@
  */
 
 
-#include <config.h>
+#include "config.h"
 #include <malloc.h>
 #include <memory.h>
 #include "mpeg.h"

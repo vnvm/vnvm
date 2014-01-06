@@ -1,3 +1,7 @@
+#ifndef __PROTO_H
+#define __PROTO_H
+
+
 #include "mpeg.h"		/* for typedef's */
 
 
@@ -170,3 +174,5 @@ void   DoDitherImage (unsigned char *l,
 		      int h, int w);
 #endif
 void   ExecuteDisplay (VidStream *vid_stream);
+
+#endif

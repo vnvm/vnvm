@@ -21,7 +21,11 @@
 
 /* Status codes for bit stream i/o operations. */
 
+#ifndef __UTIL_H
+#define __UTIL_H
+
 #define NO_VID_STREAM -1
+#undef UNDERFLOW
 #define UNDERFLOW -2
 #define OK 1
 
@@ -356,3 +360,5 @@ extern unsigned int *bitBuffer;
 #endif
 
 #define UTIL2
+
+#endif

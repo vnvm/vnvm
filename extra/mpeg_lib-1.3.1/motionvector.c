@@ -18,7 +18,7 @@
  * ON AN "AS IS" BASIS, AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATION TO
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  */
-#include <config.h>
+#include "config.h"
 #include "video.h"
 #include "proto.h"
 #include "util.h"
@@ -138,9 +138,7 @@
  */
 
 void 
-ComputeForwVector(recon_right_for_ptr, recon_down_for_ptr)
-     int *recon_right_for_ptr;
-     int *recon_down_for_ptr;
+ComputeForwVector(int *recon_right_for_ptr, int *recon_down_for_ptr)
 {
 
   Pict *picture;
@@ -177,9 +175,7 @@ ComputeForwVector(recon_right_for_ptr, recon_down_for_ptr)
  */
 
 void 
-ComputeBackVector(recon_right_back_ptr, recon_down_back_ptr)
-     int *recon_right_back_ptr;
-     int *recon_down_back_ptr;
+ComputeBackVector(int *recon_right_back_ptr, int *recon_down_back_ptr)
 {
   Pict *picture;
   Macroblock *mblock;

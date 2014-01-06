@@ -19,7 +19,7 @@
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  */
 #define NO_SANITY_CHECKS
-#include <config.h>
+#include "config.h"
 #include <assert.h>
 #include "video.h"
 #include "proto.h"
@@ -67,8 +67,7 @@ extern int zigzag_direct[];
 #define DECODE_DCT_COEFF_NEXT DecodeDCTCoeffNext
 
 void
-ParseReconBlock(n)
-     int n;
+ParseReconBlock(int n)
 {
 #ifdef RISC
   unsigned int temp_curBits;
@@ -360,8 +359,7 @@ ParseReconBlock(n)
  */
 
 void
-ParseAwayBlock(n)
-     int n;
+ParseAwayBlock(int n)
 {
   unsigned int diff;
   unsigned int size, run;

@@ -28,6 +28,9 @@
 
 /* Include util.h for bit i/o parsing macros. */
 
+#ifndef __DECODERS_H
+#define __DECODERS_H
+
 #include "util.h"
 
 /* Code for unbound values in decoding tables */
@@ -472,3 +475,5 @@ extern unsigned short int dct_coeff_first[256];
   coded_bp = coded_block_pattern[index].cbp;				\
   flush_bits(coded_block_pattern[index].num_bits);			\
 }
+
+#endif

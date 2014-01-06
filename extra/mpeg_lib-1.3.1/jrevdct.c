@@ -26,7 +26,7 @@
  * matrix, perhaps with the difference cases encoded.
  */
 
-#include <config.h>
+#include "config.h"
 #include <string.h>
 #include "video.h"
 #include "proto.h"
@@ -157,7 +157,7 @@ static DCTELEM PreIDCT[64][64];
 void
 init_pre_idct() {
   int i;
-  void mpeg_j_rev_dct();
+  //void mpeg_j_rev_dct();
 
   for (i=0; i<64; i++) {
     memset((char *) PreIDCT[i], 0, 64*sizeof(DCTELEM));
@@ -174,9 +174,7 @@ init_pre_idct() {
  */
 
 void
-mpeg_j_rev_dct_sparse (data, pos)
-     DCTBLOCK data;
-     int pos;
+mpeg_j_rev_dct_sparse (DCTBLOCK data, int pos)
 {
   register DCTELEM *dataptr;
   short int val;
@@ -235,8 +233,7 @@ mpeg_j_rev_dct_sparse (data, pos)
 
 
 void
-mpeg_j_rev_dct (data)
-     DCTBLOCK data;
+mpeg_j_rev_dct (DCTBLOCK data)
 {
   INT32 tmp0, tmp1, tmp2, tmp3;
   INT32 tmp10, tmp11, tmp12, tmp13;
@@ -1236,16 +1233,13 @@ mpeg_j_rev_dct (data)
 
 
 void
-mpeg_j_rev_dct_sparse (data, pos) 
-     DCTBLOCK data;
-     int pos;
+mpeg_j_rev_dct_sparse (DCTBLOCK data, int pos) 
 {
   mpeg_j_rev_dct(data);
 }
 
 void
-mpeg_j_rev_dct (data)
-  DCTBLOCK data;
+mpeg_j_rev_dct (DCTBLOCK data)
 {
   INT32 tmp0, tmp1, tmp2, tmp3;
   INT32 tmp10, tmp11, tmp12, tmp13;

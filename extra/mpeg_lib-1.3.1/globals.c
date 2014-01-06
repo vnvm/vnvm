@@ -51,7 +51,7 @@
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 
-#include <config.h>
+#include "config.h"
 #include <stdio.h>
 #if HAVE_NETINET_IN_H
 # include <sys/types.h>   /* to make netinet/in.h happy */
@@ -117,11 +117,7 @@ long htonl (long l)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 int 
-get_more_data(buf_start, max_length, length_ptr, buf_ptr)
-     unsigned int *buf_start;
-     int max_length;
-     int *length_ptr;
-     unsigned int **buf_ptr;
+get_more_data(unsigned int *buf_start, int max_length, int *length_ptr, unsigned int **buf_ptr)
 {
   
   int length, num_read, i, request;
@@ -230,9 +226,7 @@ get_more_data(buf_start, max_length, length_ptr, buf_ptr)
 @MODIFIED   : 
 ---------------------------------------------------------------------------- */
 void
-DoDitherImage(l, Cr, Cb, disp, h, w) 
-unsigned char *l, *Cr, *Cb, *disp;
-int h,w;
+DoDitherImage(unsigned char *l, unsigned char *Cr, unsigned char *Cb, unsigned char *disp, int h, int w) 
 {
 
   switch(ditherType) {

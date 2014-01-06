@@ -18,6 +18,9 @@
  * ON AN "AS IS" BASIS, AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATION TO
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  */
+ 
+#ifndef __FS2_H
+#define __FS2_H
 
 typedef struct {
   unsigned char value;
@@ -25,3 +28,4 @@ typedef struct {
   int e3;
 } FS2DithVal;
 
+#endif

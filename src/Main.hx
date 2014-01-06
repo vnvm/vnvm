@@ -1,5 +1,6 @@
 package ;
 
+import common.media.video.Mpeg1Native;
 import common.media.container.MpegPs;
 import common.media.audio.MP2Native;
 import common.media.audio.AudioStreamSound;
@@ -75,6 +76,8 @@ class Main extends Sprite
 		GameInput.init();
 
 		Stage2.createAndInitializeStage2(stage);
+
+		//var mpeg = new Mpeg1Native(); mpeg.play(); return;
 
 		//new AudioStreamSound(MP2Native.createWithStream(File.read("c:/temp/mp2/angela.mp2", true))).play();
 

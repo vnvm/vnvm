@@ -19,6 +19,9 @@
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  */
 
+#ifndef __DITHER_H
+#define __DITHER_H
+
 extern int LUM_RANGE;
 extern int CR_RANGE;
 extern int CB_RANGE;
@@ -33,3 +36,4 @@ extern int *lum_values;
 extern int *cr_values;
 extern int *cb_values;
 
+#endif

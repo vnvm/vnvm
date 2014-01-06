@@ -25,7 +25,7 @@
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  */
 
-#include <config.h>
+#include "config.h"
 #include "video.h"
 #include "dither.h"
 #include "proto.h"
@@ -84,6 +84,10 @@
  *
  * We'll use fixed point by adding two extra bits after the decimal.
  */
+
+#undef ONE
+#undef CONST_SCALE
+#undef FIX
 
 #define BITS	     8
 #define ONE          ((int) 1)
@@ -202,13 +206,7 @@ InitColorDither()
  *--------------------------------------------------------------
  */
 void
-ColorDitherImage(lum, cr, cb, out, rows, cols)
-  unsigned char *lum;
-  unsigned char *cr;
-  unsigned char *cb;
-  unsigned char *out;
-  int cols, rows;
-
+ColorDitherImage(unsigned char *lum, unsigned char *cr, unsigned char *cb, unsigned char *out, int rows, int cols)
 {
     int L, CR, CB;
     unsigned int *row1, *row2;

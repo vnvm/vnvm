@@ -22,7 +22,7 @@
  * the video decoder model.
  */
 
-#include <config.h>
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -150,11 +150,10 @@ static unsigned char cropTbl[NUM_CROP_ENTRIES];
  */
 
 VidStream *
-NewVidStream(bufLength)
-  int bufLength;
+NewVidStream(int bufLength)
 {
   int i, j;
-  VidStream *new;
+  VidStream *_new;
   static unsigned char default_intra_matrix[64] = {
     8, 16, 19, 22, 26, 27, 29, 34,
     16, 16, 22, 24, 27, 29, 34, 37,
@@ -176,20 +175,20 @@ NewVidStream(bufLength)
 
   /* Allocate memory for new structure. */
 
-  new = (VidStream *) malloc(sizeof(VidStream));
+  _new = (VidStream *) malloc(sizeof(VidStream));
 
   /* Initialize pointers to extension and user data. */
 
-  new->group.ext_data = new->group.user_data =
-    new->picture.extra_info = new->picture.user_data =
-    new->picture.ext_data = new->slice.extra_info =
-    new->ext_data = new->user_data = NULL;
+  _new->group.ext_data = _new->group.user_data =
+    _new->picture.extra_info = _new->picture.user_data =
+    _new->picture.ext_data = _new->slice.extra_info =
+    _new->ext_data = _new->user_data = NULL;
 
   /* Copy default intra matrix. */
 
   for (i = 0; i < 8; i++) {
     for (j = 0; j < 8; j++) {
-      new->intra_quant_matrix[j][i] = default_intra_matrix[i * 8 + j];
+      _new->intra_quant_matrix[j][i] = default_intra_matrix[i * 8 + j];
     }
   }
 
@@ -209,38 +208,38 @@ NewVidStream(bufLength)
 
   for (i = 0; i < 8; i++) {
     for (j = 0; j < 8; j++) {
-      new->non_intra_quant_matrix[j][i] = 16;
+      _new->non_intra_quant_matrix[j][i] = 16;
     }
   }
 
   /* Initialize pointers to image spaces. */
 
-  new->current = new->past = new->future = NULL;
+  _new->current = _new->past = _new->future = NULL;
   for (i = 0; i < RING_BUF_SIZE; i++) {
-    new->ring[i] = NULL;
+    _new->ring[i] = NULL;
   }
 
   /* Create buffer. */
 
-  new->buf_start = (unsigned int *) malloc(bufLength * 4);
+  _new->buf_start = (unsigned int *) malloc(bufLength * 4);
 
   /*
    * Set max_buf_length to one less than actual length to deal with messy
    * data without proper seq. end codes.
    */
 
-  new->max_buf_length = bufLength - 1;
+  _new->max_buf_length = bufLength - 1;
 
   /* Initialize bitstream i/o fields. */
 
-  new->bit_offset = 0;
-  new->buf_length = 0;
-  new->buffer = new->buf_start;
+  _new->bit_offset = 0;
+  _new->buf_length = 0;
+  _new->buffer = _new->buf_start;
 
 
   /* Return structure. */
 
-  return new;
+  return _new;
 }
 
 
@@ -261,8 +260,7 @@ NewVidStream(bufLength)
  *--------------------------------------------------------------
  */
 void
-DestroyVidStream(astream)
-  VidStream *astream;
+DestroyVidStream(VidStream *astream)
 {
   int i;
 
@@ -325,35 +323,34 @@ DestroyVidStream(astream)
  */
 
 PictImage *
-NewPictImage(width, height)
-  unsigned int width, height;
+NewPictImage(unsigned int width, unsigned int height)
 {
-  PictImage *new;
+  PictImage *_new;
 
   /* Allocate memory space for new structure. */
 
-  new = (PictImage *) malloc(sizeof(PictImage));
+  _new = (PictImage *) malloc(sizeof(PictImage));
 
 
   /* Allocate memory for image spaces. */
 
   if ((ditherType == Twox2_DITHER) || (ditherType == FULL_COLOR_DITHER)) {
-    new->display = (unsigned char *) malloc(width * height * 4);
+    _new->display = (unsigned char *) malloc(width * height * 4);
   } else {
-    new->display = (unsigned char *) malloc(width * height);
+    _new->display = (unsigned char *) malloc(width * height);
   }
 
-  new->luminance = (unsigned char *) malloc(width * height);
-  new->Cr = (unsigned char *) malloc(width * height / 4);
-  new->Cb = (unsigned char *) malloc(width * height / 4);
+  _new->luminance = (unsigned char *) malloc(width * height);
+  _new->Cr = (unsigned char *) malloc(width * height / 4);
+  _new->Cb = (unsigned char *) malloc(width * height / 4);
 
   /* Reset locked flag. */
 
-  new->locked = 0;
+  _new->locked = 0;
 
   /* Return pointer to new structure. */
 
-  return new;
+  return _new;
 }
 
 
@@ -374,8 +371,7 @@ NewPictImage(width, height)
  *--------------------------------------------------------------
  */
 void
-DestroyPictImage(apictimage)
-  PictImage *apictimage;
+DestroyPictImage(PictImage *apictimage)
 {
   if (apictimage->luminance != NULL) {
     free(apictimage->luminance);
@@ -438,9 +434,7 @@ DestroyPictImage(apictimage)
  */
 
 VidStream *
-mpegVidRsrc(time_stamp, vid_stream)
-  TimeStamp time_stamp;
-  VidStream *vid_stream;
+mpegVidRsrc(TimeStamp time_stamp, VidStream *vid_stream)
 {
   static int num_calls = 0;
   unsigned int data;
@@ -656,8 +650,7 @@ done:
  */
 
 static int
-ParseSeqHead(vid_stream)
-  VidStream *vid_stream;
+ParseSeqHead(VidStream *vid_stream)
 {
 
   unsigned int data;
@@ -817,8 +810,7 @@ ParseSeqHead(vid_stream)
  */
 
 static int
-ParseGOP(vid_stream)
-  VidStream *vid_stream;
+ParseGOP(VidStream *vid_stream)
 {
   unsigned int data;
 
@@ -922,9 +914,7 @@ ParseGOP(vid_stream)
  */
 
 static int
-ParsePicture(vid_stream, time_stamp)
-  VidStream *vid_stream;
-  TimeStamp time_stamp;
+ParsePicture(VidStream *vid_stream, TimeStamp time_stamp)
 {
   unsigned int data;
   int i;
@@ -1070,8 +1060,7 @@ ParsePicture(vid_stream, time_stamp)
  */
 
 static int
-ParseSlice(vid_stream)
-  VidStream *vid_stream;
+ParseSlice(VidStream *vid_stream)
 {
   unsigned int data;
 
@@ -1145,8 +1134,7 @@ ParseSlice(vid_stream)
  */
 
 static int
-ParseMacroBlock(vid_stream)
-  VidStream *vid_stream;
+ParseMacroBlock(VidStream *vid_stream)
 {
   int addr_incr;
   unsigned int data;
@@ -1466,9 +1454,7 @@ ParseMacroBlock(vid_stream)
  */
 
 static void
-ReconIMBlock(vid_stream, bnum)
-  VidStream *vid_stream;
-  int bnum;
+ReconIMBlock(VidStream *vid_stream, int bnum)
 {
   int mb_row, mb_col, row, col, row_size, rr;
   unsigned char *dest;
@@ -1601,9 +1587,7 @@ ReconIMBlock(vid_stream, bnum)
  */
 
 static void
-ReconPMBlock(vid_stream, bnum, recon_right_for, recon_down_for, zflag)
-  VidStream *vid_stream;
-  int bnum, recon_right_for, recon_down_for, zflag;
+ReconPMBlock(VidStream *vid_stream, int bnum, int recon_right_for, int recon_down_for, int zflag)
 {
   int mb_row, mb_col, row, col, row_size, rr;
   unsigned char *dest, *past;
@@ -2033,9 +2017,7 @@ ReconPMBlock(vid_stream, bnum, recon_right_for, recon_down_for, zflag)
  */
 
 static void
-ReconBMBlock(vid_stream, bnum, recon_right_back, recon_down_back, zflag)
-  VidStream *vid_stream;
-  int bnum, recon_right_back, recon_down_back, zflag;
+ReconBMBlock(VidStream *vid_stream, int bnum, int recon_right_back, int recon_down_back, int zflag)
 {
   int mb_row, mb_col, row, col, row_size, rr;
   unsigned char *dest, *future;
@@ -2459,11 +2441,8 @@ ReconBMBlock(vid_stream, bnum, recon_right_back, recon_down_back, zflag)
  */
 
 static void
-ReconBiMBlock(vid_stream, bnum, recon_right_for, recon_down_for,
-	      recon_right_back, recon_down_back, zflag)
-  VidStream *vid_stream;
-  int bnum, recon_right_for, recon_down_for, recon_right_back, recon_down_back;
-  int zflag;
+ReconBiMBlock(VidStream *vid_stream, int bnum, int recon_right_for, int recon_down_for,
+	      int recon_right_back, int recon_down_back, int zflag)
 {
   int mb_row, mb_col, row, col, row_size, rr;
   unsigned char *dest, *past, *future;
@@ -2750,8 +2729,7 @@ ReconBiMBlock(vid_stream, bnum, recon_right_for, recon_down_for,
  */
 
 static void
-ProcessSkippedPFrameMBlocks(vid_stream)
-  VidStream *vid_stream;
+ProcessSkippedPFrameMBlocks(VidStream *vid_stream)
 {
   int row_size, half_row, mb_row, mb_col, row, col, rr;
   int addr, row_incr, half_row_incr, crow, ccol;
@@ -2883,8 +2861,7 @@ ProcessSkippedPFrameMBlocks(vid_stream)
  */
 
 static void
-ProcessSkippedBFrameMBlocks(vid_stream)
-  VidStream *vid_stream;
+ProcessSkippedBFrameMBlocks(VidStream *vid_stream)
 {
   int row_size, half_row, mb_row, mb_col, row, col, rr;
   int right_half_for, down_half_for, c_right_half_for, c_down_half_for;
@@ -3211,11 +3188,8 @@ ProcessSkippedBFrameMBlocks(vid_stream)
  */
 
 static void
-ReconSkippedBlock(source, dest, row, col, row_size,
-		  right, down, right_half, down_half, width)
-  unsigned char *source;
-  unsigned char *dest;
-  int row, col, row_size, right, down, right_half, down_half, width;
+ReconSkippedBlock(unsigned char *source, unsigned char *dest, int row, int col, int row_size,
+		  int right, int down, int right_half, int down_half, int width)
 {
   int rr;
   unsigned char *source2;
@@ -3381,8 +3355,7 @@ ReconSkippedBlock(source, dest, row, col, row_size,
  */
 
 static void
-DoPictureDisplay(vid_stream)
-  VidStream *vid_stream;
+DoPictureDisplay(VidStream *vid_stream)
 {
 
   /* Convert to colormap space and dither. */

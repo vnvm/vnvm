@@ -18,6 +18,9 @@
  * ON AN "AS IS" BASIS, AND THE UNIVERSITY OF CALIFORNIA HAS NO OBLIGATION TO
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  */
+#ifndef __VIDEO_H
+#define __VIDEO_H
+
 #include <stdio.h>
 #include "mpeg.h"		/* for typedef's */
 
@@ -235,3 +238,4 @@ typedef DCTELEM DCTBLOCK[DCTSIZE2];
 extern double realTimeStart;
 extern int totNumFrames;
 
+#endif

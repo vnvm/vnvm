@@ -5,10 +5,8 @@ import flash.utils.ByteArray;
 import haxe.io.BytesData;
 import haxe.io.Bytes;
 @:cppFileCode('
-extern "C" {
-	#include "../../../../../../../../extra/kjmp2/kjmp2.c"
-	kjmp2_context_t context;
-}
+#include "../../../../../../../../extra/kjmp2.cpp"
+kjmp2_context_t context;
 ')
 class MP2Native implements IAudioStream
 {

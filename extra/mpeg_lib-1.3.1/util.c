@@ -19,7 +19,7 @@
  * PROVIDE MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  */
 
-#include <config.h>
+#include "config.h"
 #include <stdlib.h>
 #include "video.h"
 #include "proto.h"
@@ -139,9 +139,7 @@ correct_underflow() {
  *--------------------------------------------------------------
  */
 
-int next_bits(num, mask)
-int num;
-unsigned int mask;
+int next_bits(int num, unsigned int mask)
 {
   unsigned int stream;
   int ret_value;
