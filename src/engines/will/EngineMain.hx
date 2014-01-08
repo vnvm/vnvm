@@ -1,5 +1,6 @@
 package engines.will;
 
+import reflash.display.DisplayObjectContainer2;
 import common.input.Keys;
 import lang.promise.Deferred;
 import lang.promise.Promise;
@@ -101,6 +102,16 @@ class EngineMain extends Sprite2 implements IScene
 		this.fs = SubVirtualFileSystem.fromSubPath(fs, subpath);
 
 		init();
+	}
+
+	public function getFileSystem():VirtualFileSystem
+	{
+		return fs;
+	}
+
+	public function getGameSprite():DisplayObjectContainer2
+	{
+		return gameSprite;
 	}
 
 	private function init()

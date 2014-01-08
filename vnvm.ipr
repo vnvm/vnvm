@@ -281,6 +281,15 @@
     <mapping directory="" vcs="Git" />
   </component>
   <component name="libraryTable">
+    <library name="haxe-openfl-ffmpeg" type="Haxe">
+      <CLASSES>
+        <root url="file://$PROJECT_DIR$/../../@haxe/haxe-openfl-ffmpeg" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES>
+        <root url="file://$PROJECT_DIR$/../../@haxe/haxe-openfl-ffmpeg" />
+      </SOURCES>
+    </library>
     <library name="openfl">
       <CLASSES>
         <root url="file://C:/HaxeToolkit/haxe/lib/openfl/1,2,2" />

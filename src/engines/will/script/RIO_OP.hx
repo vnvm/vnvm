@@ -8,6 +8,12 @@ PRINCESS WALTZ:
 	sub_406F00
 */
 
+import reflash.display.Stage2;
+import reflash.gl.wgl.WGLTexture;
+import reflash.display.Image2;
+import common.StageReference;
+import flash.display.Bitmap;
+import ffmpeg.FFMPEG;
 import common.tween.Easing;
 import lang.promise.Promise;
 import lang.promise.IPromise;
@@ -99,7 +105,34 @@ class RIO_OP
 	@Unimplemented
 	public function MOVIE(can_stop:Int, name:String)
 	{
-		throw(new NotImplementedException());
+		var deferred = Promise.createDeferred();
+		//Log.trace(FFMPEG.getVersion());
+		var uri = scene.getFileSystem().getFileSystemUri();
+		var ffmpeg:FFMPEG = new FFMPEG();
+		var texture = WGLTexture.fromEmpty(800, 600);
+
+		var gameSprite = scene.getGameSprite();
+		var image = new Image2(texture);
+
+		name = name.toLowerCase();
+
+		Log.trace('MOVIE: "$uri/$name""');
+		ffmpeg.openAndPlay('$uri/$name', function() {
+			//Log.trace('completed!');
+			gameSprite.removeChild(image);
+			deferred.resolve();
+		}, function() {
+			texture.textureBase.setPixels(ffmpeg.bitmapData);
+		});
+
+		gameSprite.addChild(image);
+
+		//texture.textureBase.setPixels();
+		//new Image2();
+
+		//StageReference.stage.addChild(new Bitmap(ffmpeg.bitmapData));
+
+		return deferred.promise;
 
 		/*
 		local movie = Movie();

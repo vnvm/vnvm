@@ -24,7 +24,12 @@ class LocalFileSystem extends VirtualFileSystem
 	{
 		return this.path + "/" + name;
 	}
-	
+
+	override public function getFileSystemUri():String
+	{
+		return this.path;
+	}
+
 	override public function openAsync(name:String):IPromise<Stream>
 	{
 		var fullPath:String = getFullPath(name);

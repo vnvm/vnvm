@@ -1,12 +1,7 @@
 package ;
 
-import common.media.MpegVideo;
-import lang.time.Timer2;
 import flash.display.Bitmap;
-import common.media.video.Mpeg1Native;
-import common.media.container.MpegPs;
-import common.media.audio.MP2Native;
-import common.media.audio.AudioStreamSound;
+import ffmpeg.FFMPEG;
 import haxe.io.Bytes;
 import haxe.io.BytesData;
 import common.ArrayUtils;
@@ -44,8 +39,6 @@ class Main extends Sprite
 	var fs:VirtualFileSystem;
 	var initialized:Bool = false;
 
-
-
 	public function new()
 	{
 		super();
@@ -80,6 +73,20 @@ class Main extends Sprite
 
 		Stage2.createAndInitializeStage2(stage);
 
+		/*
+		Log.trace(FFMPEG.getVersion());
+		var ffmpeg:FFMPEG = new FFMPEG();
+		//ffmpeg.openAndPlay("c:/temp/11/iris.dat", function() {
+		//ffmpeg.openAndPlay("c:/temp/BS_OP.AVI", function() {
+		//ffmpeg.openAndPlay("c:/temp/H264_test1_Talkinghead_mp4_480x360.mp4", function() {
+		ffmpeg.openAndPlay("/mnt/sdcard/vnvm/angela.mpg", function() {
+		//ffmpeg.openAndPlay("c:/temp/BS_OP.webm", function() {
+			Log.trace('completed!');
+		});
+
+		addChild(new Bitmap(ffmpeg.bitmapData));
+		return;
+		*/
 
 		/*
 		var mpegVideo = new MpegVideo();
@@ -272,3 +279,4 @@ class Main extends Sprite
 	}
 
 }
+

@@ -37,6 +37,7 @@
 
 	<haxelib name="format" />
 	<haxelib name="openfl" />
+	<haxelib name="openfl-ffmpeg" />
 
 	<!-- TEST Libraries -->
 	<!--

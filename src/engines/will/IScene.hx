@@ -1,5 +1,8 @@
 package engines.will;
 
+import reflash.display.DisplayObjectContainer2;
+import reflash.display.DisplayObject2;
+import vfs.VirtualFileSystem;
 import lang.promise.IPromise;
 import engines.will.display.IGameElementsLayer;
 import engines.will.display.GameElementsLayer;
@@ -9,6 +12,9 @@ import flash.utils.ByteArray;
 
 interface IScene
 {
+	function getFileSystem():VirtualFileSystem;
+	function getGameSprite():DisplayObjectContainer2;
+
 	function isSkiping():Bool;
 
 	function getMaskValueAt(point:Point):Int;

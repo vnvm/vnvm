@@ -15,7 +15,12 @@ class SubVirtualFileSystem extends VirtualFileSystem
 		this.parent = parent;
 		this.path = path;
 	}
-	
+
+	override public function getFileSystemUri():String
+	{
+		return parent.getFileSystemUri() + '/' + path;
+	}
+
 	override public function openAsync(name:String):IPromise<Stream>
 	{
 		return parent.openAsync(this.path + "/" + name);

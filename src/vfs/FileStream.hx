@@ -33,14 +33,15 @@ class FileStream extends Stream
 		this.fileStat = FileSystem.stat(name);
 		this.length = fileStat.size;
 	}
-	
+
 	override public function readBytesAsync(length:Int):IPromise<ByteArray>
 	{
 		var bytes:Bytes = null;
 		
 		//Log.trace(StringEx.sprintf("Reading '%s'(0x%08X:0x%08X)", [this.fileName, this.position, this.position + length]));
 		
-		try {
+		try
+		{
 			fileInput.seek(position, FileSeek.SeekBegin);
 			
 			var currentPosition:Int = fileInput.tell();

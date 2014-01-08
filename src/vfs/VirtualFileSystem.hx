@@ -38,6 +38,12 @@ class VirtualFileSystem extends VirtualFileSystemBase
 	}
 	*/
 
+	public function getFileSystemUri():String
+	{
+		throw('Must getFileSystemUri() override exception');
+		return null;
+	}
+
 	public function openAndReadAllAsync(name:String):IPromise<ByteArray> {
 		var stream:Stream;	
 		var deferred = new Deferred<ByteArray>();
