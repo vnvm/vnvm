@@ -52,8 +52,7 @@ class ARC extends VirtualFileSystem
 
 	private function readHeaderAsync():IPromise<Dynamic>
 	{
-		var deferred = new Deferred<Dynamic>();
-		stream.readBytesAsync(4).then(function(data:ByteArray)
+		return stream.readBytesAsync(4).pipe(function(data:ByteArray)
 		{
 			var typesCount = data.readUnsignedInt();
 
@@ -61,25 +60,21 @@ class ARC extends VirtualFileSystem
 			for (n in 0 ... typesCount) {
 				promises.push(readTypeAsync(n));
 			}
-			Promise.whenAll(promises).then(function(e) {
-				deferred.resolve(null);
-			});
+			return Promise.whenAll(promises);
 		});
-		return deferred.promise;
 	}
 
 	private function readTypeAsync(index:Int):IPromise<Dynamic>
 	{
-		var deferred = new Deferred<Dynamic>();
 		stream.position = 4 + index * (4 + 4 + 4);
-		stream.readBytesAsync(12).then(function(data:ByteArray)
+		return stream.readBytesAsync(12).pipe(function(data:ByteArray)
 		{
 			var typeName = ByteArrayUtils.readStringz(data, 4);
 			var typeCount = data.readUnsignedInt();
 			var typeStart = data.readUnsignedInt();
 
 			stream.position = typeStart;
-			stream.readBytesAsync(typeCount * (9 + 4 + 4)).then(function(data:ByteArray)
+			return stream.readBytesAsync(typeCount * (9 + 4 + 4)).then(function(data:ByteArray)
 			{
 				for (n in 0 ... typeCount)
 				{
@@ -91,11 +86,8 @@ class ARC extends VirtualFileSystem
 					//Log.trace(fullFileName);
 					files[fullFileName] = SliceStream.fromLength(stream, fileStart, fileSize);
 				}
-
-				deferred.resolve(null);
 			});
 		});
-		return deferred.promise;
 	}
 
 	static public function fromStreamAsync(stream:Stream):IPromise<ARC>

@@ -39,11 +39,7 @@ class SoundPack
 	public function getSoundAsync(soundFile:String):IPromise<Sound> {
 		var entry:SoundEntry = entries.get(soundFile);
 		if (entry == null) throw(new Error('Can\'t find sound \'${soundFile}\''));
-		var deferred = new Deferred<Sound>();
-		entry.getSoundAsync(function(sound:Sound) {
-			deferred.resolve(sound);
-		});
-		return deferred.promise;
+		return entry.getSoundAsync();
 	}
 	
 	private function readEntry(stream:ByteArray):SoundEntry {
@@ -61,8 +57,7 @@ class SoundPack
 		var header1:ByteArray;
 		var header2:ByteArray;
 		
-		var deferred = new Deferred<Dynamic>();
-		stream.readBytesAsync(8).then(function(header1:ByteArray):Void {
+		return stream.readBytesAsync(8).pipe(function(header1:ByteArray) {
 			header1.readInt();
 			var headerBlocks:Int = header1.readUnsignedShort();
 			var entryCount:Int = header1.readUnsignedShort();
@@ -70,16 +65,13 @@ class SoundPack
 			stream.position += headerBlocks * 20 +  2;
 			startPosition = 4 + 2 + 2 + (headerBlocks * 20) + 2 + (entryCount * 24);
 			
-			stream.readBytesAsync((entryCount * 24)).then(function(header2:ByteArray):Void {
+			return stream.readBytesAsync((entryCount * 24)).then(function(header2:ByteArray) {
 				for (n in 0 ... entryCount) {
 					var entry:SoundEntry = readEntry(header2);
 					entries.set(entry.name, entry);
 					//BraveLog.trace(entry.name);
 				}
-				
-				deferred.resolve(null);
 			});
 		});
-		return deferred.promise;
 	}
 }

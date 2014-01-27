@@ -109,20 +109,14 @@ class AB_OP
 	{
 		game.textField.text = StringTools.replace(text, '@', '"');
 
-		var deferred = new Deferred<Dynamic>();
-
-		Signal.addAnyOnce([GameInput.onClick, GameInput.onKeyPress], function(e)
-		{
+		return Promise.fromAnySignalOnce([GameInput.onClick, GameInput.onKeyPress]).then(function(e) {
 			game.textField.text = '';
 			if (game.voiceChannel != null)
 			{
 				game.voiceChannel.stop();
 				game.voiceChannel = null;
 			}
-			deferred.resolve(null);
 		});
-
-		return deferred.promise;
 	}
 
 	@Opcode({ id:0x50, format:"T", description:"Sets the title for the save" })
@@ -152,16 +146,12 @@ class AB_OP
 //@Unimplemented
 	public function OPTION_SHOW()
 	{
-		var deferred = new Deferred<Dynamic>();
 		var e:OptionSelectedEvent;
 		game.optionList.visible = true;
-		game.optionList.onSelected.addOnce(function(e:OptionSelectedEvent)
-		{
+		return Promise.fromSignalOnce(game.optionList.onSelected).then(function(e:OptionSelectedEvent) {
 			game.optionList.visible = false;
 			ab.jump(e.selectedOption.data.pointer);
-			deferred.resolve(null);
 		});
-		return deferred.promise;
 	}
 
 	@Opcode({ id:0x0A, format:"", description:"Shows again a list of options" })
@@ -213,18 +203,9 @@ class AB_OP
 //@Unimplemented
 	public function WAIT(time:Int)
 	{
-		var deferred = new Deferred<Dynamic>();
-		if (game.isSkipping())
-		{
-			deferred.resolve(null);
-		}
-		else
-		{
-			Signal.addAnyOnce([Timer2.createAndStart(time / 1000).onTick], function(e:Event) {
-				deferred.resolve(null);
-			});
-		}
-		return deferred.promise;
+		if (game.isSkipping()) return Promise.createResolved();
+
+		return Promise.fromAnySignalOnce([Timer2.createAndStart(time / 1000).onTick]);
 	}
 
 // ---------------
@@ -353,11 +334,9 @@ class AB_OP
 		var name2Color = name2;
 		var name2Mask = name2.split('_')[0] + '_0' ;
 
-		var deferred = new Deferred<Dynamic>();
-
-		game.getImageMaskCachedAsync(name1Color, name1Mask).then(function(bitmapData1:BitmapData)
+		return game.getImageMaskCachedAsync(name1Color, name1Mask).pipe(function(bitmapData1:BitmapData)
 		{
-			game.getImageMaskCachedAsync(name2Color, name2Mask).then(function(bitmapData2:BitmapData)
+			return game.getImageMaskCachedAsync(name2Color, name2Mask).then(function(bitmapData2:BitmapData)
 			{
 				var matrix:Matrix;
 				matrix = new Matrix();
@@ -367,12 +346,8 @@ class AB_OP
 				matrix = new Matrix();
 				matrix.translate(Std.int(640 * 2 / 3 - bitmapData2.width / 2), Std.int(385 - bitmapData2.height));
 				game.back.draw(bitmapData2, matrix);
-
-				deferred.resolve(null);
 			});
 		});
-
-		return deferred.promise;
 	}
 
 // ----------------------

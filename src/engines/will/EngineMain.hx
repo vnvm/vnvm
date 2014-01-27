@@ -1,5 +1,9 @@
 package engines.will;
 
+import engines.will.utils.WillCommandLineMain;
+import lang.MathEx;
+import reflash.display.TransitionImageBlend2;
+import reflash.display.BlendMode;
 import reflash.display.DisplayObjectContainer2;
 import common.input.Keys;
 import lang.promise.Deferred;
@@ -128,6 +132,9 @@ class EngineMain extends Sprite2 implements IScene
 
 		screenRect = new Rectangle(0, 0, 800, 600);
 
+		//new WillCommandLineMain().extractAllImages();
+		//return;
+
 		//var centerPoint = Anchor.centerCenter.getPointInRect(screenRect);
 		//var zeroPoint = Anchor.topLeft.getPointInRect(screenRect);
 
@@ -185,6 +192,7 @@ class EngineMain extends Sprite2 implements IScene
 			Tween.forTime(time / 1000).onStep(function(ratio:Float)
 			{
 				currentBitmapImage.y = currentBitmapImage.x = 0;
+				currentBitmapImage.blendMode = BlendMode.NORMAL;
 				switch (kind)
 				{
 					case 0: // EFFECT // @TODO
@@ -197,14 +205,30 @@ class EngineMain extends Sprite2 implements IScene
 					case 5, 22, 34: // ZOOM IN // @TODO: pw:pw0001:EB42
 						currentBitmapImage.alpha = ratio;
 
+					case 6: // BOXES; // pw0002_1@0FC1
+						currentBitmapImage.alpha = ratio;
+
+					case 9: // DIAGONAL: pw0002_1:7F71
+						currentBitmapImage.alpha = ratio;
+
 					case 21: // PIXELATE // @TODO: pw:pw0001:EB42
+						currentBitmapImage.alpha = ratio;
+
+					case 40: // --- // @TODO: pw:pw0002_1:10209
 						currentBitmapImage.alpha = ratio;
 
 					case 25: // TRANSITION NORMAL FADE IN (alpha)
 						currentBitmapImage.alpha = ratio;
 
 					case 26: // TRANSITION NORMAL FADE IN BURN (alpha) // @TODO
-						currentBitmapImage.alpha = ratio;
+						//currentBitmap.clear(HtmlColors.transparent).draw(new TransitionImageBlend2(previousBitmap.texture, renderedBitmap.texture, ratio)).finish();
+						if (ratio < 0.5) {
+							currentBitmapImage.blendMode = BlendMode.ADD;
+							currentBitmapImage.alpha = MathEx.translateRange(ratio, 0, 0.5, 0, 1);
+						} else {
+							currentBitmapImage.blendMode = BlendMode.NORMAL;
+							currentBitmapImage.alpha = MathEx.translateRange(ratio, 0.5, 1.0, 0, 1);
+						}
 
 					case 35: // ZOOM OUT // @TODO: pw:pw0001:BFB7
 						currentBitmapImage.alpha = ratio;
@@ -278,6 +302,11 @@ class EngineMain extends Sprite2 implements IScene
 		return deferred.promise;
 	}
 
+	public function setTextSize(size:Int):Void
+	{
+		interfaceLayer.setTextSize(size);
+	}
+
 	public function soundPlayStopAsync(channelName:String, name:String, fadeInOutMs:Int):IPromise<Dynamic>
 	{
 		//return Promise.promise(null);
@@ -312,33 +341,26 @@ class EngineMain extends Sprite2 implements IScene
 
 	public function animLoadAsync(name:String):IPromise<Dynamic>
 	{
-		var deferred = new Deferred<Dynamic>();
-		getBtyeArrayAsync(Path.withExtension(name, 'anm')).then(function(data:ByteArray)
+		return getBtyeArrayAsync(Path.withExtension(name, 'anm')).pipe(function(data:ByteArray)
 		{
 			var anm = ANM.fromByteArray(data);
-			willResourceManager.getWipWithMaskAsync(anm.wipName).then(function(wip:WIP)
+			return willResourceManager.getWipWithMaskAsync(anm.wipName).then(function(wip:WIP)
 			{
 				gameLayerList.getMenuLayer().setAnmAndWip(anm, wip);
-
-				deferred.resolve(null);
 			});
 		});
-		return deferred.promise;
 	}
 
 	public function tableLoadAsync(name:String):IPromise<Dynamic>
 	{
-		var deferred = new Deferred<Dynamic>();
-		getBtyeArrayAsync(Path.withExtension(name, 'TBL')).then(function(data:ByteArray)
+		return getBtyeArrayAsync(Path.withExtension(name, 'TBL')).pipe(function(data:ByteArray)
 		{
 			var tbl = TBL.fromByteArray(data);
-			willResourceManager.getWipAsync(tbl.mskName + '.MSK').then(function(msk:WIP):Void
+			return willResourceManager.getWipAsync(tbl.mskName + '.MSK').then(function(msk:WIP):Void
 			{
 				gameLayerList.getMenuLayer().setTableMask(tbl, msk.get(0).bitmapData);
-				deferred.resolve(null);
 			});
 		});
-		return deferred.promise;
 	}
 
 	public function setDirectMode(directMode:Bool):Void

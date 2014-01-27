@@ -177,35 +177,31 @@ class Game
 	 * @param	done
 	 */
 	public function getImageCachedAsync(imageName:String):IPromise<BitmapData> {
-		var deferred = new Deferred<BitmapData>();
 		imageName = addExtensionsWhenRequired(imageName, "bmp").toUpperCase();
 		
 		if (imageCache.exists(imageName)) {
-			deferred.resolve(imageCache.get(imageName));
+			return Promise.createResolved(imageCache.get(imageName));
 		} else {
-			sg.openAndReadAllAsync(imageName).then(function(byteArray:ByteArray):Void {
+			return sg.openAndReadAllAsync(imageName).then(function(byteArray:ByteArray) {
 				imageCache.set(imageName, SG.getImage(byteArray));
-				deferred.resolve(imageCache.get(imageName));
+				return imageCache.get(imageName);
 			});
 		}
-		return deferred.promise;
 	}
 
 	public function getImageMaskCachedAsync(imageNameColor:String, imageNameMask:String):IPromise<BitmapData> {
 		var imageName:String = '${imageNameColor}${imageNameMask}';
-		var deferred = new Deferred<BitmapData>();
-		
+
 		if (imageCache.exists(imageName)) {
-			deferred.resolve(imageCache.get(imageName));
+			return Promise.createResolved(imageCache.get(imageName));
 		} else {
-			getImageCachedAsync(imageNameColor).then(function(color:BitmapData) {
-			getImageCachedAsync(imageNameMask).then(function(mask:BitmapData) {
-				imageCache.set(imageName, BitmapDataUtils.combineColorMask(color, mask));
-				deferred.resolve(imageCache.get(imageName));
-			});
+			return getImageCachedAsync(imageNameColor).pipe(function(color:BitmapData) {
+				return getImageCachedAsync(imageNameMask).then(function(mask:BitmapData) {
+					imageCache.set(imageName, BitmapDataUtils.combineColorMask(color, mask));
+					return imageCache.get(imageName);
+				});
 			});
 		}
-		return deferred.promise;
 	}
 
 	/**
@@ -228,17 +224,15 @@ class Game
 		name = addExtensionsWhenRequired(name, extension).toUpperCase();
 
 		var byteArray:ByteArray;
-		var deferred = new Deferred<Sound>();
-		vfs.openAndReadAllAsync(name).then(function(byteArray:ByteArray):Void {
+		return vfs.openAndReadAllAsync(name).then(function(byteArray:ByteArray) {
 			var sound:Sound = new Sound();
 			try {
 				sound.loadCompressedDataFromByteArray(byteArray, byteArray.length);
 			} catch (e:Dynamic) {
 				Log.trace('Error: ' + e);
 			}
-			deferred.resolve(sound);
+			return sound;
 		});
-		return deferred.promise;
 	}
 	
 	/**
@@ -248,27 +242,20 @@ class Game
 	 */
 	static public function newAsync(fileSystem:VirtualFileSystem):IPromise<Game>
 	{
-		var deferred = new Deferred<Game>();
-		getDl1Async(fileSystem, "SG.DL1").then(function(sg:DL1)
+		return getDl1Async(fileSystem, "SG.DL1").pipe(function(sg:DL1)
 		{
-			getDl1Async(fileSystem, "WV.DL1").then(function(wv:DL1)
+			return getDl1Async(fileSystem, "WV.DL1").then(function(wv:DL1)
 			{
-				deferred.resolve(new Game(fileSystem, sg, wv));
+				return new Game(fileSystem, sg, wv);
 			});
 		});
-		return deferred.promise;
 	}
 
 	static private function getDl1Async(fileSystem:VirtualFileSystem, name:String):IPromise<DL1>
 	{
-		var deferred = new Deferred<DL1>();
-		fileSystem.openAsync(name).then(function(stream:Stream):Void
+		return fileSystem.openAsync(name).pipe(function(stream:Stream)
 		{
-			DL1.loadAsync(stream).then(function(dl1:DL1)
-			{
-				deferred.resolve(dl1);
-			});
+			return DL1.loadAsync(stream);
 		});
-		return deferred.promise;
 	}
 }

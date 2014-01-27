@@ -78,19 +78,19 @@ class WGLTexture implements IGLTexture
 		return list;
 	}
 
-	static public function fromTextureBase(textureBase:IGLTextureBase, width:Int, height:Int):IGLTexture
+	static public function fromTextureBase(textureBase:IGLTextureBase):IGLTexture
 	{
-		return new WGLTexture(textureBase, new Rectangle(0, 0, width, height));
+		return new WGLTexture(textureBase, new Rectangle(0, 0, textureBase.width, textureBase.height));
 	}
 
 	static public function fromEmpty(width:Int, height:Int):IGLTexture
 	{
-		return fromTextureBase(WGLTextureBase.createEmpty(width, height), width, height);
+		return fromTextureBase(WGLTextureBase.createEmpty(width, height));
 	}
 
 	static public function fromBitmapData(bitmapData:BitmapData):IGLTexture
 	{
-		return fromTextureBase(WGLTextureBase.createWithBitmapData(bitmapData), bitmapData.width, bitmapData.height);
+		return fromTextureBase(WGLTextureBase.createWithBitmapData(bitmapData));
 	}
 
 	/*

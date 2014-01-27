@@ -1,4 +1,5 @@
 package common.display;
+import haxe.Log;
 import reflash.display.HtmlColors;
 import reflash.display.Quad2;
 import reflash.display.DisplayObject2;

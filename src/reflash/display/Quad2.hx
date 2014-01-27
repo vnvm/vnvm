@@ -17,6 +17,8 @@ class Quad2 extends DisplayObject2
 
 	override public function drawInternal(drawContext:DrawContext)
 	{
+		if (width < 1 || height < 1) return;
+
 		var shader = SolidColorShader.getInstance();
 		shader.use();
 		shader.setProjection(drawContext.projectionMatrix);

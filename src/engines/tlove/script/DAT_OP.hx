@@ -75,9 +75,7 @@ class DAT_OP
 	@Unimplemented
 	function MOUSE_WAIT_CLICK_EVERYWHERE(leftClickLabel:Int, rightClickLabel:Int)
 	{
-		var deferred = new Deferred<Dynamic>();
-
-		Signal.addAnyOnce([game.onMouseLeftClick, game.onMouseRightClick], function(e:MouseEvent) {
+		return Promise.fromAnySignalOnce([game.onMouseLeftClick, game.onMouseRightClick]).then(function(e:MouseEvent) {
 			//e.type = MouseEvent.CLICK;
 			if (e.type == MouseEvent.CLICK) {
 				dat.jumpLabel(leftClickLabel);
@@ -86,9 +84,7 @@ class DAT_OP
 			} else {
 				throw(new Error('Invalid event for MOUSE_WAIT_CLICK_EVERYWHERE $e'));
 			}
-			deferred.resolve(null);
 		});
-		return deferred.promise;
 	}
 	
 	/**
@@ -99,15 +95,9 @@ class DAT_OP
 	//@Unimplemented
 	function MOUSE_WAIT_EVENT(v:Int)
 	{
-		var deferred = new Deferred<Dynamic>();
-
-		Signal.addAnyOnce([game.onMouseLeftClick, game.onMouseRightClick, game.onMouseMove], function(e:MouseEvent) {
+		return Promise.fromAnySignalOnce([game.onMouseLeftClick, game.onMouseRightClick, game.onMouseMove]).then(function(e:MouseEvent) {
 			game.lastMouseEvent = e;
-			
-			deferred.resolve(null);
 		});
-
-		return deferred.promise;
 	}
 	
 	/**
@@ -298,14 +288,11 @@ class DAT_OP
 	function IMG_LOAD(name:String, layer:Int)
 	{
 		var mrs:MRS;
-		var deferred = new Deferred<Dynamic>();
-		game.getMrsAsync(name, function(mrs:MRS) {
+		return game.getMrsAsync(name, function(mrs:MRS) {
 			Palette.copy(mrs.image.palette, game.lastLoadedPalette);
 			mrs.image.drawToBitmapData8(game.layers[layer], 0, 0);
 			if (layer == 0) game.updateImage();
-			deferred.resolve(null);
 		});
-		return deferred.promise;
 	}
 
 	/**

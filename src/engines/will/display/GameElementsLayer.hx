@@ -95,8 +95,8 @@ class GameElementsLayer extends Sprite2 implements IGameElementsLayer
 	{
 		this.scaleX = scale;
 		this.scaleY = scale;
-		this.x = x;
-		this.y = y;
+		this.x = 800 - x;
+		this.y = 600 - y;
 		return this;
 	}
 }

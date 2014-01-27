@@ -98,7 +98,7 @@ class WGLFrameBuffer implements IGLFrameBuffer implements IWGLObject
 		WGLCommon.check();
 	}
 
-	private function bindAndSetViewport()
+	public function bindAndSetViewport():Void
 	{
 		bind();
 		setViewport();
@@ -183,7 +183,7 @@ class WGLFrameBuffer implements IGLFrameBuffer implements IWGLObject
 
 	static private var lastFrameBuffer:IGLFrameBuffer;
 
-	private function bind()
+	public function bind()
 	{
 		// no change
 		if (lastFrameBuffer == this) return;
@@ -214,12 +214,10 @@ class WGLFrameBuffer implements IGLFrameBuffer implements IWGLObject
 		return this;
 	}
 
-	/*
 	static public function unbind()
 	{
 		//GL.bindTexture(GL.TEXTURE_2D, null);
 		GL.bindFramebuffer(GL.FRAMEBUFFER, null);
 		//GL.bindRenderbuffer(GL.RENDERBUFFER, null);
 	}
-	*/
 }

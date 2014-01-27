@@ -24,10 +24,9 @@ class DL1 extends VirtualFileSystem
 		var header:ByteArray;
 		var entriesByteArray:ByteArray;
 		var dl1:DL1 = new DL1();
-		var deferred = new Deferred<DL1>();
 
 		// Read header
-		stream.readBytesAsync(0x10).then(function(header:ByteArray)
+		return stream.readBytesAsync(0x10).pipe(function(header:ByteArray)
 		{
 			var magic:String = StringTools.replace(header.readUTFBytes(8), String.fromCharCode(0), '');
 			var count:Int = header.readUnsignedShort();
@@ -42,7 +41,7 @@ class DL1 extends VirtualFileSystem
 			
 			// Read entries
 			stream.position = offset;
-			stream.readBytesAsync(16 * count).then(function(entriesByteArray:ByteArray):Void
+			return stream.readBytesAsync(16 * count).then(function(entriesByteArray:ByteArray)
 			{
 				for (n in 0 ... count) {
 					var name:String = StringTools.replace(entriesByteArray.readUTFBytes(12), String.fromCharCode(0), '');
@@ -56,11 +55,9 @@ class DL1 extends VirtualFileSystem
 					pos += size;
 				}
 
-				deferred.resolve(dl1);
+				return dl1;
 			});
 		});
-
-		return deferred.promise;
 	}
 	
 	override public function openAsync(name:String):IPromise<Stream>

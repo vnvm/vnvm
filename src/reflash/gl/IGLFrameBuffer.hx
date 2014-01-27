@@ -10,4 +10,6 @@ interface IGLFrameBuffer extends IDrawable extends IDisposable
 	function clear(color:Color2):IGLFrameBuffer;
 	function draw(drawable:IDrawable, x:Int = 0, y:Int = 0):IGLFrameBuffer;
 	function finish():IGLFrameBuffer;
+	//function bind():Void;
+	function bindAndSetViewport():Void;
 }

@@ -1,5 +1,6 @@
 package lang.promise;
 
+import lang.signal.Signal;
 import haxe.Timer;
 import lang.time.Timer2;
 class Promise
@@ -8,6 +9,26 @@ class Promise
 	{
 		return new Deferred<Dynamic>();
 	}
+
+	static public function fromSignalOnce<T>(signal:Signal<T>):IPromise<T>
+	{
+		var deferred = new Deferred<T>();
+		signal.addOnce(function(value:T) {
+			deferred.resolve(value);
+		});
+		return deferred.promise;
+	}
+
+	static public function fromAnySignalOnce<T>(signals:Array<Signal<Dynamic>>):IPromise<T>
+	{
+		var deferred = new Deferred<T>();
+		Signal.addAnyOnce(signals, function(value:T) {
+			deferred.resolve(value);
+		});
+		return deferred.promise;
+	}
+
+
 
 	static public function createResolved<T>(?value:T):IPromise<T>
 	{

@@ -92,18 +92,15 @@ class WillResourceManager
 
 	public function getWipWithMaskAsync(name:String):IPromise<WIP>
 	{
-		var deferred = new Deferred<WIP>();
-
-		getWipAsync('$name.WIP').then(function(colorWip:WIP)
+		return getWipAsync('$name.WIP').pipe(function(colorWip:WIP)
 		{
 			if (colorWip == null) throw('Can\'t find $name.WIP');
-			getWipAsync('$name.MSK', true).then(function(alphaWip:WIP)
+			return getWipAsync('$name.MSK', true).then(function(alphaWip:WIP)
 			{
 				colorWip.mergeAlpha(alphaWip);
-				deferred.resolve(colorWip);
+				return colorWip;
 			});
 		});
-		return deferred.promise;
 	}
 
 	public function getWipAsync(name:String, optional:Bool = false):IPromise<WIP>

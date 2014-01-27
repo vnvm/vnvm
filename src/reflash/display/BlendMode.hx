@@ -4,4 +4,6 @@ enum BlendMode
 {
 	NORMAL;
 	ADD;
+	MULTIPLY;
+	SCREEN;
 }

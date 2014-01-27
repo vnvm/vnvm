@@ -24,10 +24,10 @@ class WGLTextureBase implements IGLTextureBase implements IWGLObject
 	private var data:ByteArray;
 	public var referenceCounter(default, null):ReferenceCounter;
 
-	private function new()
+	public function new(textureId:GLTexture = null)
 	{
 		this.referenceCounter = new ReferenceCounter(this);
-		this.__recreate();
+		this.__recreate2(textureId);
 		_WGLInstances.getInstance().add(this);
 	}
 
@@ -68,7 +68,12 @@ class WGLTextureBase implements IGLTextureBase implements IWGLObject
 
 	public function __recreate()
 	{
-		this.textureId = GL.createTexture();
+		__recreate2(null);
+	}
+
+	public function __recreate2(textureId:GLTexture = null)
+	{
+		if (textureId == null) this.textureId = GL.createTexture();
 		WGLCommon.check();
 
 		if (data != null)

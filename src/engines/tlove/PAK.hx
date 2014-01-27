@@ -39,12 +39,11 @@ class PAK
 		var pak:PAK = new PAK();
 		var countByteArray:ByteArray;
 		var headerByteArray:ByteArray;
-		var deferred = new Deferred<PAK>();
-		
-		pakStream.readBytesAsync(2).then(function(countByteArray:ByteArray):Void {
+
+		return pakStream.readBytesAsync(2).pipe(function(countByteArray:ByteArray) {
 			var headerSize:Int = countByteArray.readUnsignedShort();
 
-			pakStream.readBytesAsync(headerSize).then(function(headerByteArray:ByteArray):Void {
+			return pakStream.readBytesAsync(headerSize).then(function(headerByteArray:ByteArray) {
 				var names:Array<String> = [];
 				var offsets:Array<Int> = [];
 
@@ -58,11 +57,9 @@ class PAK
 				for (n in 0 ... names.length - 1) {
 					pak.items.set(names[n], SliceStream.fromBounds(pakStream, offsets[n], offsets[n + 1]));
 				}
-				
-				deferred.resolve(pak);
+
+				return pak;
 			});
 		});
-		
-		return deferred.promise;
 	}
 }

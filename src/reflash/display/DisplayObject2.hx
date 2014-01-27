@@ -35,6 +35,11 @@ class DisplayObject2 implements IDrawable
 			parent.applyMatrix(matrix);
 		}
 
+		/*
+		matrix.prependScale(scaleX, scaleY, 1);
+		matrix.prependTranslation(x, y, 0);
+		matrix.prependRotation(angle, Vector3D.Z_AXIS);
+		*/
 		matrix.prependTranslation(x, y, 0);
 		matrix.prependRotation(angle, Vector3D.Z_AXIS);
 		matrix.prependScale(scaleX, scaleY, 1);
@@ -130,6 +135,12 @@ class DisplayObject2 implements IDrawable
 						//GL.blendFuncSeparate(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA, GL.ONE, GL.ZERO);
 
 						//GL.blendEquationSeparate
+					case BlendMode.MULTIPLY:
+						GL.enable(GL.BLEND);
+						GL.blendFunc(GL.DST_COLOR, GL.SRC_ALPHA);
+					case BlendMode.SCREEN:
+						GL.enable(GL.BLEND);
+						GL.blendFunc(GL.ONE, GL.ONE_MINUS_SRC_COLOR);
 					case BlendMode.ADD:
 						GL.enable(GL.BLEND);
 						GL.blendFunc(GL.SRC_ALPHA, GL.ONE);

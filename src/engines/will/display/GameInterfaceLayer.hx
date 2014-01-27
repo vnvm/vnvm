@@ -84,6 +84,16 @@ class GameInterfaceLayer extends Sprite2
 		return deferred.promise;
 	}
 
+	public function setTextSize(size:Int):Void
+	{
+		var scale:Float = switch (size) {
+			case 0: 1;
+			case 1: 2;
+			default: throw('Invalid size');
+		};
+		textFieldContent.scaleY = textFieldContent.scaleX = scale;
+	}
+
 	public function setTextAsync(text:String, title:String, timePerCharacter:Float = 0.05):IPromise<Dynamic>
 	{
 		var totalTime = timePerCharacter * text.length;

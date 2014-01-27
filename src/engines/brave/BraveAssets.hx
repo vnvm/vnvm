@@ -111,40 +111,28 @@ class BraveAssets
 	{
 		if (soundPack != null) return soundPack.getSoundAsync(name);
 
-		var deferred = new Deferred<Sound>();
-		getStreamAsync("sound.pck").then(function(stream:Stream):Void
+		return getStreamAsync("sound.pck").pipe(function(stream:Stream)
 		{
-			SoundPack.newAsync(1, stream).then(function(_soundPack:SoundPack)
+			return SoundPack.newAsync(1, stream).pipe(function(_soundPack:SoundPack)
 			{
 				BraveAssets.soundPack = _soundPack;
-				BraveAssets.soundPack.getSoundAsync(name).then(function(sound:Sound)
-				{
-					deferred.resolve(sound);
-				});
+				return BraveAssets.soundPack.getSoundAsync(name);
 			});
 		});
-		return deferred.promise;
 	}
 
 	static public function getVoiceAsync(name:String):IPromise<Sound>
 	{
 		if (voicePack != null) return voicePack.getSoundAsync(name);
 
-		var deferred = new Deferred<Sound>();
-
-		getStreamAsync("voice/voice.pck").then(function(stream:Stream):Void
+		return getStreamAsync("voice/voice.pck").pipe(function(stream:Stream)
 		{
-			SoundPack.newAsync(1, stream).then(function(_voicePack:SoundPack):Void
+			return SoundPack.newAsync(1, stream).pipe(function(_voicePack:SoundPack)
 			{
 				BraveAssets.voicePack = _voicePack;
-				BraveAssets.voicePack.getSoundAsync(name).then(function(sound:Sound):Void
-				{
-					deferred.resolve(sound);
-				});
+				return BraveAssets.voicePack.getSoundAsync(name);
 			});
 		});
-
-		return deferred.promise;
 	}
 
 	static public function getMusicAsync(name:String):IPromise<Sound>

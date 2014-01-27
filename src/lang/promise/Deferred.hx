@@ -93,6 +93,26 @@ private class PromiseImpl<T> implements IPromise<T>
 		return deferred.promise;
 	}
 
+	public function pipe<A>(successCallback:T -> IPromise<A>, ?errorCallback:Dynamic -> Void):IPromise<A>
+	{
+		var deferred = new Deferred<A>();
+
+		listeners.push({
+		successCallback: function(value:T) {
+			successCallback(value).then(deferred.resolve, deferred.reject);
+		},
+		errorCallback: errorCallback
+		});
+
+		deferred.onCancel.add(function(e) {
+			cancel();
+		});
+
+		callPending();
+
+		return deferred.promise;
+	}
+
 	private function callPending()
 	{
 		if (!isCompleted()) return;

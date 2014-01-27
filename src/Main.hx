@@ -1,5 +1,6 @@
 package ;
 
+import common.display.Quad;
 import flash.display.Bitmap;
 import ffmpeg.FFMPEG;
 import haxe.io.Bytes;
@@ -72,6 +73,15 @@ class Main extends Sprite
 		GameInput.init();
 
 		Stage2.createAndInitializeStage2(stage);
+
+		/*
+		var filteredSprite = new FilteredSprite(512, 512);
+		filteredSprite.container.addChild(new Quad(100, 100, 0x0000FF));
+		this.addChild(filteredSprite);
+		this.addChild(new Quad(20, 20, 0x00FF00));
+
+		return;
+		*/
 
 		/*
 		Log.trace(FFMPEG.getVersion());
@@ -279,4 +289,3 @@ class Main extends Sprite
 	}
 
 }
-

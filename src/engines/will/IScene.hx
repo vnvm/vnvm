@@ -29,6 +29,7 @@ interface IScene
 	function performTransitionAsync(kind:Int, time:Int):IPromise<Dynamic>;
 
 	function setTextAsync(text:String, title:String, timePerCharacter:Float):IPromise<Dynamic>;
+	function setTextSize(size:Int):Void;
 
 	function animLoadAsync(name:String):IPromise<Dynamic>;
 	function tableLoadAsync(name:String):IPromise<Dynamic>;

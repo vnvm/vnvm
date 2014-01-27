@@ -1,33 +1,28 @@
 package reflash.display;
 
+import reflash.display.shader.BlendShader;
 import reflash.gl.IGLTexture;
 import reflash.display.shader.TransitionShader;
 
-class TransitionImage2 extends DisplayObject2
+class TransitionImageBlend2 extends DisplayObject2
 {
 	private var colorTexture1:IGLTexture;
 	private var colorTexture2:IGLTexture;
-	private var maskTexture:IGLTexture;
 	public var step:Float;
-	public var reverse:Bool;
-	public var blend:Bool;
 
-	public function new(colorTexture1:IGLTexture, colorTexture2:IGLTexture, maskTexture:IGLTexture, step:Float = 0.5, reverse:Bool = false, blend:Bool = false)
+	public function new(colorTexture1:IGLTexture, colorTexture2:IGLTexture, step:Float = 0.5)
 	{
 		super();
 		this.colorTexture1 = colorTexture1;
 		this.colorTexture2 = colorTexture2;
-		this.maskTexture = maskTexture;
-		this.width = maskTexture.width;
-		this.height = maskTexture.height;
+		this.width = colorTexture1.width;
+		this.height = colorTexture1.height;
 		this.step = step;
-		this.reverse = reverse;
-		this.blend = blend;
 	}
 
 	override private function drawInternal(drawContext:DrawContext)
 	{
-		var shader = TransitionShader.getInstance();
+		var shader = BlendShader.getInstance();
 		//var shader = TextureShader.getInstance();
 		shader.use();
 		shader.setProjection(drawContext.projectionMatrix);
@@ -44,20 +39,17 @@ class TransitionImage2 extends DisplayObject2
 
 		shader.setColorTexture1(this.colorTexture1.textureBase);
 		shader.setColorTexture2(this.colorTexture2.textureBase);
-		shader.setMaskTexture(this.maskTexture.textureBase);
 		shader.setStep(step);
-		shader.setReverse(reverse);
-		shader.setBlend(blend);
-		//shader.setTexture(this.colorTexture.textureBase);
+
 
 		shader.setAlpha(drawContext.alpha);
 
 		//Log.trace('($x1, $y1)-($x2, $y2) (${texture.px1},${texture.py1})-(${texture.px2},${texture.py2})');
 
-		shader.addVertex(x1, y2, maskTexture.px1, maskTexture.py2);
-		shader.addVertex(x1, y1, maskTexture.px1, maskTexture.py1);
-		shader.addVertex(x2, y2, maskTexture.px2, maskTexture.py2);
-		shader.addVertex(x2, y1, maskTexture.px2, maskTexture.py1);
+		shader.addVertex(x1, y2, colorTexture1.px1, colorTexture1.py2);
+		shader.addVertex(x1, y1, colorTexture1.px1, colorTexture1.py1);
+		shader.addVertex(x2, y2, colorTexture1.px2, colorTexture1.py2);
+		shader.addVertex(x2, y1, colorTexture1.px2, colorTexture1.py1);
 
 		shader.draw();
 	}

@@ -1,4 +1,6 @@
 package engines.brave.sound;
+import lang.promise.Promise;
+import lang.promise.IPromise;
 import common.ByteArrayUtils;
 import haxe.io.Bytes;
 import flash.media.Sound;
@@ -25,15 +27,15 @@ class SoundEntry
 		this.length = length;
 	}
 	
-	public function getSoundAsync(done:Sound -> Void):Void {
+	public function getSoundAsync():IPromise<Sound> {
 		if (bytes == null) {
 			soundPack.stream.position = this.offset;
-			soundPack.stream.readBytesAsync(this.length).then(function(_bytes:ByteArray):Void {
+			return soundPack.stream.readBytesAsync(this.length).then(function(_bytes:ByteArray) {
 				this.bytes = ByteArrayUtils.ByteArrayToBytes(_bytes);
-				done((new SoundInstance(this)).getSound());
+				return (new SoundInstance(this)).getSound();
 			});
 		} else {
-			done((new SoundInstance(this)).getSound());
+			return Promise.createResolved((new SoundInstance(this)).getSound());
 		}
 	}
 }

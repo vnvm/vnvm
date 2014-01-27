@@ -105,6 +105,10 @@ class RIO_OP
 	@Unimplemented
 	public function MOVIE(can_stop:Int, name:String)
 	{
+		#if android
+			return Timer2.waitAsync(0.1);
+		#end
+
 		var deferred = Promise.createDeferred();
 		//Log.trace(FFMPEG.getVersion());
 		var uri = scene.getFileSystem().getFileSystemUri();
@@ -1085,10 +1089,14 @@ class RIO_OP
 		this.lastTitle = title;
 		scene.setTextAsync(text, title, isSkipping() ? 0 : 0.05).then(function(?e)
 		{
-			Signal.addAnyOnce([GameInput.onClick, GameInput.onKeyPress], function(e:Event) {
-				scene.setTextAsync('', null, 0).then(function(?e)
+			Timer2.waitAsync(0.1).then(function(?e)
+			{
+				Signal.addAnyOnce([GameInput.onClick, GameInput.onKeyPress], function(?e)
 				{
-					deferred.resolve(null);
+					scene.setTextAsync('', null, 0).then(function(?e)
+					{
+						deferred.resolve(null);
+					});
 				});
 			});
 		});
@@ -1114,9 +1122,10 @@ class RIO_OP
 	}
 
 	@Opcode({ id:0x08, format:"2", description:"Sets the size of the text (00=small, 01=big)" })
-	public function TEXT_SIZE(size)
+	public function TEXT_SIZE(size:Int)
 	{
-		throw(new NotImplementedException());
+		scene.setTextSize(size);
+		//throw(new NotImplementedException());
 		//this.TODO();
 	}
 

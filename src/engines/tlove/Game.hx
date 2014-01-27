@@ -235,12 +235,8 @@ class Game
 	static private function openAndCreatePakAsync(fs:VirtualFileSystem, name:String):IPromise<PAK>
 	{
 		var stream:Stream;
-		var deferred = new Deferred<PAK>();
-		fs.openAsync(name).then(function(stream:Stream) {
-			PAK.newPakAsync(stream).then(function(pak:PAK) {
-				deferred.resolve(pak);
-			});
+		return fs.openAsync(name).pipe(function(stream:Stream) {
+			return PAK.newPakAsync(stream);
 		});
-		return deferred.promise;
 	}
 }
