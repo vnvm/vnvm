@@ -27,33 +27,16 @@ class LzBuffer {
         this.ring = ring;
     }
 
-#if cpp
-    @:functionCode("return this->inputData->__unsafe_get(((this->inputPos)++));")
-#end
-    @:noStack public function readByte():Int {
-        return Bytes.fastGet(inputData, inputPos++);
-    }
-
-    @:noStack public inline function hasAtLeast(bytes:Int):Bool {
-        return (inputLength - inputPos) >= bytes;
-    }
+    @:noStack public function readByte():Int return Bytes.fastGet(inputData, inputPos++);
+    @:noStack public inline function hasAtLeast(bytes:Int):Bool return (inputLength - inputPos) >= bytes;
 
     @:noStack public function copyBytesFromRingBuffer(position:Int, count:Int):Void {
         ring.setReadPosition(position);
         while (count-- > 0) this.writeByte(ring.readByte());
     }
 
-#if cpp
-
-    @:functionCode("
-		this->ring->writeByte(byte);
-		this->outputData->__unsafe_set((this->outputPos)++, byte);
-		return null();
-	") #end
     @:noStack public function writeByte(byte:Int):Void {
         ring.writeByte(byte);
-        //this.outputData.writeByte(byte);
-        outputData.set(outputPos++, cast byte);
-//output[outputPos++] = byte;
+        outputData.set(outputPos++, byte);
     }
 }

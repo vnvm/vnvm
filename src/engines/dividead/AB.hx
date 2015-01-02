@@ -118,10 +118,13 @@ class AB {
         var sprite:Sprite = new Sprite();
         GraphicUtils.drawSolidFilledRectWithBounds(sprite.graphics, 0, 0, 640, 480, 0x000000, 1.0);
 
-        return Tween.forTime(time).onStep(function(step:Float) {
+        return Promise.animateAsync(Std.int(time * 1000), function(step:Float) {
             game.front.copyPixels(game.back, game.back.rect, new Point(0, 0));
             game.front.draw(sprite, null, new ColorTransform(1, 1, 1, step, 0, 0, 0, 0));
-        }).animateAsync();
+            if (step == 1) {
+                game.back.copyPixels(game.front, game.back.rect, new Point(0, 0));
+            }
+        });
     }
 
     public function paintAsync(pos:Int, type:Int):IPromise<Dynamic> {

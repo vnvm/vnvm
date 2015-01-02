@@ -1,5 +1,9 @@
 #dividead
-dividead:MAP1_12:0
+#dividead:MAP1_12:0
+dividead:F777:0
+#dividead:F777:2619
+#dividead:F777:2ADD
+#dividead:F777:2B23
 #pw
 #pw:pw0001:2E8F
 #pw:pw0001:6FC4

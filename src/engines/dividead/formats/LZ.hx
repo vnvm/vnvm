@@ -1,4 +1,5 @@
 package engines.dividead.formats;
+import cpp.Pointer;
 import reflash.Bytes3;
 import common.ByteArrayUtils;
 import haxe.Timer;
@@ -49,8 +50,6 @@ class LZ {
         var inputPosition = input.position;
         var inputLength:Int = input.length;
 
-        //Memory.getByte
-
         var outputBytes = Bytes.alloc(uncompressedSize);
         var outputData:Bytes3 = Bytes.ofData(outputBytes.getData());
         var outputPosition = 0;
@@ -61,7 +60,7 @@ class LZ {
 
         //Log.trace("[1]");
         while (inputPosition < inputLength) {
-            var code:Int = (cast inputData[inputPosition++]) | 0x100;
+            var code:Int = (inputData[inputPosition++]) | 0x100;
 
             while (code != 1) {
                 //Log.trace("[3]");
@@ -74,8 +73,8 @@ class LZ {
                 else {
                     if (inputPosition >= inputLength) break;
 
-                    var paramL:Int = cast inputData[inputPosition++];
-                    var paramH:Int = cast inputData[inputPosition++];
+                    var paramL:Int = inputData[inputPosition++];
+                    var paramH:Int = inputData[inputPosition++];
 
                     var param:Int = paramL | (paramH << 8);
 
@@ -90,7 +89,7 @@ class LZ {
                     var outputReadOffset:Int = outputPosition - convertedP;
 
                     while (outputReadOffset < 0) {
-                        outputData[outputPosition++] = cast 0;
+                        outputData[outputPosition++] = 0;
                         //outputBytes.set(outputPosition++, 0);
                         outputReadOffset++;
                         ringLength--;

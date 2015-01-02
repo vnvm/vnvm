@@ -1,4 +1,5 @@
 package engines.dividead.script;
+import lang.promise.IPromise;
 import common.event.EventListenerListGroup;
 import common.event.EventListenerGroup;
 import flash.display.Sprite;
@@ -114,13 +115,9 @@ class AB_OP {
     }
 
     @Opcode({ id:0x50, format:"T", description:"Sets the title for the save" })
-//@Unimplemented
-    public function TITLE(title:String) {
-        state.title = title;
-    }
+    public function TITLE(title:String) state.title = title;
 
     @Opcode({ id:0x06, format:"", description:"Empties the option list", savepoint:1 })
-//@Unimplemented
     public function OPTION_RESET() {
         game.optionList.clear();
         state.options = [];
@@ -299,6 +296,7 @@ class AB_OP {
     @Opcode({ id:0x47, format:"s", description:"Sets an image as the background" })
 //@Unimplemented
     public function BACKGROUND(name:String) {
+        state.background = name;
         return game.getImageCachedAsync(name).then(function(bitmapData:BitmapData) {
             var matrix:Matrix = new Matrix();
             matrix.translate(32, 8);
@@ -309,6 +307,12 @@ class AB_OP {
     @Opcode({ id:0x16, format:"S", description:"Puts an image overlay on the screen" })
     @Unimplemented
     public function IMAGE_OVERLAY(name:String) {
+        return game.getImageCachedAsync(name).then(function(bitmapData:BitmapData) {
+            var outBitmapData = BitmapDataUtils.chromaKey(bitmapData, 0x00FF00);
+            var matrix:Matrix = new Matrix();
+            matrix.translate(32, 8);
+            game.back.draw(outBitmapData, matrix);
+        });
     }
 
     @Opcode({ id:0x4B, format:"S", description:"Puts a character in the middle of the screen" })
@@ -359,20 +363,67 @@ class AB_OP {
     @Opcode({ id:0x4D, format:"", description:"Performs an animation with the current background (ABCDEF)" })
     @Unimplemented
     public function ANIMATION(type:Int) {
-        return Promise.createResolved(null);
+        var time = game.isSkipping() ? 50 : 500;
+        var names = [for (n in 0 ... 6) state.background.substr(0, -1) + String.fromCharCode('A'.code + n)];
+        var promises = [for (name in names) game.getImageCachedAsync(name)];
+        return Promise.whenAll(promises).pipe(function(images:Array<Dynamic>) {
+            var stepAsync:Dynamic -> IPromise<Dynamic> = null;
+            stepAsync = function(v:Dynamic) {
+                if (images.length > 0) {
+                    var image = images.shift();
+                    //trace('image', image);
+                    var bmp = new Bitmap(image, PixelSnapping.AUTO, true);
+                    bmp.x = 32;
+                    bmp.y = 8;
+                    game.overlaySprite.removeChildren();
+                    game.overlaySprite.addChild(bmp);
+                    game.back.draw(image, new Matrix(1, 0, 0, 1, 32, 8));
+                    return Promise.waitAsync(time).pipe(stepAsync);
+                } else {
+                    return Promise.waitAsync(time);
+                }
+            };
+            return stepAsync(null).then(function(v) {
+                //trace('*******************');
+                game.overlaySprite.removeChildren();
+            });
+        });
     }
 
     @Opcode({ id:0x4E, format:"", description:"Makes an scroll to the bottom with the current image" })
-    @Unimplemented
-    public function SCROLL_DOWN(type:Int) {
-        return Promise.createResolved(null);
-    }
+    public function SCROLL_DOWN(type:Int) return _SCROLL_DOWN_UP('A', 1);
 
     @Opcode({ id:0x4F, format:"", description:"Makes an scroll to the top with the current image" })
-    @Unimplemented
-    public function SCROLL_UP(type:Int) {
-        return Promise.createResolved(null);
+    public function SCROLL_UP(type:Int) return _SCROLL_DOWN_UP('B', -1);
+
+    private function _SCROLL_DOWN_UP(add:String, multiplier:Float) {
+        var time:Int = game.isSkipping() ? 300 : 3000;
+        var bgB = state.background + add;
+
+        return game.getImageCachedAsync(bgB).pipe(function(bgBImage:BitmapData) {
+            var bgImage = BitmapDataUtils.slice(game.front, new Rectangle(32, 8, bgBImage.width, bgBImage.height));
+            var a = new Bitmap(bgImage, PixelSnapping.AUTO, true);
+            var b = new Bitmap(bgBImage, PixelSnapping.AUTO, true);
+            var container = new Sprite();
+            b.y = a.height * multiplier;
+            container.addChild(a);
+            container.addChild(b);
+            container.scrollRect = new Rectangle(0, 0, bgImage.width, bgImage.height);
+            container.x = 32;
+            container.y = 8;
+            game.overlaySprite.removeChildren();
+            game.overlaySprite.addChild(container);
+            return Promise.animateAsync(time, function(ratio) {
+                ratio = ratio * multiplier;
+                container.scrollRect = new Rectangle(0, bgImage.height * ratio, bgImage.width, bgImage.height);
+            }).then(function(v) {
+                game.front.draw(container, new Matrix(1, 0, 0, 1, 32, 8));
+                game.back.draw(container, new Matrix(1, 0, 0, 1, 32, 8));
+                game.overlaySprite.removeChildren();
+            });
+        });
     }
+
 
 // ----------------------
 //  EFFECT RELATED

@@ -7,6 +7,7 @@ class GameState {
     public var title:String;
     public var mapImage1:String;
     public var mapImage2:String;
+    public var background:String;
 
     public function new() {
         this.options = new Array<Dynamic>();
