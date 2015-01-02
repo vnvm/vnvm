@@ -177,7 +177,7 @@ class DAT
 	{
 		var instructionPosition:Int = this.script.position;
 		var opcodeId:Int = this.script.readUnsignedByte();
-		var instructionDataLength:Int = script.readUnsignedByte();
+		var instructionDataLength:Int = this.script.readUnsignedByte();
 		if ((instructionDataLength & 0x80) != 0) {
 			var newByte:Int = this.script.readUnsignedByte();
 			instructionDataLength = newByte | ((instructionDataLength & 0x7F) << 8);

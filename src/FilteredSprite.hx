@@ -10,64 +10,56 @@ import flash.geom.Rectangle;
 import flash.display.Sprite;
 import openfl.display.OpenGLView;
 
-class FilteredSprite extends Sprite
-{
-	public var container(default, null):Sprite;
-	private var framebuffer:IGLFrameBuffer;
-	//private var reference:Reference
+class FilteredSprite extends Sprite {
+    public var container(default, null):Sprite;
+    private var framebuffer:IGLFrameBuffer;
+//private var reference:Reference
 
-	public function new(width:Int, height:Int)
-	{
-		super();
+    public function new(width:Int, height:Int) {
+        super();
 
-		width = StageReference.stage.stageWidth;
-		height = StageReference.stage.stageHeight;
+        width = StageReference.stage.stageWidth;
+        height = StageReference.stage.stageHeight;
 
-		framebuffer = WGLFrameBuffer.create(width, height);
+        framebuffer = WGLFrameBuffer.create(width, height);
 
-		this.addChild(new Before(framebuffer));
-		this.addChild(this.container = new Sprite());
-		this.addChild(new After(framebuffer));
-	}
+        this.addChild(new Before(framebuffer));
+        this.addChild(this.container = new Sprite());
+        this.addChild(new After(framebuffer));
+    }
 }
 
-private class Before extends OpenGLView
-{
-	var framebuffer:IGLFrameBuffer;
+private class Before extends OpenGLView {
+    var framebuffer:IGLFrameBuffer;
 
-	public function new(framebuffer:IGLFrameBuffer)
-	{
-		super();
-		this.framebuffer = framebuffer;
-	}
+    public function new(framebuffer:IGLFrameBuffer) {
+        super();
+        this.framebuffer = framebuffer;
+    }
 
-	override public function render(rect:Rectangle)
-	{
-		framebuffer.bindAndSetViewport();
+    override public function render(rect:Rectangle) {
+        framebuffer.bindAndSetViewport();
 //GL.bindFramebuffer(GL.FRAMEBUFFER, framebuffer);
-	}
+    }
 }
 
-private class After extends OpenGLView
-{
-	var framebuffer:IGLFrameBuffer;
+private class After extends OpenGLView {
+    var framebuffer:IGLFrameBuffer;
 
-	public function new(framebuffer:IGLFrameBuffer)
-	{
-		super();
+    public function new(framebuffer:IGLFrameBuffer) {
+        super();
 
-		this.framebuffer = framebuffer;
-	}
+        this.framebuffer = framebuffer;
+    }
 
-	override public function render(rect:Rectangle)
-	{
-		framebuffer.finish();
+    override public function render(rect:Rectangle) {
+        framebuffer.finish();
 
-		WGLFrameBuffer.getScreen().bindAndSetViewport();
+        WGLFrameBuffer.getScreen().bindAndSetViewport();
 
-		//new Image2(framebuffer.texture).drawElement
+//new Image2(framebuffer.texture).drawElement
 
-		/*
+/*
 		WGLFrameBuffer.getScreen().draw(
 			new Image2(framebuffer.texture)
 		);
@@ -98,5 +90,5 @@ private class After extends OpenGLView
 		shader.addVertex(StageReference.stage.stageWidth, StageReference.stage.stageHeight, 1, 1);
 		shader.draw();
 		*/
-	}
+    }
 }

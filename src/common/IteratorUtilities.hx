@@ -6,14 +6,14 @@ package common;
  */
 
 private class XRange {
-	var min : Int;
-    var max : Int;
-	var step : Int;
+    var min:Int;
+    var max:Int;
+    var step:Int;
 
-    public function new( min : Int, max : Int, step : Int ) {
+    public function new(min:Int, max:Int, step:Int) {
         this.min = min;
         this.max = max;
-		this.step = step;
+        this.step = step;
     }
 
     public function hasNext() {
@@ -21,16 +21,15 @@ private class XRange {
     }
 
     public function next() {
-		var ret:Int = min;
+        var ret:Int = min;
         min += step;
-		return ret;
+        return ret;
     }
-	
+
 }
 
-class IteratorUtilities 
-{
-	static public function xrange(start:Int, stop:Int, step:Int = 1):Iterator<Int> {
-		return new XRange(start, stop, step);
-	}
+class IteratorUtilities {
+    static public function xrange(start:Int, stop:Int, step:Int = 1):Iterator<Int> {
+        return new XRange(start, stop, step);
+    }
 }

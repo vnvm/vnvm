@@ -1,4 +1,5 @@
 package common.imaging;
+import reflash.Bytes3;
 import lang.MathEx;
 import haxe.io.Bytes;
 import lang.exceptions.OutOfBoundsException;
@@ -36,6 +37,7 @@ class BitmapDataUtils
 
 	@:noStack static private function _blend(colorDataData:BytesData, maskDataData:BytesData, totalPixels:Int, readOffset:Int, writeOffset:Int, ratio:Float, reverse:Bool)
 	{
+		var colorDataData2 = new Bytes3(Bytes.ofData(colorDataData));
 		var offset:Int = Std.int(MathEx.translateRange(ratio, 0, 1, -255, 255));
 		if (reverse) offset = -offset;
 
@@ -44,7 +46,7 @@ class BitmapDataUtils
 			//Log.trace('$writeOffset, $readOffset');
 			var value = MathEx.clampInt(cast(Bytes.fastGet(maskDataData, readOffset), Int) + offset, 0, 255);
 			if (reverse) value = 255 - value;
-			colorDataData[writeOffset] = cast value;
+			colorDataData2[writeOffset] = cast value;
 			readOffset += 4;
 			writeOffset += 4;
 		}
@@ -52,14 +54,16 @@ class BitmapDataUtils
 
 	@:noStack static private function _mask(colorDataData:BytesData, maskDataData:BytesData, totalPixels:Int, readOffset:Int, writeOffset:Int, ratio:Float, reverse:Bool)
 	{
+		var colorDataData2 = new Bytes3(Bytes.ofData(colorDataData));
+		var maskDataData2 = new Bytes3(Bytes.ofData(maskDataData));
 		var thresold:Int = Std.int(MathEx.translateRange(ratio, 0, 1, 0, 255));
 		if (reverse) thresold = 255 - thresold;
 
 		while (totalPixels-- > 0)
 		{
-			var value = (cast(maskDataData[readOffset], Int) >= thresold) ? 0xFF : 0x00;
+			var value = (cast(maskDataData2[readOffset], Int) >= thresold) ? 0xFF : 0x00;
 			if (reverse) value = 255 - value;
-			colorDataData[writeOffset] = cast value;
+			colorDataData2[writeOffset] = cast value;
 			readOffset += 4;
 			writeOffset += 4;
 		}
@@ -107,7 +111,7 @@ class BitmapDataUtils
 		color.lock();
 		{
 			var colorData = color.getPixels(color.rect);
-			var colorDataData = colorData.getData();
+			var colorDataData = Bytes.ofData(colorData.getData());
 
 			var totalPixels = color.width * color.height;
 
@@ -119,7 +123,7 @@ class BitmapDataUtils
 			var offset:Int = 0;
 			for (n in 0 ... totalPixels)
 			{
-				var value = cast colorDataData[offset + redOffset];
+				var value = cast colorDataData.get(offset + redOffset);
 				//pixels[n] = palette[value];
 				pixels.push(palette[value]);
 				offset += 4;

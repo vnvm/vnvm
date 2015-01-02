@@ -1,152 +1,134 @@
 package engines.dividead.formats;
+import reflash.Bytes3;
 import common.ByteArrayUtils;
-import flash.Memory;
 import haxe.Timer;
 import common.compression.IPositionCountExtractor;
 import common.compression.LzOptions;
 import common.compression.LzDecoder;
 import haxe.io.Bytes;
-import haxe.Log;
 import flash.utils.ByteArray;
 
-class LZ
-{
-	static public function decode(data:ByteArray):ByteArray
-	{
-		var magic:String = data.readUTFBytes(2);
-		var compressedSize:Int = data.readInt();
-		var uncompressedSize:Int = data.readInt();
+class LZ {
+    static public function decode(data:ByteArray):ByteArray {
+        var magic:String = data.readUTFBytes(2);
+        var compressedSize:Int = data.readInt();
+        var uncompressedSize:Int = data.readInt();
 
-		if (magic != "LZ") throw("Invalid LZ stream");
-		
-		return _decode(data, uncompressedSize);
-	}
+        if (magic != "LZ") throw("Invalid LZ stream");
 
-	static private function _decode(input:ByteArray, uncompressedSize:Int):ByteArray
-	{
-		//return _decodeFast(input, uncompressedSize);
+        return _decode(data, uncompressedSize);
+    }
 
-		var uncompressed:ByteArray;
-		Timer.measure(function() {
-			uncompressed = _decodeGeneric(input, uncompressedSize);
-			//uncompressed = _decodeFast(input, uncompressedSize);
-		});
-		return uncompressed;
-	}
+    static private function _decode(input:ByteArray, uncompressedSize:Int):ByteArray {
+//return _decodeFast(input, uncompressedSize);
 
-	static private function _decodeGeneric(input:ByteArray, uncompressedSize:Int):ByteArray
-	{
-		var options = new LzOptions();
+        var uncompressed:ByteArray;
+        Timer.measure(function() {
+            uncompressed = _decodeGeneric(input, uncompressedSize);
+//uncompressed = _decodeFast(input, uncompressedSize);
+        });
+        return uncompressed;
+    }
 
-		options.ringBufferSize = 0x1000;
-		options.startRingBufferPos = 0xFEE;
-		//options.setCountPositionBits(4, 12);
-		options.compressedBit = 0;
-		options.countPositionBytesHighFirst = false;
-		options.positionCountExtractor = new DivideadPositionCountExtractor();
+    static private function _decodeGeneric(input:ByteArray, uncompressedSize:Int):ByteArray {
+        var options = new LzOptions();
 
-		return LzDecoder.decode(input, options, uncompressedSize);
-	}
+        options.ringBufferSize = 0x1000;
+        options.startRingBufferPos = 0xFEE;
+//options.setCountPositionBits(4, 12);
+        options.compressedBit = 0;
+        options.countPositionBytesHighFirst = false;
+        options.positionCountExtractor = new DivideadPositionCountExtractor();
 
-	@:noStack static private function _decodeFast(input:ByteArray, uncompressedSize:Int):ByteArray
-	{
-		var inputBytes = ByteArrayUtils.ByteArrayToBytes(input);
-		var inputData = inputBytes.getData();
-		var inputPosition = input.position;
-		var inputLength:Int = input.length;
+        return LzDecoder.decode(input, options, uncompressedSize);
+    }
 
-		//Memory.getByte
+    @:noStack static private function _decodeFast(input:ByteArray, uncompressedSize:Int):ByteArray {
+        var inputBytes = ByteArrayUtils.ByteArrayToBytes(input);
+        var inputData:Bytes3 = Bytes.ofData(inputBytes.getData());
+        var inputPosition = input.position;
+        var inputLength:Int = input.length;
 
-		var outputBytes = Bytes.alloc(uncompressedSize);
-		var outputData = outputBytes.getData();
-		var outputPosition = 0;
-		var ringStart = 0xFEE;
-		//var extractor = new DivideadPositionCountExtractor();
+        //Memory.getByte
 
-		//Memory.select(input);
+        var outputBytes = Bytes.alloc(uncompressedSize);
+        var outputData:Bytes3 = Bytes.ofData(outputBytes.getData());
+        var outputPosition = 0;
+        var ringStart = 0xFEE;
+        //var extractor = new DivideadPositionCountExtractor();
 
-		//Log.trace("[1]");
-		while (inputPosition < inputLength)
-		{
-			var code:Int = (cast inputData[inputPosition++]) | 0x100;
+        //Memory.select(input);
 
-			while (code != 1)
-			{
-				//Log.trace("[3]");
-				
-				// Uncompressed
-				if ((code & 1) != 0)
-				{
-					outputData[outputPosition++] = inputData[inputPosition++];
-				}
-				// Compressed
-				else
-				{
-					if (inputPosition >= inputLength) break;
+        //Log.trace("[1]");
+        while (inputPosition < inputLength) {
+            var code:Int = (cast inputData[inputPosition++]) | 0x100;
 
-					var paramL:Int = cast inputData[inputPosition++];
-					var paramH:Int = cast inputData[inputPosition++];
-					
-					var param:Int = paramL | (paramH << 8);
+            while (code != 1) {
+                //Log.trace("[3]");
 
-					var ringOffset:Int = extractPosition(param);
-					var ringLength:Int = extractCount(param);
+                // Uncompressed
+                if ((code & 1) != 0) {
+                    outputData[outputPosition++] = inputData[inputPosition++];
+                }
+                // Compressed
+                else {
+                    if (inputPosition >= inputLength) break;
 
-					//Log.trace('Compressed: $param, $ringOffset, $ringLength');
+                    var paramL:Int = cast inputData[inputPosition++];
+                    var paramH:Int = cast inputData[inputPosition++];
 
-					var convertedP:Int = ((ringStart + outputPosition) & 0xFFF) - ringOffset;
-					if (convertedP < 0) convertedP += 0x1000;
+                    var param:Int = paramL | (paramH << 8);
 
-					var outputReadOffset:Int = outputPosition - convertedP;
+                    var ringOffset:Int = extractPosition(param);
+                    var ringLength:Int = extractCount(param);
 
-					while (outputReadOffset < 0)
-					{
-						outputData[outputPosition++] = cast 0;
-						//outputBytes.set(outputPosition++, 0);
-						outputReadOffset++;
-						ringLength--;
-					}
+                    //Log.trace('Compressed: $param, $ringOffset, $ringLength');
 
-					while (ringLength-- > 0)
-					{
-						//outputBytes.set(outputPosition++, Bytes.fastGet(outputData, outputReadOffset++));
-						//outputData[outputPosition++] = Bytes.fastGet(outputData, outputReadOffset++);
-						outputData[outputPosition++] = outputData[outputReadOffset++];
-					}
-				}
+                    var convertedP:Int = ((ringStart + outputPosition) & 0xFFF) - ringOffset;
+                    if (convertedP < 0) convertedP += 0x1000;
 
-				code >>= 1;
-			}
-		}
+                    var outputReadOffset:Int = outputPosition - convertedP;
 
-		return ByteArrayUtils.BytesToByteArray(outputBytes);
-	}
+                    while (outputReadOffset < 0) {
+                        outputData[outputPosition++] = cast 0;
+                        //outputBytes.set(outputPosition++, 0);
+                        outputReadOffset++;
+                        ringLength--;
+                    }
 
-	@:noStack static private inline function extractPosition(param:Int):Int
-	{
-		return (param & 0xFF) | ((param >> 4) & 0xF00);
-	}
+                    while (ringLength-- > 0) {
+                        //outputBytes.set(outputPosition++, Bytes.fastGet(outputData, outputReadOffset++));
+                        //outputData[outputPosition++] = Bytes.fastGet(outputData, outputReadOffset++);
+                        outputData[outputPosition++] = outputData[outputReadOffset++];
+                    }
+                }
 
-	@:noStack static private inline function extractCount(param:Int):Int
-	{
-		return ((param >> 8) & 0xF) + 3;
-	}
+                code >>= 1;
+            }
+        }
+
+        return ByteArrayUtils.BytesToByteArray(outputBytes);
+    }
+
+    @:noStack static private inline function extractPosition(param:Int):Int {
+        return (param & 0xFF) | ((param >> 4) & 0xF00);
+    }
+
+    @:noStack static private inline function extractCount(param:Int):Int {
+        return ((param >> 8) & 0xF) + 3;
+    }
 }
 
-class DivideadPositionCountExtractor implements IPositionCountExtractor
-{
-	@:noStack public inline function extractPosition(param:Int):Int
-	{
-		return (param & 0xFF) | ((param >> 4) & 0xF00);
-	}
+class DivideadPositionCountExtractor implements IPositionCountExtractor {
+    @:noStack public inline function extractPosition(param:Int):Int {
+        return (param & 0xFF) | ((param >> 4) & 0xF00);
+    }
 
-	@:noStack public inline function extractCount(param:Int):Int
-	{
-		return ((param >> 8) & 0xF) + 3;
-	}
+    @:noStack public inline function extractCount(param:Int):Int {
+        return ((param >> 8) & 0xF) + 3;
+    }
 
-	public function new()
-	{
+    public function new() {
 
-	}
+    }
 }

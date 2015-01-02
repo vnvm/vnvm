@@ -16,8 +16,8 @@ class DisplayObject2 implements IDrawable
 	public var scaleX:Float = 1;
 	public var scaleY:Float = 1;
 	public var zIndex(default, set):Int;
-	public var width:Float;
-	public var height:Float;
+	public var width:Float = 0.0;
+	public var height:Float = 0.0;
 	public var angle:Float = 0;
 	public var alpha:Float = 1;
 	public var visible:Bool = true;

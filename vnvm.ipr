@@ -19,9 +19,7 @@
       </profile>
     </annotationProcessing>
   </component>
-  <component name="CopyrightManager" default="">
-    <module2copyright />
-  </component>
+  <component name="CopyrightManager" default="" />
   <component name="DaemonCodeAnalyzer">
     <disable_hints />
   </component>
@@ -30,6 +28,7 @@
   </component>
   <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false" />
   <component name="HaxeProjectSettings" defines="display" />
+  <component name="IdProvider" IDEtalkID="0D46B237B7C8A2C0E2F1066073101A9F" />
   <component name="Palette2">
     <group name="Swing">
       <item class="com.intellij.uiDesigner.HSpacer" tooltip-text="Horizontal Spacer" icon="/com/intellij/uiDesigner/icons/hspacer.png" removable="false" auto-create-binding="false" can-attach-label="false">
@@ -159,7 +158,7 @@
         </XML>
       </value>
     </option>
-    <option name="PREFERRED_PROJECT_CODE_STYLE" value="Nova" />
+    <option name="PREFERRED_PROJECT_CODE_STYLE" value="Default (2)" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="false">
     <OptionsSetting value="true" id="Add" />
@@ -176,7 +175,7 @@
       <module fileurl="file://$PROJECT_DIR$/vnvm.iml" filepath="$PROJECT_DIR$/vnvm.iml" />
     </modules>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="Haxe 3.0.1" project-jdk-type="Haxe SDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_6" assert-keyword="true" jdk-15="true" project-jdk-name="Haxe 3.1.3" project-jdk-type="Haxe toolkit">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
   <component name="RunManager">
@@ -281,13 +280,13 @@
     <mapping directory="" vcs="Git" />
   </component>
   <component name="libraryTable">
-    <library name="haxe-openfl-ffmpeg" type="Haxe">
+    <library name="haxe-openfl-ffmpeg">
       <CLASSES>
-        <root url="file://$PROJECT_DIR$/../../@haxe/haxe-openfl-ffmpeg" />
+        <root url="file://$USER_HOME$/@haxe/haxe-openfl-ffmpeg" />
       </CLASSES>
       <JAVADOC />
       <SOURCES>
-        <root url="file://$PROJECT_DIR$/../../@haxe/haxe-openfl-ffmpeg" />
+        <root url="file://$USER_HOME$/@haxe/haxe-openfl-ffmpeg" />
       </SOURCES>
     </library>
     <library name="openfl">
@@ -301,4 +300,3 @@
     </library>
   </component>
 </project>
-

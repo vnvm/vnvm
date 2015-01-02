@@ -17,7 +17,15 @@ class AssetsFileSystemCpp implements IAssetsFileSystem
 			"/mnt/sdcard/vnvm",
 			"/private/var/mobile/vnvm",
 			File.applicationDirectory.nativePath + "/assets",
-			"assets", "../assets", "../../assets", "../../../assets", "../../../../assets", "../../../../../assets"
+			"assets",
+			"../assets",
+			"../../assets",
+			"../../../assets",
+			"../../../../assets",
+			"../../../../../assets",
+			"../../../../../../assets",
+			"../../../../../../../assets",
+			"../../../../../../../../assets"
 		];
 	}
 

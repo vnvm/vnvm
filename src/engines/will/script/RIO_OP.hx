@@ -13,7 +13,7 @@ import reflash.gl.wgl.WGLTexture;
 import reflash.display.Image2;
 import common.StageReference;
 import flash.display.Bitmap;
-import ffmpeg.FFMPEG;
+//import ffmpeg.FFMPEG;
 import common.tween.Easing;
 import lang.promise.Promise;
 import lang.promise.IPromise;
@@ -109,6 +109,7 @@ class RIO_OP
 			return Timer2.waitAsync(0.1);
 		#end
 
+	/*
 		var deferred = Promise.createDeferred();
 		//Log.trace(FFMPEG.getVersion());
 		var uri = scene.getFileSystem().getFileSystemUri();
@@ -137,6 +138,8 @@ class RIO_OP
 		//StageReference.stage.addChild(new Bitmap(ffmpeg.bitmapData));
 
 		return deferred.promise;
+		*/
+	return Timer2.waitAsync(0.1);
 
 		/*
 		local movie = Movie();

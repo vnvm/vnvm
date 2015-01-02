@@ -2,7 +2,6 @@ package ;
 
 import common.display.Quad;
 import flash.display.Bitmap;
-import ffmpeg.FFMPEG;
 import haxe.io.Bytes;
 import haxe.io.BytesData;
 import common.ArrayUtils;

@@ -1,6 +1,5 @@
 package engines.will.utils;
 
-import flash.display.PNGEncoderOptions;
 import engines.will.formats.wip.WIP;
 import lang.promise.Promise;
 import lang.promise.IPromise;

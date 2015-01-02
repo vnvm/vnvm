@@ -3,8 +3,8 @@
   <component name="HaxeModuleSettingsStorage">
     <option name="buildConfig" value="3" />
     <option name="flexSdkName" value="airsdk" />
-    <option name="openFLCompilePath" value="$MODULE_DIR$" />
     <option name="openFLTarget" value="Windows" />
+    <option name="outputFolder" value="$MODULE_DIR$/out/production/vnvm" />
   </component>
   <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/out/production/vnvm" />
@@ -16,10 +16,11 @@
       <excludeFolder url="file://$MODULE_DIR$/extra" />
       <excludeFolder url="file://$MODULE_DIR$/out" />
     </content>
-    <orderEntry type="jdk" jdkName="Haxe 3.0.1" jdkType="Haxe SDK" />
+    <content url="file:///usr/lib/haxe/lib">
+      <sourceFolder url="file:///usr/lib/haxe/lib/openfl/2,1,8" isTestSource="false" />
+      <sourceFolder url="file:///usr/lib/haxe/lib/format/3,1,2" isTestSource="false" />
+    </content>
+    <orderEntry type="jdk" jdkName="Haxe 3.1.3" jdkType="Haxe toolkit" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="openfl" level="project" />
-    <orderEntry type="library" name="haxe-openfl-ffmpeg" level="project" />
   </component>
 </module>
-

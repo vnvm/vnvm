@@ -15,6 +15,7 @@ import flash.geom.Point;
 class GameInput 
 {
 	static var pressing:Map<Int,Void>;
+	static var lastPressing:Map<Int,Void>;
 
 	private function new() 
 	{
@@ -23,11 +24,18 @@ class GameInput
 	static public var onClick:Signal<MouseEvent>;
 	static public var onMouseMoveEvent:Signal<MouseEvent>;
 	static public var onKeyPress:Signal<KeyboardEvent>;
+	static public var onKeyRelease:Signal<KeyboardEvent>;
+	static public var onKeyPressing:Signal<KeyboardEvent>;
 	
 	static public function init() {
 		pressing = new Map<Int,Void>();
-		StageReference.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
-		StageReference.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
+		lastPressing = new Map<Int,Void>();
+		StageReference.stage.addEventListener(KeyboardEvent.KEY_DOWN, function(e:KeyboardEvent) {
+			setKey(e.keyCode, true);
+		});
+		StageReference.stage.addEventListener(KeyboardEvent.KEY_UP, function(e:KeyboardEvent) {
+			setKey(e.keyCode, false);
+		});
 		StageReference.stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
 		StageReference.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 		StageReference.stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
@@ -45,11 +53,25 @@ class GameInput
 		onClick = new Signal<MouseEvent>();
 		onMouseMoveEvent = new Signal<MouseEvent>();
 		onKeyPress = new Signal<KeyboardEvent>();
+		onKeyRelease = new Signal<KeyboardEvent>();
+		onKeyPressing = new Signal<KeyboardEvent>();
 	}
 	
 	static public function onEnterFrame(e:Event):Void {
+		for (key in lastPressing.keys()) {
+			if (pressing.exists(key)) {
+			} else {
+				lastPressing.remove(key);
+				onKeyRelease.dispatch(new KeyboardEvent("onRelease", true, false, 0, key));
+			}
+		}
 		for (key in pressing.keys()) {
-			onKeyPress.dispatch(new KeyboardEvent("onPress", true, false, 0, key));
+			if (lastPressing.exists(key)) {
+				onKeyPressing.dispatch(new KeyboardEvent("onPressing", true, false, 0, key));
+			} else {
+				lastPressing.set(key, null);
+				onKeyPress.dispatch(new KeyboardEvent("onPress", true, false, 0, key));
+			}
 		}
 	}
 	
@@ -63,14 +85,6 @@ class GameInput
 		} else {
 			pressing.remove(key);
 		}
-	}
-	
-	static private function onKeyDown(e:KeyboardEvent):Void  {
-		setKey(e.keyCode, true);
-	}
-	
-	static private function onKeyUp(e:KeyboardEvent):Void  {
-		setKey(e.keyCode, false);
 	}
 	
 	static public var mouseCurrent:Point;
