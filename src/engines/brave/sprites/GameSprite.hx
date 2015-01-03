@@ -1,4 +1,5 @@
 package engines.brave.sprites;
+import reflash.display2.View;
 import common.display.SpriteUtils;
 import engines.brave.sprites.map.MapSprite;
 import flash.display.Graphics;
@@ -11,7 +12,7 @@ import flash.text.TextFormat;
  * @author 
  */
 
-class GameSprite extends Sprite
+class GameSprite extends View
 {
 	public var mapSprite:MapSprite;
 	public var background:Sprite;
@@ -25,7 +26,7 @@ class GameSprite extends Sprite
 		
 		//BraveAssets.getBitmapData("PG_MAIN");
 		
-		addChild(mapSprite = new MapSprite());
+		addChild(mapSprite = new MapSprite(this));
 		addChild(background = new Sprite());
 		background.addChild(backgroundBack = new Sprite());
 		background.addChild(backgroundFront = new Sprite());

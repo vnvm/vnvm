@@ -1,4 +1,6 @@
-package engines.dividead.script;
+package engines.dividead;
+import reflash.display2.Update;
+import reflash.display2.View;
 import lang.promise.IPromise;
 import common.event.EventListenerListGroup;
 import common.event.EventListenerGroup;
@@ -12,7 +14,6 @@ import lang.signal.Signal;
 import lang.promise.Promise;
 import common.display.OptionSelectedEvent;
 import common.input.GameInput;
-import lang.time.Timer2;
 import engines.dividead.AB;
 import haxe.Log;
 import flash.display.BitmapData;
@@ -99,18 +100,32 @@ class AB_OP {
     public function TEXT(text:String) {
         game.textField.text = StringTools.replace(text, '@', '"');
 
-        var promise = if (game.isSkipping()) {
-            Promise.waitAsync(50);
-        } else {
-            Promise.fromAnySignalOnce([GameInput.onClick, GameInput.onKeyPress]);
-        }
-
-        return promise.then(function(e) {
-            game.textField.text = '';
-            if (game.voiceChannel != null) {
-                game.voiceChannel.stop();
-                game.voiceChannel = null;
+        return game.getImageCachedAsync('waku_p').pipe(function(wakuB:BitmapData) {
+            var slices = [for (n in 0 ... 9) new Bitmap(BitmapDataUtils.slice(wakuB, new Rectangle(18 * n, 144, 18, 18)), null, true)];
+            var animated = new View();
+            animated.addUpdater(function(u:Update) {
+                animated.removeChildren();
+                animated.addChild(slices[Std.int((u.totalMs / 100) % slices.length)]);
+                //u.dt
+            });
+            game.overlaySprite.removeChildren();
+            game.overlaySprite.addChild(animated);
+            var promise = if (game.isSkipping()) {
+                game.gameSprite.waitAsync(50);
+            } else {
+                Promise.fromAnySignalOnce([GameInput.onClick, GameInput.onKeyPress]);
             }
+            animated.x = 520;
+            animated.y = 448;
+
+            return promise.then(function(e) {
+                game.textField.text = '';
+                game.overlaySprite.removeChildren();
+                if (game.voiceChannel != null) {
+                    game.voiceChannel.stop();
+                    game.voiceChannel = null;
+                }
+            });
         });
     }
 
@@ -227,7 +242,7 @@ class AB_OP {
     public function WAIT(time:Int) {
         if (game.isSkipping()) return Promise.createResolved();
 
-        return Promise.fromAnySignalOnce([Timer2.createAndStart(time / 1000).onTick]);
+        return game.gameSprite.waitAsync(time);
     }
 
 // ---------------
@@ -378,9 +393,9 @@ class AB_OP {
                     game.overlaySprite.removeChildren();
                     game.overlaySprite.addChild(bmp);
                     game.back.draw(image, new Matrix(1, 0, 0, 1, 32, 8));
-                    return Promise.waitAsync(time).pipe(stepAsync);
+                    return game.gameSprite.waitAsync(time).pipe(stepAsync);
                 } else {
-                    return Promise.waitAsync(time);
+                    return game.gameSprite.waitAsync(time);
                 }
             };
             return stepAsync(null).then(function(v) {
@@ -413,7 +428,8 @@ class AB_OP {
             container.y = 8;
             game.overlaySprite.removeChildren();
             game.overlaySprite.addChild(container);
-            return Promise.animateAsync(time, function(ratio) {
+
+            return game.gameSprite.animateAsync(time, function(ratio) {
                 ratio = ratio * multiplier;
                 container.scrollRect = new Rectangle(0, bgImage.height * ratio, bgImage.width, bgImage.height);
             }).then(function(v) {

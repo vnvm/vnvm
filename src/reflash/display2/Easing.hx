@@ -1,4 +1,4 @@
-package common.tween;
+package reflash.display2;
 
 class Easing {
     static public function linear(step:Float):Float {

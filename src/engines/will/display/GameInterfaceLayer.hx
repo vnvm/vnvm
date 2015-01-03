@@ -1,6 +1,6 @@
 package engines.will.display;
 
-import lang.time.Timer2;
+import reflash.display2.View;
 import lang.DisposableGroup;
 import lang.IDisposable;
 import lang.signal.Signal;
@@ -16,8 +16,7 @@ import reflash.display.Image2;
 import reflash.display.Stage2;
 import flash.display.BitmapData;
 import flash.text.TextField;
-import common.tween.Easing;
-import common.tween.Tween;
+import reflash.display2.Easing;
 import haxe.Log;
 import engines.will.formats.wip.WIP;
 import reflash.display.Sprite2;
@@ -29,11 +28,13 @@ class GameInterfaceLayer extends Sprite2
 	private var textFieldContent:TextField2;
 	private var textFieldTitle:TextField2;
 	private var waitingLayer:DisplayObject2;
+	private var view:View;
 
-	public function new(willResourceManager:WillResourceManager)
+	public function new(view:View, willResourceManager:WillResourceManager)
 	{
 		super();
 
+		this.view = view;
 		this.willResourceManager = willResourceManager;
 	}
 
@@ -114,9 +115,10 @@ class GameInterfaceLayer extends Sprite2
 			textFieldTitle.visible = false;
 		}
 
-		var promise = Tween.forTime(totalTime).onStep(function(step:Float) {
+
+		var promise = view.animateAsync(Std.int(totalTime * 1000), function(step:Float) {
 			textFieldContent.text = text.substr(0, Math.round(text.length * step));
-		}).animateAsync().then(function(e) {
+		}).then(function(e) {
 			waitingLayer.visible = true;
 			Log.trace('Completed text! $text');
 			disposable.dispose();
@@ -136,12 +138,10 @@ class GameInterfaceLayer extends Sprite2
 		this.waitingLayer.visible = false;
 		wipLayer.setLayerVisibility(31, false);
 
-		return Tween.forTime(time)
-			.interpolateTo(wipLayer.getLayer(0), { scaleY: 0 })
-			.interpolateTo(wipLayer, { alpha: 0 })
-			.withEasing(Easing.easeInOutQuad)
-			.animateAsync()
-		;
+		return Promise.whenAll([
+			view.interpolateAsync(wipLayer.getLayer(0), Std.int(time * 1000), { scaleY: 0 }, Easing.easeInOutQuad),
+			view.interpolateAsync(wipLayer, Std.int(time * 1000), { alpha: 0 }, Easing.easeInOutQuad)
+		]);
 	}
 
 	public function showAsync(time:Float = 0.3):IPromise<Dynamic>
@@ -151,12 +151,10 @@ class GameInterfaceLayer extends Sprite2
 		this.waitingLayer.visible = false;
 		//wipLayer.setLayerVisibility(31, false);
 
-		return Tween.forTime(time)
-			.interpolateTo(wipLayer.getLayer(0), { scaleY: 1 })
-			.interpolateTo(wipLayer, { alpha: 1 })
-			.withEasing(Easing.easeInOutQuad)
-			.animateAsync()
-		;
+		return Promise.whenAll([
+			view.interpolateAsync(wipLayer.getLayer(0), Std.int(time * 1000), { scaleY: 1 }, Easing.easeInOutQuad),
+			view.interpolateAsync(wipLayer, Std.int(time * 1000), { alpha: 1 }, Easing.easeInOutQuad)
+		]);
 	}
 
 	private function setButtonState(button:Int, state:Int):Void

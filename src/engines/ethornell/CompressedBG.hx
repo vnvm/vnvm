@@ -4,7 +4,6 @@ import common.imaging.BmpColor;
 import lang.LangUtils;
 import lang.Reference;
 import lang.StringEx;
-import lang.time.Timer2;
 import haxe.io.Bytes;
 import flash.geom.Rectangle;
 import flash.display.BitmapData;

@@ -90,6 +90,7 @@ class BitmapData8 {
 		
 		var dstPos:Int;
 		var srcPos:Int;
+		var _data = Bytes.ofData(data.getData());
 		for (y in 0 ... rectH) {
 			dstPos = y * rectW * 4;
 			srcPos = getIndex(rectX + 0, rectY + y);
@@ -97,7 +98,7 @@ class BitmapData8 {
 			//Log.trace(Std.format("($srcPos, $dstPos) :: ($rectX, $rectY, $rectW, $rectH)"));
 		
 			for (x in 0 ... rectW) {
-				Memory.setI32(dstPos, colorsPalette[data[srcPos]]);
+				Memory.setI32(dstPos, colorsPalette[_data.get(srcPos)]);
 				dstPos += 4;
 				srcPos += 1;
 			}
@@ -213,16 +214,19 @@ class BitmapData8 {
 		height = Std.int(MathEx.clamp(height, 0, src.height - srcY));
 
 		step = MathEx.clamp(step, 0, 1);
-		
+
+		var _srcData:Bytes = Bytes.ofData(srcData.getData());
+		var _dstData:Bytes = Bytes.ofData(dstData.getData());
+
 		if ((step >= 1) || (effect == 0)) {
 			for (y in 0 ... height) {
 				var srcN:Int = src.getIndex(srcX + 0, srcY + y);
 				var dstN:Int = dst.getIndex(dstX + 0, dstY + y);
 				
 				for (x in 0 ... width) {
-					var c:Int = srcData[srcN];
+					var c:Int = _srcData.get(srcN);
 					if (c != transparentColor) {
-						dstData[dstN] = c;
+						_dstData.set(dstN, c);
 					}
 					dstN++;
 					srcN++;
@@ -232,6 +236,7 @@ class BitmapData8 {
 		} else {
 			var checker:Int -> Int -> Int -> Int -> Float -> Bool;
 			var mask:ByteArray = new ByteArray();
+			var _mask = Bytes.ofData(mask.getData());
 			var random:Array<Float> = getRandomData();
 			
 			getMaskRandomPixels(mask, random, width, height, step);
@@ -242,10 +247,10 @@ class BitmapData8 {
 				var dstN:Int = dst.getIndex(dstX + 0, dstY + y);
 				
 				for (x in 0 ... width) {
-					if (mask[n] != 0) {
-						var c:Int = srcData[srcN];
+					if (_mask.get(n) != 0) {
+						var c:Int = _srcData.get(srcN);
 						if (c != transparentColor) {
-							dstData[dstN] = c;
+							_dstData.set(dstN, c);
 						}
 					}
 					

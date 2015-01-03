@@ -1,5 +1,5 @@
 package engines.brave.sprites.map;
-import common.tween.Tween;
+import reflash.display2.Easing;
 import common.imaging.GraphicUtils;
 import lang.MathEx;
 import common.StageReference;
@@ -15,12 +15,7 @@ import haxe.Timer;
 import flash.display.Sprite;
 import flash.events.Event;
 
-/**
- * ...
- * @author 
- */
-
-class Character 
+class Character
 {
 	public var id:Int;
 	public var imageName:String;
@@ -34,10 +29,12 @@ class Character
 	public var alive:Bool = true;
 	var frameNums:Array<Int>;
 	var actions:AsyncList;
+	var gameSprite:GameSprite;
 	var mapSprite:MapSprite;
 	
-	public function new(mapSprite:MapSprite, id:Int, imageName:String, x:Int, y:Int, direction:Int = 0) 
+	public function new(gameSprite:GameSprite, mapSprite:MapSprite, id:Int, imageName:String, x:Int, y:Int, direction:Int = 0)
 	{
+		this.gameSprite = gameSprite;
 		this.mapSprite = mapSprite;
 		this.id = id;
 		this.imageName = imageName;
@@ -197,9 +194,9 @@ class Character
 				this.direction = (destY < y) ? 2 : 0;
 			}
 
-			Tween.forTime(1).onStep(function(step:Float) {
+			gameSprite.interpolateAsync(this, 1000, { x : destX, y : destY }, Easing.linear, function(ratio:Float) {
 				frame++;
-			}).interpolateTo(this, { x : destX, y : destY }).animateAsync().then(function(?e) {
+			}).then(function(v) {
 				done();
 			});
 		});

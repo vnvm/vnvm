@@ -1,4 +1,4 @@
-package engines.tlove.mrs;
+package engines.tlove;
 import lang.StringEx;
 import haxe.Log;
 import flash.errors.Error;
@@ -32,7 +32,7 @@ class LZ
 		while (true)
 		{
 			if (input.position >= input.length) break;
-			if (cast(output.position, Int) >= outputSize) break;
+			if (output.position >= outputSize) break;
 			
 			var c:Int = (input.readUnsignedByte() & 0xFF);
 			

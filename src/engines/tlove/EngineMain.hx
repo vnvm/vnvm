@@ -3,7 +3,6 @@ import common.display.GameScalerSprite;
 import vfs.Stream;
 import vfs.SubVirtualFileSystem;
 import vfs.VirtualFileSystem;
-import engines.tlove.mrs.MRS;
 import flash.display.Bitmap;
 import flash.display.PixelSnapping;
 import flash.display.Sprite;

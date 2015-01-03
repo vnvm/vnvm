@@ -1,4 +1,4 @@
-package engines.dividead.formats;
+package engines.dividead;
 import common.imaging.format.image.BMP;
 import flash.display.BitmapData;
 import flash.utils.ByteArray;

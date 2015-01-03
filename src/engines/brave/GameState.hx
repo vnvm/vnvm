@@ -1,8 +1,6 @@
 package engines.brave;
 
-import lang.time.Timer2;
-import common.tween.Easing;
-import common.tween.Tween;
+import reflash.display2.Easing;
 import lang.MathEx;
 import common.script.ScriptOpcodes;
 import common.display.SpriteUtils;
@@ -96,16 +94,16 @@ class GameState
 			case 3: "C_ALICIA";
 			default: "C_GOBL01";
 		};
-		var character:Character = new Character(rootClip.mapSprite, charaId, partName, x * 40, y * 40, direction);
+		var character = new Character(rootClip, rootClip.mapSprite, charaId, partName, x * 40, y * 40, direction);
 		character.loadImageAsync(function() {
 			rootClip.mapSprite.addCharacter(character);
 			done();
 		});
 	}
 	
-	static public function waitClickOrKeyPress(done:Void -> Void):Void {
+	public function waitClickOrKeyPress(done:Void -> Void):Void {
 		if (keyPress.exists(17)) {
-			Timer2.waitAsync(0.001).then(function(?e){ done(); });
+			rootClip.waitAsync(1).then(function(?e){ done(); });
 			return;
 		}
 		var onClick = null;
@@ -113,9 +111,9 @@ class GameState
 			StageReference.stage.removeEventListener(MouseEvent.CLICK, onClick);
 			StageReference.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onClick);
 
-			Timer.delay(function() {
+			rootClip.waitAsync(1).then(function(e) {
 				done();
-			}, 1);
+			});
 		};
 		StageReference.stage.addEventListener(MouseEvent.CLICK, onClick);
 		StageReference.stage.addEventListener(KeyboardEvent.KEY_DOWN, onClick);
@@ -187,15 +185,11 @@ class GameState
 		
 		//rootClip.backgroundBack.transform.colorTransform = new ColorTransform(1, 0.6, 0.3, 1.0, 0, 0, 0, 0);
 
-		Tween.forTime(time)
-			.interpolateTo(rootClip.backgroundFront, { alpha : 0 }, Easing.easeInOutQuad)
-			.animateAsync()
-			.then(function(?e) {
-				rootClip.backgroundFront.alpha = 1;
-				SpriteUtils.swapSpriteChildren(rootClip.backgroundFront, rootClip.backgroundBack);
-				done();
-			})
-		;
+		rootClip.interpolateAsync(rootClip.backgroundFront, Std.int(time * 1000), { alpha : 0 }, Easing.easeInOutQuad).then(function(e) {
+			rootClip.backgroundFront.alpha = 1;
+			SpriteUtils.swapSpriteChildren(rootClip.backgroundFront, rootClip.backgroundBack);
+			done();
+		});
 	}
 	
 	public function fadeToMap(done:Void -> Void, time:Int):Void {
@@ -204,12 +198,8 @@ class GameState
 		rootClip.mapSprite.visible = true;
 		rootClip.backgroundBack.visible = false;
 
-		Tween.forTime(time)
-			.interpolateTo(rootClip.background, { alpha : 0 }, Easing.easeInOutQuad)
-			.animateAsync()
-			.then(function(?e) {
-				done();
-			})
-		;
+		rootClip.interpolateAsync(rootClip.background, Std.int(time * 1000), { alpha : 0 }, Easing.easeInOutQuad).then(function(e) {
+			done();
+		});
 	}
 }

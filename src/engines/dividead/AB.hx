@@ -3,15 +3,12 @@ package engines.dividead;
 import lang.promise.Promise;
 import lang.promise.Deferred;
 import lang.promise.IPromise;
-import common.tween.Tween;
 import common.IteratorUtilities;
 import common.script.Instruction2;
-import engines.dividead.script.AB_OP;
 import common.ByteArrayUtils;
 import common.imaging.GraphicUtils;
 import lang.MathEx;
 import common.script.Opcode;
-import haxe.Timer;
 import flash.display.Sprite;
 import flash.geom.ColorTransform;
 import flash.geom.Point;
@@ -118,7 +115,7 @@ class AB {
         var sprite:Sprite = new Sprite();
         GraphicUtils.drawSolidFilledRectWithBounds(sprite.graphics, 0, 0, 640, 480, 0x000000, 1.0);
 
-        return Promise.animateAsync(Std.int(time * 1000), function(step:Float) {
+        return game.gameSprite.animateAsync(Std.int(time * 1000), function(step:Float) {
             game.front.copyPixels(game.back, game.back.rect, new Point(0, 0));
             game.front.draw(sprite, null, new ColorTransform(1, 1, 1, step, 0, 0, 0, 0));
             if (step == 1) {
@@ -129,14 +126,10 @@ class AB {
 
     public function paintAsync(pos:Int, type:Int):IPromise<Dynamic> {
         var allRects:Array<Array<Rectangle>> = [];
-        var deferred = new Deferred<Dynamic>();
 
         if ((type == 0) || game.isSkipping()) {
             game.front.copyPixels(game.back, new Rectangle(0, 0, 640, 480), new Point(0, 0));
-            Timer.delay(function() {
-                deferred.resolve(null);
-            }, 4);
-            return deferred.promise;
+            return game.gameSprite.waitAsync(4);
         }
 
         function addFlipSet(action:Array<Rectangle> -> Void):Void {
@@ -179,34 +172,22 @@ class AB {
                 addFlipSet(function(rects:Array<Rectangle>) { rects.push(new Rectangle(0, 0, 640, 480)); });
         }
 
-        var step = null;
+        var lastExecutedRatio = 0.0;
+        return game.gameSprite.animateAsync(300, function(ratio:Float) {
+            var _from = Std.int(allRects.length * lastExecutedRatio);
+            var _to = Std.int(allRects.length * ratio);
+            lastExecutedRatio = ratio;
+            game.front.lock();
+            for (index in _from ... _to) {
+                var rectangles = allRects[index];
 
-        var frameTime:Int = MathEx.int_div(300, allRects.length);
-
-        step = function() {
-            if (allRects.length > 0) {
-                var rectangles:Array<Rectangle> = allRects.shift();
-
-                game.front.lock();
-                for (rectangle in rectangles) {
-/*
-					var pixels:ByteArray = game.back.getPixels(rectangle);
-					pixels.position = 0;
-					game.front.setPixels(rectangle, pixels);
-					*/
-//Log.trace(Std.format("(${rectangle.x},${rectangle.y})-(${rectangle.width},${rectangle.height})"));
-                    game.front.copyPixels(game.back, rectangle, rectangle.topLeft);
+                if (rectangles != null) {
+                    for (rectangle in rectangles) {
+                        game.front.copyPixels(game.back, rectangle, rectangle.topLeft);
+                    }
                 }
-                game.front.unlock();
-
-                Timer.delay(step, frameTime);
-            } else {
-                deferred.resolve(null);
             }
-        };
-
-        step();
-
-        return deferred.promise;
+            game.front.unlock();
+        });
     }
 }

@@ -1,8 +1,8 @@
 package engines.brave.formats;
 
+import reflash.display2.TimeMeasure;
 import common.ByteArrayUtils;
 import haxe.Log;
-import lang.time.Timer2;
 import common.imaging.format.pixel.PixelFormat565;
 import haxe.io.Bytes;
 import flash.display.BitmapData;
@@ -57,7 +57,7 @@ class BraveImage
 
 	@:noStack public function load(dataCompressed:ByteArray):Void
 	{
-		var elapsed = Timer2.measure(function() {
+		var elapsed = TimeMeasure.measure(function() {
 			_load(dataCompressed);
 		});
 		Log.trace('Decoded image ${dataCompressed.length} ... ${elapsed}s');

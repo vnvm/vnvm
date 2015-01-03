@@ -1,17 +1,8 @@
 package ;
 
-import common.display.Quad;
-import flash.display.Bitmap;
-import haxe.io.Bytes;
-import haxe.io.BytesData;
-import common.ArrayUtils;
+import reflash.display2.View;
+import reflash.display2.Update;
 import haxe.Log;
-import common.ByteArrayUtils;
-import sys.io.File;
-import flash.text.TextFormat;
-import flash.text.TextField;
-import flash.text.TextFieldAutoSize;
-import openfl.Assets;
 import reflash.display.Stage2;
 import common.encoding.Encoding;
 import flash.display.StageAlign;
@@ -34,46 +25,40 @@ import flash.utils.ByteArray;
  * @author
  * @see http://developer.android.com/reference/android/Manifest.permission.html
  */
-class Main extends Sprite
-{
-	var fs:VirtualFileSystem;
-	var initialized:Bool = false;
+class Main extends View {
+    var fs:VirtualFileSystem;
+    var initialized:Bool = false;
 
-	public function new()
-	{
-		super();
+    public function new() {
+        super();
 
-		#if (cpp || neko)
+#if (cpp || neko)
 			Stage.setFixedOrientation(Stage.OrientationLandscapeRight);
 		#end
 
-		if (stage != null)
-		{
-			initOnce();
-		} else
-		{
-			addEventListener(Event.ADDED_TO_STAGE, initOnce);
-		}
-	}
+        if (stage != null) {
+            initOnce();
+        } else {
+            addEventListener(Event.ADDED_TO_STAGE, initOnce);
+        }
+    }
 
-	private function initOnce(?e)
-	{
-		removeEventListener(Event.ADDED_TO_STAGE, initOnce);
-		if (!initialized)
-		{
-			initialized = true;
-			init(e);
-		}
-	}
+    private function initOnce(?e) {
+        removeEventListener(Event.ADDED_TO_STAGE, initOnce);
+        if (!initialized) {
+            initialized = true;
+            init(e);
+        }
+    }
 
-	private function init(e)
-	{
-		StageReference.stage = this.stage;
-		GameInput.init();
+    private function init(e) {
+        StageReference.stage = this.stage;
+        GameInput.init();
+		Update.init(this);
 
-		Stage2.createAndInitializeStage2(stage);
+        Stage2.createAndInitializeStage2(stage);
 
-		/*
+/*
 		var filteredSprite = new FilteredSprite(512, 512);
 		filteredSprite.container.addChild(new Quad(100, 100, 0x0000FF));
 		this.addChild(filteredSprite);
@@ -82,7 +67,7 @@ class Main extends Sprite
 		return;
 		*/
 
-		/*
+/*
 		Log.trace(FFMPEG.getVersion());
 		var ffmpeg:FFMPEG = new FFMPEG();
 		//ffmpeg.openAndPlay("c:/temp/11/iris.dat", function() {
@@ -97,7 +82,7 @@ class Main extends Sprite
 		return;
 		*/
 
-		/*
+/*
 		var mpegVideo = new MpegVideo();
 		mpegVideo.loadAndPlayAsync(File.read('c:/temp/anglea.mpg', true)).then(function(e) {
 			Log.trace('ENDED!');
@@ -107,12 +92,12 @@ class Main extends Sprite
 		return;
 		*/
 
-		//new AudioStreamSound(MP2Native.createWithStream(File.read("c:/temp/mp2/angela.mp2", true))).play();
+//new AudioStreamSound(MP2Native.createWithStream(File.read("c:/temp/mp2/angela.mp2", true))).play();
 
-		//var data = ByteArrayUtils.BytesToByteArray();
-		//var data = File.getBytes("c:/temp/mp2/angela.mp2").getData();
+//var data = ByteArrayUtils.BytesToByteArray();
+//var data = File.getBytes("c:/temp/mp2/angela.mp2").getData();
 
-		/*
+/*
 		var mpeg = new MpegPs(file);
 		var audioStream = mpeg.getAudioStream(0);
 
@@ -121,7 +106,7 @@ class Main extends Sprite
 		return;
 		*/
 
-		/*
+/*
 		var data = ByteArrayUtils.BytesToByteArray(File.getBytes("c:/temp/mp2/angela.mp2"));
 
 		var mp2 = new MP2();
@@ -138,7 +123,7 @@ class Main extends Sprite
 		return;
 		*/
 
-		/*
+/*
 		var textField = new TextField();
 		textField.defaultTextFormat = new TextFormat("fonts/Anonymous.ttf", 32, 0xFF0000);
 		textField.autoSize = TextFieldAutoSize.LEFT;
@@ -149,12 +134,12 @@ class Main extends Sprite
 		return;
 		*/
 
-		//Sandbox.test();
-		//return;
+//Sandbox.test();
+//return;
 
-		//new CommandLineMain().extractAllImages(); return;
+//new CommandLineMain().extractAllImages(); return;
 
-		/*
+/*
 		var texture1 = WGLTexture.fromBitmapData(BitmapDataBuilder.create(512, 512).noise().bitmapData);
 		var buffer1 = WGLFrameBuffer.create(512, 512).clear(HtmlColors.red).draw(new Image2(texture1)).finish();
 
@@ -167,8 +152,7 @@ class Main extends Sprite
 		return;
 		*/
 
-
-		/*
+/*
 		var bitmapData = new BitmapData(512, 512); bitmapData.noise(0);
 		var test = WGLFrameBuffer.create(512, 512);
 		test.clear(HtmlColors.red);
@@ -179,7 +163,7 @@ class Main extends Sprite
 		return;
 		*/
 
-		/*
+/*
 		var view = new OpenGLView();
 		var screen = WGLFrameBuffer.getScreen();
 		var test = WGLFrameBuffer.create(512, 512);
@@ -195,12 +179,11 @@ class Main extends Sprite
 		return;
 		*/
 
+        fs = AssetsFileSystem.getAssetsFileSystem();
 
-		fs = AssetsFileSystem.getAssetsFileSystem();
+//Log.trace(haxe.Serializer.run(new GameState()));
 
-		//Log.trace(haxe.Serializer.run(new GameState()));
-
-		/*
+/*
 		WillResourceManager.createFromFileSystemAsync(SubVirtualFileSystem.fromSubPath(fs, "pw")).then(function(willResourceManager:WillResourceManager) {
 			//
 			//var rio = new RIO(willResourceManager);
@@ -227,64 +210,57 @@ class Main extends Sprite
 		return;
 		*/
 
-		var loadByteArray:ByteArray;
-		var fileName:String = "load.txt";
-		fs.existsAsync(fileName).then(function(exists:Bool)
-		{
-			Log.trace('Exists load.txt: ' + exists);
-			if (exists)
-			{
-				fs.openAndReadAllAsync(fileName).then(function(loadByteArray:ByteArray)
-				{
-					var text:String = StringTools.trim(Encoding.UTF8.getString(loadByteArray));
-					for (line in text.split('\n'))
-					{
-						line = StringTools.trim(line);
-						Log.trace('load line: $line');
-						if (line.substr(0, 1) == '#') continue;
+        var loadByteArray:ByteArray;
+        var fileName:String = "load.txt";
+        fs.existsAsync(fileName).then(function(exists:Bool) {
+            Log.trace('Exists load.txt: ' + exists);
+            if (exists) {
+                fs.openAndReadAllAsync(fileName).then(function(loadByteArray:ByteArray) {
+                    var text:String = StringTools.trim(Encoding.UTF8.getString(loadByteArray));
+                    for (line in text.split('\n')) {
+                        line = StringTools.trim(line);
+                        Log.trace('load line: $line');
+                        if (line.substr(0, 1) == '#') continue;
 
-						var parts:Array<String> = line.split(':');
-						var scriptName:String = null;
-						var scriptPos:Int = 0;
+                        var parts:Array<String> = line.split(':');
+                        var scriptName:String = null;
+                        var scriptPos:Int = 0;
 
-						fileName = parts[0];
-						if (parts.length >= 1) scriptName = parts[1];
-						if (parts.length >= 2) scriptPos = StringEx.parseInt(parts[2], 16);
-						loadEngine(fileName, scriptName, scriptPos);
+                        fileName = parts[0];
+                        if (parts.length >= 1) scriptName = parts[1];
+                        if (parts.length >= 2) scriptPos = StringEx.parseInt(parts[2], 16);
+                        loadEngine(fileName, scriptName, scriptPos);
 
-						return;
-					}
-				});
-			} else
-			{
-				loadEngine("dividead", null);
-				//loadEngine("tlove", null);
-			}
-		});
-	}
+                        return;
+                    }
+                });
+            } else {
+                loadEngine("dividead", null);
+//loadEngine("tlove", null);
+            }
+        });
+    }
 
-	private function loadEngine(name:String, ?scriptName:String, ?scriptPos:Int):Void
-	{
-		Log.trace('loadEngine: $name:$scriptName:$scriptPos');
-		switch (name) {
-			case "tlove": addChild(new engines.tlove.EngineMain(fs, scriptName, scriptPos));
-			case "dividead": addChild(new engines.dividead.EngineMain(fs, scriptName, scriptPos));
-			case "brave": addChild(new engines.brave.EngineMain(fs, scriptName));
-			case "edelweiss": addChild(new engines.ethornell.EngineMain(fs, scriptName));
-			case "yume":
-			case "pw":
-				Stage2.instance.addChild(new engines.will.EngineMain(fs, name, scriptName, scriptPos));
-			default: throw(new Error('Invalid engine \'$name\''));
-		}
-	}
+    private function loadEngine(name:String, ?scriptName:String, ?scriptPos:Int):Void {
+        Log.trace('loadEngine: $name:$scriptName:$scriptPos');
+        switch (name) {
+            case "tlove": addChild(new engines.tlove.EngineMain(fs, scriptName, scriptPos));
+            case "dividead": addChild(new engines.dividead.EngineMain(fs, scriptName, scriptPos));
+            case "brave": addChild(new engines.brave.EngineMain(fs, scriptName));
+            case "edelweiss": addChild(new engines.ethornell.EngineMain(fs, scriptName));
+            case "yume":
+            case "pw":
+                Stage2.instance.addChild(new engines.will.EngineMain(this, fs, name, scriptName, scriptPos));
+            default: throw(new Error('Invalid engine \'$name\''));
+        }
+    }
 
-	static public function main()
-	{
-		var stage = Lib.current.stage;
-		stage.scaleMode = StageScaleMode.NO_SCALE;
-		stage.align = StageAlign.TOP_LEFT;
+    static public function main() {
+        var stage = Lib.current.stage;
+        stage.scaleMode = StageScaleMode.NO_SCALE;
+        stage.align = StageAlign.TOP_LEFT;
 
-		Lib.current.addChild(new Main());
-	}
+        Lib.current.addChild(new Main());
+    }
 
 }

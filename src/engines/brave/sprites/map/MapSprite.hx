@@ -1,6 +1,6 @@
 package engines.brave.sprites.map;
-import common.tween.Easing;
-import common.tween.Tween;
+import reflash.display2.View;
+import reflash.display2.Easing;
 import lang.LangUtils;
 import lang.MathEx;
 import common.display.SpriteUtils;
@@ -43,10 +43,13 @@ class MapSprite extends Sprite
 	private var foregroundSprite:Sprite;
 	private var rowSprites:Array<RowSprite>;
 
-	public function new() 
+	private var view:View;
+
+	public function new(view:View)
 	{
 		super();
-		
+
+		this.view = view;
 		addChild(backgroundSprite = new Sprite());
 		addChild(foregroundSprite = new Sprite());
 
@@ -83,12 +86,9 @@ class MapSprite extends Sprite
 		destX = MathEx.clamp(destX, 0, map.width * 40 - 640);
 		destY = MathEx.clamp(destY, 0, map.height * 40 - 480);
 
-		Tween.forTime(time)
-			.interpolateTo(this, { cameraX : destX, cameraY : destY }, Easing.easeInOutQuad)
-			.animateAsync().then(function(?e) {
-				done();
-			})
-		;
+		view.interpolateAsync(this, Std.int(time * 1000), { cameraX : destX, cameraY : destY }, Easing.easeInOutQuad).then(function(e) {
+			done();
+		});
 	}
 	
 	private var followingCharacter:Character;

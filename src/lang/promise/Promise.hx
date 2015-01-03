@@ -1,10 +1,5 @@
 package lang.promise;
 
-import common.event.EventListenerGroup;
-import openfl.events.Event;
-import openfl.Lib;
-import flash.utils.Timer;
-import lang.time.Timer2;
 import lang.signal.Signal;
 class Promise {
     static public function createDeferred():IDeferred<Dynamic> {
@@ -88,31 +83,5 @@ class Promise {
 
     static public function unresolved():IPromise<Dynamic> {
         return Promise.createDeferred().promise;
-    }
-
-    static public function waitAsync(time:Int):IPromise<Dynamic> {
-        var deferred = Promise.createDeferred();
-        haxe.Timer.delay(function() {
-            deferred.resolve(null);
-        }, time);
-        return deferred.promise;
-    }
-
-    static public function animateAsync(time:Int, callback: Float -> Void):IPromise<Dynamic> {
-        var deferred = Promise.createDeferred();
-        var start = Lib.getTimer();
-        callback(0);
-        var events = new EventListenerGroup(Lib.current);
-        events.addEventListener(Event.ENTER_FRAME, function(e) {
-            var current = Lib.getTimer();
-            var elapsed = current - start;
-            var ratio = Math.min(Math.max(elapsed / time, 0), 1);
-            callback(ratio);
-            if (ratio >= 1) {
-                events.dispose();
-                deferred.resolve(null);
-            }
-        });
-        return deferred.promise;
     }
 }

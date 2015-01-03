@@ -1,5 +1,5 @@
 package engines.brave.sprites;
-import common.tween.Tween;
+import reflash.display2.View;
 import common.display.SpriteUtils;
 import lang.StringEx;
 import engines.brave.BraveAssets;
@@ -15,7 +15,7 @@ import flash.text.TextFormat;
  * @author 
  */
 
-class TextSprite extends Sprite
+class TextSprite extends View
 {
 	var picture:Sprite;
 	var textContainer:Sprite;
@@ -79,18 +79,12 @@ class TextSprite extends Sprite
 	private function setText(faceId:Int, title:String, text:String, done:Void -> Void):Void {
 		if (animateText) 
 		{
-			var obj:Dynamic = { showChars : 0 };
-			var time:Float = text.length * 0.01;
-
-			Tween.forTime(time)
-				.interpolateTo(obj, { showChars : text.length })
-				.onStep(function(step:Float) {
-					_setText(text.substr(0, Std.int(obj.showChars)));
-				})
-				.animateAsync().then(function(?e) {
-					done();
-				})
-			;
+			this.animateAsync(text.length * 10, function(ratio:Float) {
+				var showChars = Math.round(text.length * ratio);
+				_setText(text.substr(0, showChars));
+			}).then(function(v) {
+				done();
+			});
 		}
 		else
 		{
@@ -122,7 +116,7 @@ class TextSprite extends Sprite
 	public function enable(done:Void -> Void):Void
 	{
 		if (alpha != 1) {
-			Tween.forTime(0.3).interpolateTo(this, { alpha : 1 }).animateAsync().then(function(?e) {
+			interpolateAsync(this, 300, { alpha : 1 }).then(function(v) {
 				done();
 			});
 		} else {
@@ -140,7 +134,7 @@ class TextSprite extends Sprite
 			done();
 		};
 		if (alpha != 0) {
-			Tween.forTime(0.1).interpolateTo(this, { alpha : 0 }).animateAsync().then(function(?e) {
+			interpolateAsync(this, 100, { alpha : 0 }).then(function(v) {
 				done2();
 			});
 		} else {

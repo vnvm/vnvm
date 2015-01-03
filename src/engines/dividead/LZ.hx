@@ -1,5 +1,4 @@
-package engines.dividead.formats;
-import cpp.Pointer;
+package engines.dividead;
 import reflash.Bytes3;
 import common.ByteArrayUtils;
 import haxe.Timer;
@@ -10,7 +9,14 @@ import haxe.io.Bytes;
 import flash.utils.ByteArray;
 
 class LZ {
+    static public function is(data:ByteArray):Bool {
+        data.position = 0;
+        var magic:String = data.readUTFBytes(2);
+        return magic == 'LZ';
+    }
+
     static public function decode(data:ByteArray):ByteArray {
+        data.position = 0;
         var magic:String = data.readUTFBytes(2);
         var compressedSize:Int = data.readInt();
         var uncompressedSize:Int = data.readInt();

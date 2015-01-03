@@ -1,5 +1,6 @@
 package engines.tlove;
 
+import reflash.display2.View;
 import lang.signal.Signal;
 import lang.promise.IPromise;
 import lang.promise.Deferred;
@@ -11,9 +12,6 @@ import vfs.Stream;
 import vfs.VirtualFileSystem;
 import lang.LangUtils;
 import common.script.ScriptOpcodes;
-import engines.tlove.mrs.MRS;
-import engines.tlove.script.DAT;
-import engines.tlove.script.DAT_OP;
 import haxe.Log;
 import haxe.Timer;
 import flash.display.Bitmap;
@@ -49,7 +47,7 @@ class Game
 	public var backupPalette:Palette;
 	public var lastLoadedPalette:Palette;
 	private var _lastUpdatedPalette:Palette;
-	public var sprite:Sprite;
+	public var sprite:View;
 	private var updatedBitmap:BitmapData;
 	public var state:GameState;
 	static inline public var fps:Int = 60;
@@ -82,7 +80,7 @@ class Game
 		this.lastLoadedPalette = new Palette();
 		this._lastUpdatedPalette = new Palette();
 		this.updatedBitmap = new BitmapData(640, 400);
-		this.sprite = new Sprite();
+		this.sprite = new View();
 		
 		this.onMouseLeftClick = new Signal<MouseEvent>();
 		this.onMouseRightClick = new Signal<MouseEvent>();

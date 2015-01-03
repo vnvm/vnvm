@@ -8,16 +8,16 @@ PRINCESS WALTZ:
 	sub_406F00
 */
 
+import reflash.display2.View;
 import reflash.display.Stage2;
 import reflash.gl.wgl.WGLTexture;
 import reflash.display.Image2;
 import common.StageReference;
 import flash.display.Bitmap;
 //import ffmpeg.FFMPEG;
-import common.tween.Easing;
+import reflash.display2.Easing;
 import lang.promise.Promise;
 import lang.promise.IPromise;
-import common.tween.Tween;
 import reflash.display.HtmlColors;
 import lang.signal.Signal;
 import lang.promise.Deferred;
@@ -28,20 +28,22 @@ import flash.events.Event;
 import common.input.GameInput;
 import common.geom.Anchor;
 import haxe.Log;
-import lang.time.Timer2;
 import lang.MathEx;
 import common.BitUtils;
 import lang.exceptions.NotImplementedException;
 import flash.errors.Error;
+
 class RIO_OP
 {
+	private var view:View;
 	private var scene:IScene;
 	private var state:GameState;
 	private var script:IScript;
 	private var clicked:Bool;
 
-	public function new(scene:IScene, state:GameState, script:IScript)
+	public function new(view:View, scene:IScene, state:GameState, script:IScript)
 	{
+		this.view = view;
 		this.scene = scene;
 		this.state = state;
 		this.script = script;
@@ -139,7 +141,7 @@ class RIO_OP
 
 		return deferred.promise;
 		*/
-	return Timer2.waitAsync(0.1);
+	return view.waitAsync(100);
 
 		/*
 		local movie = Movie();
@@ -666,7 +668,11 @@ class RIO_OP
 		if (layer != null)
 		{
 			if (animations == null) animations = [];
-			animations.push(Tween.forTime(time).interpolateTo(layer, { x: layer.x + inc_x, y: layer.y + inc_y, alpha: layer.alpha + alpha }).withEasing(Easing.linear).animateAsync);
+			animations.push(
+				function() {
+					return view.interpolateAsync(layer, Std.int(time * 1000), { x: layer.x + inc_x, y: layer.y + inc_y, alpha: layer.alpha + alpha }, Easing.linear);
+				}
+			);
 		}
 	}
 
@@ -975,7 +981,7 @@ class RIO_OP
 	public function WAIT(delay_ms:Int, unk1:Int)
 	{
 		if (state.debug) delay_ms = Std.int(delay_ms / 10);
-		return Timer2.waitAsync(delay_ms / 1000);
+		return view.waitAsync(delay_ms);
 		throw(new NotImplementedException());
 		/*
 		local timer = Timer(delay_ms);
@@ -1092,7 +1098,7 @@ class RIO_OP
 		this.lastTitle = title;
 		scene.setTextAsync(text, title, isSkipping() ? 0 : 0.05).then(function(?e)
 		{
-			Timer2.waitAsync(0.1).then(function(?e)
+			view.waitAsync(100).then(function(?e)
 			{
 				Signal.addAnyOnce([GameInput.onClick, GameInput.onKeyPress], function(?e)
 				{

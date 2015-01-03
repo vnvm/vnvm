@@ -562,7 +562,7 @@ class ScriptInstructions
 			var textSprite:TextSprite = scriptThread.gameState.rootClip.ui.textSprite;
 			
 			textSprite.setTextAndEnable(faceId, title, text, function() {
-				GameState.waitClickOrKeyPress(function() {
+				scriptThread.gameState.waitClickOrKeyPress(function() {
 					textSprite.endText();
 					if (voiceChannel != null) voiceChannel.stop();
 					Timer.delay(function() {

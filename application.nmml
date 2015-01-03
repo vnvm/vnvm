@@ -7,7 +7,10 @@
 	
 	<!-- output -->
 	<app main="Main" file="VNVM" path="bin" swf-version="11.7" />
-	
+	<!--
+	<app main="engines.dividead.DivideadCommandLine" file="VNVM" path="bin" swf-version="11.7" />
+	-->
+
 	<window background="#000000" fps="60" />
 	
 	<!--<window width="1280" height="960" unless="mobile" />-->

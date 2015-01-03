@@ -1,5 +1,6 @@
 package engines.will;
 
+import reflash.display2.View;
 import engines.will.utils.WillCommandLineMain;
 import lang.MathEx;
 import reflash.display.TransitionImageBlend2;
@@ -38,7 +39,6 @@ import flash.text.TextField;
 import flash.geom.Rectangle;
 import common.geom.Anchor;
 import flash.errors.Error;
-import common.tween.Tween;
 import flash.geom.Point;
 import flash.display.BitmapData;
 import flash.media.SoundChannel;
@@ -79,6 +79,8 @@ class EngineMain extends Sprite2 implements IScene
 
 	private var contentContainer:Sprite2;
 
+	public var view:View;
+
 	//private var textLayer:TextField;
 	//private var menuLayer:Sprite2;
 	private var gameLayerList:GameInterfaceLayerList;
@@ -92,10 +94,11 @@ class EngineMain extends Sprite2 implements IScene
 	private var transitionMask:BitmapData;
 	private var transitionMaskTexture:DisposableHolder<IGLTexture>;
 
-	public function new(fs:VirtualFileSystem, subpath:String, script:String, scriptPos:Int = 0)
+	public function new(view:View, fs:VirtualFileSystem, subpath:String, script:String, scriptPos:Int = 0)
 	{
 		super();
 
+		this.view = view;
 		transitionMaskTexture = new DisposableHolder<IGLTexture>();
 
 //if (script == null) script = 'PW0001';
@@ -147,14 +150,14 @@ class EngineMain extends Sprite2 implements IScene
 
 		this.gameSprite.addChild(previousBitmapImage = new Image2(previousBitmap.texture));
 		this.gameSprite.addChild(currentBitmapImage = new Image2(currentBitmap.texture));
-		this.gameSprite.addChild(interfaceLayer = new GameInterfaceLayer(willResourceManager));
+		this.gameSprite.addChild(interfaceLayer = new GameInterfaceLayer(view, willResourceManager));
 
 		interfaceLayer.setZIndex(10);
 
 		addChild(new GameScalerSprite2(800, 600, this.gameSprite));
 
 		gameState = new GameState();
-		var rio = new RIO(this, willResourceManager, gameState);
+		var rio = new RIO(view, this, willResourceManager, gameState);
 
 		interfaceLayer.initAsync().then(function(?e)
 		{
@@ -189,8 +192,7 @@ class EngineMain extends Sprite2 implements IScene
 			renderedBitmap.clear(HtmlColors.black).draw(contentContainer).finish();
 			currentBitmap.clear(HtmlColors.black).draw(renderedBitmap).finish();
 
-			Tween.forTime(time / 1000).onStep(function(ratio:Float)
-			{
+			view.animateAsync(time, function(ratio:Float) {
 				currentBitmapImage.y = currentBitmapImage.x = 0;
 				currentBitmapImage.blendMode = BlendMode.NORMAL;
 				switch (kind)
@@ -221,7 +223,7 @@ class EngineMain extends Sprite2 implements IScene
 						currentBitmapImage.alpha = ratio;
 
 					case 26: // TRANSITION NORMAL FADE IN BURN (alpha) // @TODO
-						//currentBitmap.clear(HtmlColors.transparent).draw(new TransitionImageBlend2(previousBitmap.texture, renderedBitmap.texture, ratio)).finish();
+//currentBitmap.clear(HtmlColors.transparent).draw(new TransitionImageBlend2(previousBitmap.texture, renderedBitmap.texture, ratio)).finish();
 						if (ratio < 0.5) {
 							currentBitmapImage.blendMode = BlendMode.ADD;
 							currentBitmapImage.alpha = MathEx.translateRange(ratio, 0, 0.5, 0, 1);
@@ -256,7 +258,7 @@ class EngineMain extends Sprite2 implements IScene
 					default:
 						throw('Invalid transition kind $kind');
 				}
-			}).animateAsync().then(function(?e)
+			}).then(function(?e)
 			{
 				deferred.resolve(null);
 			});

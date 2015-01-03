@@ -1,10 +1,8 @@
 package engines.dividead;
 
+import reflash.display2.View;
 import lang.promise.Promise;
 import lang.promise.IPromise;
-import engines.dividead.formats.SG;
-import engines.dividead.formats.DL1;
-import engines.dividead.script.AB_OP;
 import vfs.SubVirtualFileSystem;
 import haxe.Log;
 import common.imaging.BitmapDataUtils;
@@ -40,7 +38,7 @@ class Game {
     public var back:BitmapData;
     public var front:BitmapData;
     public var textField:TextField;
-    public var gameSprite:Sprite;
+    public var gameSprite:View;
     public var overlaySprite:Sprite;
     public var voiceChannel:SoundChannel;
     public var effectChannel:SoundChannel;
@@ -84,7 +82,7 @@ class Game {
         optionList = new OptionList(428, 60, 3, 2, true);
         optionList.sprite.x = 108;
         optionList.sprite.y = 402;
-        gameSprite = new Sprite();
+        gameSprite = new View();
         gameSprite.addChild(new Bitmap(front, PixelSnapping.AUTO, true));
         gameSprite.addChild(textField);
         gameSprite.addChild(optionList.sprite);
@@ -97,12 +95,6 @@ class Game {
         if (name.indexOf(".") == -1) name += "." + expectedExtension;
         return name;
     }
-
-/**
-	 * 
-	 * @param	imageName
-	 * @param	done
-	 */
 
     public function getImageCachedAsync(imageName:String):IPromise<BitmapData> {
         imageName = addExtensionsWhenRequired(imageName, "bmp").toUpperCase();
@@ -149,12 +141,6 @@ class Game {
             return sound;
         });
     }
-
-/**
-	 * 
-	 * @param	fileSystem
-	 * @param	done
-	 */
 
     static public function newAsync(fileSystem:VirtualFileSystem):IPromise<Game> {
         return getDl1Async(fileSystem, "SG.DL1").pipe(function(sg:DL1) {

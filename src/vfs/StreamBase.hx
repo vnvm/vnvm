@@ -2,19 +2,12 @@ package vfs;
 import lang.promise.IPromise;
 import flash.utils.ByteArray;
 
-/**
- * ...
- * @author soywiz
- */
+class StreamBase {
+    public var position:Int;
+    public var length:Int;
 
-class StreamBase 
-{
-	public var position:Int;
-	public var length:Int;
-	
-	public function readBytesAsync(length:Int):IPromise<ByteArray>
-	{
-		throw('Not implemented Stream.readBytesAsync : $this');
-		return null;
-	}
+    public function readBytesAsync(length:Int):IPromise<ByteArray> {
+        throw('Not implemented Stream.readBytesAsync : $this');
+        return null;
+    }
 }

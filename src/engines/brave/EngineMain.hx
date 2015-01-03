@@ -1,5 +1,6 @@
 package engines.brave;
 
+import reflash.display2.View;
 import common.display.GameScalerSprite;
 import common.imaging.GraphicUtils;
 import vfs.SubVirtualFileSystem;
@@ -36,7 +37,7 @@ import flash.media.SoundTransform;
  * @author soywiz
  */
 
-class EngineMain extends Sprite 
+class EngineMain extends View
 {
 	
 	public function new(fs:VirtualFileSystem, script:String) 
@@ -85,10 +86,10 @@ class EngineMain extends Sprite
 		
 		if (false) {
 			GameMap.loadFromNameAsync("a_wood0", function(woods:GameMap):Void {
-				var mapSprite:MapSprite = new MapSprite();
+				var mapSprite:MapSprite = new MapSprite(this);
 				addChild(mapSprite);
 				mapSprite.setMap(woods);
-				var character:Character = new Character(mapSprite, 0, "C_RUDY", 20 * 40, 71 * 40);
+				var character:Character = new Character(gameSprite, mapSprite, 0, "C_RUDY", 20 * 40, 71 * 40);
 				character.loadImageAsync(function() {
 					mapSprite.addCharacter(character);
 				});

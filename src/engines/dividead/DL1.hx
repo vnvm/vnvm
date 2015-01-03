@@ -1,5 +1,6 @@
-package engines.dividead.formats;
+package engines.dividead;
 
+import common.IteratorUtilities;
 import lang.promise.Promise;
 import lang.promise.Deferred;
 import lang.promise.IPromise;
@@ -11,10 +12,9 @@ import haxe.Log;
 import flash.utils.ByteArray;
 
 class DL1 extends VirtualFileSystem {
-    private var entries:Map<String, Stream>;
+    private var entries = new Map<String, Stream>();
 
     private function new() {
-        this.entries = new Map<String, Stream>();
     }
 
     static public function loadAsync(stream:Stream):IPromise<DL1> {
@@ -41,18 +41,17 @@ class DL1 extends VirtualFileSystem {
                 for (n in 0 ... count) {
                     var name:String = StringTools.replace(entriesByteArray.readUTFBytes(12), String.fromCharCode(0), '');
                     var size:Int = entriesByteArray.readUnsignedInt();
-
-                    //Log.trace(name + ':' + size);
-
-                    //Log.trace(name);
                     dl1.entries.set(name.toUpperCase(), SliceStream.fromLength(stream, pos, size));
-
                     pos += size;
                 }
 
                 return dl1;
             });
         });
+    }
+
+    public function listFiles():Iterator<String> {
+        return this.entries.keys();
     }
 
     override public function openAsync(name:String):IPromise<Stream> {
