@@ -29,14 +29,16 @@ class View extends Sprite implements Updatable {
         return result;
     }
 
-    public function animateAsync(time:Milliseconds, step: Float -> Void) {
+    public function animateAsync(time:Milliseconds, step: Float -> Void, ?easing:Float -> Float) {
+        if (easing == null) easing = Easing.linear;
+
         var deferred = Promise.createDeferred();
         var elapsed:Int = 0;
         var updater:ViewComponent = null;
         updater = addUpdater(function(context:Update) {
             elapsed += context.dtMs;
             var ratio = Math.min(Math.max(elapsed / time.toInt(), 0), 1);
-            step(ratio);
+            step(easing(ratio));
             if (ratio >= 1) {
                 updater.remove();
                 deferred.resolve(null);
@@ -46,10 +48,10 @@ class View extends Sprite implements Updatable {
     }
 
     public function interpolateAsync(object:Dynamic, time:Milliseconds, target:Dynamic, ?easing:Float -> Float, ?step: Float -> Void):IPromise<Dynamic> {
+        if (easing == null) easing = Easing.linear;
         var keys = Reflect.fields(target);
         var source = {};
         for (key in keys) Reflect.setField(source, key, Reflect.getProperty(object, key));
-        if (easing == null) easing = Easing.linear;
 
         return animateAsync(time, function(ratio:Float) {
             ratio = easing(ratio);

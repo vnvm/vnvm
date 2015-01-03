@@ -393,7 +393,7 @@ class DAT_OP {
 //@Unimplemented
     function JUMP_COND_SYS_FLAG(flagIndex:Int, value:Int, label:Int) {
         if (this.state.getSysFlag(flagIndex) == value) dat.jumpLabel(label);
-        //return game.sprite.waitAsync(0);
+//return game.sprite.waitAsync(0);
         return Promise.createResolved(null);
     }
 
@@ -401,9 +401,9 @@ class DAT_OP {
     function MUSIC_PLAY(name:String, loop:Int) {
         return MUSIC_STOP().pipe(function(e) {
             return game.midi.getBytesAsync(Path.withExtension(name, "mid").toUpperCase()).then(function(bytes:ByteArray) {
-                //var sound:Sound = new Sound();
-                //sound.loadCompressedDataFromByteArray(bytes, bytes.length);
-                //game.musicChannel = sound.play();
+//var sound:Sound = new Sound();
+//sound.loadCompressedDataFromByteArray(bytes, bytes.length);
+//game.musicChannel = sound.play();
             });
         });
     }

@@ -1,4 +1,5 @@
 package engines.dividead;
+import reflash.display2.Easing;
 import reflash.display2.Seconds;
 import reflash.display2.Milliseconds;
 import reflash.display2.Update;
@@ -162,26 +163,22 @@ class AB_OP {
     public function OPTION_RESHOW() return OPTION_SHOW();
 
     @Opcode({ id:0x37, format:"SS", description:"Sets the images that will be used in the map overlay" })
-    @Unimplemented
     public function MAP_IMAGES(name1:String, name2:String) {
         game.state.mapImage1 = name1;
         game.state.mapImage2 = name2;
     }
 
     @Opcode({ id:0x38, format:"", description:"Empties the map_option list", savepoint:1 })
-    @Unimplemented
     public function MAP_OPTION_RESET() {
         game.state.optionsMap = [];
     }
 
     @Opcode({ id:0x40, format:"P2222", description:"Adds an option to the map_option list" })
-    @Unimplemented
     public function MAP_OPTION_ADD(pointer:Int, x1:Int, y1:Int, x2:Int, y2:Int) {
         game.state.optionsMap.push({pointer: pointer, rect: new Rectangle(x1, y1, x2 - x1, y2 - y1)});
     }
 
     @Opcode({ id:0x41, format:"", description:"Shows the map and waits for selecting an option" })
-    @Unimplemented
     public function MAP_OPTION_SHOW() {
         return Promise.whenAll([
             game.getImageCachedAsync(game.state.mapImage1),
@@ -240,7 +237,6 @@ class AB_OP {
     }
 
     @Opcode({ id:0x11, format:"2", description:"Wait `time` milliseconds" })
-//@Unimplemented
     public function WAIT(time:Int) {
         if (game.isSkipping()) return Promise.createResolved(null);
 
@@ -252,7 +248,6 @@ class AB_OP {
 // ---------------
 
     @Opcode({ id:0x26, format:"S", description:"Starts a music" })
-//@Unimplemented
     public function MUSIC_PLAY(name:String) {
         var sound:Sound;
 
@@ -270,7 +265,6 @@ class AB_OP {
     }
 
     @Opcode({ id:0x2B, format:"S", description:"Plays a sound in the voice channel" })
-//@Unimplemented
     public function VOICE_PLAY(name:String) {
         var sound:Sound;
         return ab.game.getSoundAsync(name).then(function(sound:Sound) {
@@ -279,7 +273,6 @@ class AB_OP {
     }
 
     @Opcode({ id:0x35, format:"S", description:"Plays a sound in the effect channel" })
-//@Unimplemented
     public function EFFECT_PLAY(name:String) {
         var sound:Sound;
         EFFECT_STOP();
@@ -289,7 +282,6 @@ class AB_OP {
     }
 
     @Opcode({ id:0x36, format:"", description:"Stops the sound playing in the effect channgel" })
-//@Unimplemented
     public function EFFECT_STOP() {
         if (ab.game.effectChannel == null) return;
         ab.game.effectChannel.stop();
@@ -301,7 +293,6 @@ class AB_OP {
 // ---------------
 
     @Opcode({ id:0x46, format:"S", description:"Sets an image as the foreground" })
-//@Unimplemented
     public function FOREGROUND(name:String) {
         return game.getImageCachedAsync(name).then(function(bitmapData:BitmapData) {
             var matrix:Matrix = new Matrix();
@@ -311,7 +302,6 @@ class AB_OP {
     }
 
     @Opcode({ id:0x47, format:"s", description:"Sets an image as the background" })
-//@Unimplemented
     public function BACKGROUND(name:String) {
         state.background = name;
         return game.getImageCachedAsync(name).then(function(bitmapData:BitmapData) {
@@ -322,7 +312,6 @@ class AB_OP {
     }
 
     @Opcode({ id:0x16, format:"S", description:"Puts an image overlay on the screen" })
-    @Unimplemented
     public function IMAGE_OVERLAY(name:String) {
         return game.getImageCachedAsync(name).then(function(bitmapData:BitmapData) {
             var outBitmapData = BitmapDataUtils.chromaKey(bitmapData, 0x00FF00);
@@ -333,7 +322,6 @@ class AB_OP {
     }
 
     @Opcode({ id:0x4B, format:"S", description:"Puts a character in the middle of the screen" })
-//@Unimplemented
     public function CHARA1(name:String) {
         var bitmapData:BitmapData;
 
@@ -348,7 +336,6 @@ class AB_OP {
     }
 
     @Opcode({ id:0x4C, format:"SS", description:"Puts two characters in the screen" })
-    @Unimplemented
     public function CHARA2(name1:String, name2:String) {
         var bitmapData1:BitmapData;
         var bitmapData2:BitmapData;
@@ -378,7 +365,6 @@ class AB_OP {
 // ----------------------
 
     @Opcode({ id:0x4D, format:"", description:"Performs an animation with the current background (ABCDEF)" })
-    @Unimplemented
     public function ANIMATION(type:Int) {
         var time = new Milliseconds(game.isSkipping() ? 50 : 500);
         var names = [for (n in 0 ... 6) state.background.substr(0, -1) + String.fromCharCode('A'.code + n)];
@@ -434,7 +420,7 @@ class AB_OP {
             return game.gameSprite.animateAsync(time, function(ratio) {
                 ratio = ratio * multiplier;
                 container.scrollRect = new Rectangle(0, bgImage.height * ratio, bgImage.width, bgImage.height);
-            }).then(function(v) {
+            }, Easing.easeInOutQuad).then(function(v) {
                 game.front.draw(container, new Matrix(1, 0, 0, 1, 32, 8));
                 game.back.draw(container, new Matrix(1, 0, 0, 1, 32, 8));
                 game.overlaySprite.removeChildren();
@@ -448,7 +434,6 @@ class AB_OP {
 // ----------------------
 
     @Opcode({ id:0x30, format:"2222", description:"Sets a clipping for the screen" })
-    @Unimplemented
     public function CLIP(x1:Int, y1:Int, x2:Int, y2:Int) {
     }
 
