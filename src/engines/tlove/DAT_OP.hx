@@ -1,4 +1,6 @@
 package engines.tlove;
+import reflash.display2.Seconds;
+import reflash.display2.Milliseconds;
 import lang.signal.Signal;
 import lang.promise.Promise;
 import haxe.io.Path;
@@ -154,7 +156,7 @@ class DAT_OP {
 //@Unimplemented
     function JUMP(label:Int) {
         dat.jumpLabel(label);
-        return game.sprite.waitAsync(0);
+        return Promise.createResolved(null);
     }
 
     @Opcode( { id:0x2B, format:"2", description:"Jumps to an address" } )
@@ -191,12 +193,12 @@ class DAT_OP {
 
     @Opcode({ id:0x32, format:"", description:"Fade In" })
     function FADE_IN() {
-        return game.sprite.interpolateAsync(game.blackOverlay, delayEnabled ? 500 : 0, { alpha: 0 });
+        return game.sprite.interpolateAsync(game.blackOverlay, new Milliseconds(delayEnabled ? 500 : 0), { alpha: 0 });
     }
 
     @Opcode({ id:0x35, format:"", description:"Fade Out" })
     function FADE_OUT() {
-        return game.sprite.interpolateAsync(game.blackOverlay, delayEnabled ? 500 : 0, { alpha: 1 });
+        return game.sprite.interpolateAsync(game.blackOverlay, new Milliseconds(delayEnabled ? 500 : 0), { alpha: 1 });
     }
 
     @Opcode( { id:0x36, format:"1112222122", description:"Copy an slice of buffer into another" } )
@@ -210,11 +212,11 @@ class DAT_OP {
             case 0:
                 BitmapData8.copyRect(src, new Rectangle(srcX, srcY, srcWidth, srcHeight), dst, new Point(dstX, dstY));
                 if (dstLayer == 0) dat.game.updateImage(new Rectangle(dstX, dstY, srcWidth, srcHeight));
-                return game.sprite.waitAsync(0);
+                return game.sprite.waitAsync(new Seconds(0.0));
 //case 29:
             default:
                 if (delayEnabled) {
-                    return game.sprite.animateAsync(400, function(step:Float) {
+                    return game.sprite.animateAsync(new Milliseconds(400), function(step:Float) {
                         BitmapData8.copyRectTransition(src, new Rectangle(srcX, srcY, srcWidth, srcHeight), dst, new Point(dstX, dstY), step, effect, transparentColor);
                         if (dstLayer == 0) dat.game.updateImage(new Rectangle(dstX, dstY, srcWidth, srcHeight));
                     });
@@ -222,7 +224,7 @@ class DAT_OP {
                 else {
                     BitmapData8.copyRectTransition(src, new Rectangle(srcX, srcY, srcWidth, srcHeight), dst, new Point(dstX, dstY), 1, effect, transparentColor);
                     if (dstLayer == 0) dat.game.updateImage(new Rectangle(dstX, dstY, srcWidth, srcHeight));
-                    return game.sprite.waitAsync(0);
+                    return game.sprite.waitAsync(new Seconds(0.0));
                 }
         }
     }
@@ -250,7 +252,7 @@ class DAT_OP {
     @Opcode( { id:0x3C, format:"11111", description:"???" } )
 //@Unimplemented
     function PALETTE_ACTION(mode:Int, index:Int, b:Int, r:Int, g:Int) {
-        var color:BmpColor = new BmpColor(r, g, b, 0xFF);
+        var color = new BmpColor(r, g, b, 0xFF);
 
         switch (mode) {
             case 0: // SET_WORK_PALETTE_COLOR
@@ -270,7 +272,7 @@ class DAT_OP {
                 var src = game.workPalette.clone();
                 var dst = game.currentPalette.clone();
 
-                return game.sprite.animateAsync(delayEnabled ? 1000 : 0, function(step:Float) {
+                return game.sprite.animateAsync(new Milliseconds(delayEnabled ? 1000 : 0), function(step:Float) {
                     game.workPalette.interpolate(src, dst, step);
                     game.updateImage();
                 });
@@ -319,7 +321,7 @@ class DAT_OP {
         if (this.condition(f, op, imm)) {
             dat.jumpLabel(label);
         }
-        return game.sprite.waitAsync(0);
+        return Promise.createResolved(null);
     }
 
     function condition(left, operator, right) {
@@ -391,7 +393,8 @@ class DAT_OP {
 //@Unimplemented
     function JUMP_COND_SYS_FLAG(flagIndex:Int, value:Int, label:Int) {
         if (this.state.getSysFlag(flagIndex) == value) dat.jumpLabel(label);
-        return game.sprite.waitAsync(0);
+        //return game.sprite.waitAsync(0);
+        return Promise.createResolved(null);
     }
 
     @Opcode({ id:0x61, format:"s2", description:"Plays a midi file" })
@@ -418,21 +421,21 @@ class DAT_OP {
             game.musicChannel.stop();
             game.musicChannel = null;
         }
-        return game.sprite.waitAsync(10);
+        return game.sprite.waitAsync(new Milliseconds(10));
     }
 
     @Opcode( { id:0x66, format:"s", description:"Plays a sound" } )
     @Unimplemented
     function SOUND_PLAY(name:String) {
         throw(new Error("SOUND_PLAY"));
-        return game.sprite.waitAsync(10);
+        return game.sprite.waitAsync(new Milliseconds(10));
     }
 
     @Opcode( { id:0x67, format:"", description:"???" } )
     @Unimplemented
     function SOUND_STOP() {
         throw(new Error("SOUND_STOP"));
-        return game.sprite.waitAsync(10);
+        return game.sprite.waitAsync(new Milliseconds(10));
     }
 
     @Opcode({ id:0x70, format:"?", description:"Put text (dialog)" })
@@ -549,7 +552,7 @@ class DAT_OP {
     @Unimplemented
     function DELAY_83(time:Int) {
         if (delayEnabled) {
-            return game.sprite.waitAsync(time * 10);
+            return game.sprite.waitAsync(new Milliseconds(time * 10));
         } else {
             return Promise.createResolved(null);
         }
@@ -582,7 +585,7 @@ class DAT_OP {
     }
 
     @Opcode( { id:0x89, format:"2", description:"Delay" } )
-    function DELAY_89(time:Int) return game.sprite.waitAsync(time * 10);
+    function DELAY_89(time:Int) return game.sprite.waitAsync(new Milliseconds(time * 10));
 
 /**
 	 * 

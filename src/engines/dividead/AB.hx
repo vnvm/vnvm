@@ -1,5 +1,7 @@
 package engines.dividead;
 
+import reflash.display2.Milliseconds;
+import reflash.display2.Seconds;
 import lang.promise.Promise;
 import lang.promise.Deferred;
 import lang.promise.IPromise;
@@ -111,11 +113,11 @@ class AB {
         this.running = false;
     }
 
-    public function paintToColorAsync(color:Array<Int>, time:Float):IPromise<Dynamic> {
+    public function paintToColorAsync(color:Array<Int>, time:Seconds):IPromise<Dynamic> {
         var sprite:Sprite = new Sprite();
         GraphicUtils.drawSolidFilledRectWithBounds(sprite.graphics, 0, 0, 640, 480, 0x000000, 1.0);
 
-        return game.gameSprite.animateAsync(Std.int(time * 1000), function(step:Float) {
+        return game.gameSprite.animateAsync(time, function(step:Float) {
             game.front.copyPixels(game.back, game.back.rect, new Point(0, 0));
             game.front.draw(sprite, null, new ColorTransform(1, 1, 1, step, 0, 0, 0, 0));
             if (step == 1) {
@@ -129,7 +131,7 @@ class AB {
 
         if ((type == 0) || game.isSkipping()) {
             game.front.copyPixels(game.back, new Rectangle(0, 0, 640, 480), new Point(0, 0));
-            return game.gameSprite.waitAsync(4);
+            return game.gameSprite.waitAsync(new Milliseconds(4));
         }
 
         function addFlipSet(action:Array<Rectangle> -> Void):Void {
@@ -173,7 +175,8 @@ class AB {
         }
 
         var lastExecutedRatio = 0.0;
-        return game.gameSprite.animateAsync(300, function(ratio:Float) {
+
+        return game.gameSprite.animateAsync(new Seconds(game.isSkipping() ? 0.03 : 0.3), function(ratio:Float) {
             var _from = Std.int(allRects.length * lastExecutedRatio);
             var _to = Std.int(allRects.length * ratio);
             lastExecutedRatio = ratio;

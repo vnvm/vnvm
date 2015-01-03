@@ -1,5 +1,7 @@
 package engines.will;
 
+import reflash.display2.Milliseconds;
+import reflash.display2.Seconds;
 import reflash.display.DisplayObjectContainer2;
 import reflash.display.DisplayObject2;
 import vfs.VirtualFileSystem;
@@ -26,9 +28,9 @@ interface IScene
 
 	function getLayerWithName(name:String):IGameElementsLayer;
 
-	function performTransitionAsync(kind:Int, time:Int):IPromise<Dynamic>;
+	function performTransitionAsync(kind:Int, time:Milliseconds):IPromise<Dynamic>;
 
-	function setTextAsync(text:String, title:String, timePerCharacter:Float):IPromise<Dynamic>;
+	function setTextAsync(text:String, title:String, timePerCharacter:Seconds):IPromise<Dynamic>;
 	function setTextSize(size:Int):Void;
 
 	function animLoadAsync(name:String):IPromise<Dynamic>;

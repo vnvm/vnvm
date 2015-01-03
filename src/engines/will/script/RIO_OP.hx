@@ -8,12 +8,9 @@ PRINCESS WALTZ:
 	sub_406F00
 */
 
+import reflash.display2.Milliseconds;
+import reflash.display2.Seconds;
 import reflash.display2.View;
-import reflash.display.Stage2;
-import reflash.gl.wgl.WGLTexture;
-import reflash.display.Image2;
-import common.StageReference;
-import flash.display.Bitmap;
 //import ffmpeg.FFMPEG;
 import reflash.display2.Easing;
 import lang.promise.Promise;
@@ -21,38 +18,33 @@ import lang.promise.IPromise;
 import reflash.display.HtmlColors;
 import lang.signal.Signal;
 import lang.promise.Deferred;
-import common.input.Keys;
 import flash.events.MouseEvent;
 import flash.geom.Point;
-import flash.events.Event;
 import common.input.GameInput;
 import common.geom.Anchor;
 import haxe.Log;
 import lang.MathEx;
 import common.BitUtils;
 import lang.exceptions.NotImplementedException;
-import flash.errors.Error;
 
-class RIO_OP
-{
-	private var view:View;
-	private var scene:IScene;
-	private var state:GameState;
-	private var script:IScript;
-	private var clicked:Bool;
+class RIO_OP {
+    private var view:View;
+    private var scene:IScene;
+    private var state:GameState;
+    private var script:IScript;
+    private var clicked:Bool;
 
-	public function new(view:View, scene:IScene, state:GameState, script:IScript)
-	{
-		this.view = view;
-		this.scene = scene;
-		this.state = state;
-		this.script = script;
-		GameInput.onClick.add(function(e) {
-			clicked = true;
-		});
-	}
+    public function new(view:View, scene:IScene, state:GameState, script:IScript) {
+        this.view = view;
+        this.scene = scene;
+        this.state = state;
+        this.script = script;
+        GameInput.onClick.add(function(e) {
+            clicked = true;
+        });
+    }
 
-	/*
+/*
 		pw0001@04DC: OP(0x86) : UNK_86_DELAY : [230,0]
 		pw0001@04DC: OP(0x86) : UNK_86_DELAY : [230,0]...  @TODO
 		pw0001@04DF: OP(0x01) : JUMP_IF : [3,998,0,20]
@@ -61,12 +53,11 @@ class RIO_OP
 		pw0001@04F2: OP(0x82) : WAIT : [1000,0]
 	*/
 
-	@Opcode({ id:0x86, format:"11", description:"" })
-	public function UNK_86_DELAY(unk1, unk2)
-	{
+    @Opcode({ id:0x86, format:"11", description:"" })
+    public function UNK_86_DELAY(unk1, unk2) {
 
-		//throw(new NotImplementedException());
-		/*
+//throw(new NotImplementedException());
+/*
 		if (unk1 > 0)
 		{
 			//this.interface.enabled = false;
@@ -76,42 +67,38 @@ class RIO_OP
 		this.TODO();
 		//Screen.delay(unk1);
 		*/
-	}
+    }
 
-	@Opcode({ id:0x55, format:"1", description:"" })
-	public function UNK_55(unk:Int)
-	{
-		//scene.setDirectMode(true);
-		//this.interface.enabled = false;
-		//gameStep();
-		//this.interface.enabled = false;
-		/*
+    @Opcode({ id:0x55, format:"1", description:"" })
+    public function UNK_55(unk:Int) {
+//scene.setDirectMode(true);
+//this.interface.enabled = false;
+//gameStep();
+//this.interface.enabled = false;
+/*
 		this.interface.enabled = true;
 		this.interface.text_title = "";
 		this.interface.text_body = "";
 		*/
-		//this.TODO();
-	}
+//this.TODO();
+    }
 
-	@Opcode({ id:0x29, format:"22", description:"" })
-	public function UNK_29(param1:Int, param2:Int)
-	{
-	}
+    @Opcode({ id:0x29, format:"22", description:"" })
+    public function UNK_29(param1:Int, param2:Int) {
+    }
 
-	@Opcode({ id:0x30, format:"22", description:"" })
-	public function UNK_30(param1:Int, param2:Int)
-	{
-	}
+    @Opcode({ id:0x30, format:"22", description:"" })
+    public function UNK_30(param1:Int, param2:Int) {
+    }
 
-	@Opcode({ id:0x61, format:"1s", description:"" })
-	@Unimplemented
-	public function MOVIE(can_stop:Int, name:String)
-	{
-		#if android
+    @Opcode({ id:0x61, format:"1s", description:"" })
+    @Unimplemented
+    public function MOVIE(can_stop:Int, name:String) {
+#if android
 			return Timer2.waitAsync(0.1);
 		#end
 
-	/*
+/*
 		var deferred = Promise.createDeferred();
 		//Log.trace(FFMPEG.getVersion());
 		var uri = scene.getFileSystem().getFileSystemUri();
@@ -141,9 +128,9 @@ class RIO_OP
 
 		return deferred.promise;
 		*/
-	return view.waitAsync(100);
+        return view.waitAsync(new Seconds(0.1));
 
-		/*
+/*
 		local movie = Movie();
 		local movie_buffer = movie.load(path_to_files + "/" + name);
 		movie.viewport(0, 0, screen.w, screen.h);
@@ -167,66 +154,55 @@ class RIO_OP
 		this.scene.showLayer.drawBitmap(movie_buffer, 400, 300, 1.0, 1.0);
 		movie.stop();
 		*/
-	}
+    }
 
-	@Opcode({ id:0x4E, format:"4", description:"" })
-	public function UNK_4E(param:Int)
-	{
-	}
+    @Opcode({ id:0x4E, format:"4", description:"" })
+    public function UNK_4E(param:Int) {
+    }
 
-	@Opcode({ id:0x76, format:"441", description:"" })
-	public function UNK_76(unk1:Int, unk2:Int, unk3:Int)
-	{
-	}
+    @Opcode({ id:0x76, format:"441", description:"" })
+    public function UNK_76(unk1:Int, unk2:Int, unk3:Int) {
+    }
 
-	@Opcode({ id:0x62, format:"1", description:"" })
-	public function UNK_62(param:Int)
-	{
-	}
+    @Opcode({ id:0x62, format:"1", description:"" })
+    public function UNK_62(param:Int) {
+    }
 
-	@Opcode({ id:0x85, format:"2", description:"" })
-	public function UNK_85(param:Int)
-	{
-		// @TODO: Maybe related with being able to save?
-	}
+    @Opcode({ id:0x85, format:"2", description:"" })
+    public function UNK_85(param:Int) {
+// @TODO: Maybe related with being able to save?
+    }
 
-	@Opcode({ id:0x89, format:"1", description:"" })
-	public function UNK_89(unk:Int)
-	{
-	}
+    @Opcode({ id:0x89, format:"1", description:"" })
+    public function UNK_89(unk:Int) {
+    }
 
-	@Opcode({ id:0x8C, format:"21", description:"" })
-	public function UNK_8C(unk1:Int, unk2:Int)
-	{
-		//scene.setDirectMode(false);
-	}
+    @Opcode({ id:0x8C, format:"21", description:"" })
+    public function UNK_8C(unk1:Int, unk2:Int) {
+//scene.setDirectMode(false);
+    }
 
-	@Opcode({ id:0x8E, format:"1", description:"" })
-	public function UNK_8E(param:Int)
-	{
-	}
+    @Opcode({ id:0x8E, format:"1", description:"" })
+    public function UNK_8E(param:Int) {
+    }
 
-	@Opcode({ id:0xBD, format:"2", description:"" })
-	public function UNK_BD(param:Int)
-	{
-	}
+    @Opcode({ id:0xBD, format:"2", description:"" })
+    public function UNK_BD(param:Int) {
+    }
 
-	@Opcode({ id:0xBE, format:"1", description:"" })
-	public function UNK_BE(param:Int)
-	{
-	}
+    @Opcode({ id:0xBE, format:"1", description:"" })
+    public function UNK_BE(param:Int) {
+    }
 
-	@Opcode({ id:0xBC, format:"22", description:"" })
-	public function UNK_BC(param1:Int, param2:Int)
-	{
-	}
+    @Opcode({ id:0xBC, format:"22", description:"" })
+    public function UNK_BC(param1:Int, param2:Int) {
+    }
 
-	@Opcode({ id:0xE5, format:"1", description:"" })
-	public function UNK_E5(param:Int)
-	{
-	}
+    @Opcode({ id:0xE5, format:"1", description:"" })
+    public function UNK_E5(param:Int) {
+    }
 
-	/*
+/*
 	@Opcode({ id:0xE6, format:"...", description:"" })
 	public function UNK_E6()
 	{
@@ -234,90 +210,83 @@ class RIO_OP
 	}
 	*/
 
-	/////////////////////////////////////////////////////////////////////////////////////
-	// ANIM                                                                            //
-	/////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
+// ANIM                                                                            //
+/////////////////////////////////////////////////////////////////////////////////////
 
-	@Opcode({ id:0x43, format:"42s", description:"" })
-	public function TABLE_ANIM_LOAD(unk1:Int, unk1:Int, file:String)
-	{
-		return scene.animLoadAsync(file);
-		/*
+    @Opcode({ id:0x43, format:"42s", description:"" })
+    public function TABLE_ANIM_LOAD(unk1:Int, unk1:Int, file:String) {
+        return scene.animLoadAsync(file);
+/*
 		this.scene.table.anim.load(file);
 		this.scene.table.enabled = true;
 		this.scene.background.enabled = false;
 		*/
-	}
+    }
 
-	@Opcode({ id:0x45, format:"121", description:"" })
-	public function TABLE_ANIM_OBJECT_PUT(unk1:Int, index:Int, unk2:Int)
-	{
-		//throw(new NotImplementedException());
-		return this.scene.setAnimObjectVisibility(index, true);
+    @Opcode({ id:0x45, format:"121", description:"" })
+    public function TABLE_ANIM_OBJECT_PUT(unk1:Int, index:Int, unk2:Int) {
+//throw(new NotImplementedException());
+        return this.scene.setAnimObjectVisibility(index, true);
 
-		//this.scene.table.anim.active_set(index, 1);
-	}
+//this.scene.table.anim.active_set(index, 1);
+    }
 
-	@Opcode({ id:0x4F, format:"121", description:"" })
-	public function TABLE_ANIM_OBJECT_UNPUT(unk1:Int, index:Int, unk2:Int)
-	{
-		return this.scene.setAnimObjectVisibility(index, false);
-		//throw(new NotImplementedException());
+    @Opcode({ id:0x4F, format:"121", description:"" })
+    public function TABLE_ANIM_OBJECT_UNPUT(unk1:Int, index:Int, unk2:Int) {
+        return this.scene.setAnimObjectVisibility(index, false);
+//throw(new NotImplementedException());
 
-		//this.scene.table.anim.active_set(index, 0);
-	}
+//this.scene.table.anim.active_set(index, 0);
+    }
 
-	@Opcode({ id:0x50, format:"s", description:"" })
-	public function TABLE_TABLE_LOAD(table_name:String)
-	{
-		return scene.tableLoadAsync(table_name);
-	}
+    @Opcode({ id:0x50, format:"s", description:"" })
+    public function TABLE_TABLE_LOAD(table_name:String) {
+        return scene.tableLoadAsync(table_name);
+    }
 
-	@Opcode({ id:0x51, format:"ff1", description:"" })
-	@SkipLog
-	public function TABLE_PICK(flagMaskClick:Int, flagMaskOver:Int, unk1:Int)
-	{
-		scene.setDirectMode(true);
+    @Opcode({ id:0x51, format:"ff1", description:"" })
+    @SkipLog
+    public function TABLE_PICK(flagMaskClick:Int, flagMaskOver:Int, unk1:Int) {
+        scene.setDirectMode(true);
 
-		var deferred = new Deferred<Dynamic>();
-		var mousePosition:Point = scene.getMousePosition();
-		var overKind1:Int = scene.getMaskValueAt(mousePosition);
-		var overKind:Int = scene.isEnabledKind(overKind1) ? overKind1 : 0;
-		//Log.trace('$mousePosition: $overKind1: $overKind');
+        var deferred = new Deferred<Dynamic>();
+        var mousePosition:Point = scene.getMousePosition();
+        var overKind1:Int = scene.getMaskValueAt(mousePosition);
+        var overKind:Int = scene.isEnabledKind(overKind1) ? overKind1 : 0;
+//Log.trace('$mousePosition: $overKind1: $overKind');
 
-		function onClick() {
-			//throw(new Error("onClick!"));
-			this.state.setFlag(flagMaskClick, (overKind != 0) ? 1 : 0);
-			this.state.setFlag(flagMaskOver, overKind);
-			clicked = false;
-			deferred.resolve(null);
-		}
+        function onClick() {
+//throw(new Error("onClick!"));
+            this.state.setFlag(flagMaskClick, (overKind != 0) ? 1 : 0);
+            this.state.setFlag(flagMaskOver, overKind);
+            clicked = false;
+            deferred.resolve(null);
+        }
 
-		function onMove() {
-			this.state.setFlag(flagMaskClick, 0);
-			this.state.setFlag(flagMaskOver, overKind);
-			clicked = false;
-			deferred.resolve(null);
-		}
+        function onMove() {
+            this.state.setFlag(flagMaskClick, 0);
+            this.state.setFlag(flagMaskOver, overKind);
+            clicked = false;
+            deferred.resolve(null);
+        }
 
-		if (clicked)
-		{
-			onClick();
-		}
-		else
-		{
-			Signal.addAnyOnce([GameInput.onClick, GameInput.onMouseMoveEvent], function(e:MouseEvent) {
-				if (e.type == MouseEvent.CLICK || e.type == MouseEvent.MOUSE_DOWN) {
-					onClick();
-				} else {
-					onMove();
-				}
-			});
-		}
+        if (clicked) {
+            onClick();
+        }
+        else {
+            Signal.addAnyOnce([GameInput.onClick, GameInput.onMouseMoveEvent], function(e:MouseEvent) {
+                if (e.type == MouseEvent.CLICK || e.type == MouseEvent.MOUSE_DOWN) {
+                    onClick();
+                } else {
+                    onMove();
+                }
+            });
+        }
 
-		return deferred.promise;
-		//throw(new NotImplementedException());
-		/*
+        return deferred.promise;
+//throw(new NotImplementedException());
+/*
 		this._interface.enabled = false;
 		this.scene.table.flag_move_click = flag_move_click;
 		this.scene.table.flag_mask_kind = flag_mask_kind;
@@ -326,74 +295,68 @@ class RIO_OP
 		gameStep();
 		this.scene.table.mustUpdate = false;
 		*/
-	}
+    }
 
-	/////////////////////////////////////////////////////////////////////////////////////
-	// AUDIO                                                                           //
-	/////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
+// AUDIO                                                                           //
+/////////////////////////////////////////////////////////////////////////////////////
 
-	@Opcode({ id:0x22, format:"121", description:"" })
-	public function MUSIC_STOP(unk:Int, fadeout_ms:Int, idx:Int)
-	{
-		return this.scene.soundPlayStopAsync('music', null, fadeout_ms);
-	}
+    @Opcode({ id:0x22, format:"121", description:"" })
+    public function MUSIC_STOP(unk:Int, fadeout_ms:Int, idx:Int) {
+        return this.scene.soundPlayStopAsync('music', null, fadeout_ms);
+    }
 
-	// 23 - VOICE_PLAY idx, u2, u3, kind(girl=0,boy=1), unk4, voice_file   //
-	@Opcode({ id:0x23, format:"12112s", description:"" })
-	public function VOICE_PLAY(channel:Int, u2:Int, u3:Int, kind:Int, unk4:Int, voice_file:String)
-	{
-		if (isSkipping()) return null;
-		return this.scene.soundPlayStopAsync('voice', voice_file, 0);
-	}
+// 23 - VOICE_PLAY idx, u2, u3, kind(girl=0,boy=1), unk4, voice_file   //
 
-	@Opcode({ id:0x26, format:"2", description:"" })
-	public function SOUND_STOP(channel:Int)
-	{
-		Log.trace('SOUND_STOP: $channel');
-		return this.scene.soundPlayStopAsync('sound', null, 0);
-		//throw(new NotImplementedException());
+    @Opcode({ id:0x23, format:"12112s", description:"" })
+    public function VOICE_PLAY(channel:Int, u2:Int, u3:Int, kind:Int, unk4:Int, voice_file:String) {
+        if (isSkipping()) return null;
+        return this.scene.soundPlayStopAsync('voice', voice_file, 0);
+    }
 
-		//Audio.channelStop(channel);
-	}
+    @Opcode({ id:0x26, format:"2", description:"" })
+    public function SOUND_STOP(channel:Int) {
+        Log.trace('SOUND_STOP: $channel');
+        return this.scene.soundPlayStopAsync('sound', null, 0);
+//throw(new NotImplementedException());
 
-	@Opcode({ id:0x52, format:"2", description:"" })
-	@Unimplemented
-	public function SOUND_WAIT(channel:Int)
-	{
-		//throw(new NotImplementedException());
-		/*
+//Audio.channelStop(channel);
+    }
+
+    @Opcode({ id:0x52, format:"2", description:"" })
+    @Unimplemented
+    public function SOUND_WAIT(channel:Int) {
+//throw(new NotImplementedException());
+/*
 		while (Audio.channelProgress(idx) < 0.25) {
 			//printf("%f\n", Audio.channelProgress(idx));
 			gameStep();
 		}
 		*/
-	}
+    }
 
-	/////////////////////////////////////////////////////////////////////////////////////
-	// EFFECTS                                                                         //
-	/////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
+// EFFECTS                                                                         //
+/////////////////////////////////////////////////////////////////////////////////////
 
-	@Opcode({ id:0x54, format:"s", description:"" })
-	public function TRANS_IMAGE(name:String)
-	{
-		return this.scene.setTransitionMaskAsync(name);
-	}
+    @Opcode({ id:0x54, format:"s", description:"" })
+    public function TRANS_IMAGE(name:String) {
+        return this.scene.setTransitionMaskAsync(name);
+    }
 
-	private function isSkipping():Bool
-	{
-		return scene.isSkiping();
-	}
+    private function isSkipping():Bool {
+        return scene.isSkiping();
+    }
 
-	@Opcode({ id:0x4A, format:"121", description:"" })
-	public function TRANSITION(kind:Int, ms_time:Int, unk1:Int)
-	{
-		if (this.isSkipping()) ms_time = Std.int(ms_time / 10);
-		Log.trace('TRANSITION: $kind, $ms_time');
+    @Opcode({ id:0x4A, format:"121", description:"" })
+    public function TRANSITION(kind:Int, ms_time:Int, unk1:Int) {
+        if (this.isSkipping()) ms_time = Std.int(ms_time / 10);
+        Log.trace('TRANSITION: $kind, $ms_time');
 
-		scene.setDirectMode(false);
-		return this.scene.performTransitionAsync(kind, ms_time);
+        scene.setDirectMode(false);
+        return this.scene.performTransitionAsync(kind, new Milliseconds(ms_time));
 
-		/*
+/*
 		switch (kind) {
 			default:
 
@@ -409,9 +372,9 @@ class RIO_OP
 
 		return Timer2.waitAsync(10);
 		*/
-		//throw(new NotImplementedException());
+//throw(new NotImplementedException());
 
-	/*
+/*
 		local effect = null;
 		//if (ms_time == 0) ms_time = 1;
 
@@ -649,49 +612,43 @@ class RIO_OP
 		this.scene.setEffect("normal");
 		//printf("-------------------------------\n");
 	*/
-	}
+    }
 
-	private var animations:Array<Void -> IPromise<Dynamic>>;
+    private var animations:Array<Void -> IPromise<Dynamic>>;
 
-	@Opcode({ id:0x4B, format:"1222221", description:"" })
-	public function ANIMATE_ADD(object_id:Int, inc_x:Int, inc_y:Int, timeMs:Int, unk0:Int, alpha:Int, unk2:Int)
-	{
-		var time = timeMs / 1000;
+    @Opcode({ id:0x4B, format:"1222221", description:"" })
+    public function ANIMATE_ADD(object_id:Int, inc_x:Int, inc_y:Int, timeMs:Int, unk0:Int, alpha:Int, unk2:Int) {
+        var time = new Milliseconds(isSkipping() ? Std.int(timeMs / 10) : timeMs);
 
-		if (isSkipping()) time /= 10;
+        var layer = if (object_id == 0) {
+            this.scene.getLayerWithName("background").getObject(0);
+        } else {
+            this.scene.getLayerWithName("layer2").getObject(object_id - 1);
+        }
+        if (layer != null) {
+            if (animations == null) animations = [];
+            animations.push(
+                function() {
+                    return view.interpolateAsync(layer, time, { x: layer.x + inc_x, y: layer.y + inc_y, alpha: layer.alpha + alpha }, Easing.linear);
+                }
+            );
+        }
+    }
 
-		var layer = if (object_id == 0) {
-			this.scene.getLayerWithName("background").getObject(0);
-		} else {
-			this.scene.getLayerWithName("layer2").getObject(object_id - 1);
-		}
-		if (layer != null)
-		{
-			if (animations == null) animations = [];
-			animations.push(
-				function() {
-					return view.interpolateAsync(layer, Std.int(time * 1000), { x: layer.x + inc_x, y: layer.y + inc_y, alpha: layer.alpha + alpha }, Easing.linear);
-				}
-			);
-		}
-	}
+    @Opcode({ id:0x4C, format:"1.", description:"" })
+    public function ANIMATE_PLAY(can_skip:Int) {
+        scene.setDirectMode(true);
+//return Promise.createDeferred().promise;
+        return Promise.parallel(animations).then(function(e) {
+            animations = null;
+        });
+    }
 
-	@Opcode({ id:0x4C, format:"1.", description:"" })
-	public function ANIMATE_PLAY(can_skip:Int)
-	{
-		scene.setDirectMode(true);
-		//return Promise.createDeferred().promise;
-		return Promise.parallel(animations).then(function(e) {
-			animations = null;
-		});
-	}
-
-	@Opcode({ id:0x4D, format:"1121", description:"" })
-	@Unimplemented
-	public function EFFECT(kind:Int, duration:Int, quantity:Int, unk1:Int)
-	{
-		//throw(new NotImplementedException());
-		/*
+    @Opcode({ id:0x4D, format:"1121", description:"" })
+    @Unimplemented
+    public function EFFECT(kind:Int, duration:Int, quantity:Int, unk1:Int) {
+//throw(new NotImplementedException());
+/*
 		local kinds = [null, "quake", "heat"];
 		local kind_name = (kind in kinds) ? kinds[kind] : "unknown";
 
@@ -727,263 +684,241 @@ class RIO_OP
 			break;
 		}
 		*/
-	}
+    }
 
-	/////////////////////////////////////////////////////////////////////////////////////
-	// FLOW                                                                            //
-	/////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
+// FLOW                                                                            //
+/////////////////////////////////////////////////////////////////////////////////////
 
-	private function doBinaryOperation(operator:String, left:Int, right:Int):Dynamic
-	{
-		return switch (operator)
-		{
-			// JUMP_IF
-			case ">="  : left >= right;
-			case "<="  : left <= right;
-			case "=="  : left == right;
-			case "!="  : left != right;
-			case ">"   : left >  right;
-			case "<"   : left <  right;
+    private function doBinaryOperation(operator:String, left:Int, right:Int):Dynamic {
+        return switch (operator)
+        {
+// JUMP_IF
+            case ">=" : left >= right;
+            case "<=" : left <= right;
+            case "==" : left == right;
+            case "!=" : left != right;
+            case ">" : left > right;
+            case "<" : left < right;
 
-			// SET
-			case "+"   : left + right;
-			case "-"   : left - right;
-			case "%"   : left % right;
-			case "="   : right;
-			case "ref" : this.state.getFlag(right);
-			case "rand": MathEx.randomInt(0, right);
+// SET
+            case "+" : left + right;
+            case "-" : left - right;
+            case "%" : left % right;
+            case "=" : right;
+            case "ref" : this.state.getFlag(right);
+            case "rand": MathEx.randomInt(0, right);
 
-			default: throw("Unknown binary_operation::op :: '" + operator + "'");
-		}
-	}
+            default: throw("Unknown binary_operation::op :: '" + operator + "'");
+        }
+    }
 
-	static private var ops_set;
-	static private var ops_jump_if;
+    static private var ops_set;
+    static private var ops_jump_if;
 
-	static public function __init__()
-	{
-		ops_set = [ "?", "=", "+", "-", "ref", "%", "rand" ];
-		ops_jump_if = [ "", ">=", "<=", "==", "!=", ">", "<" ];
-	}
+    static public function __init__() {
+        ops_set = [ "?", "=", "+", "-", "ref", "%", "rand" ];
+        ops_jump_if = [ "", ">=", "<=", "==", "!=", ">", "<" ];
+    }
 
-	/*
+/*
 			MAINMENU@000002D4: Executing OP(0x0C) : TIMER_GET : [867,0]...249
 			MAINMENU@000002D8: Executing OP(0x01) : JUMP_IF : [4,867,0,50]...true
 		*/
 
-	@Opcode({ id:0x01, format:"Of2l.", description:"Jumps if the condition is false" })
-	@SkipLog
-	public function JUMP_IF(operation:Int, leftFlag:Int, rightValueOrFlag:Int, relativeOffset:Int)
-	{
-		var isRightFlag = BitUtils.extract(operation, 4, 4) != 0;
-		var operator = ops_jump_if[BitUtils.extract(operation, 0, 4)];
-		var left = this.state.getFlag(leftFlag);
-		var right = isRightFlag
-			? this.state.getFlag(rightValueOrFlag)
-			: rightValueOrFlag
-		;
+    @Opcode({ id:0x01, format:"Of2l.", description:"Jumps if the condition is false" })
+    @SkipLog
+    public function JUMP_IF(operation:Int, leftFlag:Int, rightValueOrFlag:Int, relativeOffset:Int) {
+        var isRightFlag = BitUtils.extract(operation, 4, 4) != 0;
+        var operator = ops_jump_if[BitUtils.extract(operation, 0, 4)];
+        var left = this.state.getFlag(leftFlag);
+        var right = isRightFlag
+        ? this.state.getFlag(rightValueOrFlag)
+        : rightValueOrFlag
+        ;
 
-		var result = doBinaryOperation(operator, left, right);
-		//printf("JUMP_IF %d(%d) %s %d(%d)...\n", left_flag, left, operator, right_value_or_flag, right);
+        var result = doBinaryOperation(operator, left, right);
+//printf("JUMP_IF %d(%d) %s %d(%d)...\n", left_flag, left, operator, right_value_or_flag, right);
 
-		if (!result)
-		{
-			this.script.jumpRelative(relativeOffset);
-			//printf("result: %d\n", result ? 1 : 0);
-			//this.TODO();
-		}
-	}
+        if (!result) {
+            this.script.jumpRelative(relativeOffset);
+//printf("result: %d\n", result ? 1 : 0);
+//this.TODO();
+        }
+    }
 
-	// 03 - SET (=+-) op(1) variable(2) kind(1) variable/value(2)          //
-	// // [OP.03]: [1, 993, 0, 1000, 0, ] ('12121', 'SET')
-	@Opcode({ id:0x03, format:"ofkF.", description:"Sets the value of a flag" })
-	public function SET(operation:Int, leftFlag:Int, isRightFlag:Int, rightValueOrFlag:Int)
-	{
-		var left  = this.state.getFlag(leftFlag);
-		var right = (isRightFlag != 0)
-			? this.state.getFlag(rightValueOrFlag)
-			: rightValueOrFlag
-		;
+// 03 - SET (=+-) op(1) variable(2) kind(1) variable/value(2)          //
+// // [OP.03]: [1, 993, 0, 1000, 0, ] ('12121', 'SET')
 
-		if (operation == 0)
-		{
-			this.state.setFlagsRange(0, 1000, 0);
-			//printf("**SET_ALL_TEMPORAL_FLAGS_TO_ZERO()\n");
-		}
-		else
-		{
-			var value = doBinaryOperation(ops_set[operation], left, right);
-			this.state.setFlag(leftFlag, value);
-			//if (leftFlag == 996 && value) {
-				//this.interface.enabled = false;
-				//gameStep();
-			//}
-			//printf("**SET %d=%d\n", left_flag, this.state.flags[left_flag % State.MAX_FLAGS]);
-		}
-	}
+    @Opcode({ id:0x03, format:"ofkF.", description:"Sets the value of a flag" })
+    public function SET(operation:Int, leftFlag:Int, isRightFlag:Int, rightValueOrFlag:Int) {
+        var left = this.state.getFlag(leftFlag);
+        var right = (isRightFlag != 0)
+        ? this.state.getFlag(rightValueOrFlag)
+        : rightValueOrFlag
+        ;
 
-	@Opcode({ id:0x04, format:"", description:"Ends the execution" })
-	public function EXIT()
-	{
-		throw(new NotImplementedException());
-		//this.exit();
-	}
+        if (operation == 0) {
+            this.state.setFlagsRange(0, 1000, 0);
+//printf("**SET_ALL_TEMPORAL_FLAGS_TO_ZERO()\n");
+        }
+        else {
+            var value = doBinaryOperation(ops_set[operation], left, right);
+            this.state.setFlag(leftFlag, value);
+//if (leftFlag == 996 && value) {
+//this.interface.enabled = false;
+//gameStep();
+//}
+//printf("**SET %d=%d\n", left_flag, this.state.flags[left_flag % State.MAX_FLAGS]);
+        }
+    }
 
-	@Opcode({ id:0x06, format:"L1", description:"Jumps always" })
-	@SkipLog
-	public function JUMP(absolute_position:Int, param)
-	{
-		this.script.jumpAbsolute(absolute_position);
-		//throw(new NotImplementedException());
-		//this.jump_absolute(absolute_position);
-	}
+    @Opcode({ id:0x04, format:"", description:"Ends the execution" })
+    public function EXIT() {
+        throw(new NotImplementedException());
+//this.exit();
+    }
 
-	@Opcode({ id:0x07, format:"s", description:"Switches to an script" })
-	public function SCRIPT(name:String)
-	{
-		return this.script.loadAsync(name);
-	}
+    @Opcode({ id:0x06, format:"L1", description:"Jumps always" })
+    @SkipLog
+    public function JUMP(absolute_position:Int, param) {
+        this.script.jumpAbsolute(absolute_position);
+//throw(new NotImplementedException());
+//this.jump_absolute(absolute_position);
+    }
 
-	@Opcode({ id:0x09, format:"s", description:"Calls a script" })
-	public function SCRIPT_CALL(name:String)
-	{
-		return this.script.scriptCallAsync(name);
-	}
+    @Opcode({ id:0x07, format:"s", description:"Switches to an script" })
+    public function SCRIPT(name:String) {
+        return this.script.loadAsync(name);
+    }
 
-	@Opcode({ id:0x0A, format:"1", description:"Returns from a script" })
-	public function SCRIPT_RET(param:Int)
-	{
-		return this.script.scriptReturnAsync();
-	}
+    @Opcode({ id:0x09, format:"s", description:"Calls a script" })
+    public function SCRIPT_CALL(name:String) {
+        return this.script.scriptCallAsync(name);
+    }
 
-	@Opcode({ id:0xFF, format:"", description:"" })
-	public function EOF()
-	{
-		throw(new NotImplementedException());
+    @Opcode({ id:0x0A, format:"1", description:"Returns from a script" })
+    public function SCRIPT_RET(param:Int) {
+        return this.script.scriptReturnAsync();
+    }
 
-		//this.TODO();
-	}
+    @Opcode({ id:0xFF, format:"", description:"" })
+    public function EOF() {
+        throw(new NotImplementedException());
 
-	/////////////////////////////////////////////////////////////////////////////////////
-	// MENUS                                                                           //
-	/////////////////////////////////////////////////////////////////////////////////////
+//this.TODO();
+    }
 
-	@Opcode({ id:0x83, format:".", description:"" })
-	public function RUN_LOAD()
-	{
-		throw(new NotImplementedException());
-		/*
+/////////////////////////////////////////////////////////////////////////////////////
+// MENUS                                                                           //
+/////////////////////////////////////////////////////////////////////////////////////
+
+    @Opcode({ id:0x83, format:".", description:"" })
+    public function RUN_LOAD() {
+        throw(new NotImplementedException());
+/*
 		this.state.load(100);
 		this.TODO();
 		*/
-	}
+    }
 
-	@Opcode({ id:0x84, format:"1", description:"" })
-	public function RUN_SAVE(param)
-	{
-		throw(new NotImplementedException());
+    @Opcode({ id:0x84, format:"1", description:"" })
+    public function RUN_SAVE(param) {
+        throw(new NotImplementedException());
 
-		//this.TODO();
-	}
+//this.TODO();
+    }
 
-	@Opcode({ id:0x88, format:"111", description:"" })
-	public function BATTLE(unk1, battle_id, unk3)
-	{
-		throw(new NotImplementedException());
-		/*
+    @Opcode({ id:0x88, format:"111", description:"" })
+    public function BATTLE(unk1, battle_id, unk3) {
+        throw(new NotImplementedException());
+/*
 		this.TODO();
 		this.state.flag_set(916, 1); // WIN
 		//this.state.flag_set(916, 0); // LOOSE
 		*/
-	}
+    }
 
-	@Opcode({ id:0x8A, format:"1", description:"" })
-	public function UNK_8A(param)
-	{
-		throw(new NotImplementedException());
+    @Opcode({ id:0x8A, format:"1", description:"" })
+    public function UNK_8A(param) {
+        throw(new NotImplementedException());
 
-		//this.TODO();
-	}
+//this.TODO();
+    }
 
-	@Opcode({ id:0x8B, format:".", description:"" })
-	@Unimplemented
-	public function RUN_CONFIG():Void
-	{
-		// CFGBG
-		// CFG_P1M
-	}
+    @Opcode({ id:0x8B, format:".", description:"" })
+    @Unimplemented
+    public function RUN_CONFIG():Void {
+// CFGBG
+// CFG_P1M
+    }
 
-	@Opcode({ id:0xE2, format:".", description:"" })
-	public function RUN_QLOAD()
-	{
-		throw(new NotImplementedException());
+    @Opcode({ id:0xE2, format:".", description:"" })
+    public function RUN_QLOAD() {
+        throw(new NotImplementedException());
 
-		/*
+/*
 		printf("RUN_QLOAD()\n");
 		this.state.load(100);
 		this.TODO();
 		*/
-	}
+    }
 
-	// Special.
-	@Opcode({ id:0x201, format:"", description:"" })
-	public function RUN_QSAVE()
-	{
-		throw(new NotImplementedException());
-		/*
+// Special.
+
+    @Opcode({ id:0x201, format:"", description:"" })
+    public function RUN_QSAVE() {
+        throw(new NotImplementedException());
+/*
 		printf("RUN_QSAVE()\n");
 		this.state.save(100);
 		this.TODO();
 		*/
-	}
+    }
 
-	/////////////////////////////////////////////////////////////////////////////////////
-	// TIMER                                                                           //
-	/////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
+// TIMER                                                                           //
+/////////////////////////////////////////////////////////////////////////////////////
 
-	@Opcode({ id:0x05, format:"1", description:"Wait until the timer reaches 0" })
-	public function TIMER_WAIT(can_skip)
-	{
-		throw(new NotImplementedException());
+    @Opcode({ id:0x05, format:"1", description:"Wait until the timer reaches 0" })
+    public function TIMER_WAIT(can_skip) {
+        throw(new NotImplementedException());
 
-		/*
+/*
 		while (this.state.timer > 0) {
 			this.input_update();
 			if (can_skip && mouse.click_left) break;
 			this.frame_tick();
 		}
 		*/
-	}
+    }
 
-	@Opcode({ id:0x0B, format:"2", description:"Sets the timer in ticks. Each tick is 1 frame. And the game runs at 25fps. 40 ticks = 1 second." })
-	public function TIMER_SET(ticks)
-	{
-		throw(new NotImplementedException());
-		/*
+    @Opcode({ id:0x0B, format:"2", description:"Sets the timer in ticks. Each tick is 1 frame. And the game runs at 25fps. 40 ticks = 1 second." })
+    public function TIMER_SET(ticks) {
+        throw(new NotImplementedException());
+/*
 		this.state.timer_max = this.state.timer = ticks;
 		*/
-	}
+    }
 
-	@Opcode({ id:0x0C, format:"21", description:"Decreases the timer and returns true if reached 0." })
-	public function TIMER_DEC(flag, param)
-	{
-		throw(new NotImplementedException());
-		/*
+    @Opcode({ id:0x0C, format:"21", description:"Decreases the timer and returns true if reached 0." })
+    public function TIMER_DEC(flag, param) {
+        throw(new NotImplementedException());
+/*
 		if (this.state.timer > 0) this.state.timer--;
 
 		this.state.flag_set(flag % State.MAX_FLAGS, (this.state.timer <= 0) ? 1 : 0);
 		return this.state.timer;
 		//this.TODO();
 		*/
-	}
+    }
 
-	@Opcode({ id:0x82, format:"21", description:"" })
-	public function WAIT(delay_ms:Int, unk1:Int)
-	{
-		if (state.debug) delay_ms = Std.int(delay_ms / 10);
-		return view.waitAsync(delay_ms);
-		throw(new NotImplementedException());
-		/*
+    @Opcode({ id:0x82, format:"21", description:"" })
+    public function WAIT(delay_ms:Int, unk1:Int) {
+        if (state.debug) delay_ms = Std.int(delay_ms / 10);
+        return view.waitAsync(new Milliseconds(delay_ms));
+        throw(new NotImplementedException());
+/*
 		local timer = Timer(delay_ms);
 		while (!timer.ended) {
 			if (this.skipping()) break;
@@ -991,47 +926,43 @@ class RIO_OP
 			gameStep();
 		}
 		*/
-	}
+    }
 
-	/////////////////////////////////////////////////////////////////////////////////////
-	// SCENE                                                                           //
-	/////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
+// SCENE                                                                           //
+/////////////////////////////////////////////////////////////////////////////////////
 
-	@Opcode({ id:0x46, format:"22221s", description:"Puts a background in a position" })
-	public function BACKGROUND(x:Int, y:Int, unk1:Int, unk2:Int, index:Int, name:String)
-	{
-		return scene.getLayerWithName('background').putObjectAsync(0, x, y, name, Anchor.centerCenter);
-	}
+    @Opcode({ id:0x46, format:"22221s", description:"Puts a background in a position" })
+    public function BACKGROUND(x:Int, y:Int, unk1:Int, unk2:Int, index:Int, name:String) {
+        return scene.getLayerWithName('background').putObjectAsync(0, x, y, name, Anchor.centerCenter);
+    }
 
-	@Opcode({ id:0x47, format:"11", description:"" })
-	public function BACKGROUND_COLOR(colorIndex:Int, param:Int)
-	{
-		var color = switch(colorIndex) {
-			case 0: HtmlColors.black;
-			default: throw('Unknown colorIndex: $colorIndex');
-		};
-		scene.getLayerWithName('background').putColor(0, 400, 300, 800, 600, color, Anchor.centerCenter);
-	}
+    @Opcode({ id:0x47, format:"11", description:"" })
+    public function BACKGROUND_COLOR(colorIndex:Int, param:Int) {
+        var color = switch(colorIndex) {
+            case 0: HtmlColors.black;
+            default: throw('Unknown colorIndex: $colorIndex');
+        };
+        scene.getLayerWithName('background').putColor(0, 400, 300, 800, 600, color, Anchor.centerCenter);
+    }
 
-	@Opcode({ id:0x68, format:"2221", description:"Sets background size and position x and y coords are the center points of the viewport." })
-	public function BACKGROUND_VIEWPORT(size:Int, x:Int, y:Int, unk4:Int)
-	{
-		return scene.getLayerWithName('background').setLayerViewPort(size / 100.0, x, y);
-	}
+    @Opcode({ id:0x68, format:"2221", description:"Sets background size and position x and y coords are the center points of the viewport." })
+    public function BACKGROUND_VIEWPORT(size:Int, x:Int, y:Int, unk4:Int) {
+        return scene.getLayerWithName('background').setLayerViewPort(size / 100.0, x, y);
+    }
 
-	@Opcode({ id:0x48, format:"122221s", description:"" })
-	@Unimplemented
-	public function CHARA_PUT(index:Int, x:Int, y:Int, unk1:Int, unk2:Int, index2:Int, name:String)
-	{
-		return scene.getLayerWithName("layer2").putObjectAsync(
-			index,
-			x,
-			y,
-			name,
-			Anchor.topLeft
-		);
-		//throw(new NotImplementedException());
-		/*
+    @Opcode({ id:0x48, format:"122221s", description:"" })
+    @Unimplemented
+    public function CHARA_PUT(index:Int, x:Int, y:Int, unk1:Int, unk2:Int, index2:Int, name:String) {
+        return scene.getLayerWithName("layer2").putObjectAsync(
+            index,
+            x,
+            y,
+            name,
+            Anchor.topLeft
+        );
+//throw(new NotImplementedException());
+/*
 		local object = this.scene.sprites_l1[index];
 		object.index = index2;
 		object.name = name;
@@ -1043,14 +974,14 @@ class RIO_OP
 
 		this.TODO();
 		*/
-	}
+    }
 
-	// OBJ_PUT : [243,276,0,0,0,"EC_001"]
-	@Opcode({ id:0x73, format:"22221s", description:"" })
-	public function OBJ_PUT(x:Int, y:Int, unk1:Int, unk2:Int, unk3:Int, name:String)
-	{
-		return scene.getLayerWithName('objects').putObjectAsync(0, x, y, name, Anchor.topLeft);
-		/*
+// OBJ_PUT : [243,276,0,0,0,"EC_001"]
+
+    @Opcode({ id:0x73, format:"22221s", description:"" })
+    public function OBJ_PUT(x:Int, y:Int, unk1:Int, unk2:Int, unk3:Int, name:String) {
+        return scene.getLayerWithName('objects').putObjectAsync(0, x, y, name, Anchor.topLeft);
+/*
 		local object = this.scene.overlay;
 		object.index = 0;
 		object.x = x;
@@ -1061,87 +992,74 @@ class RIO_OP
 
 		this.TODO();
 		*/
-	}
+    }
 
-	@Opcode({ id:0x49, format:"2.", description:"Clears an object/character in layer1 (0=LEFT, 1=CENTER, 2=RIGHT)" })
-	@SkipLog
-	public function CLEAR_L1(index:Int)
-	{
-		scene.getLayerWithName('layer1').removeObject(index);
-	}
+    @Opcode({ id:0x49, format:"2.", description:"Clears an object/character in layer1 (0=LEFT, 1=CENTER, 2=RIGHT)" })
+    @SkipLog
+    public function CLEAR_L1(index:Int) {
+        scene.getLayerWithName('layer1').removeObject(index);
+    }
 
-	@Opcode({ id:0xB8, format:"2.", description:"" })
-	@SkipLog
-	public function CLEAR_L2(index:Int)
-	{
-		scene.getLayerWithName('layer2').removeObject(index);
-	}
+    @Opcode({ id:0xB8, format:"2.", description:"" })
+    @SkipLog
+    public function CLEAR_L2(index:Int) {
+        scene.getLayerWithName('layer2').removeObject(index);
+    }
 
-	@Opcode({ id:0x74, format:"2", description:"" })
-	@SkipLog
-	public function OBJ_CLEAR(index:Int)
-	{
-		scene.getLayerWithName('objects').removeObject(index);
-	}
+    @Opcode({ id:0x74, format:"2", description:"" })
+    @SkipLog
+    public function OBJ_CLEAR(index:Int) {
+        scene.getLayerWithName('objects').removeObject(index);
+    }
 
-	/////////////////////////////////////////////////////////////////////////////////////
-	// TEXT                                                                            //
-	/////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////
+// TEXT                                                                            //
+/////////////////////////////////////////////////////////////////////////////////////
 
-	private var lastText:String;
-	private var lastTitle:String;
+    private var lastText:String;
+    private var lastTitle:String;
 
-	public function TEXT_COMMON(text_id:Int, text:String, ?title:String)
-	{
-		var deferred = new Deferred<Dynamic>();
-		this.lastText = text;
-		this.lastTitle = title;
-		scene.setTextAsync(text, title, isSkipping() ? 0 : 0.05).then(function(?e)
-		{
-			view.waitAsync(100).then(function(?e)
-			{
-				Signal.addAnyOnce([GameInput.onClick, GameInput.onKeyPress], function(?e)
-				{
-					scene.setTextAsync('', null, 0).then(function(?e)
-					{
-						deferred.resolve(null);
-					});
-				});
-			});
-		});
-		return deferred.promise;
-	}
+    public function TEXT_COMMON(text_id:Int, text:String, ?title:String) {
+        var deferred = new Deferred<Dynamic>();
+        this.lastText = text;
+        this.lastTitle = title;
+        scene.setTextAsync(text, title, new Seconds(isSkipping() ? 0.0 : 0.05)).then(function(?e) {
+            view.waitAsync(new Seconds(0.1)).then(function(?e) {
+                Signal.addAnyOnce([GameInput.onClick, GameInput.onKeyPress], function(?e) {
+                    scene.setTextAsync('', null, new Seconds(0.0)).then(function(?e) {
+                        deferred.resolve(null);
+                    });
+                });
+            });
+        });
+        return deferred.promise;
+    }
 
-	@Opcode({ id:0x41, format:"2.t", description:"" })
-	public function TEXT(text_id:Int, text:String)
-	{
-		return TEXT_COMMON(text_id, text);
-	}
+    @Opcode({ id:0x41, format:"2.t", description:"" })
+    public function TEXT(text_id:Int, text:String) {
+        return TEXT_COMMON(text_id, text);
+    }
 
-	@Opcode({ id:0x42, format:"2..tt", description:"" })
-	public function TEXT2(text_id:Int, title:String, text:String)
-	{
-		return TEXT_COMMON(text_id, text, title);
-	}
+    @Opcode({ id:0x42, format:"2..tt", description:"" })
+    public function TEXT2(text_id:Int, title:String, text:String) {
+        return TEXT_COMMON(text_id, text, title);
+    }
 
-	@Opcode({ id:0xB6, format:"2t", description:"" })
-	public function TEXT_ADD(text_id:Int, text:String)
-	{
-		return TEXT_COMMON(text_id, lastText + text, lastTitle);
-	}
+    @Opcode({ id:0xB6, format:"2t", description:"" })
+    public function TEXT_ADD(text_id:Int, text:String) {
+        return TEXT_COMMON(text_id, lastText + text, lastTitle);
+    }
 
-	@Opcode({ id:0x08, format:"2", description:"Sets the size of the text (00=small, 01=big)" })
-	public function TEXT_SIZE(size:Int)
-	{
-		scene.setTextSize(size);
-		//throw(new NotImplementedException());
-		//this.TODO();
-	}
+    @Opcode({ id:0x08, format:"2", description:"Sets the size of the text (00=small, 01=big)" })
+    public function TEXT_SIZE(size:Int) {
+        scene.setTextSize(size);
+//throw(new NotImplementedException());
+//this.TODO();
+    }
 
-	public function OPTION_SELECT_common(options)
-	{
-		throw(new NotImplementedException());
-		/*
+    public function OPTION_SELECT_common(options) {
+        throw(new NotImplementedException());
+/*
 		if (options.len() == 0) return;
 
 		local selwnd0 = resman.get_image("SELWND0", 1);
@@ -1217,14 +1135,14 @@ class RIO_OP
 			this.jump_absolute(selectedOption.result.address);
 		}
 		*/
-	}
+    }
 
-	//  02.? [0200], [7201], "Tell her", [01520307], @t001_02b@, [7301], "Don't tell her", [01530307], @t001_02c@
-	@Opcode({ id:0x02, format:"C[2t3c]", description:"Show a list of options" })
-	public function OPTION_SELECT(roptions)
-	{
-		throw(new NotImplementedException());
-		/*
+//  02.? [0200], [7201], "Tell her", [01520307], @t001_02b@, [7301], "Don't tell her", [01530307], @t001_02c@
+
+    @Opcode({ id:0x02, format:"C[2t3c]", description:"Show a list of options" })
+    public function OPTION_SELECT(roptions) {
+        throw(new NotImplementedException());
+/*
 		printf("::: %s\n\n\n", object_to_string(roptions));
 		local options = [];
 		foreach (n, option in roptions) {
@@ -1239,6 +1157,6 @@ class RIO_OP
 		RIO_OP_TEXT.OPTION_SELECT_common(options);
 		this.TODO();
 		*/
-	}
+    }
 
 }

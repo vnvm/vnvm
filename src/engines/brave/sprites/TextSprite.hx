@@ -1,4 +1,6 @@
 package engines.brave.sprites;
+import reflash.display2.Seconds;
+import reflash.display2.Milliseconds;
 import reflash.display2.View;
 import common.display.SpriteUtils;
 import lang.StringEx;
@@ -79,7 +81,7 @@ class TextSprite extends View
 	private function setText(faceId:Int, title:String, text:String, done:Void -> Void):Void {
 		if (animateText) 
 		{
-			this.animateAsync(text.length * 10, function(ratio:Float) {
+			this.animateAsync(new Milliseconds(text.length * 10), function(ratio:Float) {
 				var showChars = Math.round(text.length * ratio);
 				_setText(text.substr(0, showChars));
 			}).then(function(v) {
@@ -116,7 +118,7 @@ class TextSprite extends View
 	public function enable(done:Void -> Void):Void
 	{
 		if (alpha != 1) {
-			interpolateAsync(this, 300, { alpha : 1 }).then(function(v) {
+			interpolateAsync(this, new Seconds(0.3), { alpha : 1 }).then(function(v) {
 				done();
 			});
 		} else {
@@ -134,7 +136,7 @@ class TextSprite extends View
 			done();
 		};
 		if (alpha != 0) {
-			interpolateAsync(this, 100, { alpha : 0 }).then(function(v) {
+			interpolateAsync(this, new Seconds(0.1), { alpha : 0 }).then(function(v) {
 				done2();
 			});
 		} else {

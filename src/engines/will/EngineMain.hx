@@ -1,5 +1,7 @@
 package engines.will;
 
+import reflash.display2.Milliseconds;
+import reflash.display2.Seconds;
 import reflash.display2.View;
 import engines.will.utils.WillCommandLineMain;
 import lang.MathEx;
@@ -182,11 +184,11 @@ class EngineMain extends Sprite2 implements IScene
 		});
 	}
 
-	public function performTransitionAsync(kind:Int, time:Int):IPromise<Dynamic>
+	public function performTransitionAsync(kind:Int, time:Milliseconds):IPromise<Dynamic>
 	{
 		var deferred = Promise.createDeferred();
 
-		interfaceLayer.hideAsync(isSkiping() ? 0 : 0.3).then(function(?e)
+		interfaceLayer.hideAsync(new Seconds(isSkiping() ? 0.0 : 0.3)).then(function(?e)
 		{
 			previousBitmap.clear(HtmlColors.black).draw(renderedBitmap).finish();
 			renderedBitmap.clear(HtmlColors.black).draw(contentContainer).finish();
@@ -287,13 +289,13 @@ class EngineMain extends Sprite2 implements IScene
 		}
 	}
 
-	public function setTextAsync(text:String, title:String, timePerCharacter:Float):IPromise<Dynamic>
+	public function setTextAsync(text:String, title:String, timePerCharacter:Seconds):IPromise<Dynamic>
 	{
 		text = StringTools.replace(text, '\\n', '\n');
 		title = StringTools.replace(title, '\\n', '\n');
 
 		var deferred = Promise.createDeferred();
-		interfaceLayer.showAsync(isSkiping() ? 0 : 0.3).then(function(?e)
+		interfaceLayer.showAsync(new Seconds(isSkiping() ? 0.0 : 0.3)).then(function(?e)
 		{
 			interfaceLayer.setTextAsync(text, title, timePerCharacter).then(function(?e)
 			{

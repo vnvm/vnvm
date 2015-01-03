@@ -1,4 +1,5 @@
 package engines.brave.sprites.map;
+import reflash.display2.Seconds;
 import reflash.display2.Easing;
 import common.imaging.GraphicUtils;
 import lang.MathEx;
@@ -194,7 +195,7 @@ class Character
 				this.direction = (destY < y) ? 2 : 0;
 			}
 
-			gameSprite.interpolateAsync(this, 1000, { x : destX, y : destY }, Easing.linear, function(ratio:Float) {
+			gameSprite.interpolateAsync(this, new Seconds(1), { x : destX, y : destY }, Easing.linear, function(ratio:Float) {
 				frame++;
 			}).then(function(v) {
 				done();

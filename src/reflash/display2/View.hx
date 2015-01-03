@@ -11,12 +11,12 @@ class View extends Sprite implements Updatable {
 
     public var components = new Array<Updatable>();
 
-    public function addTimer(time:Int, callback: Void -> Void) {
+    public function addTimer(time:Milliseconds, callback: Void -> Void) {
         var elapsed:Int = 0;
         var updater:ViewComponent = null;
         updater = addUpdater(function(context:Update) {
             elapsed += Std.int(context.dt * 1000);
-            if (elapsed >= time) {
+            if (elapsed >= time.toInt()) {
                 updater.remove();
                 callback();
             }
@@ -29,13 +29,13 @@ class View extends Sprite implements Updatable {
         return result;
     }
 
-    public function animateAsync(time:Int, step: Float -> Void) {
+    public function animateAsync(time:Milliseconds, step: Float -> Void) {
         var deferred = Promise.createDeferred();
         var elapsed:Int = 0;
         var updater:ViewComponent = null;
         updater = addUpdater(function(context:Update) {
             elapsed += context.dtMs;
-            var ratio = Math.min(Math.max(elapsed / time, 0), 1);
+            var ratio = Math.min(Math.max(elapsed / time.toInt(), 0), 1);
             step(ratio);
             if (ratio >= 1) {
                 updater.remove();
@@ -45,7 +45,7 @@ class View extends Sprite implements Updatable {
         return deferred.promise;
     }
 
-    public function interpolateAsync(object:Dynamic, time:Int, target:Dynamic, ?easing:Float -> Float, ?step: Float -> Void):IPromise<Dynamic> {
+    public function interpolateAsync(object:Dynamic, time:Milliseconds, target:Dynamic, ?easing:Float -> Float, ?step: Float -> Void):IPromise<Dynamic> {
         var keys = Reflect.fields(target);
         var source = {};
         for (key in keys) Reflect.setField(source, key, Reflect.getProperty(object, key));
@@ -60,7 +60,7 @@ class View extends Sprite implements Updatable {
         });
     }
 
-    public function waitAsync(time:Int):IPromise<Dynamic> {
+    public function waitAsync(time:Milliseconds):IPromise<Dynamic> {
         var deferred = Promise.createDeferred();
         addTimer(time, function() {
             deferred.resolve(null);

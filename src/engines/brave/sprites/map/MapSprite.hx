@@ -1,4 +1,5 @@
 package engines.brave.sprites.map;
+import reflash.display2.Seconds;
 import reflash.display2.View;
 import reflash.display2.Easing;
 import lang.LangUtils;
@@ -82,11 +83,11 @@ class MapSprite extends Sprite
 		this.cameraY = destY;
 	}
 
-	public function moveCameraTo(destX:Float, destY:Float, time:Float, ?done:Void -> Void):Void {
+	public function moveCameraTo(destX:Float, destY:Float, time:Seconds, ?done:Void -> Void):Void {
 		destX = MathEx.clamp(destX, 0, map.width * 40 - 640);
 		destY = MathEx.clamp(destY, 0, map.height * 40 - 480);
 
-		view.interpolateAsync(this, Std.int(time * 1000), { cameraX : destX, cameraY : destY }, Easing.easeInOutQuad).then(function(e) {
+		view.interpolateAsync(this, time, { cameraX : destX, cameraY : destY }, Easing.easeInOutQuad).then(function(e) {
 			done();
 		});
 	}

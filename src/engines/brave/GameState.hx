@@ -1,5 +1,7 @@
 package engines.brave;
 
+import reflash.display2.Seconds;
+import reflash.display2.Milliseconds;
 import reflash.display2.Easing;
 import lang.MathEx;
 import common.script.ScriptOpcodes;
@@ -103,7 +105,7 @@ class GameState
 	
 	public function waitClickOrKeyPress(done:Void -> Void):Void {
 		if (keyPress.exists(17)) {
-			rootClip.waitAsync(1).then(function(?e){ done(); });
+			rootClip.waitAsync(new Milliseconds(1)).then(function(?e){ done(); });
 			return;
 		}
 		var onClick = null;
@@ -111,7 +113,7 @@ class GameState
 			StageReference.stage.removeEventListener(MouseEvent.CLICK, onClick);
 			StageReference.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onClick);
 
-			rootClip.waitAsync(1).then(function(e) {
+			rootClip.waitAsync(new Milliseconds(1)).then(function(e) {
 				done();
 			});
 		};
@@ -178,14 +180,14 @@ class GameState
 	
 	public function transition(done:Void -> Void, type:Int):Void {
 		//rootClip.backgroundFront.alpha
-		var time:Float = 0.5;
+		var time = new Seconds(0.5);
 		
 		rootClip.mapSprite.visible = false;
 		rootClip.backgroundBack.visible = true;
 		
 		//rootClip.backgroundBack.transform.colorTransform = new ColorTransform(1, 0.6, 0.3, 1.0, 0, 0, 0, 0);
 
-		rootClip.interpolateAsync(rootClip.backgroundFront, Std.int(time * 1000), { alpha : 0 }, Easing.easeInOutQuad).then(function(e) {
+		rootClip.interpolateAsync(rootClip.backgroundFront, time, { alpha : 0 }, Easing.easeInOutQuad).then(function(e) {
 			rootClip.backgroundFront.alpha = 1;
 			SpriteUtils.swapSpriteChildren(rootClip.backgroundFront, rootClip.backgroundBack);
 			done();
@@ -193,12 +195,12 @@ class GameState
 	}
 	
 	public function fadeToMap(done:Void -> Void, time:Int):Void {
-		var time:Float = 0.5;
+		var time = new Seconds(0.5);
 		
 		rootClip.mapSprite.visible = true;
 		rootClip.backgroundBack.visible = false;
 
-		rootClip.interpolateAsync(rootClip.background, Std.int(time * 1000), { alpha : 0 }, Easing.easeInOutQuad).then(function(e) {
+		rootClip.interpolateAsync(rootClip.background, time, { alpha : 0 }, Easing.easeInOutQuad).then(function(e) {
 			done();
 		});
 	}

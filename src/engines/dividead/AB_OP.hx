@@ -1,4 +1,6 @@
 package engines.dividead;
+import reflash.display2.Seconds;
+import reflash.display2.Milliseconds;
 import reflash.display2.Update;
 import reflash.display2.View;
 import lang.promise.IPromise;
@@ -111,7 +113,7 @@ class AB_OP {
             game.overlaySprite.removeChildren();
             game.overlaySprite.addChild(animated);
             var promise = if (game.isSkipping()) {
-                game.gameSprite.waitAsync(50);
+                game.gameSprite.waitAsync(new Milliseconds(50));
             } else {
                 Promise.fromAnySignalOnce([GameInput.onClick, GameInput.onKeyPress]);
             }
@@ -240,9 +242,9 @@ class AB_OP {
     @Opcode({ id:0x11, format:"2", description:"Wait `time` milliseconds" })
 //@Unimplemented
     public function WAIT(time:Int) {
-        if (game.isSkipping()) return Promise.createResolved();
+        if (game.isSkipping()) return Promise.createResolved(null);
 
-        return game.gameSprite.waitAsync(time);
+        return game.gameSprite.waitAsync(new Milliseconds(time));
     }
 
 // ---------------
@@ -378,7 +380,7 @@ class AB_OP {
     @Opcode({ id:0x4D, format:"", description:"Performs an animation with the current background (ABCDEF)" })
     @Unimplemented
     public function ANIMATION(type:Int) {
-        var time = game.isSkipping() ? 50 : 500;
+        var time = new Milliseconds(game.isSkipping() ? 50 : 500);
         var names = [for (n in 0 ... 6) state.background.substr(0, -1) + String.fromCharCode('A'.code + n)];
         var promises = [for (name in names) game.getImageCachedAsync(name)];
         return Promise.whenAll(promises).pipe(function(images:Array<Dynamic>) {
@@ -412,7 +414,7 @@ class AB_OP {
     public function SCROLL_UP(type:Int) return _SCROLL_DOWN_UP('B', -1);
 
     private function _SCROLL_DOWN_UP(add:String, multiplier:Float) {
-        var time:Int = game.isSkipping() ? 300 : 3000;
+        var time = new Milliseconds(game.isSkipping() ? 300 : 3000);
         var bgB = state.background + add;
 
         return game.getImageCachedAsync(bgB).pipe(function(bgBImage:BitmapData) {
@@ -457,8 +459,8 @@ class AB_OP {
     public function REPAINT_IN(type:Int) return ab.paintAsync(1, type);
 
     @Opcode({ id:0x1E, format:"", description:"Performs a fade out to color black" })
-    public function FADE_OUT_BLACK() return ab.paintToColorAsync([0x00, 0x00, 0x00], 1.0);
+    public function FADE_OUT_BLACK() return ab.paintToColorAsync([0x00, 0x00, 0x00], new Seconds(1.0));
 
     @Opcode({ id:0x1F, format:"", description:"Performs a fade out to color white" })
-    public function FADE_OUT_WHITE() return ab.paintToColorAsync([0xFF, 0xFF, 0xFF], 1.0);
+    public function FADE_OUT_WHITE() return ab.paintToColorAsync([0xFF, 0xFF, 0xFF], new Seconds(1.0));
 }
