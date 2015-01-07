@@ -44,9 +44,10 @@ class ByteArrayTools
 #if flash
 		return bd;
 		#else
+        var b = Bytes.ofData(bd);
         var ba = new ByteArray();
-        for (n in 0...bd.length)
-            ba.writeByte(cast(bd[n],Int));
+        for (n in 0...b.length)
+            ba.writeByte(Bytes.fastGet(bd, n));
         return ba;
 #end
     }

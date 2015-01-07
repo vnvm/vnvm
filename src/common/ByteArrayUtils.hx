@@ -85,7 +85,14 @@ class ByteArrayUtils {
 //return bytes.getData();
         var byteArray:ByteArray = new ByteArray();
         byteArray.endian = Endian.LITTLE_ENDIAN;
-        for (n in 0 ... bytes.length) byteArray.writeByte(bytes.get(n));
+        #if cpp
+        byteArray.setLength(bytes.length);
+        var _out = byteArray.getData();
+        var _in = bytes.getData();
+        for (n in 0 ... bytes.length) untyped _out.__unsafe_set(n, _in.__unsafe_get(n));
+        #else
+        for (n in 0 ... bytes.length) byteArray[n] = bytes.get(n);
+        #end
         byteArray.position = 0;
         return byteArray;
     }

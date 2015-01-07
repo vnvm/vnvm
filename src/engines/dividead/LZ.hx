@@ -1,4 +1,5 @@
 package engines.dividead;
+import haxe.io.BytesData;
 import reflash.Bytes3;
 import common.ByteArrayUtils;
 import haxe.Timer;
@@ -31,8 +32,8 @@ class LZ {
 
         var uncompressed:ByteArray;
         Timer.measure(function() {
-            uncompressed = _decodeGeneric(input, uncompressedSize);
-//uncompressed = _decodeFast(input, uncompressedSize);
+            //uncompressed = _decodeGeneric(input, uncompressedSize);
+            uncompressed = _decodeFast(input, uncompressedSize);
         });
         return uncompressed;
     }
@@ -51,36 +52,43 @@ class LZ {
     }
 
     @:noStack static private function _decodeFast(input:ByteArray, uncompressedSize:Int):ByteArray {
-        var inputBytes = ByteArrayUtils.ByteArrayToBytes(input);
-        var inputData:Bytes3 = Bytes.ofData(inputBytes.getData());
+        var inputData = ByteArrayUtils.ByteArrayToBytes(input);
+        var i = inputData.getData();
         var inputPosition = input.position;
         var inputLength:Int = input.length;
 
-        var outputBytes = Bytes.alloc(uncompressedSize);
-        var outputData:Bytes3 = Bytes.ofData(outputBytes.getData());
-        var outputPosition = 0;
+        var outputData = Bytes.alloc(uncompressedSize + 0x1000);
+        var o = outputData.getData();
+        var outputPosition = 0x1000;
         var ringStart = 0xFEE;
         //var extractor = new DivideadPositionCountExtractor();
+
+        //var bd = Bytes.alloc(1000).getData();
+        //var ptr = Pointer.fromArray(bd, 0);
+
+        //var ptr:cpp.Pointer<cpp.UInt8> = null;
+        //var ptr:cpp.Pointer<haxe.io.Unsigned_char__> = null;
+        //trace(ptr); // some pointer address
 
         //Memory.select(input);
 
         //Log.trace("[1]");
         while (inputPosition < inputLength) {
-            var code:Int = (inputData[inputPosition++]) | 0x100;
+            var code:Int = fastGet(i, inputPosition++) | 0x100;
 
             while (code != 1) {
                 //Log.trace("[3]");
 
                 // Uncompressed
                 if ((code & 1) != 0) {
-                    outputData[outputPosition++] = inputData[inputPosition++];
+                    fastSet(o, outputPosition++, fastGet(i, inputPosition++));
                 }
                 // Compressed
                 else {
                     if (inputPosition >= inputLength) break;
 
-                    var paramL:Int = inputData[inputPosition++];
-                    var paramH:Int = inputData[inputPosition++];
+                    var paramL:Int = fastGet(i, inputPosition++);
+                    var paramH:Int = fastGet(i, inputPosition++);
 
                     var param:Int = paramL | (paramH << 8);
 
@@ -90,21 +98,12 @@ class LZ {
                     //Log.trace('Compressed: $param, $ringOffset, $ringLength');
 
                     var convertedP:Int = ((ringStart + outputPosition) & 0xFFF) - ringOffset;
-                    if (convertedP < 0) convertedP += 0x1000;
+                    if (convertedP < 0) convertedP = convertedP + 0x1000;
 
                     var outputReadOffset:Int = outputPosition - convertedP;
 
-                    while (outputReadOffset < 0) {
-                        outputData[outputPosition++] = 0;
-                        //outputBytes.set(outputPosition++, 0);
-                        outputReadOffset++;
-                        ringLength--;
-                    }
-
                     while (ringLength-- > 0) {
-                        //outputBytes.set(outputPosition++, Bytes.fastGet(outputData, outputReadOffset++));
-                        //outputData[outputPosition++] = Bytes.fastGet(outputData, outputReadOffset++);
-                        outputData[outputPosition++] = outputData[outputReadOffset++];
+                        fastSet(o, outputPosition++, fastGet(o, outputReadOffset++));
                     }
                 }
 
@@ -112,7 +111,42 @@ class LZ {
             }
         }
 
-        return ByteArrayUtils.BytesToByteArray(outputBytes);
+        return ByteArrayUtils.BytesToByteArray(outputData.sub(0x1000, uncompressedSize));
+    }
+
+    @:noStack static private inline function fastSet(b:BytesData, pos : Int, v : Int ) : Void {
+        #if neko
+		untyped __dollar__sset(b,pos,v);
+		#elseif flash9
+		b[pos] = v;
+		#elseif php
+		b[pos] = untyped __call__("chr", v);
+		#elseif cpp
+		untyped b.__unsafe_set(pos, v);
+		#elseif java
+		b[pos] = cast v;
+		#elseif cs
+		b[pos] = cast v;
+		#else
+        b[pos] = v & 0xFF;
+        #end
+    }
+
+
+    @:noStack static private inline function fastGet( b : BytesData, pos : Int ) : Int {
+#if neko
+		return untyped __dollar__sget(b,pos);
+		#elseif flash9
+		return b[pos];
+		#elseif php
+		return untyped __call__("ord", b[pos]);
+		#elseif cpp
+		return untyped b.__unsafe_get(pos);
+		#elseif java
+		return untyped b[pos] & 0xFF;
+		#else
+        return b[pos];
+#end
     }
 
     @:noStack static private inline function extractPosition(param:Int):Int {
