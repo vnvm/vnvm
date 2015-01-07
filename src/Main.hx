@@ -1,5 +1,11 @@
 package ;
 
+import midi.dsp.Reverb;
+import midi.Audio;
+import midi.SMFParser;
+import midi.SMF;
+import midi.Sequencer;
+import midi.sf2.SF2;
 import reflash.display2.View;
 import reflash.display2.Update;
 import haxe.Log;
@@ -242,6 +248,20 @@ class Main extends View {
     }
 
     private function loadEngine(name:String, ?scriptName:String, ?scriptPos:Int):Void {
+		/*
+		fs.openAndReadAllAsync('E-MU 3.5 MB GM.sf2').then(function(sf2data) {
+			fs.openAndReadAllAsync('dividead/MID/BGM_1.MID').then(function(middata) {
+				Audio.init({Volume:{vol:1.0,on:true}},true);
+				//var seq = new Sequencer(Std.int(44100), 4096,4,null,new Reverb(2048, 1800, 1.0, 1.0, 0.93, 780, 2048));
+				var seq = new Sequencer(Std.int(44100), 4096,4,null,null);
+				var sf2 = SF2.load(seq, sf2data);
+				//var smf = SMF.read(middata);
+				var events = SMFParser.load(seq, middata);
+				seq.pushEvents(events.copy());
+				seq.play("synth", "Volume");
+			});
+		});
+		*/
         Log.trace('loadEngine: $name:$scriptName:$scriptPos');
         switch (name) {
             case "tlove": addChild(new engines.tlove.EngineMain(fs, scriptName, scriptPos));
