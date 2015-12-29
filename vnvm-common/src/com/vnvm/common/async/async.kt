@@ -391,32 +391,47 @@ object EventLoop {
 		timers.add(Pair(DateTime.nowMillis() + ms, callback))
 	}
 
-	fun process() {
-		if (executing) return
+	fun process():Int {
+		if (executing) return 0
+		var processed = 0
 
 		executing = true
 		try {
 			while (items.isNotEmpty()) {
 				val callback = items.dequeue()
 				callback()
+				processed++
 			}
 		} finally {
 			executing = false
 		}
+		return processed
 	}
 
-	fun frame() {
+	fun frame(): Int {
 		val now = DateTime.nowMillis()
+		var processed = 0
 
 		var removeList = listOf<Pair<Long, () -> Unit>>()
 		for (timer in timers) {
 			if (now >= timer.first) {
 				timer.second()
+				processed++
 				removeList += timer
 			}
 		}
 		timers.removeAll(removeList)
 
-		process()
+		processed += process()
+		return processed
+	}
+
+	fun waitAllEvents() {
+		while (frame() > 0) Thread.sleep(1L)
+	}
+
+	inline fun runAndWait(callback: () -> Unit) {
+		callback()
+		waitAllEvents()
 	}
 }

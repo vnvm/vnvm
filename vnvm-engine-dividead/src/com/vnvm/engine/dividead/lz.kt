@@ -23,12 +23,7 @@ object LZ {
 	}
 
 	private fun _decode(input: BinBytes, uncompressedSize: Int): ByteArray {
-		//return _decodeFast(input, uncompressedSize)
-
-		return measure {
-			//uncompressed = _decodeGeneric(input, uncompressedSize)
-			_decodeFast(input, uncompressedSize)
-		}
+		return measure("decoding image") { _decodeFast(input, uncompressedSize) }
 	}
 
 	/*

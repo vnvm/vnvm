@@ -10,6 +10,6 @@
 *.ipr
 *.class
 /vnvm-common/target
-/vnvm-entine-truelove/target
-/vnvm-entine-dividead/target
+/vnvm-engine-truelove/target
+/vnvm-engine-dividead/target
 /vnvm-launcher/target

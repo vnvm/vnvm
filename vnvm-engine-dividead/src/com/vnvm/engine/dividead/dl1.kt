@@ -2,10 +2,7 @@ package com.vnvm.engine.dividead
 
 import com.vnvm.common.async.Promise
 import com.vnvm.common.error.InvalidArgumentException
-import com.vnvm.common.io.AsyncStream
-import com.vnvm.common.io.BinBytes
-import com.vnvm.common.io.VirtualFileSystem
-import com.vnvm.common.io.sliceLength
+import com.vnvm.common.io.*
 import com.vnvm.common.log.Log
 import java.io.FileNotFoundException
 import java.util.*
@@ -48,6 +45,13 @@ class DL1 : VirtualFileSystem {
 				dl1
 			}
 		}
+	}
+
+	override public fun listFilesAsync(): Promise<List<VfsStat>> {
+		return Promise.resolved(this.entries.map {
+			val (name, info) = it
+			VfsStat(VfsFile(this, name), info.length)
+		})
 	}
 
 	public fun listFiles(): Iterable<String> {
