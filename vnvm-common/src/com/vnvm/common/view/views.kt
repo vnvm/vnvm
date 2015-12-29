@@ -1,28 +1,190 @@
 package com.vnvm.common.view
 
+import com.vnvm.common.TimeSpan
+import com.vnvm.common.async.Promise
 import com.vnvm.common.async.Signal
+import com.vnvm.common.clamp01
 import com.vnvm.common.error.noImpl
 import com.vnvm.common.image.BitmapData
+import com.vnvm.graphics.GraphicsContext
+import com.vnvm.graphics.RenderContext
+import com.vnvm.graphics.Texture
+import com.vnvm.graphics.TextureSlice
+
+interface Updatable {
+	fun update(dt: Int): Unit
+}
+
+class Views(val graphics: GraphicsContext) : Updatable {
+	public val root = Sprite()
+
+	fun render(context: RenderContext) {
+		context.begin()
+		root.render(context)
+		context.end()
+	}
+
+	override fun update(dt: Int) {
+		root.update(dt)
+	}
+}
+
+class UpdatableGroup : Updatable {
+	private val items = arrayListOf<Updatable>()
+
+	fun add(updatable: Updatable) {
+		items.add(updatable)
+	}
+
+	fun remove(updatable: Updatable) {
+		items.remove(updatable)
+	}
+
+	override fun update(dt: Int) {
+		for (n in 0 until items.size) items[n].update(dt)
+	}
+}
+
+
+
+class Timers : Updatable {
+	private val group = UpdatableGroup()
+
+
+	override fun update(dt: Int) {
+		group.update(dt)
+	}
+
+	fun waitAsync(time: TimeSpan): Promise<Unit> {
+		val deferred = Promise.Deferred<Unit>()
+		val totalTime = time.milliseconds
+		var item: Updatable? = null
+		item = object : Updatable {
+			var elapsedTime = 0
+			override fun update(dt: Int) {
+				elapsedTime += dt
+				if (elapsedTime >= totalTime) {
+					group.remove(item!!)
+					deferred.resolve(Unit)
+				}
+			}
+		}
+		group.add(item)
+		return deferred.promise
+	}
+}
+
+class Tweens : Updatable {
+	private val group = UpdatableGroup()
+
+	override fun update(dt: Int) {
+		group.update(dt)
+	}
+
+	fun animateAsync(time: TimeSpan, step: (ratio: Double) -> Unit): Promise<Unit> {
+		val deferred = Promise.Deferred<Unit>()
+		val totalTime = time.milliseconds
+		var item: Updatable? = null
+		step(0.0)
+		item = object : Updatable {
+			var elapsedTime = 0
+			override fun update(dt: Int) {
+				elapsedTime += dt
+				val ratio = (elapsedTime.toDouble() / totalTime.toDouble()).clamp01()
+				step(ratio)
+				if (ratio >= 1.0) {
+					group.remove(item!!)
+					deferred.resolve(Unit)
+				}
+			}
+		}
+		group.add(item)
+		return deferred.promise
+	}
+}
 
 open class DisplayObject {
 	var x: Double = 0.0
 	var y: Double = 0.0
+	var alpha: Double = 1.0
+	var speed: Double = 1.0
+	var scaleX: Double = 1.0
+	var scaleY: Double = 1.0
+	var rotation: Double = 0.0
+	private var updatables = arrayListOf<Updatable>()
+	val timers: Timers by lazy { addUpdatable(Timers()) }
+	val tweens: Tweens by lazy { addUpdatable(Tweens()) }
+
+	fun <T : Updatable> addUpdatable(updatable: T): T {
+		updatables.add(updatable)
+		return updatable
+	}
+
+	fun addUpdatable(updatable: (dt: Int) -> Unit) = object : Updatable {
+		override fun update(dt: Int) = updatable(dt)
+	}
+
+	fun update(dt: Int): Unit {
+		val dt = (dt * speed).toInt()
+		updateInternal(dt)
+		for (n in 0 until updatables.size) updatables[n].update(dt)
+	}
+
+	fun render(context: RenderContext): Unit {
+		context.save()
+		context.translate(x, y)
+		context.scale(scaleX, scaleY)
+		context.rotate(rotation)
+		renderInternal(context)
+		context.restore()
+	}
+
+	open fun renderInternal(context: RenderContext): Unit {
+	}
+
+	open protected fun updateInternal(dt: Int) {
+	}
 }
 
 open class Sprite : DisplayObject() {
+	private val children = arrayListOf<DisplayObject>()
+
 	fun addChild(child: DisplayObject): Unit {
-		noImpl
+		children.add(child)
 	}
 
 	fun removeChildren(): Unit {
-		noImpl
+		children.clear()
+	}
+
+	override fun renderInternal(context: RenderContext): Unit {
+		for (n in 0 until children.size) children[n].render(context)
+	}
+
+	override protected fun updateInternal(dt: Int) {
+		for (n in 0 until children.size) children[n].update(dt)
 	}
 }
 
 enum class PixelSnapping { AUTO }
 
 class Bitmap(val data: BitmapData, val snapping: PixelSnapping = PixelSnapping.AUTO, val smooth: Boolean = true) : DisplayObject() {
+	var width = data.width
+	var height = data.height
+}
 
+class Image(val data: TextureSlice, val snapping: PixelSnapping = PixelSnapping.AUTO, val smooth: Boolean = true) : DisplayObject() {
+	var width = data.width
+	var height = data.height
+
+	override fun renderInternal(context: RenderContext) {
+		context.quad(data, width, height)
+	}
+}
+
+class SolidColor(val color: Int) : DisplayObject() {
+	var width: Int = 100
+	var height: Int = 100
 }
 
 open class TextField : DisplayObject() {
@@ -34,8 +196,7 @@ open class TextField : DisplayObject() {
 	var textColor: Int = -1
 }
 
-enum class Keys(val value:Int)
-{
+enum class Keys(val value: Int) {
 	Backspace(8),
 	Tab(9),
 	Enter(13),
@@ -142,6 +303,7 @@ enum class Keys(val value:Int)
 	F15 = 126
 	*/
 }
+
 object GameInput {
 	val onClick: Signal<Unit> get() = noImpl
 	val onKeyPress: Signal<Keys> get() = noImpl

@@ -2,6 +2,7 @@ package com.vnvm.common.image.format
 
 import com.vnvm.common.IRectangle
 import com.vnvm.common.Memory
+import com.vnvm.common.MemoryI
 import com.vnvm.common.error.InvalidArgumentException
 import com.vnvm.common.error.InvalidOperationException
 import com.vnvm.common.image.BitmapData
@@ -65,21 +66,19 @@ object BMP {
 	}
 
 	private fun decodeRows8(bytes: BinBytes, bitmapData: BitmapData, palette: List<BmpColor>): Unit {
-		val width: Int = bitmapData.width
-		val height: Int = bitmapData.height;
+		val width = bitmapData.width
+		val height = bitmapData.height;
 
-		var bmpData: ByteArray = ByteArray(width * height * 4)
-		var paletteInt: IntArray = palette.map { it.getPixel32() }.toIntArray()
-		var stride: Int = width * 4;
+		val bmpData = ByteArray(width * height * 4)
+		val paletteInt = palette.map { it.getPixel32() }.toIntArray()
 
 		Memory.select(bmpData) {
 			for (y in 0 until height) {
-				var n: Int = (height - y - 1) * stride;
+				var n = (height - y - 1) * width;
 				for (x in 0 until width) {
-					var index: Int = bytes.readUnsignedByte();
+					var index = bytes.readUnsignedByte();
 					//Log.trace(Std.format("INDEX: $index, ${palette.length}"));
-					Memory.setI32(n, paletteInt[index]);
-					n += 4;
+					MemoryI[n++] = paletteInt[index]
 				}
 			}
 			bitmapData.setPixels(IRectangle(0, 0, width, height), bmpData);

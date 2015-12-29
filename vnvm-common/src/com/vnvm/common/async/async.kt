@@ -85,9 +85,13 @@ class Promise<T : Any>(var parent: Promise<*>?) {
 		fun resolve() = Promise.resolved(Unit)
 
 		fun <T : Any> resolved(value: T): Promise<T> {
-			val deferred = Deferred<T>()
-			deferred.resolve(value)
-			return deferred.promise
+			if (value is Promise<*>) {
+				return value as Promise<T>
+			} else {
+				val deferred = Deferred<T>()
+				deferred.resolve(value)
+				return deferred.promise
+			}
 		}
 
 		fun <T : Any> rejected(value: Throwable): Promise<T> {
@@ -278,6 +282,8 @@ class Promise<T : Any>(var parent: Promise<*>?) {
 	}
 }
 
+val Promise.Companion.unit: Promise<Unit> get() = Promise.resolved(Unit)
+
 val <T : Any> Promise<T>.unit: Promise<Unit> get() = then { Unit }
 
 // @TODO: Improve performance using two lists and swapping, instead of cloning callbacks list each dispatch!
@@ -378,7 +384,7 @@ object EventLoop {
 
 	fun setTimeout(time: TimeSpan, callback: () -> Unit) = setTimeout(time.milliseconds, callback)
 
-	fun waitAsync(time: TimeSpan):Promise<Unit> {
+	fun waitAsync(time: TimeSpan): Promise<Unit> {
 		return Promise.create { resolve, reject ->
 			setTimeout(time) {
 				resolve(Unit)
@@ -391,7 +397,7 @@ object EventLoop {
 		timers.add(Pair(DateTime.nowMillis() + ms, callback))
 	}
 
-	fun process():Int {
+	fun process(): Int {
 		if (executing) return 0
 		var processed = 0
 

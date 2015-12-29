@@ -63,7 +63,7 @@ class DL1 : VirtualFileSystem {
 	}
 
 	private fun getEntry(name:String):AsyncStream {
-		val name = name.toUpperCase();
+		val name = name.toUpperCase().trimStart('/');
 		if (name !in entries) throw FileNotFoundException("Can't find '$name'")
 		return entries[name]!!
 	}

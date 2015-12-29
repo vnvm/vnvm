@@ -13,3 +13,6 @@
 /vnvm-engine-truelove/target
 /vnvm-engine-dividead/target
 /vnvm-launcher/target
+/vnvm-launcher-desktop/target
+*.bmp
+*.lz

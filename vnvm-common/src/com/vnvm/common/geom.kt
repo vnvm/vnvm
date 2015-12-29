@@ -1,7 +1,5 @@
 package com.vnvm.common
 
-import com.vnvm.common.error.noImpl
-
 class Point(
 	@JvmField var x: Double = 0.0,
 	@JvmField var y: Double = 0.0
@@ -54,10 +52,43 @@ data class Rectangle(
 }
 
 data class IRectangle(val x: Int, val y: Int, val width: Int, val height: Int) {
-	val topLeft: IPoint get() = noImpl
-	val topRight: IPoint get() = noImpl
-	val bottomLeft: IPoint get() = noImpl
-	val bottomRight: IPoint get() = noImpl
+	val area: Int get() = width * height
+	val left: Int get() = x
+	val top: Int get() = y
+	val right: Int get() = x + width
+	val bottom: Int get() = y + height
+	val topLeft: IPoint get() = IPoint(left, top)
+	val topRight: IPoint get() = IPoint(right, top)
+	val bottomLeft: IPoint get() = IPoint(left, bottom)
+	val bottomRight: IPoint get() = IPoint(right, bottom)
+
+	companion object {
+		fun fromBounds(left: Int, top: Int, right: Int, bottom: Int): IRectangle {
+			return IRectangle(left, top, right - left, bottom - top)
+		}
+	}
+
+	fun translate(dx: Int, dy: Int):IRectangle {
+		return IRectangle(this.x + dx, this.y + dy, this.width, this.height)
+	}
+}
+
+fun IRectangle.intersection(that: IRectangle): IRectangle {
+	return IRectangle.fromBounds(
+		Math.max(this.left, that.left),
+		Math.max(this.top, that.top),
+		Math.min(this.right, that.right),
+		Math.min(this.bottom, that.bottom)
+	)
+}
+
+fun IRectangle.grow(that: IRectangle): IRectangle {
+	return IRectangle.fromBounds(
+		MathEx.min(this.left, that.left, this.right, that.right),
+		MathEx.min(this.top, that.top, this.bottom, that.bottom),
+		MathEx.max(this.left, that.left, this.right, that.right),
+		MathEx.max(this.top, that.top, this.bottom, that.bottom)
+	)
 }
 
 data class IPoint(val x: Int, val y: Int)

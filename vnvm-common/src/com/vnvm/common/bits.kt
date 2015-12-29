@@ -17,6 +17,13 @@ object BitUtils {
 		return pack32(data[offset + 0], data[offset + 1], data[offset + 2], data[offset + 3])
 	}
 
+	@JvmStatic public fun writeIntLE(data: ByteArray, offset: Int, value:Int): Unit {
+		data[offset + 0] = (value ushr 0).toByte()
+		data[offset + 1] = (value ushr 8).toByte()
+		data[offset + 2] = (value ushr 16).toByte()
+		data[offset + 3] = (value ushr 24).toByte()
+	}
+
 	@JvmStatic public fun pack16(b1: Int, b2: Int): Int {
 		return ((b1 and 0xFF) shl 0) or ((b2 and 0xFF) shl 8)
 	}
@@ -75,6 +82,9 @@ object MathEx {
 
 	@Deprecated("", ReplaceWith("v.clamp(a, b)", "com.vnvm.common.clamp"))
 	@JvmStatic fun clampInt(v: Int, a: Int, b: Int): Int = clamp(v, a, b)
+
+	@JvmStatic fun min(a:Int, b:Int, c:Int, d:Int) = Math.min(Math.min(Math.min(a, b), c), d)
+	@JvmStatic fun max(a:Int, b:Int, c:Int, d:Int) = Math.max(Math.max(Math.max(a, b), c), d)
 }
 
 object Std {

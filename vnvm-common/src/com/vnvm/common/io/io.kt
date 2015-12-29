@@ -10,7 +10,7 @@ import java.util.*
 class BinBytes(val data: ByteArray, val offset: Int = 0, val length: Int = data.size) {
 	var position: Int = 0
 	val available: Int get() = length - position
-	val eof: Boolean get() = (available > 0)
+	val eof: Boolean get() = (available <= 0)
 	fun readUTFBytes(count: Int): String {
 		return String(readBytes(count), "UTF-8")
 	}

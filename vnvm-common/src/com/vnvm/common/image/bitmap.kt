@@ -2,27 +2,83 @@ package com.vnvm.common.image
 
 import com.vnvm.common.IPoint
 import com.vnvm.common.IRectangle
-import com.vnvm.common.Matrix
-import com.vnvm.common.error.noImpl
+import com.vnvm.common.Memory
+import com.vnvm.common.intersection
+
+enum class BitmapDataChannel {
+	RED, GREEN, BLUE, ALPHA
+}
 
 class BitmapData(val width: Int, val height: Int, val transparent: Boolean = true, val color: Int = -1) {
 	private val data: ByteArray = ByteArray(width * height * 4)
 	val rect = IRectangle(0, 0, width, height)
-	fun setPixels(rect: IRectangle, data: ByteArray): Unit = noImpl
-	fun lock(): Unit = noImpl
-	fun unlock(): Unit = noImpl
-	fun copyPixels(from: BitmapData, rect: IRectangle, pos: IPoint): Unit = noImpl
-	fun getPixel32(x: Int, y: Int): Int = noImpl
-	inline fun lock(callback: () -> Unit) {
-		this.lock()
-		try {
-			callback()
-		} finally {
-			this.unlock()
+	var version = 0
+
+	private fun getOffset(x: Int, y: Int) = (y * width + x) * 4
+
+	private fun _transfer(r: IRectangle, data: ByteArray, dir: Boolean): Unit {
+		for (y in 0 until r.height) {
+			val outOffset = getOffset(r.left, r.top + y)
+			val inOffset = (r.width * 4) * y
+			val size = r.width * 4
+			if (dir) {
+				System.arraycopy(data, inOffset, this.data, outOffset, size)
+			} else {
+				System.arraycopy(this.data, outOffset, data, inOffset, size)
+			}
 		}
 	}
 
-	fun draw(bitmapData: BitmapData, matrix: Matrix): Unit {
+	fun setPixels(rect: IRectangle, data: ByteArray): Unit {
+		lock {
+			val r = rect.intersection(this.rect)
+			_transfer(r, data, true)
+		}
+	}
+
+	fun lock(): Unit {
+
+	}
+
+	fun unlock(): Unit {
+		version++
+	}
+
+	fun copyPixels(from: BitmapData, rect: IRectangle, pos: IPoint): Unit {
+		// CHECK BOUNDS!
+		this.setPixels(rect.translate(pos.x, pos.y), from.getPixels(rect))
+	}
+
+	fun getPixel32(x: Int, y: Int): Int {
+		return Memory.getI32(data, getOffset(x, y))
+	}
+
+	fun setPixel32(x: Int, y: Int, value:Int): Unit {
+		Memory.setI32(data, getOffset(x, y), value)
+	}
+
+	inline fun lock(callback: () -> Unit) {
+		this.lock()
+		callback()
+		this.unlock()
+	}
+
+	//fun draw(bitmapData: BitmapData, matrix: Matrix): Unit = noImpl
+
+	fun draw(bitmapData: BitmapData, x: Int, y: Int): Unit {
+		//noImpl
+		println("## DRAWING!")
+	}
+
+	fun getPixels(rect: IRectangle = this.rect): ByteArray {
+		val r = rect.intersection(this.rect)
+		val data = ByteArray(r.area * 4)
+		_transfer(r, data, false)
+		return data
+	}
+
+	fun copyChannel(sourceBitmapData: BitmapData, sourceRect: IRectangle, destPoint: IPoint, sourceChannel: BitmapDataChannel, destChannel: BitmapDataChannel): Unit {
+		println("BitmapData.copyChannel")
 	}
 }
 
@@ -34,15 +90,31 @@ object BitmapDataUtils {
 		return destination;
 	}
 
-	/*
 	fun combineColorMask(color: BitmapData, mask: BitmapData): BitmapData {
-		var newBitmap: BitmapData = BitmapData(color.width, color.height, true, 0x00000000);
-		//newBitmap.copyPixels(color, color.rect, new Point(0, 0), mask, new Point(0, 0), false);
+		var newBitmap = BitmapData(color.width, color.height, true, 0x00000000);
 		newBitmap.copyPixels(color, color.rect, IPoint(0, 0));
 		newBitmap.copyChannel(mask, mask.rect, IPoint(0, 0), BitmapDataChannel.RED, BitmapDataChannel.ALPHA);
 		return newBitmap;
 	}
 
+	fun chromaKey(image: BitmapData, chromaKey: Int): BitmapData {
+		var colors = image.getPixels(image.rect);
+		var output = BitmapData(image.width, image.height, true, 0);
+		Memory.select(colors) {
+			var m = 0;
+			val chromaKey2 = chromaKey and 0xFFFFFF;
+			for (n in 0 until colors.size / 4) {
+				var c = Memory.getI32(m);
+				if (((c ushr 8) and 0xFFFFFF) == chromaKey2) c = 0;
+				Memory.setI32(m, c);
+				m += 4;
+			}
+		}
+		output.setPixels(image.rect, colors);
+		return output;
+	}
+
+	/*
 	private fun _blend(colorDataData: BytesData, maskDataData: BytesData, totalPixels: Int, readOffset: Int, writeOffset: Int, ratio: Float, reverse: Bool) {
 		var colorDataData2 = new Bytes3(Bytes.ofData(colorDataData));
 		var offset: Int = int(MathEx.translateRange(ratio, 0, 1, -255, 255));
@@ -103,24 +175,6 @@ object BitmapDataUtils {
 		}
 	}
 
-	fun chromaKey(image: BitmapData, chromaKey: Int): BitmapData {
-		var colors = image.getPixels(image.rect);
-		colors.position = 0;
-		var output = new BitmapData(image.width, image.height, true, 0);
-		trace('ColorsLength:', colors.length);
-		Memory.select(colors);
-		var m = 0;
-		chromaKey = chromaKey and 0xFFFFFF;
-		for (n in 0 until colors.length / 4) {
-			var c = Memory.getI32(m);
-			if (((c > > > 8) & 0xFFFFFF) == chromaKey) c = 0;
-			Memory.setI32(m, c);
-			m += 4;
-		}
-		colors.position = 0;
-		output.setPixels(image.rect, colors);
-		return output;
-	}
 
 	fun applyPalette(color: BitmapData, palette: Array<Int>): Void {
 		if (palette.size != 0x100) throw OutOfBoundsException("Palette must have 256 elements")

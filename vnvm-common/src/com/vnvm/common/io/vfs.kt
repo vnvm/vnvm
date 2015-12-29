@@ -8,7 +8,8 @@ class VfsFile(val vfs: VirtualFileSystem, val path: String) {
 	fun listAsync(): Promise<List<VfsStat>> = vfs.listAsync(path)
 	fun statAsync(): Promise<VfsStat> = vfs.statAsync(path)
 	fun readAllAsync(): Promise<ByteArray> = vfs.readAllAsync(path)
-	operator fun get(subpath: String) = VfsFile(vfs, "$path/$subpath") // @TODO: Security!
+	fun jail(): VfsFile = JailVirtualFileSystem(this).root()
+	operator fun get(subpath: String) = VfsFile(vfs, "$path/$subpath".trimStart('/')) // @TODO: Security!
 }
 
 data class VfsStat(
@@ -19,9 +20,9 @@ data class VfsStat(
 }
 
 interface VirtualFileSystem {
-	fun openAsync(name: String): Promise<AsyncStream>
-	fun statAsync(name: String): Promise<VfsStat>
-	fun listAsync(name: String): Promise<List<VfsStat>>
+	fun openAsync(path: String): Promise<AsyncStream>
+	fun statAsync(path: String): Promise<VfsStat>
+	fun listAsync(path: String): Promise<List<VfsStat>>
 }
 
 fun VirtualFileSystem.root():VfsFile {
@@ -35,6 +36,26 @@ fun VirtualFileSystem.readAllAsync(path: String): Promise<ByteArray> {
 			it
 		}
 	}
+}
+
+private class JailVirtualFileSystem(val file: VfsFile) : VirtualFileSystem {
+	private fun getJailedPath(path:String): String {
+		// @TODO: Security! expand ".."
+		return (this.file.path + "/" + path).trimStart('/')
+	}
+
+	override fun openAsync(path: String): Promise<AsyncStream> {
+		return file.vfs.openAsync(getJailedPath(path))
+	}
+
+	override fun statAsync(path: String): Promise<VfsStat> {
+		return file.vfs.statAsync(getJailedPath(path))
+	}
+
+	override fun listAsync(path: String): Promise<List<VfsStat>> {
+		return file.vfs.listAsync(getJailedPath(path))
+	}
+
 }
 
 private class _LocalVirtualFileSystem(val basepath:String) : VirtualFileSystem {

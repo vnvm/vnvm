@@ -2,14 +2,15 @@ package com.vnvm.engine.dividead
 
 import com.vnvm.common.*
 import com.vnvm.common.async.Promise
+import com.vnvm.common.async.unit
+import com.vnvm.common.error.noImpl
 import com.vnvm.common.image.BitmapDataUtils
 import com.vnvm.common.log.Log
+import com.vnvm.common.script.Opcode
 import com.vnvm.common.view.Bitmap
 import com.vnvm.common.view.GameInput
 import com.vnvm.common.view.PixelSnapping
 import com.vnvm.common.view.Sprite
-
-annotation class Opcode(val id: Int, val format: String, val description: String, val savepoint: Boolean = false)
 
 class AB_OP(val ab: AB) {
 	//static var margin = { x = 108, y = 400, h = 12 };
@@ -77,12 +78,14 @@ class AB_OP(val ab: AB) {
 	@Opcode(id = 0x00, format = "T", description = "Prints a text on the screen", savepoint = true)
 	//@Unimplemented
 	public fun TEXT(text: String) {
+		println("TEXT: $text")
+		/*
 		game.textField.text = text.replace('@', '"')
 
 		return game.getImageCachedAsync("waku_p").pipe { wakuB ->
 			var slices = (0 until 9).map { Bitmap(BitmapDataUtils.slice(wakuB, IRectangle(18 * it, 144, 18, 18))) }
 			var animated = Sprite();
-			animated.addUpdater { u ->
+			animated.addUpdatable { u ->
 				animated.removeChildren();
 				animated.addChild(slices[(u.totalMs / 100) % slices.size]);
 				//u.dt
@@ -90,7 +93,7 @@ class AB_OP(val ab: AB) {
 			game.overlaySprite.removeChildren();
 			game.overlaySprite.addChild(animated);
 			var promise = if (game.isSkipping()) {
-				game.gameSprite.waitAsync(50.milliseconds);
+				game.gameSprite.timers.waitAsync(50.milliseconds);
 			} else {
 				Promise.fromAnySignalOnce(GameInput.onClick, GameInput.onKeyPress);
 			}
@@ -106,17 +109,20 @@ class AB_OP(val ab: AB) {
 				}
 			}
 		}
+		*/
 	}
 
 	@Opcode(id = 0x50, format = "T", description = "Sets the title for the save")
 	public fun TITLE(title: String) {
 		state.title = title
+		println("Set title: '$title'")
 	}
 
 	@Opcode(id = 0x06, format = "", description = "Empties the option list", savepoint = true)
 	public fun OPTION_RESET() {
-		game.optionList.clear();
+		//game.optionList.clear();
 		state.options = arrayListOf();
+		noImpl
 	}
 
 	@Opcode(id = 0x01, format = "PT", description = "Adds an option to the list of options")
@@ -124,17 +130,21 @@ class AB_OP(val ab: AB) {
 	public fun OPTION_ADD(pointer: Int, text: String) {
 		val option = GameState.Option(pointer, text)
 		state.options.add(option)
-		game.optionList.addOption(text, option);
+		//game.optionList.addOption(text, option);
+		noImpl
 	}
 
 	@Opcode(id = 0x07, format = "", description = "Show the list of options")
 	//@Unimplemented
 	public fun OPTION_SHOW() {
+		/*
 		game.optionList.visible = true;
 		return game.optionList.onSelected.waitOneAsync().then { e ->
 			game.optionList.visible = false;
 			ab.jump(e.selectedOption.data.pointer);
 		}
+		*/
+		noImpl
 	}
 
 	@Opcode(id = 0x0A, format = "", description = "Shows again a list of options")
@@ -158,6 +168,7 @@ class AB_OP(val ab: AB) {
 
 	@Opcode(id = 0x41, format = "", description = "Shows the map and waits for selecting an option")
 	public fun MAP_OPTION_SHOW(): Promise<Unit> {
+		/*
 		return Promise.whenAll(
 			game.getImageCachedAsync(game.state.mapImage1),
 			game.getImageCachedAsync(game.state.mapImage2)
@@ -169,7 +180,7 @@ class AB_OP(val ab: AB) {
 			game.front.draw(bg, matrix);
 
 			var events = EventListenerListGroup();
-			var deferred = Promise.createDeferred();
+			var deferred = Promise.Deferred<Unit>();
 
 			game.state.optionsMap.forEach { option ->
 				var pointer = option.pointer;
@@ -178,20 +189,19 @@ class AB_OP(val ab: AB) {
 				slice.addChild(Bitmap(BitmapDataUtils.slice(fg, rect), PixelSnapping.AUTO, true));
 				slice.x = rect.x + 32;
 				slice.y = rect.y + 8;
-				slice.alpha = 0;
+				slice.alpha = 0.0
 				events.addEventListener(slice, MouseEvent.MOUSE_OVER, function(e) {
-					trace('over');
-					slice.alpha = 1;
+					println("over");
+					slice.alpha = 1.0
 				});
 				events.addEventListener(slice, MouseEvent.MOUSE_OUT, function(e) {
-					trace('out');
-					slice.alpha = 0;
+					println("out");
+					slice.alpha = 0.0
 				});
 				events.addEventListener(slice, MouseEvent.CLICK, function(e) {
 					deferred.resolve(option);
 				});
 				game.overlaySprite.addChild(slice);
-				return true;
 			}
 
 			deferred.promise.then { option ->
@@ -200,13 +210,15 @@ class AB_OP(val ab: AB) {
 				ab.jump(option.pointer);
 			}
 		}
+		*/
+		noImpl
 	}
 
 	@Opcode(id = 0x11, format = "2", description = "Wait `time` milliseconds")
 	public fun WAIT(time: Int): Promise<Unit> {
-		if (game.isSkipping()) return Promise.createResolved(Unit);
+		if (game.isSkipping()) return Promise.unit
 
-		return game.gameSprite.waitAsync(time.milliseconds);
+		return game.gameSprite.timers.waitAsync(time.milliseconds)
 	}
 
 	// ---------------
@@ -219,21 +231,19 @@ class AB_OP(val ab: AB) {
 
 		MUSIC_STOP();
 		return ab.game.getMusicAsync(name).then { sound ->
-			ab.game.musicChannel = sound.play(0, -1, SoundTransform(1.0, 0.0));
+			ab.game.musicChannel.play(sound)
 		}
 	}
 
 	@Opcode(id = 0x28, format = "", description = "Stops the currently playing music")
 	public fun MUSIC_STOP() {
-		if (ab.game.musicChannel == null) return;
 		ab.game.musicChannel.stop();
-		ab.game.musicChannel = null;
 	}
 
 	@Opcode(id = 0x2B, format = "S", description = "Plays a sound in the voice channel")
 	public fun VOICE_PLAY(name: String): Promise<Unit> {
 		return ab.game.getSoundAsync(name).then { sound ->
-			ab.game.voiceChannel = sound.play(0, 0, SoundTransform(1.0, 0.0));
+			ab.game.voiceChannel.play(sound)
 		}
 	}
 
@@ -241,15 +251,13 @@ class AB_OP(val ab: AB) {
 	public fun EFFECT_PLAY(name: String): Promise<Unit> {
 		EFFECT_STOP();
 		return ab.game.getSoundAsync(name).then { sound ->
-			ab.game.effectChannel = sound.play(0, 0, SoundTransform(1.0, 0.0));
+			ab.game.effectChannel.play(sound)
 		}
 	}
 
 	@Opcode(id = 0x36, format = "", description = "Stops the sound playing in the effect channgel")
 	public fun EFFECT_STOP() {
-		if (ab.game.effectChannel == null) return;
 		ab.game.effectChannel.stop();
-		ab.game.effectChannel = null;
 	}
 
 	// ---------------
@@ -259,9 +267,7 @@ class AB_OP(val ab: AB) {
 	@Opcode(id = 0x46, format = "S", description = "Sets an image as the foreground")
 	public fun FOREGROUND(name: String): Promise<Unit> {
 		return game.getImageCachedAsync(name).then { bitmapData ->
-			var matrix = Matrix();
-			matrix.translate(0.0, 0.0);
-			game.back.draw(bitmapData, matrix);
+			game.back.draw(bitmapData, 0, 0);
 		}
 	}
 
@@ -269,19 +275,15 @@ class AB_OP(val ab: AB) {
 	public fun BACKGROUND(name: String): Promise<Unit> {
 		state.background = name;
 		return game.getImageCachedAsync(name).then { bitmapData ->
-			val matrix = Matrix()
-			matrix.translate(32.0, 8.0);
-			game.back.draw(bitmapData, matrix);
+			game.back.draw(bitmapData, 32, 8);
 		}
 	}
 
 	@Opcode(id = 0x16, format = "S", description = "Puts an image overlay on the screen")
 	public fun IMAGE_OVERLAY(name: String): Promise<Unit> {
 		return game.getImageCachedAsync(name).then { bitmapData ->
-			var outBitmapData = BitmapDataUtils.chromaKey(bitmapData, 0x00FF00);
-			var matrix: Matrix = Matrix()
-			matrix.translate(32.0, 8.0);
-			game.back.draw(outBitmapData, matrix);
+			var outBitmapData = BitmapDataUtils.chromaKey(bitmapData, 0x00FF00)
+			game.back.draw(outBitmapData, 32, 8);
 		}
 	}
 
@@ -291,9 +293,7 @@ class AB_OP(val ab: AB) {
 		var nameMask = name.split('_')[0] + "_0"
 
 		return game.getImageMaskCachedAsync(nameColor, nameMask).then { bitmapData ->
-			var matrix = Matrix();
-			matrix.translate(Std.int(640 / 2 - bitmapData.width / 2), Std.int(385 - bitmapData.height));
-			game.back.draw(bitmapData, matrix);
+			game.back.draw(bitmapData, (640 / 2 - bitmapData.width / 2), (385 - bitmapData.height));
 		}
 	}
 
@@ -307,13 +307,8 @@ class AB_OP(val ab: AB) {
 
 		return game.getImageMaskCachedAsync(name1Color, name1Mask).pipe { bitmapData1 ->
 			game.getImageMaskCachedAsync(name2Color, name2Mask).then { bitmapData2 ->
-				var matrix = Matrix();
-				matrix.translate(Std.int(640 * 1 / 3 - bitmapData1.width / 2), Std.int(385 - bitmapData1.height));
-				game.back.draw(bitmapData1, matrix);
-
-				matrix = Matrix();
-				matrix.translate(Std.int(640 * 2 / 3 - bitmapData2.width / 2), Std.int(385 - bitmapData2.height));
-				game.back.draw(bitmapData2, matrix);
+				game.back.draw(bitmapData1, 640 * 1 / 3 - bitmapData1.width / 2, 385 - bitmapData1.height);
+				game.back.draw(bitmapData2, 640 * 2 / 3 - bitmapData2.width / 2, 385 - bitmapData2.height);
 			}
 		}
 	}
@@ -324,11 +319,12 @@ class AB_OP(val ab: AB) {
 
 	@Opcode(id = 0x4D, format = "", description = "Performs an animation with the current background (ABCDEF)")
 	public fun ANIMATION(type: Int): Promise<Unit> {
+		/*
 		var time = if (game.isSkipping()) 50.milliseconds else 500.milliseconds
 		var names = (0 until 6).map { n -> state.background.substr(0, -1) + String.fromCharCode('A'.code + n)] }
 		var promises = names.map { game.getImageCachedAsync(name) }
 		return Promise.whenAll(promises).pipe { images ->
-			var stepAsync -> IPromise<Dynamic> = null;
+			var stepAsync: (() -> Promise<Unit>)? = null
 			stepAsync = fun(v: Any) {
 				if (images.length > 0) {
 					var image = images.shift();
@@ -339,9 +335,9 @@ class AB_OP(val ab: AB) {
 					game.overlaySprite.removeChildren();
 					game.overlaySprite.addChild(bmp);
 					game.back.draw(image, new Matrix(1, 0, 0, 1, 32, 8));
-					return game.gameSprite.waitAsync(time).pipe(stepAsync);
+					return game.gameSprite.timers.waitAsync(time).pipe(stepAsync);
 				} else {
-					return game.gameSprite.waitAsync(time);
+					return game.gameSprite.timers.waitAsync(time);
 				}
 			};
 			stepAsync(null).then {
@@ -349,6 +345,8 @@ class AB_OP(val ab: AB) {
 				game.overlaySprite.removeChildren();
 			}
 		}
+		*/
+		return Promise.unit
 	}
 
 	@Opcode(id = 0x4E, format = "", description = "Makes an scroll to the bottom with the current image")
@@ -358,6 +356,7 @@ class AB_OP(val ab: AB) {
 	public fun SCROLL_UP(type: Int) = _SCROLL_DOWN_UP("B", -1.0);
 
 	private fun _SCROLL_DOWN_UP(add: String, multiplier: Double) {
+		/*
 		val time = if (game.isSkipping()) 300.milliseconds else 3000.milliseconds
 		val bgB = state.background + add;
 
@@ -384,6 +383,7 @@ class AB_OP(val ab: AB) {
 				game.overlaySprite.removeChildren();
 			}
 		}
+		*/
 	}
 
 

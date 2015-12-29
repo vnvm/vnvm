@@ -7,11 +7,11 @@ import java.lang.reflect.Method
 data class Instruction2(
 	val script: String,
 	val opcode: OpcodeInfo,
-	val parameters: List<Any>,
+	val parameters: Array<Any?>,
 	val position: Int = 0,
 	val size: Int = -1
 ) {
-	public fun call(`object`: Any): Any {
+	public fun call(obj: Any): Any {
 		if (opcode.info.unimplemented) {
 			Log.trace("Unimplemented: $this");
 		} else if (opcode.info.untested) {
@@ -19,7 +19,16 @@ data class Instruction2(
 		} else if (!opcode.info.skipLog) {
 			Log.trace("Executing... $this");
 		}
-		return opcode.method.invoke(`object`, parameters);
+		println("EXECUTE: $this")
+		try {
+			return opcode.method.invoke(obj, *parameters);
+		} catch (e:Throwable) {
+			println(obj)
+			println(opcode.method)
+			println(parameters)
+			println(e)
+			return Unit
+		}
 	}
 
 	override public fun toString(): String {
@@ -49,7 +58,7 @@ data class ScriptOpcodes private constructor(
 	companion object {
 		fun createWithClass(opcodesClass: Class<*>): ScriptOpcodes {
 			return ScriptOpcodes(opcodesClass.methods.flatMap { method ->
-				val annotation = method.getAnnotation(Opcode::class.java)
+				val annotation = method.annotations.filterIsInstance<Opcode>().firstOrNull()
 				if (annotation != null) listOf(Pair(annotation.id, OpcodeInfo(method, annotation))) else listOf()
 			}.toMap())
 		}

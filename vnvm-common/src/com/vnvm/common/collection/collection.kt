@@ -48,6 +48,9 @@ class Stack<T> : CollectionSize, Iterable<T> {
 	fun push(v: T) {
 		list.add(v)
 	}
+	fun clear() {
+		list.clear()
+	}
 
 	fun pop(): T = list.removeAt(0)
 	override val size: Int get() = list.size
