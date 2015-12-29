@@ -1,4 +1,12 @@
-package common.imaging.format.pixel;
+package com.vnvm.common.image.format
+
+interface IPixelFormat
+{
+	function extractRed(value:Int):Int;
+	function extractGreen(value:Int):Int;
+	function extractBlue(value:Int):Int;
+	function extractAlpha(value:Int):Int;
+}
 
 class PixelFormat565 implements IPixelFormat
 {

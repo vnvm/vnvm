@@ -148,3 +148,120 @@ object BitmapDataUtils {
 		}
 	}
 }
+
+class BitmapDataBuilder
+{
+	public var bitmapData(default, null):BitmapData;
+
+	private function new(width:Int, height:Int)
+	{
+		this.bitmapData = new BitmapData(width, height, true, 0x00000000);
+	}
+
+	static public function create(width:Int, height:Int):BitmapDataBuilder
+	{
+		return new BitmapDataBuilder(width, height);
+	}
+
+	public function noise():BitmapDataBuilder
+	{
+		this.bitmapData.noise(0);
+		return this;
+	}
+}
+
+class BitmapDataSerializer
+{
+	static private inline var outputPixelSize = 4;
+
+	@:noStack static public function decode(input:ByteArray, width:Int, height:Int, channels:String = "argb", interleaved:Bool = true):BitmapData
+	{
+		var inputStart = input.position;
+		var output = ByteArrayUtils.newByteArrayWithLength(width * height * 4, Endian.LITTLE_ENDIAN);
+		var totalPixels = width * height;
+		var inputPixelSize = interleaved ? channels.length : 1;
+		var displacementNextChannel = interleaved ? 1 : totalPixels;
+		var channelStartOffset = 0;
+
+		for (channelChar in channels.split(''))
+		{
+			var readOffset = inputStart + channelStartOffset;
+			var writeOffset = getChannelOffset(channelChar);
+			for (n in 0 ... totalPixels)
+			{
+				output[writeOffset] = input[readOffset];
+				readOffset += inputPixelSize;
+				writeOffset += outputPixelSize;
+			}
+			channelStartOffset += displacementNextChannel;
+		}
+
+		if (channels.indexOf('a') < 0)
+		{
+			var writeOffset = getChannelOffset('a');
+			for (n in 0 ... totalPixels)
+			{
+				output[writeOffset] = 0xFF;
+				writeOffset += outputPixelSize;
+			}
+		}
+
+		return BitmapDataSerializer.fromByteArray(width, height, output);
+	}
+
+	static public function getChannelOffset(channelChar:String):Int
+	{
+		#if flash9
+		return switch (channelChar) { case 'a': 3; case 'r': 2; case 'g': 1; case 'b': 0; default: throw('Invalid channel char $channelChar'); }
+		#else
+		return switch (channelChar) { case 'a': 0; case 'r': 1; case 'g': 2; case 'b': 3; default: throw('Invalid channel char $channelChar'); }
+		#end
+	}
+
+	static public function fromByteArray(width:Int, height:Int, data:ByteArray):BitmapData
+	{
+		var bitmapData = new BitmapData(width, height, true, 0x00000000);
+
+		bitmapData.setPixels(bitmapData.rect, data);
+
+		return bitmapData;
+	}
+}
+
+class GraphicUtils
+{
+	static private var matrix:Matrix = new Matrix();
+
+	static public function drawBitmapSlice(graphics:Graphics, bitmapData:BitmapData, dstX:Int, dstY:Int, srcX:Int, srcY:Int, dstW:Int, dstH:Int, ?srcW:Int, ?srcH:Int):Void {
+	if (srcW == null) srcW = dstW;
+	if (srcH == null) srcH = dstH;
+
+	var pointTL:Point = new Point(dstX       , dstY       );
+	var pointBR:Point = new Point(dstX + dstW, dstY + dstH);
+
+	var uvPointTL:Point = new Point((srcX) / bitmapData.width, (srcY) / bitmapData.height);
+	var uvPointBR:Point = new Point((srcX + srcW) / bitmapData.width, (srcY + srcH) / bitmapData.height);
+
+	var verticies:Array<Float> = [pointTL.x, pointTL.y, pointBR.x, pointTL.y, pointTL.x, pointBR.y, pointBR.x, pointBR.y];
+	var uvtData:Array<Float> = [uvPointTL.x, uvPointTL.y, uvPointBR.x, uvPointTL.y, uvPointTL.x, uvPointBR.y, uvPointBR.x, uvPointBR.y];
+	var indices:Array<Int> = [0, 1, 2, 1, 3, 2];
+
+	graphics.beginBitmapFill(bitmapData, null, false, true);
+	#if flash
+	graphics.drawTriangles(Vector.ofArray(verticies), Vector.ofArray(indices), Vector.ofArray(uvtData));
+	#else
+	graphics.drawTriangles(cast verticies, cast indices, cast uvtData);
+	#end
+	graphics.endFill();
+}
+
+	static public function drawSolidFilledRectWithBounds(graphics:Graphics, x0:Float, y0:Float, x1:Float, y1:Float, rgb:Int = 0x000000, alpha:Float = 1.0):Void {
+	var x = x0;
+	var y = y0;
+	var w = x1 - x0;
+	var h = y1 - y0;
+	graphics.beginFill(rgb, alpha);
+	graphics.drawRect(x, y, w, h);
+	graphics.endFill();
+}
+}

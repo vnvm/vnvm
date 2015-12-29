@@ -14,19 +14,27 @@ class Point(
 }
 
 data class Rectangle(
-	@JvmField var left:Double,
-	@JvmField var top:Double,
-	@JvmField var right:Double,
-	@JvmField var bottom:Double
+	@JvmField var left: Double,
+	@JvmField var top: Double,
+	@JvmField var right: Double,
+	@JvmField var bottom: Double
 ) {
 	constructor() : this(0.0, 0.0, 0.0, 0.0)
 
-	var x: Double get() = left; set(value) { left = value }
-	var y: Double get() = top; set(value) { top = value }
-	var width: Double get() = right - left; set(value) { right = left + value }
-	var height: Double get() = bottom - top; set(value) { bottom = top + value }
+	var x: Double get() = left; set(value) {
+		left = value
+	}
+	var y: Double get() = top; set(value) {
+		top = value
+	}
+	var width: Double get() = right - left; set(value) {
+		right = left + value
+	}
+	var height: Double get() = bottom - top; set(value) {
+		bottom = top + value
+	}
 
-	private fun _setToBounds(left:Double, top:Double, right:Double, bottom:Double): Rectangle {
+	private fun _setToBounds(left: Double, top: Double, right: Double, bottom: Double): Rectangle {
 		this.left = left
 		this.top = top
 		this.right = right
@@ -34,11 +42,11 @@ data class Rectangle(
 		return this
 	}
 
-	fun setToBounds(left:Double, top:Double, right:Double, bottom:Double): Rectangle {
+	fun setToBounds(left: Double, top: Double, right: Double, bottom: Double): Rectangle {
 		return _setToBounds(left, top, right, bottom)
 	}
 
-	fun setToSize(x:Double, y:Double, width:Double, height:Double): Rectangle {
+	fun setToSize(x: Double, y: Double, width: Double, height: Double): Rectangle {
 		return _setToBounds(x, y, x + width, y + height)
 	}
 
@@ -199,7 +207,7 @@ data class Matrix(
 	fun concat(that: Matrix): Matrix = multiply(this, that)
 	fun preconcat(that: Matrix): Matrix = multiply(that, this)
 
-	fun pretransform(a:Double, b:Double, c:Double, d:Double, tx:Double, ty:Double): Matrix {
+	fun pretransform(a: Double, b: Double, c: Double, d: Double, tx: Double, ty: Double): Matrix {
 		return preconcat(temp.setTo(a, b, c, d, tx, ty))
 	}
 
@@ -213,5 +221,16 @@ data class Matrix(
 			this.a * px + this.c * py + this.tx,
 			this.d * py + this.b * px + this.ty
 		)
+	}
+}
+
+data class Anchor(val sx: Double, val sy: Double) {
+	companion object {
+		val topLeft: Anchor = Anchor(0.0, 0.0);
+		val centerCenter: Anchor = Anchor(0.5, 0.5);
+	}
+
+	public fun getPointInRect(rect: Rectangle): Point {
+		return Point(rect.x + rect.width * this.sx, rect.y + rect.height * this.sy);
 	}
 }
