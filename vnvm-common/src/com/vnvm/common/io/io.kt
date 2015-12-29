@@ -1,34 +1,61 @@
 package com.vnvm.common.io
 
+import com.vnvm.common.BitUtils
 import com.vnvm.common.async.Promise
-import com.vnvm.common.error.noImpl
+import com.vnvm.common.clamp
 import java.io.File
 import java.io.RandomAccessFile
 import java.util.*
 
-class BinBytes(val data: ByteArray) {
+class BinBytes(val data: ByteArray, val offset: Int = 0, val length: Int = data.size) {
 	var position: Int = 0
-	val length: Int get() = data.size
-	val eof: Boolean get() = noImpl
-	fun readUTFBytes(count: Int): String = noImpl
-	fun readUnsignedInt(): Int = noImpl
-	fun readUnsignedShort(): Int = noImpl
-	fun readShort(): Int = noImpl
-	fun readByte(): Int = noImpl
+	val available: Int get() = length - position
+	val eof: Boolean get() = (available > 0)
+	fun readUTFBytes(count: Int): String {
+		return String(readBytes(count), "UTF-8")
+	}
+
+	fun readUnsignedInt(): Int {
+		return readInt()
+	}
+
+	fun readUnsignedShort(): Int = readShort() and 0xFFFF
+	fun readInt(): Int {
+		val out = BitUtils.readIntLE(data, offset + position)
+		position += 4
+		return out.toInt()
+	}
+
+	fun readShort(): Int {
+		val out = BitUtils.readShortLE(data, offset + position)
+		position += 2
+		return out.toInt()
+	}
+
+	fun readByte(): Int {
+		return data[offset + position++].toInt()
+	}
+
+	fun readBytes(count: Int): ByteArray {
+		val out = Arrays.copyOfRange(data, offset + position, offset + position + count)
+		position += count
+		return out
+	}
+
 	fun readStringz(): String {
-		var chars = arrayListOf<Char>()
+		var chars = arrayListOf<Byte>()
 		while (!eof) {
 			var b = readByte()
 			if (b == 0) break
-			chars.add(b.toChar())
+			chars.add(b.toByte())
 		}
-		return String(chars.toCharArray())
+		return String(chars.toByteArray(), "UTF-8")
 	}
 
 	fun readUnsignedByte(): Int = readByte() and 0xFF
 
-	fun readStream(i: Int): BinBytes {
-		noImpl
+	fun readStream(count: Int): BinBytes {
+		return BinBytes(data, offset + position, count)
 	}
 }
 
@@ -40,6 +67,9 @@ abstract class AsyncStream {
 		val out = readBytesAsync(position, count)
 		position += count
 		return out
+	}
+
+	open fun close(): Unit {
 	}
 }
 
@@ -56,7 +86,9 @@ fun AsyncStream.sliceLength(pos: Long, size: Long): AsyncStream {
 class SliceAsyncStream(val parent: AsyncStream, val start: Long, val end: Long) : AsyncStream() {
 	override val length: Long = end - start
 	override fun readBytesAsync(position: Long, count: Int): Promise<ByteArray> {
-		throw UnsupportedOperationException()
+		val start1 = (start + position).clamp(start, end)
+		val end1 = (start + position + count).clamp(start, end)
+		return parent.readBytesAsync(start1, (end1 - start1).toInt())
 	}
 }
 

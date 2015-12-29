@@ -12,4 +12,11 @@ interface VirtualFileSystem {
 	fun openAsync(name: String): Promise<AsyncStream>
 }
 
-fun VirtualFileSystem.openAndReadAllAsync(path: String): Promise<ByteArray> = noImpl
+fun VirtualFileSystem.readAllAsync(path: String): Promise<ByteArray> {
+	return openAsync(path).pipe { stream ->
+		stream.readBytesAsync(stream.length.toInt()).then {
+			stream.close()
+			it
+		}
+	}
+}
