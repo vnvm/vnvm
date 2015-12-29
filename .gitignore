@@ -4,4 +4,7 @@
 /.build
 /out
 
-/*.iws
+.idea
+*.iws
+*.iml
+*.ipr
