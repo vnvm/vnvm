@@ -5,7 +5,10 @@ import java.io.File
 
 class VfsFile(val vfs: VirtualFileSystem, val path: String) {
 	fun openAsync(): Promise<AsyncStream> = vfs.openAsync(path)
-	fun access(subpath: String) = VfsFile(vfs, "$path/$subpath") // @TODO: Security!
+	fun listAsync(): Promise<List<VfsStat>> = vfs.listAsync(path)
+	fun statAsync(): Promise<VfsStat> = vfs.statAsync(path)
+	fun readAllAsync(): Promise<ByteArray> = vfs.readAllAsync(path)
+	operator fun get(subpath: String) = VfsFile(vfs, "$path/$subpath") // @TODO: Security!
 }
 
 data class VfsStat(
@@ -17,7 +20,12 @@ data class VfsStat(
 
 interface VirtualFileSystem {
 	fun openAsync(name: String): Promise<AsyncStream>
-	fun listFilesAsync(): Promise<List<VfsStat>>
+	fun statAsync(name: String): Promise<VfsStat>
+	fun listAsync(name: String): Promise<List<VfsStat>>
+}
+
+fun VirtualFileSystem.root():VfsFile {
+	return VfsFile(this, "")
 }
 
 fun VirtualFileSystem.readAllAsync(path: String): Promise<ByteArray> {
@@ -29,16 +37,30 @@ fun VirtualFileSystem.readAllAsync(path: String): Promise<ByteArray> {
 	}
 }
 
-class LocalVirtualFileSystem(val basepath:String) : VirtualFileSystem {
+private class _LocalVirtualFileSystem(val basepath:String) : VirtualFileSystem {
 	val absolutePath = File(basepath).absolutePath
 
-	override fun listFilesAsync(): Promise<List<VfsStat>> {
-		return Promise.resolved(File(absolutePath).listFiles().map {
-			VfsStat(VfsFile(this, it.name), it.length())
-		})
+	override fun listAsync(path:String): Promise<List<VfsStat>> {
+		return Promise.resolved(File(absolutePath).listFiles().map { getStat(it) })
 	}
 
-	override fun openAsync(name: String): Promise<AsyncStream> {
-		return Promise.resolved(FileAsyncStream(File(absolutePath + "/" + name)))
+	override fun statAsync(path:String): Promise<VfsStat> {
+		return Promise.resolved(getStat(resolveFile(path)))
 	}
+
+	override fun openAsync(path: String): Promise<AsyncStream> {
+		return Promise.resolved(FileAsyncStream(resolveFile(path)))
+	}
+
+	private fun getStat(file:File):VfsStat {
+		return VfsStat(VfsFile(this, file.name), file.length())
+	}
+
+	private fun resolveFile(path:String):File {
+		return File(absolutePath + "/" + path)
+	}
+}
+
+fun LocalVirtualFileSystem(basepath: String): VfsFile {
+	return _LocalVirtualFileSystem(basepath).root()
 }

@@ -83,6 +83,10 @@ fun AsyncStream.sliceLength(pos: Long, size: Long): AsyncStream {
 	return this.slice(pos, pos + size)
 }
 
+fun AsyncStream.clone(): AsyncStream {
+	return this.slice(position, length)
+}
+
 class SliceAsyncStream(val parent: AsyncStream, val start: Long, val end: Long) : AsyncStream() {
 	override val length: Long = end - start
 	override fun readBytesAsync(position: Long, count: Int): Promise<ByteArray> {

@@ -11,7 +11,7 @@ class DL1 : VirtualFileSystem {
 	private var entries = LinkedHashMap<String, AsyncStream>();
 
 	companion object {
-		fun loadAsync(stream: AsyncStream): Promise<DL1> {
+		fun loadAsync(stream: AsyncStream): Promise<VfsFile> {
 			var header: ByteArray;
 			var entriesByteArray: ByteArray;
 			val dl1 = DL1();
@@ -42,25 +42,33 @@ class DL1 : VirtualFileSystem {
 					}
 				}
 			}.then {
-				dl1
+				dl1.root()
 			}
 		}
 	}
 
-	override public fun listFilesAsync(): Promise<List<VfsStat>> {
+	override public fun listAsync(path: String): Promise<List<VfsStat>> {
 		return Promise.resolved(this.entries.map {
 			val (name, info) = it
 			VfsStat(VfsFile(this, name), info.length)
-		})
+		}.filter { it.name.startsWith(path) })
+	}
+
+	override public fun statAsync(path: String): Promise<VfsStat> {
+		return Promise.resolved(VfsStat(VfsFile(this, path), getEntry(path).length))
 	}
 
 	public fun listFiles(): Iterable<String> {
 		return this.entries.keys
 	}
 
-	override public fun openAsync(name: String): Promise<AsyncStream> {
+	private fun getEntry(name:String):AsyncStream {
 		val name = name.toUpperCase();
 		if (name !in entries) throw FileNotFoundException("Can't find '$name'")
-		return Promise.resolved(entries[name]!!)
+		return entries[name]!!
+	}
+
+	override public fun openAsync(name: String): Promise<AsyncStream> {
+		return Promise.resolved(getEntry(name).clone())
 	}
 }
