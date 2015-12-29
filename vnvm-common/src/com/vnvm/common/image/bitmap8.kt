@@ -1,6 +1,7 @@
 package com.vnvm.common.image
 
 import com.vnvm.common.*
+import com.vnvm.common.collection.foreach
 import com.vnvm.common.log.Log
 
 class BitmapData8(val width: Int, val height: Int) {
@@ -30,11 +31,11 @@ class BitmapData8(val width: Int, val height: Int) {
 		fun createWithDataAndPalette(data: ByteArray, width: Int, height: Int, palette: Palette): BitmapData8 {
 			var bitmapData: BitmapData8 = BitmapData8(width, height)
 			System.arraycopy(data, 0, bitmapData.data, 0, width * height)
-			bitmapData.palette.copy(palette)
+			Palette.copy(palette, bitmapData.palette)
 			return bitmapData
 		}
 
-		fun copyRect(src: BitmapData8, srcRect: IRectangle, dst: BitmapData8, dstPoint: IPoint): Void {
+		fun copyRect(src: BitmapData8, srcRect: IRectangle, dst: BitmapData8, dstPoint: IPoint) {
 			copyRectTransition(src, srcRect, dst, dstPoint, 1.0, 0)
 		}
 
@@ -52,27 +53,25 @@ class BitmapData8(val width: Int, val height: Int) {
 			return __randomData!!
 		}
 
-		private fun getMaskRandomPixels(mask: ByteArray, random: Array<Float>, w: Int, h: Int, step: Float): Void {
-			var n = 0
-			for (x in 0 until w) for (y in 0 until h) {
-				mask.writeByte(if (step >= random[n % random.size]) 1 else 0)
-				n++
+		private fun getMaskRandomPixels(mask: ByteArray, random: DoubleArray, w: Int, h: Int, step: Double) {
+			foreach(w, h) { x, y, n ->
+				mask[n] = (if (step >= random[n % random.size]) 1 else 0)
 			}
 		}
 
-		private fun getMaskRandomRows(mask: ByteArray, random: Array<Float>, w: Int, h: Int, step: Float): Void {
-			for (x in 0 until w) for (y in 0 until h) {
-				mask.writeByte(if (step >= random[y % random.size]) 1 else 0)
+		private fun getMaskRandomRows(mask: ByteArray, random: DoubleArray, w: Int, h: Int, step: Double) {
+			foreach(w, h) { x, y, n ->
+				mask[n] = (if (step >= random[y % random.size]) 1 else 0)
 			}
 		}
 
-		private fun getMaskRandomColumns(mask: ByteArray, random: Array<Float>, w: Int, h: Int, step: Float): Void {
-			for (x in 0 until w) for (y in 0 until h) {
-				mask.writeByte(if (step >= random[x % random.size]) 1 else 0)
+		private fun getMaskRandomColumns(mask: ByteArray, random: DoubleArray, w: Int, h: Int, step: Double) {
+			foreach(w, h) { x, y, n ->
+				mask[n] = (if (step >= random[x % random.size]) 1 else 0)
 			}
 		}
 
-		public fun copyRectTransition(src: BitmapData8, srcRect: IRectangle, dst: BitmapData8, dstPoint: IPoint, step: Double, effect: Int, transparentColor: Int = -1): Void {
+		public fun copyRectTransition(src: BitmapData8, srcRect: IRectangle, dst: BitmapData8, dstPoint: IPoint, step: Double, effect: Int, transparentColor: Int = -1) {
 			dst.palette = src.palette
 
 			var srcX = srcRect.x
@@ -93,13 +92,13 @@ class BitmapData8(val width: Int, val height: Int) {
 			if (!dst.inBounds(dstX, dstY)) Log.trace("BitmapData8.copyRect.Error [3]")
 			if (!dst.inBounds(dstX + width - 1, dstY + height - 1)) Log.trace("BitmapData8.copyRect.Error [4]")
 
-			width = Std.int(MathEx.clamp(width, 0, dst.width - dstX))
-			width = Std.int(MathEx.clamp(width, 0, src.width - srcX))
+			width = width.clamp(0, dst.width - dstX)
+			width = width.clamp(0, src.width - srcX)
 
-			height = Std.int(MathEx.clamp(height, 0, dst.height - dstY))
-			height = Std.int(MathEx.clamp(height, 0, src.height - srcY))
+			height = height.clamp(0, dst.height - dstY)
+			height = height.clamp(0, src.height - srcY)
 
-			step = step.clamp01()
+			val step = step.clamp01()
 
 			var _srcData = srcData
 			var _dstData = dstData
@@ -119,9 +118,9 @@ class BitmapData8(val width: Int, val height: Int) {
 				}
 			} else {
 				var checker: (Int, Int, Int, Int, Float) -> Boolean
-				var mask = ByteArray()
+				var mask = ByteArray(width * height)
 				var _mask = mask
-				var random: Array<Float> = getRandomData()
+				var random = getRandomData()
 
 				getMaskRandomPixels(mask, random, width, height, step)
 
@@ -131,9 +130,9 @@ class BitmapData8(val width: Int, val height: Int) {
 					var dstN: Int = dst.getIndex(dstX + 0, dstY + y)
 
 					for (x in 0 until width) {
-						if (_mask.get(n) != 0) {
-							var c: Int = _srcData[srcN]
-							if (c != transparentColor) {
+						if (_mask[n] != 0.toByte()) {
+							var c = _srcData[srcN]
+							if (c.toInt() != transparentColor) {
 								_dstData[dstN] = c
 							}
 						}

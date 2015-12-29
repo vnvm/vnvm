@@ -8,3 +8,8 @@
 *.iws
 *.iml
 *.ipr
+*.class
+/vnvm-common/target
+/vnvm-entine-truelove/target
+/vnvm-entine-dividead/target
+/vnvm-launcher/target

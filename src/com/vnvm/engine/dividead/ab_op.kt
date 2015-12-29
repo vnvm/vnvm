@@ -4,8 +4,6 @@ import com.vnvm.common.Rectangle
 import com.vnvm.common.SoundTransform
 import com.vnvm.common.milliseconds
 
-annotation class Opcode(val id: Int, val format: String, val description: String, val savepoint: Boolean = false)
-
 class AB_OP {
 	//static var margin = { x = 108, y = 400, h = 12 };
 

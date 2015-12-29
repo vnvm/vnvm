@@ -3,9 +3,6 @@ package com.vnvm.common.image
 import com.vnvm.common.IPoint
 import com.vnvm.common.IRectangle
 import com.vnvm.common.Matrix
-import com.vnvm.common.Std
-import com.vnvm.common.Std.int
-import com.vnvm.common.error.OutOfBoundsException
 import com.vnvm.common.error.noImpl
 
 class BitmapData(val width: Int, val height: Int, val transparent: Boolean = true, val color: Int = -1) {
@@ -15,6 +12,7 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 	fun lock(): Unit = noImpl
 	fun unlock(): Unit = noImpl
 	fun copyPixels(from: BitmapData, rect: IRectangle, pos: IPoint): Unit = noImpl
+	fun getPixel32(x: Int, y: Int): Int = noImpl
 	inline fun lock(callback: () -> Unit) {
 		this.lock()
 		try {
@@ -36,6 +34,7 @@ object BitmapDataUtils {
 		return destination;
 	}
 
+	/*
 	fun combineColorMask(color: BitmapData, mask: BitmapData): BitmapData {
 		var newBitmap: BitmapData = BitmapData(color.width, color.height, true, 0x00000000);
 		//newBitmap.copyPixels(color, color.rect, new Point(0, 0), mask, new Point(0, 0), false);
@@ -147,8 +146,10 @@ object BitmapDataUtils {
 			color.setVector(color.rect, pixels);
 		}
 	}
+	*/
 }
 
+/*
 class BitmapDataBuilder
 {
 	public var bitmapData(default, null):BitmapData;
@@ -265,3 +266,4 @@ class GraphicUtils
 	graphics.endFill();
 }
 }
+*/

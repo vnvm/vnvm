@@ -2,7 +2,6 @@ package com.vnvm.common.image.format
 
 import com.vnvm.common.IRectangle
 import com.vnvm.common.Memory
-import com.vnvm.common.Std
 import com.vnvm.common.error.InvalidArgumentException
 import com.vnvm.common.error.InvalidOperationException
 import com.vnvm.common.image.BitmapData
@@ -73,21 +72,21 @@ object BMP {
 		var paletteInt: IntArray = palette.map { it.getPixel32() }.toIntArray()
 		var stride: Int = width * 4;
 
-		Memory.select(bmpData);
-		for (y in 0 until height) {
-			var n: Int = (height - y - 1) * stride;
-			for (x in 0 until width) {
-				var index: Int = bytes.readUnsignedByte();
-				//Log.trace(Std.format("INDEX: $index, ${palette.length}"));
-				Memory.setI32(n, paletteInt[index]);
-				n += 4;
+		Memory.select(bmpData) {
+			for (y in 0 until height) {
+				var n: Int = (height - y - 1) * stride;
+				for (x in 0 until width) {
+					var index: Int = bytes.readUnsignedByte();
+					//Log.trace(Std.format("INDEX: $index, ${palette.length}"));
+					Memory.setI32(n, paletteInt[index]);
+					n += 4;
+				}
 			}
+			bitmapData.setPixels(IRectangle(0, 0, width, height), bmpData);
 		}
-		bitmapData.setPixels(IRectangle(0, 0, width, height), bmpData);
-		Memory.select(null);
 
 		// Free memory
-		ByteArrayUtils.freeByteArray(bmpData);
+		Memory.free(bmpData);
 	}
 
 	private fun decodeRows24(bytes: BinBytes, bitmapData: BitmapData): Unit {
@@ -96,12 +95,11 @@ object BMP {
 
 		var bmpData = ByteArray(width * height * 4)
 		var opos = 0
-		var ipos = 0
 		for (y in 0 until height) {
 			for (x in 0 until width) {
-				val r = bytes[ipos++]
-				val g = bytes[ipos++]
-				val b = bytes[ipos++]
+				val r = bytes.readUnsignedByte().toByte()
+				val g = bytes.readUnsignedByte().toByte()
+				val b = bytes.readUnsignedByte().toByte()
 				val a = 0xFF.toByte()
 				bmpData[opos++] = a
 				bmpData[opos++] = b

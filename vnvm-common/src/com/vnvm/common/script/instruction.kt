@@ -1,97 +1,61 @@
 package com.vnvm.common.script
 
-/*
+import com.vnvm.common.error.InvalidOperationException
+import com.vnvm.common.log.Log
+import java.lang.reflect.Method
+
 data class Instruction2(
 	val script: String,
-	val opcode: Opcode,
+	val opcode: OpcodeInfo,
 	val parameters: List<Any>,
 	val position: Int = 0,
 	val size: Int = -1
 ) {
-	public fun call(`object`: Dynamic): Dynamic {
-		if (opcode.unimplemented) {
-			Log.trace('Unimplemented: $this');
-		} else if (opcode.untested) {
-			Log.trace('Untested... $this');
-		} else if (!opcode.skipLog) {
-			Log.trace('Executing... $this');
+	public fun call(`object`: Any): Any {
+		if (opcode.info.unimplemented) {
+			Log.trace("Unimplemented: $this");
+		} else if (opcode.info.untested) {
+			Log.trace("Untested... $this");
+		} else if (!opcode.info.skipLog) {
+			Log.trace("Executing... $this");
 		}
-		return Reflect.callMethod(`object`, Reflect.field(`object`, opcode.methodName), parameters);
+		return opcode.method.invoke(`object`, parameters);
 	}
 
 	override public fun toString(): String {
-		return "%s:%04X(%d): %04X.%s %s".format(script, position, size, opcode.opcodeId, opcode.methodName, parameters.joinToString(", "))
+		return "%s:%04X(%d): %04X.%s %s".format(script, position, size, opcode.info.id, opcode.method.name, parameters.joinToString(", "))
 	}
 }
 
-data class Opcode(
-	val methodName: String,
-	val opcodeId: Int,
-	val format: String,
-	val description: String,
-	val unimplemented: Boolean,
-	val untested: Boolean,
-	val skipLog: Boolean
+data class OpcodeInfo(
+	val method: Method,
+	val info: Opcode
 )
 
-class ScriptOpcodes {
-	private var opcodesById = new Map<Int, Opcode>();
+annotation class Opcode(
+	val id: Int,
+	val format: String,
+	val description: String = "",
+	val unimplemented: Boolean = false,
+	val savepoint: Boolean = false,
+	val untested: Boolean = false,
+	val skipLog: Boolean = false
+)
 
-	public function new():Void
-	{
-	}
 
-	static public function createWithClass(opcodesClass:Class<Dynamic>):ScriptOpcodes
-	{
-		var scriptOpcodes: ScriptOpcodes = new ScriptOpcodes();
-		scriptOpcodes.initializeOpcodesById(opcodesClass);
-		return scriptOpcodes;
-	}
-
-	private function initializeOpcodesById(opcodesClass:Class<Dynamic>):Void
-	{
-		if (Type.getSuperClass(opcodesClass) != null) initializeOpcodesById(Type.getSuperClass(opcodesClass));
-
-		var metas = Meta.getFields(opcodesClass);
-
-		//BraveLog.trace(metas.JUMP_IF);
-
-		//Log.trace(Reflect.fields(metas));
-		//Log.trace(Type.getInstanceFields(opcodesClass));
-
-		for (key in Reflect.fields(metas)) {
-			var metas: Dynamic = Reflect.getProperty(metas, key);
-			var opcodeAttribute: Dynamic = metas.Opcode;
-			var unimplemented: Bool = Reflect.hasField(metas, "Unimplemented");
-			var untested: Bool = Reflect.hasField(metas, "Untested");
-			var skipLog: Bool = Reflect.hasField(metas, "SkipLog");
-
-			if (opcodeAttribute != null) {
-				var id: Int = -1;
-				var format: String = "";
-				var description: String = "";
-
-				if (Reflect.isObject(opcodeAttribute[0])) {
-					id = opcodeAttribute[0].id;
-					format = opcodeAttribute[0].format;
-					description = opcodeAttribute[0].description;
-				} else {
-					id = opcodeAttribute[0];
-					format = opcodeAttribute[Std.int(opcodeAttribute.length - 1)];
-				}
-
-				var opcode: Opcode = new Opcode(key, id, format, description, unimplemented, untested, skipLog);
-				opcodesById.set(id, opcode);
-			}
+data class ScriptOpcodes private constructor(
+	val opcodesById: Map<Int, OpcodeInfo>
+) {
+	companion object {
+		fun createWithClass(opcodesClass: Class<*>): ScriptOpcodes {
+			return ScriptOpcodes(opcodesClass.methods.flatMap { method ->
+				val annotation = method.getAnnotation(Opcode::class.java)
+				if (annotation != null) listOf(Pair(annotation.id, OpcodeInfo(method, annotation))) else listOf()
+			}.toMap())
 		}
 	}
 
-	public function getOpcodeWithId(id:Int):Opcode
-	{
-		var opcode = opcodesById.get(id);
-		if (opcode == null) throw(new Error('Unknown opcode ${id}'));
-		return opcode;
+	operator public fun get(id: Int): OpcodeInfo {
+		return opcodesById[id] ?: throw InvalidOperationException("Unknown opcode ${id}")
 	}
-
 }
-*/

@@ -153,6 +153,7 @@ data class TextFormat(val face: String, val size: Int, val color: Int) {
 
 }
 
+/*
 class GameInput
 {
 	static var pressing:Map<Int,Void>;
@@ -268,3 +269,4 @@ class GameInput
 	onMouseMoveEvent.dispatch(e);
 }
 }
+*/
