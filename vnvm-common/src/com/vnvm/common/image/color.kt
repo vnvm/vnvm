@@ -1,7 +1,7 @@
 package com.vnvm.common.image
 
-import com.vnvm.common.MathEx
 import com.vnvm.common.Std
+import com.vnvm.common.clamp01
 
 class BmpColor(r: Int, g: Int, b: Int, a: Int) {
 	var r: Int = r and 0xFF
@@ -41,7 +41,7 @@ class BmpColor(r: Int, g: Int, b: Int, a: Int) {
 		}
 
 		fun interpolate(left: BmpColor, right: BmpColor, step: Double): BmpColor {
-			var step_l = MathEx.clamp(step, 0.0, 1.0);
+			var step_l = step.clamp01();
 			var step_r = 1.0 - step_l;
 			return BmpColor(
 				(Std.int(left.r * step_l + right.r * step_r)) and 0xFF,
@@ -69,7 +69,6 @@ class BmpColor(r: Int, g: Int, b: Int, a: Int) {
 			);
 		}
 
-
 		private fun fromColors(v: Int, r: Int, g: Int, b: Int, a: Int): BmpColor {
 			return BmpColor(
 				(v ushr r) and 0xFF,
@@ -87,5 +86,12 @@ class BmpColor(r: Int, g: Int, b: Int, a: Int) {
 
 	override public fun toString(): String {
 		return "BmpColor($r,$g,$b,$a)";
+	}
+
+	fun set(that: BmpColor) {
+		this.r = that.r
+		this.g = that.g
+		this.b = that.b
+		this.a = that.a
 	}
 }

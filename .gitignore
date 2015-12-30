@@ -16,3 +16,5 @@
 /vnvm-launcher-desktop/target
 *.bmp
 *.lz
+*.log
+*.tga

@@ -42,14 +42,14 @@ object Memory {
 		return BitUtils.readIntLE(data, index)
 	}
 
-	fun setI32(data: ByteArray, index: Int, value:Int): Unit {
+	fun setI32(data: ByteArray, index: Int, value: Int): Unit {
 		BitUtils.writeIntLE(data, index, value)
 	}
 }
 
 object MemoryI {
-	operator inline fun get(index:Int): Int = Memory.getI32(index shl 2)
-	operator inline fun set(index:Int, value:Int): Unit {
+	operator inline fun get(index: Int): Int = Memory.getI32(index shl 2)
+	operator inline fun set(index: Int, value: Int): Unit {
 		Memory.setI32(index shl 2, value)
 	}
 }
@@ -67,6 +67,7 @@ object Memory {
 
 	@JvmStatic inline fun select(data: ByteArray, callback: () -> Unit) {
 		val old = mem
+		mem = data
 		try {
 			callback()
 		} finally {
@@ -79,25 +80,29 @@ object Memory {
 	}
 
 	@JvmStatic fun memset8(offset: Int, length: Int, value: Int) {
-		unsafe.setMemory(mem, offset.toLong(), length.toLong(), value.toByte())
+		//unsafe.setMemory(mem, offset.toLong(), length.toLong(), value.toByte())
 		// @TODO: pack and set in blocks
 		//for (n in 0 until length) setI8(offset + n, value)
 	}
 
-	fun setI32(index: Int, value: Int): Unit {
+	@JvmStatic fun setI32(index: Int, value: Int): Unit {
 		unsafe.putInt(mem, index.toLong(), value)
 	}
 
-	fun setI8(index: Int, value: Int): Unit {
+	@JvmStatic fun setI8(index: Int, value: Int): Unit {
 		unsafe.putByte(mem, index.toLong(), value.toByte())
 	}
 
-	fun getI32(index: Int): Int {
+	@JvmStatic fun getI32(index: Int): Int {
 		return unsafe.getInt(mem, index.toLong())
 	}
 
-	fun getI32(data:ByteArray, index: Int): Int {
+	@JvmStatic fun getI32(data:ByteArray, index: Int): Int {
 		return unsafe.getInt(data, index.toLong())
+	}
+
+	@JvmStatic fun setI32(data:ByteArray, index: Int, value:Int): Unit {
+		unsafe.putInt(data, index.toLong(), value)
 	}
 }
 */

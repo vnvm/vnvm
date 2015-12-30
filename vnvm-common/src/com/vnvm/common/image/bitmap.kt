@@ -1,25 +1,24 @@
 package com.vnvm.common.image
 
-import com.vnvm.common.IPoint
-import com.vnvm.common.IRectangle
-import com.vnvm.common.Memory
-import com.vnvm.common.intersection
+import com.vnvm.common.*
+import com.vnvm.common.collection.foreach
 
 enum class BitmapDataChannel {
 	RED, GREEN, BLUE, ALPHA
 }
 
 class BitmapData(val width: Int, val height: Int, val transparent: Boolean = true, val color: Int = -1) {
-	private val data: ByteArray = ByteArray(width * height * 4)
+	val data: ByteArray = ByteArray(width * height * 4)
 	val rect = IRectangle(0, 0, width, height)
 	var version = 0
 
 	private fun getOffset(x: Int, y: Int) = (y * width + x) * 4
 
-	private fun _transfer(r: IRectangle, data: ByteArray, dir: Boolean): Unit {
+	private fun _transfer(r: IRectangle, data: ByteArray, dir: Boolean, flipY: Boolean): Unit {
 		for (y in 0 until r.height) {
+			val y2 = if (flipY) r.height - y - 1 else y
 			val outOffset = getOffset(r.left, r.top + y)
-			val inOffset = (r.width * 4) * y
+			val inOffset = (r.width * y2) * 4
 			val size = r.width * 4
 			if (dir) {
 				System.arraycopy(data, inOffset, this.data, outOffset, size)
@@ -29,10 +28,10 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 		}
 	}
 
-	fun setPixels(rect: IRectangle, data: ByteArray): Unit {
+	fun setPixels(rect: IRectangle, data: ByteArray, flipY: Boolean = false): Unit {
 		lock {
 			val r = rect.intersection(this.rect)
-			_transfer(r, data, true)
+			_transfer(r, data, true, flipY)
 		}
 	}
 
@@ -70,15 +69,40 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 		println("## DRAWING!")
 	}
 
-	fun getPixels(rect: IRectangle = this.rect): ByteArray {
+	fun getPixels(rect: IRectangle = this.rect, flipY: Boolean = false): ByteArray {
 		val r = rect.intersection(this.rect)
 		val data = ByteArray(r.area * 4)
-		_transfer(r, data, false)
+		_transfer(r, data, false, flipY)
 		return data
 	}
 
 	fun copyChannel(sourceBitmapData: BitmapData, sourceRect: IRectangle, destPoint: IPoint, sourceChannel: BitmapDataChannel, destChannel: BitmapDataChannel): Unit {
 		println("BitmapData.copyChannel")
+	}
+
+	companion object {
+		fun color(r:Int, g:Int, b:Int, a:Int):Int = BitUtils.pack32(r, g, b, a)
+		fun r(color:Int):Byte = (color ushr 0).toByte()
+		fun g(color:Int):Byte = (color ushr 8).toByte()
+		fun b(color:Int):Byte = (color ushr 16).toByte()
+		fun a(color:Int):Byte = (color ushr 24).toByte()
+	}
+
+	inline fun map(callback: (x:Int, y:Int, n:Int) -> Int) {
+		lock {
+			foreach(width, height) { x, y, n ->
+				//println("$width, $height, $x, $y, $n")
+				Memory.setI32(data, n * 4, callback(x, y, n))
+			}
+		}
+	}
+
+	fun foreach(callback: (x:Int, y:Int, n:Int, color:Int) -> Unit) {
+		foreach(width, height) { x, y, n ->
+			//println("$width, $height, $x, $y, $n")
+			val color = Memory.getI32(data, n * 4)
+			callback(x, y, n, color)
+		}
 	}
 }
 

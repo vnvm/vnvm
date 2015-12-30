@@ -23,7 +23,7 @@ fun xrange(min:Int, max:Int, step:Int): Iterable<Int> {
 
 inline fun foreach(width:Int, height:Int, callback: (x:Int, y:Int, n:Int) -> Unit) {
 	var n = 0
-	for (x in 0 until width) for (y in 0 until height) {
+	for (y in 0 until height) for (x in 0 until width) {
 		callback(x, y, n)
 		n++
 	}

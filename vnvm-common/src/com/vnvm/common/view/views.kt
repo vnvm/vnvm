@@ -1,8 +1,10 @@
 package com.vnvm.common.view
 
 import com.vnvm.common.TimeSpan
+import com.vnvm.common.async.EventLoop
 import com.vnvm.common.async.Promise
 import com.vnvm.common.async.Signal
+import com.vnvm.common.clamp
 import com.vnvm.common.clamp01
 import com.vnvm.common.error.noImpl
 import com.vnvm.common.image.BitmapData
@@ -22,6 +24,16 @@ class Views(val graphics: GraphicsContext) : Updatable {
 		context.begin()
 		root.render(context)
 		context.end()
+	}
+
+	private var lastTime:Long = System.currentTimeMillis()
+	fun frame() {
+		val currentTime = System.currentTimeMillis()
+		val elapsed = (lastTime - currentTime).toInt()
+		val elapsedNormalized = elapsed.clamp(0, 40)
+		update(elapsedNormalized)
+		EventLoop.frame()
+		lastTime = currentTime
 	}
 
 	override fun update(dt: Int) {

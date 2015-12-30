@@ -11,14 +11,8 @@ class BinBytes(val data: ByteArray, val offset: Int = 0, val length: Int = data.
 	var position: Int = 0
 	val available: Int get() = length - position
 	val eof: Boolean get() = (available <= 0)
-	fun readUTFBytes(count: Int): String {
-		return String(readBytes(count), "UTF-8")
-	}
-
-	fun readUnsignedInt(): Int {
-		return readInt()
-	}
-
+	fun readUTFBytes(count: Int) = String(readBytes(count), "UTF-8")
+	fun readUnsignedInt() = readInt()
 	fun readUnsignedShort(): Int = readShort() and 0xFFFF
 	fun readInt(): Int {
 		val out = BitUtils.readIntLE(data, offset + position)
@@ -33,7 +27,9 @@ class BinBytes(val data: ByteArray, val offset: Int = 0, val length: Int = data.
 	}
 
 	fun readByte(): Int {
-		return data[offset + position++].toInt()
+		val out = data[offset + position]
+		position += 1
+		return out.toInt()
 	}
 
 	fun readBytes(count: Int): ByteArray {
@@ -55,7 +51,9 @@ class BinBytes(val data: ByteArray, val offset: Int = 0, val length: Int = data.
 	fun readUnsignedByte(): Int = readByte() and 0xFF
 
 	fun readStream(count: Int): BinBytes {
-		return BinBytes(data, offset + position, count)
+		val stream = BinBytes(data, offset + position, count)
+		position += count
+		return stream
 	}
 }
 

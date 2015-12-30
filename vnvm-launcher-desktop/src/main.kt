@@ -15,6 +15,7 @@ import com.vnvm.common.collection.foreach
 import com.vnvm.common.image.BitmapData
 import com.vnvm.common.view.Image
 import com.vnvm.common.view.Views
+import com.vnvm.engine.dividead.DivideadEngine
 import com.vnvm.graphics.GraphicsContext
 import com.vnvm.graphics.RenderContext
 import com.vnvm.graphics.Texture
@@ -24,21 +25,8 @@ import kotlin.properties.Delegates
 
 fun main(args: Array<String>) {
 	LwjglApplication(GdxApp({ views ->
-		val bmp = BitmapData(128, 128)
-		val texture = views.graphics.createTexture(bmp)
-		bmp.lock {
-			foreach(128, 128) { x, y, n ->
-				bmp.setPixel32(x, y, 0xFF0000FF.toInt())
-			}
-		}
-		val image = Image(texture)
-		image.x = 128.0
-		image.scaleX = 2.0
-		image.scaleY = 2.0
-		image.rotation = 0.1
-		views.root.addChild(image)
-		//views.root.scaleX = 2.0
-		//views.root.scaleY = 2.0
+
+		DivideadEngine.start(views)
 	}), LwjglApplicationConfiguration().apply {
 		width = 640;
 		height = 480;
@@ -61,13 +49,20 @@ class LibgdxTexture(
 	}
 
 	fun upload(data: BitmapData) {
-		val pixelsData = data.getPixels()
+		val pixelsData = data.getPixels(flipY = false)
 		val bb = ByteBuffer.allocateDirect(pixelsData.size)
 		bb.put(pixelsData)
 		bb.flip()
 		val pixmap = Gdx2DPixmap(bb, longArrayOf(0L, data.width.toLong(), data.height.toLong(), Gdx2DPixmap.GDX2D_FORMAT_RGBA8888.toLong()))
 		val pixmap2 = Pixmap(pixmap)
 		tex?.dispose()
+
+		/*
+		val pixmap2 = Pixmap(data.width, data.height, Pixmap.Format.RGBA8888)
+		foreach(data.width, data.height) { x, y, n ->
+			pixmap2.drawPixel(x, y, Integer.reverseBytes(data.getPixel32(x, y)))
+		}
+		*/
 		tex = com.badlogic.gdx.graphics.Texture(pixmap2)
 	}
 
@@ -163,15 +158,11 @@ class GdxApp(private val init: (views: Views) -> Unit) : ApplicationListener {
 	}
 
 	override public fun render(): Unit {
-		Gdx.gl.glClearColor(1f, 0f, 1f, 1f);
+		Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
 		Gdx.gl.glClear(GL.GL_COLOR_BUFFER_BIT);
 
-		//batches.begin()
-		//batches.draw(texture, 0f, 0f)
-		//batches.end()
-
 		views.render(context)
-		views.update(20)
+		views.frame()
 	}
 
 	override public fun resize(width: Int, height: Int): Unit {

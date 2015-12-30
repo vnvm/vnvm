@@ -1,7 +1,13 @@
 package com.vnvm.engine.dividead
 
 import com.vnvm.common.async.EventLoop
+import com.vnvm.common.collection.foreach
+import com.vnvm.common.image.BitmapData
+import com.vnvm.common.image.format.TGA
 import com.vnvm.common.io.LocalVirtualFileSystem
+import com.vnvm.common.view.Image
+import com.vnvm.common.view.Views
+import java.io.File
 
 /*
 class EngineMain extends Sprite {
@@ -44,11 +50,28 @@ object DivideadMain {
 			val scriptName = "aastart"
 			val scriptPos = 0
 			Game.newAsync(fs["dividead"]).then { game ->
-				var ab = AB(game);
+				var ab = AB(game)
 				//addChild(new GameScalerSprite(640, 480, game.gameSprite));
 				ab.loadScriptAsync(scriptName, scriptPos).then { success ->
-					ab.executeAsync();
+					ab.executeAsync()
 				}
+			}
+		}
+	}
+}
+
+object DivideadEngine {
+	fun start(views:Views) {
+		var fs = LocalVirtualFileSystem("assets")
+		val scriptName = "aastart"
+		val scriptPos = 0
+		Game.newAsync(fs["dividead"]).then { game ->
+			game.getImageCachedAsync("WAKU_C1.BMP").then { bitmapData ->
+				val texture = views.graphics.createTexture(bitmapData)
+				views.root.addChild(Image(texture))
+				//bitmapData.map { x, y, n -> BitmapData.color(x, y, 0x00, 0xFF) }
+				File("temp.tga").writeBytes(TGA.encode(bitmapData))
+
 			}
 		}
 	}

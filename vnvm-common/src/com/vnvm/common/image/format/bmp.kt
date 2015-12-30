@@ -6,7 +6,9 @@ import com.vnvm.common.MemoryI
 import com.vnvm.common.error.InvalidArgumentException
 import com.vnvm.common.error.InvalidOperationException
 import com.vnvm.common.image.BitmapData
+import com.vnvm.common.image.BitmapData8
 import com.vnvm.common.image.BmpColor
+import com.vnvm.common.image.Palette
 import com.vnvm.common.io.BinBytes
 
 object BMP {
@@ -66,26 +68,10 @@ object BMP {
 	}
 
 	private fun decodeRows8(bytes: BinBytes, bitmapData: BitmapData, palette: List<BmpColor>): Unit {
-		val width = bitmapData.width
-		val height = bitmapData.height;
-
-		val bmpData = ByteArray(width * height * 4)
-		val paletteInt = palette.map { it.getPixel32() }.toIntArray()
-
-		Memory.select(bmpData) {
-			for (y in 0 until height) {
-				var n = (height - y - 1) * width;
-				for (x in 0 until width) {
-					var index = bytes.readUnsignedByte();
-					//Log.trace(Std.format("INDEX: $index, ${palette.length}"));
-					MemoryI[n++] = paletteInt[index]
-				}
-			}
-			bitmapData.setPixels(IRectangle(0, 0, width, height), bmpData);
-		}
-
-		// Free memory
-		Memory.free(bmpData);
+		val bmp8 = BitmapData8(bitmapData.width, bitmapData.height)
+		//println(bmp8[0, 0])
+		bmp8.setPixels(bmp8.rect, bytes.readBytes(bitmapData.width * bitmapData.height))
+		bmp8.drawToBitmapDataWithPalette(bitmapData, Palette(palette))
 	}
 
 	private fun decodeRows24(bytes: BinBytes, bitmapData: BitmapData): Unit {

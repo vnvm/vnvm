@@ -2,6 +2,7 @@ package com.vnvm.common.image
 
 import com.vnvm.common.*
 import com.vnvm.common.collection.foreach
+import com.vnvm.common.collection.getu
 import com.vnvm.common.log.Log
 
 class BitmapData8(val width: Int, val height: Int) {
@@ -12,8 +13,8 @@ class BitmapData8(val width: Int, val height: Int) {
 	companion object {
 		fun createWithBitmapData(bitmapData32: BitmapData): BitmapData8 {
 			var bitmapData8 = createNewWithSize(bitmapData32.width, bitmapData32.height)
-			bitmapData8.palette.colors[0] = BmpColor(0xFF, 0xFF, 0xFF, 0x00)
-			bitmapData8.palette.colors[1] = BmpColor(0xFF, 0xFF, 0xFF, 0xFF)
+			bitmapData8.palette.colors[0].set(BmpColor(0xFF, 0xFF, 0xFF, 0x00))
+			bitmapData8.palette.colors[1].set(BmpColor(0xFF, 0xFF, 0xFF, 0xFF))
 			for (y in 0 until bitmapData32.height) {
 				for (x in 0 until bitmapData32.width) {
 					if (bitmapData32.getPixel32(x, y) != 0) {
@@ -156,7 +157,13 @@ class BitmapData8(val width: Int, val height: Int) {
 		this.drawToBitmapDataWithPalette(bmp, this.palette, rect)
 	}
 
-	public fun drawToBitmapDataWithPalette(bmp: BitmapData, palette: Palette, rect: IRectangle) {
+	public fun applyPalette(palette: Palette): BitmapData {
+		val out = BitmapData(width, height)
+		drawToBitmapDataWithPalette(out, palette, rect)
+		return out
+	}
+
+	public fun drawToBitmapDataWithPalette(bmp: BitmapData, palette: Palette, rect: IRectangle = this.rect) {
 		var rectX: Int = rect.x
 		var rectY: Int = rect.y
 		var rectW: Int = rect.width
@@ -175,7 +182,7 @@ class BitmapData8(val width: Int, val height: Int) {
 				//Log.trace(Std.format("($srcPos, $dstPos) :: ($rectX, $rectY, $rectW, $rectH)"))
 
 				for (x in 0 until rectW) {
-					Memory.setI32(dstPos, colorsPalette[_data[srcPos].toInt()])
+					Memory.setI32(dstPos, colorsPalette[_data.getu(srcPos)])
 					dstPos += 4
 					srcPos += 1
 				}
@@ -187,9 +194,14 @@ class BitmapData8(val width: Int, val height: Int) {
 	}
 
 	public fun getIndex(x: Int, y: Int): Int = y * width + x
-	public fun getPixel(x: Int, y: Int): Int = data[getIndex(x, y)].toInt()
+	public fun getPixel(x: Int, y: Int): Int = data.getu(getIndex(x, y))
 	public fun setPixel(x: Int, y: Int, colorIndex: Int) {
 		data[getIndex(x, y)] = colorIndex.toByte()
+	}
+
+	operator fun get(x: Int, y: Int): Int = data.getu(getIndex(x, y))
+	operator fun set(x: Int, y: Int, value:Int): Unit {
+		data[getIndex(x, y)] = value.toByte()
 	}
 
 	public fun drawToBitmapData8(dst: BitmapData8, px: Int, py: Int) {
@@ -215,4 +227,13 @@ class BitmapData8(val width: Int, val height: Int) {
 	}
 
 	public fun inBounds(x: Int, y: Int): Boolean = (x >= 0 && y >= 0 && x < width && y < height)
+
+	fun setPixels(rect: IRectangle, bytes: ByteArray) {
+		for (y in 0 until rect.height) {
+			val indexBmp = getIndex(rect.x, rect.y + y)
+			val indexBytes = y * rect.width
+			val size = rect.width
+			System.arraycopy(bytes, indexBytes, data, indexBmp, size)
+		}
+	}
 }
