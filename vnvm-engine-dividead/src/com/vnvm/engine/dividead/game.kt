@@ -6,12 +6,12 @@ import com.vnvm.common.async.Promise
 import com.vnvm.common.image.BitmapData
 import com.vnvm.common.image.BitmapDataUtils
 import com.vnvm.common.io.VfsFile
-import com.vnvm.common.io.VirtualFileSystem
 import com.vnvm.common.log.Log
 import com.vnvm.common.script.ScriptOpcodes
 import com.vnvm.common.view.*
 
 class Game(
+	val views: Views,
 	val fileSystem: VfsFile,
 	val sg: VfsFile,
 	val wv: VfsFile
@@ -45,23 +45,26 @@ class Game(
 	//}
 
 	public var gameSprite = Sprite().apply {
-		addChild(Bitmap(front, PixelSnapping.AUTO, true));
+		val texture = views.graphics.createTexture(front)
+		//addChild(Bitmap(front, PixelSnapping.AUTO, true));
+		addChild(Image(texture));
 		addChild(textField);
 		//addChild(optionList.sprite);
 		addChild(overlaySprite);
 	}
 
-	public fun isSkipping() = GameInput.isPressing(Keys.Control);
+	//public fun isSkipping() = GameInput.isPressing(Keys.Control);
+	public fun isSkipping() = false
 
 	companion object {
 		private fun addExtensionsWhenRequired(name: String, expectedExtension: String): String {
 			return if (name.indexOf(".") >= 0) name else name + "." + expectedExtension
 		}
 
-		fun newAsync(fileSystem: VfsFile): Promise<Game> {
+		fun newAsync(views: Views, fileSystem: VfsFile): Promise<Game> {
 			return getDl1Async(fileSystem["SG.DL1"]).pipe { sg ->
 				getDl1Async(fileSystem["WV.DL1"]).then { wv ->
-					Game(fileSystem, sg, wv);
+					Game(views, fileSystem, sg, wv);
 				}
 			}
 		}

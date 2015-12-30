@@ -1,16 +1,15 @@
 package com.vnvm.engine.dividead
 
-import com.vnvm.common.*
+import com.vnvm.common.IRectangle
+import com.vnvm.common.Sound
 import com.vnvm.common.async.Promise
 import com.vnvm.common.async.unit
 import com.vnvm.common.error.noImpl
 import com.vnvm.common.image.BitmapDataUtils
 import com.vnvm.common.log.Log
+import com.vnvm.common.milliseconds
 import com.vnvm.common.script.Opcode
-import com.vnvm.common.view.Bitmap
-import com.vnvm.common.view.GameInput
-import com.vnvm.common.view.PixelSnapping
-import com.vnvm.common.view.Sprite
+import com.vnvm.common.seconds
 
 class AB_OP(val ab: AB) {
 	//static var margin = { x = 108, y = 400, h = 12 };
@@ -77,8 +76,9 @@ class AB_OP(val ab: AB) {
 
 	@Opcode(id = 0x00, format = "T", description = "Prints a text on the screen", savepoint = true)
 	//@Unimplemented
-	public fun TEXT(text: String) {
+	public fun TEXT(text: String): Promise<Unit> {
 		println("TEXT: $text")
+		return game.gameSprite.timers.waitAsync(5.seconds)
 		/*
 		game.textField.text = text.replace('@', '"')
 

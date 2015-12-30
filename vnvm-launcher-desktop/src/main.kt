@@ -11,9 +11,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Affine2
 import com.badlogic.jglfw.gl.GL
 import com.vnvm.common.collection.Stack
-import com.vnvm.common.collection.foreach
 import com.vnvm.common.image.BitmapData
-import com.vnvm.common.view.Image
 import com.vnvm.common.view.Views
 import com.vnvm.engine.dividead.DivideadEngine
 import com.vnvm.graphics.GraphicsContext
@@ -56,6 +54,8 @@ class LibgdxTexture(
 		val pixmap = Gdx2DPixmap(bb, longArrayOf(0L, data.width.toLong(), data.height.toLong(), Gdx2DPixmap.GDX2D_FORMAT_RGBA8888.toLong()))
 		val pixmap2 = Pixmap(pixmap)
 		tex?.dispose()
+
+		//println("upload texture")
 
 		/*
 		val pixmap2 = Pixmap(data.width, data.height, Pixmap.Format.RGBA8888)

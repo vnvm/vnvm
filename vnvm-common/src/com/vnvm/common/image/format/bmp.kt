@@ -72,6 +72,7 @@ object BMP {
 		//println(bmp8[0, 0])
 		bmp8.setPixels(bmp8.rect, bytes.readBytes(bitmapData.width * bitmapData.height))
 		bmp8.drawToBitmapDataWithPalette(bitmapData, Palette(palette))
+		bitmapData.flipY()
 	}
 
 	private fun decodeRows24(bytes: BinBytes, bitmapData: BitmapData): Unit {

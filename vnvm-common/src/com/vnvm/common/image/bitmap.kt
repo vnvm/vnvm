@@ -44,8 +44,7 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 	}
 
 	fun copyPixels(from: BitmapData, rect: IRectangle, pos: IPoint): Unit {
-		// CHECK BOUNDS!
-		this.setPixels(rect.translate(pos.x, pos.y), from.getPixels(rect))
+		draw(from, rect, pos.x, pos.y)
 	}
 
 	fun getPixel32(x: Int, y: Int): Int {
@@ -64,9 +63,23 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 
 	//fun draw(bitmapData: BitmapData, matrix: Matrix): Unit = noImpl
 
-	fun draw(bitmapData: BitmapData, x: Int, y: Int): Unit {
-		//noImpl
-		println("## DRAWING!")
+	fun draw(bitmapData: BitmapData, rect:IRectangle, px: Int, py: Int): Unit {
+		lock {
+			for (y in 0 until rect.height) {
+				for (x in 0 until rect.width) {
+					val tx = px + x
+					val ty = py + y
+					if (tx < 0 || tx >= this.width) break
+					if (ty < 0 || ty >= this.height) break
+					this.setPixel32(tx, ty, bitmapData.getPixel32(x + rect.x, y + rect.y))
+				}
+			}
+			//println("drawn!")
+		}
+	}
+
+	fun draw(bitmapData: BitmapData, px: Int, py: Int): Unit {
+		draw(bitmapData, bitmapData.rect, px, py)
 	}
 
 	fun getPixels(rect: IRectangle = this.rect, flipY: Boolean = false): ByteArray {
@@ -102,6 +115,18 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 			//println("$width, $height, $x, $y, $n")
 			val color = Memory.getI32(data, n * 4)
 			callback(x, y, n, color)
+		}
+	}
+
+	fun flipY() {
+		val temp = ByteArray(width * 4)
+		for (y in 0 until height) {
+			val row1 = getOffset(0, y)
+			val row2 = getOffset(0, height - y - 1)
+			val size = width * 4
+			System.arraycopy(data, row1, temp, 0, size)
+			System.arraycopy(data, row2, data, row1, size)
+			System.arraycopy(temp, 0, data, row2, size)
 		}
 	}
 }

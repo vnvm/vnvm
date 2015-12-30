@@ -7,11 +7,12 @@ import java.lang.reflect.Method
 data class Instruction2(
 	val script: String,
 	val opcode: OpcodeInfo,
-	val parameters: Array<Any?>,
+	val parameters: Array<Any>,
 	val position: Int = 0,
 	val size: Int = -1
 ) {
-	public fun call(obj: Any): Any {
+	val method = opcode.method
+	public fun call(obj: Any): Any? {
 		if (opcode.info.unimplemented) {
 			Log.trace("Unimplemented: $this");
 		} else if (opcode.info.untested) {
@@ -19,16 +20,13 @@ data class Instruction2(
 		} else if (!opcode.info.skipLog) {
 			Log.trace("Executing... $this");
 		}
-		println("EXECUTE: $this")
-		try {
-			return opcode.method.invoke(obj, *parameters);
-		} catch (e:Throwable) {
-			println(obj)
-			println(opcode.method)
-			println(parameters)
-			println(e)
-			return Unit
-		}
+		//try {
+			return method(obj, *parameters);
+		//} catch (e:Throwable) {
+		//	val paramcount = parameters.size
+		//	println("FAILED: this=$this : obj=$obj : method=${opcode.method} : paramcount=$paramcount, parameters=${parameters.toList()} : e=$e")
+		//	throw e
+		//}
 	}
 
 	override public fun toString(): String {

@@ -29,7 +29,7 @@ class Views(val graphics: GraphicsContext) : Updatable {
 	private var lastTime:Long = System.currentTimeMillis()
 	fun frame() {
 		val currentTime = System.currentTimeMillis()
-		val elapsed = (lastTime - currentTime).toInt()
+		val elapsed = (currentTime - lastTime).toInt()
 		val elapsedNormalized = elapsed.clamp(0, 40)
 		update(elapsedNormalized)
 		EventLoop.frame()

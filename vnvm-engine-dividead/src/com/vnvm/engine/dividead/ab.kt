@@ -24,7 +24,7 @@ class AB(public var game: Game) {
 		}
 	}
 
-	fun parseParam(type: Char): Any? {
+	fun parseParam(type: Char): Any {
 		return when (type) {
 			'F' -> script.readShort().clamp(0, 999)
 			'2' -> script.readShort()
@@ -35,7 +35,7 @@ class AB(public var game: Game) {
 		}
 	}
 
-	private fun parseParams(format: String): List<Any?> {
+	private fun parseParams(format: String): List<Any> {
 		return format.map { parseParam(it) }
 	}
 
@@ -48,7 +48,7 @@ class AB(public var game: Game) {
 		var instruction = Instruction2(scriptName, opcode, params, opcodePosition, this.script.position - opcodePosition)
 		var result = instruction.call(this.abOp)
 
-		return Promise.resolved(result)
+		return Promise.resolved(result ?: Unit)
 	}
 
 	private fun hasMore() = this.script.position < this.script.length
@@ -103,8 +103,11 @@ class AB(public var game: Game) {
 	}
 
 	public fun paintAsync(pos: Int, type: Int): Promise<Unit> {
+		//game.front.copyPixels(game.back, game.back.rect, IPoint(0, 0))
+		//return Promise.unit
+
 		if ((type == 0) || game.isSkipping()) {
-			game.front.copyPixels(game.back, IRectangle(0, 0, 640, 480), IPoint(0, 0))
+			game.front.copyPixels(game.back, game.back.rect, IPoint(0, 0))
 			return game.gameSprite.timers.waitAsync(4.milliseconds)
 		}
 
