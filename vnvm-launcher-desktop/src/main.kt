@@ -28,7 +28,7 @@ fun main(args: Array<String>) {
 	}), LwjglApplicationConfiguration().apply {
 		width = 640;
 		height = 480;
-		title = "HelloWorld";
+		title = "VNVM";
 	});
 }
 
@@ -47,7 +47,7 @@ class LibgdxTexture(
 	}
 
 	fun upload(data: BitmapData) {
-		val pixelsData = data.getPixels(flipY = false)
+		val pixelsData = data.getPixels(flipY = true)
 		val bb = ByteBuffer.allocateDirect(pixelsData.size)
 		bb.put(pixelsData)
 		bb.flip()
@@ -135,9 +135,6 @@ class LibgdxContext : RenderContext, GraphicsContext {
 class GdxApp(private val init: (views: Views) -> Unit) : ApplicationListener {
 	var views by Delegates.notNull<Views>()
 	var context by Delegates.notNull<RenderContext>()
-	var texture by Delegates.notNull<com.badlogic.gdx.graphics.Texture>()
-	//private var batch: SpriteBatch;
-	//private var font: BitmapFont;
 
 	override public fun create(): Unit {
 
@@ -145,16 +142,9 @@ class GdxApp(private val init: (views: Views) -> Unit) : ApplicationListener {
 		this.context = context
 		this.views = Views(context)
 		init(this.views)
-		//texture = com.badlogic.gdx.graphics.Texture("test.png")
-		val pixmap = Pixmap(128, 128, Pixmap.Format.RGBA8888)
-		pixmap.setColor(Color.BLUE)
-		pixmap.fillRectangle(0, 0, 128, 128)
-		texture = com.badlogic.gdx.graphics.Texture(pixmap)
 	}
 
 	override public fun dispose() {
-		//batch.dispose();
-		//font.dispose();
 	}
 
 	override public fun render(): Unit {

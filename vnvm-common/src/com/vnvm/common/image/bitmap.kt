@@ -31,6 +31,7 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 	fun setPixels(rect: IRectangle, data: ByteArray, flipY: Boolean = false): Unit {
 		lock {
 			val r = rect.intersection(this.rect)
+			//val r = rect
 			_transfer(r, data, true, flipY)
 		}
 	}
@@ -51,7 +52,7 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 		return Memory.getI32(data, getOffset(x, y))
 	}
 
-	fun setPixel32(x: Int, y: Int, value:Int): Unit {
+	fun setPixel32(x: Int, y: Int, value: Int): Unit {
 		Memory.setI32(data, getOffset(x, y), value)
 	}
 
@@ -63,7 +64,7 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 
 	//fun draw(bitmapData: BitmapData, matrix: Matrix): Unit = noImpl
 
-	fun draw(bitmapData: BitmapData, rect:IRectangle, px: Int, py: Int): Unit {
+	fun draw(bitmapData: BitmapData, rect: IRectangle, px: Int, py: Int): Unit {
 		lock {
 			for (y in 0 until rect.height) {
 				for (x in 0 until rect.width) {
@@ -94,14 +95,14 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 	}
 
 	companion object {
-		fun color(r:Int, g:Int, b:Int, a:Int):Int = BitUtils.pack32(r, g, b, a)
-		fun r(color:Int):Byte = (color ushr 0).toByte()
-		fun g(color:Int):Byte = (color ushr 8).toByte()
-		fun b(color:Int):Byte = (color ushr 16).toByte()
-		fun a(color:Int):Byte = (color ushr 24).toByte()
+		fun color(r: Int, g: Int, b: Int, a: Int): Int = BitUtils.pack32(r, g, b, a)
+		fun r(color: Int): Byte = (color ushr 0).toByte()
+		fun g(color: Int): Byte = (color ushr 8).toByte()
+		fun b(color: Int): Byte = (color ushr 16).toByte()
+		fun a(color: Int): Byte = (color ushr 24).toByte()
 	}
 
-	inline fun map(callback: (x:Int, y:Int, n:Int) -> Int) {
+	inline fun map(callback: (x: Int, y: Int, n: Int) -> Int) {
 		lock {
 			foreach(width, height) { x, y, n ->
 				//println("$width, $height, $x, $y, $n")
@@ -110,7 +111,7 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 		}
 	}
 
-	fun foreach(callback: (x:Int, y:Int, n:Int, color:Int) -> Unit) {
+	fun foreach(callback: (x: Int, y: Int, n: Int, color: Int) -> Unit) {
 		foreach(width, height) { x, y, n ->
 			//println("$width, $height, $x, $y, $n")
 			val color = Memory.getI32(data, n * 4)
@@ -119,14 +120,16 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 	}
 
 	fun flipY() {
-		val temp = ByteArray(width * 4)
-		for (y in 0 until height) {
-			val row1 = getOffset(0, y)
-			val row2 = getOffset(0, height - y - 1)
-			val size = width * 4
-			System.arraycopy(data, row1, temp, 0, size)
-			System.arraycopy(data, row2, data, row1, size)
-			System.arraycopy(temp, 0, data, row2, size)
+		lock {
+			val temp = ByteArray(width * 4)
+			val size = temp.size
+			for (y in 0 until height / 2) {
+				val row1 = getOffset(0, y)
+				val row2 = getOffset(0, height - y - 1)
+				System.arraycopy(data, row1, temp, 0, size)
+				System.arraycopy(data, row2, data, row1, size)
+				System.arraycopy(temp, 0, data, row2, size)
+			}
 		}
 	}
 }

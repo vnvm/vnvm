@@ -79,20 +79,21 @@ object BMP {
 		var width = bitmapData.width
 		var height = bitmapData.height
 
-		var bmpData = ByteArray(width * height * 4)
-		var opos = 0
+		var row = ByteArray(width * 4)
 		for (y in 0 until height) {
+			var opos = 0
 			for (x in 0 until width) {
 				val r = bytes.readUnsignedByte().toByte()
 				val g = bytes.readUnsignedByte().toByte()
 				val b = bytes.readUnsignedByte().toByte()
 				val a = 0xFF.toByte()
-				bmpData[opos++] = a
-				bmpData[opos++] = b
-				bmpData[opos++] = g
-				bmpData[opos++] = r
+				row[opos++] = b
+				row[opos++] = g
+				row[opos++] = r
+				row[opos++] = a
 			}
-			bitmapData.setPixels(IRectangle(0, height - y - 1, width, 1), bmpData);
+			bitmapData.setPixels(IRectangle(0, height - y - 1, width, 1), row);
+			//bitmapData.setPixels(IRectangle(0, y, width, 1), row);
 		}
 	}
 }

@@ -209,10 +209,10 @@ class BitmapData8(val width: Int, val height: Int) {
 	}
 
 	public fun fillRect(color: Int, rect: IRectangle) {
-		var rectX: Int = (rect.x)
-		var rectY: Int = (rect.y)
-		var rectW: Int = (rect.width)
-		var rectH: Int = (rect.height)
+		var rectX = (rect.x)
+		var rectY = (rect.y)
+		var rectW = (rect.width)
+		var rectH = (rect.height)
 		rectX = rectX.clamp(0, this.width - 1)
 		rectY = rectY.clamp(0, this.height - 1)
 		rectW = rectW.clamp(0, this.width - 1 - rectX)
