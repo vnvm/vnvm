@@ -1,4 +1,3 @@
-import com.vnvm.common.error.noImpl
 import com.vnvm.common.script.Opcode
 import com.vnvm.common.script.ScriptOpcodes
 import org.junit.Assert

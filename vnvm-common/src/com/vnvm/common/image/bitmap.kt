@@ -2,12 +2,14 @@ package com.vnvm.common.image
 
 import com.vnvm.common.*
 import com.vnvm.common.collection.foreach
+import com.vnvm.graphics.TextureSlice
 
 enum class BitmapDataChannel {
 	RED, GREEN, BLUE, ALPHA
 }
 
 class BitmapData(val width: Int, val height: Int, val transparent: Boolean = true, val color: Int = -1) {
+	var texture: TextureSlice? = null
 	val data: ByteArray = ByteArray(width * height * 4)
 	val rect = IRectangle(0, 0, width, height)
 	var version = 0
@@ -137,7 +139,7 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 
 object BitmapDataUtils {
 	fun slice(source: BitmapData, rect: IRectangle): BitmapData {
-		var destination: BitmapData = BitmapData(rect.width, rect.height);
+		var destination = BitmapData(rect.width, rect.height);
 		destination.copyPixels(source, rect, IPoint(0, 0))
 		return destination;
 	}

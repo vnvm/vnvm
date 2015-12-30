@@ -40,9 +40,9 @@ object BMP {
 		val colorsUsed = if (colorsUsed0 == 0) 0x100 else colorsUsed0
 		val palette = if (bitCount == 8) {
 			(0 until colorsUsed).map {
-				val b = bytes.readUnsignedByte();
-				val g = bytes.readUnsignedByte();
 				val r = bytes.readUnsignedByte();
+				val g = bytes.readUnsignedByte();
+				val b = bytes.readUnsignedByte();
 				val reserved = bytes.readUnsignedByte();
 				BmpColor(r, g, b, 0xFF)
 			}

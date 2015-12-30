@@ -46,8 +46,8 @@ class Game(
 
 	public var gameSprite = Sprite().apply {
 		val texture = views.graphics.createTexture(front)
-		//addChild(Bitmap(front, PixelSnapping.AUTO, true));
-		addChild(Image(texture));
+		addChild(Bitmap(front, PixelSnapping.AUTO, true));
+		//addChild(Image(texture));
 		addChild(textField);
 		//addChild(optionList.sprite);
 		addChild(overlaySprite);

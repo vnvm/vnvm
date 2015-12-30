@@ -10,7 +10,6 @@ import com.vnvm.common.error.noImpl
 import com.vnvm.common.image.BitmapData
 import com.vnvm.graphics.GraphicsContext
 import com.vnvm.graphics.RenderContext
-import com.vnvm.graphics.Texture
 import com.vnvm.graphics.TextureSlice
 
 interface Updatable {
@@ -19,14 +18,34 @@ interface Updatable {
 
 class Views(val graphics: GraphicsContext) : Updatable {
 	public val root = Sprite()
+	val usedBitmapDatas = hashSetOf<BitmapData>()
+	val lastFrameBitmapDatas = hashSetOf<BitmapData>()
+
+	var frames = 0
 
 	fun render(context: RenderContext) {
+		if (frames++ == 0) {
+			usedBitmapDatas.clear()
+		}
 		context.begin()
-		root.render(context)
+		root.render(this, context)
 		context.end()
+		lastFrameBitmapDatas.addAll(usedBitmapDatas)
+		if (frames >= 60) {
+			frames = 0
+			val texturesToRemove = lastFrameBitmapDatas.subtract(usedBitmapDatas)
+			if (texturesToRemove.isNotEmpty()) {
+				println("textures to remove!")
+				for (tex in texturesToRemove) {
+					tex.texture?.texture?.dispose()
+					tex.texture = null
+				}
+				lastFrameBitmapDatas.clear()
+			}
+		}
 	}
 
-	private var lastTime:Long = System.currentTimeMillis()
+	private var lastTime: Long = System.currentTimeMillis()
 	fun frame() {
 		val currentTime = System.currentTimeMillis()
 		val elapsed = (currentTime - lastTime).toInt()
@@ -56,7 +75,6 @@ class UpdatableGroup : Updatable {
 		for (n in 0 until items.size) items[n].update(dt)
 	}
 }
-
 
 
 class Timers : Updatable {
@@ -132,9 +150,9 @@ open class DisplayObject {
 		return updatable
 	}
 
-	fun addUpdatable(updatable: (dt: Int) -> Unit) = object : Updatable {
+	fun addUpdatable(updatable: (dt: Int) -> Unit) = addUpdatable(object : Updatable {
 		override fun update(dt: Int) = updatable(dt)
-	}
+	})
 
 	fun update(dt: Int): Unit {
 		val dt = (dt * speed).toInt()
@@ -142,16 +160,16 @@ open class DisplayObject {
 		for (n in 0 until updatables.size) updatables[n].update(dt)
 	}
 
-	fun render(context: RenderContext): Unit {
+	fun render(views: Views, context: RenderContext): Unit {
 		context.save()
 		context.translate(x, y)
 		context.scale(scaleX, scaleY)
 		context.rotate(rotation)
-		renderInternal(context)
+		renderInternal(views, context)
 		context.restore()
 	}
 
-	open fun renderInternal(context: RenderContext): Unit {
+	open fun renderInternal(views: Views, context: RenderContext): Unit {
 	}
 
 	open protected fun updateInternal(dt: Int) {
@@ -169,8 +187,8 @@ open class Sprite : DisplayObject() {
 		children.clear()
 	}
 
-	override fun renderInternal(context: RenderContext): Unit {
-		for (n in 0 until children.size) children[n].render(context)
+	override fun renderInternal(views: Views, context: RenderContext): Unit {
+		for (n in 0 until children.size) children[n].render(views, context)
 	}
 
 	override protected fun updateInternal(dt: Int) {
@@ -183,14 +201,13 @@ enum class PixelSnapping { AUTO }
 class Bitmap(val data: BitmapData, val snapping: PixelSnapping = PixelSnapping.AUTO, val smooth: Boolean = true) : DisplayObject() {
 	var width = data.width
 	var height = data.height
-}
 
-class Image(val data: TextureSlice, val snapping: PixelSnapping = PixelSnapping.AUTO, val smooth: Boolean = true) : DisplayObject() {
-	var width = data.width
-	var height = data.height
-
-	override fun renderInternal(context: RenderContext) {
-		context.quad(data, width, height)
+	override fun renderInternal(views: Views, context: RenderContext) {
+		views.usedBitmapDatas.add(data)
+		if (data.texture == null) {
+			data.texture = context.createTexture(data)
+		}
+		context.quad(data.texture!!, width.toDouble(), height.toDouble())
 	}
 }
 
@@ -206,6 +223,10 @@ open class TextField : DisplayObject() {
 	var text: String = ""
 	var selectable: Boolean = false
 	var textColor: Int = -1
+
+	override fun renderInternal(views: Views, context: RenderContext) {
+		context.text(text)
+	}
 }
 
 enum class Keys(val value: Int) {

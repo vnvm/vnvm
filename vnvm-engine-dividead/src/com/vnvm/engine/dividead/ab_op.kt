@@ -10,6 +10,8 @@ import com.vnvm.common.log.Log
 import com.vnvm.common.milliseconds
 import com.vnvm.common.script.Opcode
 import com.vnvm.common.seconds
+import com.vnvm.common.view.Bitmap
+import com.vnvm.common.view.Sprite
 
 class AB_OP(val ab: AB) {
 	//static var margin = { x = 108, y = 400, h = 12 };
@@ -77,25 +79,25 @@ class AB_OP(val ab: AB) {
 	@Opcode(id = 0x00, format = "T", description = "Prints a text on the screen", savepoint = true)
 	//@Unimplemented
 	public fun TEXT(text: String): Promise<Unit> {
-		println("TEXT: $text")
-		return game.gameSprite.timers.waitAsync(5.seconds)
-		/*
+		//println("TEXT: $text")
 		game.textField.text = text.replace('@', '"')
 
 		return game.getImageCachedAsync("waku_p").pipe { wakuB ->
 			var slices = (0 until 9).map { Bitmap(BitmapDataUtils.slice(wakuB, IRectangle(18 * it, 144, 18, 18))) }
 			var animated = Sprite();
-			animated.addUpdatable { u ->
+			var totalTime = 0
+			animated.addUpdatable { dt ->
+				totalTime += dt
 				animated.removeChildren();
-				animated.addChild(slices[(u.totalMs / 100) % slices.size]);
-				//u.dt
+				animated.addChild(slices[(totalTime / 100) % slices.size]);
 			}
 			game.overlaySprite.removeChildren();
 			game.overlaySprite.addChild(animated);
 			var promise = if (game.isSkipping()) {
 				game.gameSprite.timers.waitAsync(50.milliseconds);
 			} else {
-				Promise.fromAnySignalOnce(GameInput.onClick, GameInput.onKeyPress);
+				game.gameSprite.timers.waitAsync(5000.milliseconds);
+				//Promise.fromAnySignalOnce(GameInput.onClick, GameInput.onKeyPress);
 			}
 			animated.x = 520.0;
 			animated.y = 448.0;
@@ -103,13 +105,9 @@ class AB_OP(val ab: AB) {
 			promise.then { e ->
 				game.textField.text = "";
 				game.overlaySprite.removeChildren();
-				if (game.voiceChannel != null) {
-					game.voiceChannel.stop();
-					game.voiceChannel = null;
-				}
+				game.voiceChannel.stop();
 			}
 		}
-		*/
 	}
 
 	@Opcode(id = 0x50, format = "T", description = "Sets the title for the save")

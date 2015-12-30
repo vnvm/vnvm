@@ -8,9 +8,9 @@ class GameState {
 
 	public var options = arrayListOf<Option>()
 	public var optionsMap = arrayListOf<MapOption>()
-	public var flags: IntArray = IntArray(1000)
-	public var title: String = "NoTitle"
-	public var mapImage1: String = ""
-	public var mapImage2: String = ""
-	public var background: String = ""
+	public var flags = IntArray(1000)
+	public var title = "NoTitle"
+	public var mapImage1 = ""
+	public var mapImage2 = ""
+	public var background = ""
 }

@@ -3,7 +3,7 @@ package com.vnvm.graphics
 import com.vnvm.common.Disposable
 import com.vnvm.common.image.BitmapData
 
-interface RenderContext {
+interface RenderContext : GraphicsContext {
 	fun begin(): Unit
 	fun save(): Unit
 	fun restore(): Unit
@@ -12,7 +12,7 @@ interface RenderContext {
 	fun scale(sx: Double, sy: Double): Unit
 	fun quad(tex: TextureSlice, width:Double = tex.width, height:Double = tex.height)
 	fun end(): Unit
-
+	fun text(text:String, x:Double = 0.0, y:Double = 0.0)
 }
 
 interface GraphicsContext {

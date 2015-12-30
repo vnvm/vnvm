@@ -5,6 +5,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
+import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.Gdx2DPixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
@@ -47,7 +48,7 @@ class LibgdxTexture(
 	}
 
 	fun upload(data: BitmapData) {
-		val pixelsData = data.getPixels(flipY = true)
+		val pixelsData = data.getPixels(flipY = false)
 		val bb = ByteBuffer.allocateDirect(pixelsData.size)
 		bb.put(pixelsData)
 		bb.flip()
@@ -74,6 +75,11 @@ class LibgdxTexture(
 
 class LibgdxContext : RenderContext, GraphicsContext {
 	val batch = SpriteBatch()
+	val font = BitmapFont()
+	//val font = BitmapFont(Gdx.files.internal("Anonymous.ttf"));
+	//val font = BitmapFont(Gdx.files.local("Anonymous.ttf"));
+	//val font = BitmapFont(Gdx.files.local("font.fnt"));
+
 
 	override fun createTexture(data: BitmapData): TextureSlice = TextureSlice(LibgdxTexture(data))
 
@@ -85,6 +91,7 @@ class LibgdxContext : RenderContext, GraphicsContext {
 		val height = Gdx.graphics.height.toFloat()
 		val camera = OrthographicCamera(width, height);
 		camera.setToOrtho(true, width, height);
+		//camera.setToOrtho(false, width, height);
 
 		camera.update();
 		batch.projectionMatrix = camera.combined;
@@ -114,6 +121,15 @@ class LibgdxContext : RenderContext, GraphicsContext {
 		affine.scale(sx.toFloat(), sy.toFloat())
 	}
 
+	override fun text(text:String, x:Double, y:Double) {
+		if (text.length > 0) {
+			//font.color = Color.RED
+
+			//font.draw(batch, text, x.toFloat(), y.toFloat() + font.descent)
+			font.draw(batch, text, 200f, 200f)
+		}
+	}
+
 	private val texreg = TextureRegion()
 
 	override fun quad(tex: TextureSlice, width: Double, height: Double) {
@@ -137,7 +153,6 @@ class GdxApp(private val init: (views: Views) -> Unit) : ApplicationListener {
 	var context by Delegates.notNull<RenderContext>()
 
 	override public fun create(): Unit {
-
 		val context = LibgdxContext()
 		this.context = context
 		this.views = Views(context)

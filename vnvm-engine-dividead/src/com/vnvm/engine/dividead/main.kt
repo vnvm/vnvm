@@ -1,12 +1,11 @@
 package com.vnvm.engine.dividead
 
 import com.vnvm.common.io.LocalVirtualFileSystem
-import com.vnvm.common.view.Image
+import com.vnvm.common.view.Bitmap
 import com.vnvm.common.view.Views
-import java.io.File
 
 object DivideadEngine {
-	fun start1(views:Views) {
+	fun start1(views: Views) {
 		///*
 		var fs = LocalVirtualFileSystem("assets")
 		val scriptName = "aastart"
@@ -19,8 +18,7 @@ object DivideadEngine {
 			*/
 
 			game.getImageCachedAsync("I_87.BMP").then { bitmapData ->
-				val texture = views.graphics.createTexture(bitmapData)
-				views.root.addChild(Image(texture))
+				views.root.addChild(Bitmap(bitmapData))
 				//bitmapData.map { x, y, n -> BitmapData.color(x, y, 0x00, 0xFF) }
 				//File("temp.tga").writeBytes(TGA.encode(bitmapData))
 
@@ -28,7 +26,8 @@ object DivideadEngine {
 		}
 
 	}
-	fun start2(views:Views) {
+
+	fun start2(views: Views) {
 		var fs = LocalVirtualFileSystem("assets")
 		val scriptName = "aastart"
 		val scriptPos = 0
@@ -42,6 +41,7 @@ object DivideadEngine {
 			}
 		}
 	}
+
 	fun start(views: Views) {
 		//start1(views)
 		start2(views)
