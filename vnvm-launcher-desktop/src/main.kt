@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.g2d.Gdx2DPixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Affine2
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.jglfw.gl.GL
 import com.vnvm.common.collection.Stack
 import com.vnvm.common.image.BitmapData
@@ -48,7 +49,8 @@ class LibgdxTexture(
 	}
 
 	fun upload(data: BitmapData) {
-		val pixelsData = data.getPixels(flipY = false)
+		//val pixelsData = data.getPixels(flipY = false)
+		val pixelsData = data.getPixels(flipY = true)
 		val bb = ByteBuffer.allocateDirect(pixelsData.size)
 		bb.put(pixelsData)
 		bb.flip()
@@ -75,7 +77,7 @@ class LibgdxTexture(
 
 class LibgdxContext : RenderContext, GraphicsContext {
 	val batch = SpriteBatch()
-	val font = BitmapFont()
+	val font = BitmapFont(Gdx.files.classpath("com/badlogic/gdx/utils/arial-15.fnt"), true)
 	//val font = BitmapFont(Gdx.files.internal("Anonymous.ttf"));
 	//val font = BitmapFont(Gdx.files.local("Anonymous.ttf"));
 	//val font = BitmapFont(Gdx.files.local("font.fnt"));
@@ -126,7 +128,9 @@ class LibgdxContext : RenderContext, GraphicsContext {
 			//font.color = Color.RED
 
 			//font.draw(batch, text, x.toFloat(), y.toFloat() + font.descent)
-			font.draw(batch, text, 200f, 200f)
+			val translation = affine.getTranslation(Vector2())
+
+			font.draw(batch, text, translation.x, translation.y)
 		}
 	}
 
