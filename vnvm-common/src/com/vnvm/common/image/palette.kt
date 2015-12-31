@@ -1,13 +1,13 @@
 package com.vnvm.common.image
 
 class Palette(
-	val colors: List<BmpColor> = (0 until 0x100).map { BmpColor(0, 0, 0, 0xFF) }.toArrayList()
+	val colors: List<MutableColor> = (0 until 0x100).map { MutableColor(0, 0, 0, 0xFF) }.toArrayList()
 ) {
 	public fun equals(dst: Palette) = this.colors == dst.colors
 
 	public fun interpolate(left: Palette, right: Palette, step: Double) {
 		for (n in 0 until Math.min(this.colors.size, Math.min(left.colors.size, right.colors.size))) {
-			this.colors[n].set(BmpColor.interpolate(left.colors[n], right.colors[n], step))
+			this.colors[n].setInterpolate(left.colors[n], right.colors[n], step)
 		}
 	}
 

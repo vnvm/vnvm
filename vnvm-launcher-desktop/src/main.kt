@@ -1,5 +1,6 @@
 import com.badlogic.gdx.ApplicationListener
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.badlogic.gdx.graphics.Color
@@ -22,14 +23,15 @@ import java.nio.ByteBuffer
 import kotlin.properties.Delegates
 
 fun main(args: Array<String>) {
-	LwjglApplication(GdxApp({ views ->
-
+	val app = GdxApp { views ->
 		DivideadEngine.start(views)
-	}), LwjglApplicationConfiguration().apply {
-		width = 640;
-		height = 480;
-		title = "VNVM";
-	});
+	}
+
+	LwjglApplication(app, LwjglApplicationConfiguration().apply {
+		width = 640
+		height = 480
+		title = "VNVM"
+	})
 }
 
 class LibgdxTexture(
@@ -73,11 +75,13 @@ class LibgdxTexture(
 	}
 }
 
-class LibgdxContext : RenderContext, GraphicsContext, InputContext {
-	override val onMouseClick = Signal<MouseEvent>()
-	override val onMouseMove = Signal<MouseEvent>()
-	override val onMouseDown = Signal<MouseEvent>()
-	override val onMouseUp = Signal<MouseEvent>()
+class LibgdxContext : RenderContext, GraphicsContext, InputContext, WindowContext {
+	override var title: String
+		get() = throw UnsupportedOperationException()
+		set(value) {
+			Gdx.graphics.setTitle(value)
+		}
+	override val onEvent = Signal<Event>()
 
 	val batch = SpriteBatch()
 	val font = BitmapFont(Gdx.files.classpath("com/badlogic/gdx/utils/arial-15.fnt"), true)
@@ -162,8 +166,60 @@ class GdxApp(private val init: (views: Views) -> Unit) : ApplicationListener {
 	override public fun create(): Unit {
 		val context = LibgdxContext()
 		this.context = context
-		this.views = Views(context, context)
+		this.views = Views(context, context, context)
 		init(this.views)
+		val clickEvent = MouseClickEvent(0.0, 0.0, 0)
+		val moveEvent = MouseMovedEvent(0.0, 0.0)
+		val keyDown = KeyDownEvent(0)
+		val keyUp = KeyUpEvent(0)
+		val keyPress = KeyPressEvent(0)
+		val onEvent = context.onEvent
+		Gdx.input.inputProcessor = object : InputProcessor {
+			override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+				clickEvent.x = screenX.toDouble()
+				clickEvent.y = screenY.toDouble()
+				clickEvent.button = button
+				onEvent.dispatch(clickEvent)
+				return true
+			}
+
+			override fun mouseMoved(screenX: Int, screenY: Int): Boolean {
+				moveEvent.x = screenX.toDouble()
+				moveEvent.y = screenY.toDouble()
+				onEvent.dispatch(moveEvent)
+				return true
+			}
+
+			override fun keyTyped(character: Char): Boolean {
+				keyPress.code = character.toInt()
+				onEvent.dispatch(keyPress)
+				return true
+			}
+
+			override fun touchDown(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
+				return true
+			}
+
+			override fun scrolled(amount: Int): Boolean {
+				return true
+			}
+
+			override fun keyUp(keycode: Int): Boolean {
+				keyUp.code = keycode
+				onEvent.dispatch(keyUp)
+				return true
+			}
+
+			override fun touchDragged(screenX: Int, screenY: Int, pointer: Int): Boolean {
+				return true
+			}
+
+			override fun keyDown(keycode: Int): Boolean {
+				keyDown.code = keycode
+				onEvent.dispatch(keyDown)
+				return true
+			}
+		}
 	}
 
 	override public fun dispose() {

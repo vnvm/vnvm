@@ -5,8 +5,14 @@ import com.vnvm.common.async.Promise
 import com.vnvm.common.async.unit
 import com.vnvm.common.collection.xrange
 import com.vnvm.common.error.InvalidOperationException
+import com.vnvm.common.error.noImpl
+import com.vnvm.common.image.BColor
+import com.vnvm.common.image.BitmapData
+import com.vnvm.common.image.Colors
+import com.vnvm.common.image.toInt
 import com.vnvm.common.io.BinBytes
 import com.vnvm.common.script.Instruction2
+import com.vnvm.common.view.Sprite
 
 class AB(public var game: Game) {
 	public var scriptName = ""
@@ -86,20 +92,16 @@ class AB(public var game: Game) {
 		this.running = false
 	}
 
-	public fun paintToColorAsync(color: List<Int>, time: TimeSpan): Promise<Unit> {
-		return Promise.unit
-		/*
-		var sprite = Sprite()
-		GraphicUtils.drawSolidFilledRectWithBounds(sprite.graphics, 0, 0, 640, 480, 0x000000, 1.0)
+	public fun paintToColorAsync(color: BColor, time: TimeSpan): Promise<Unit> {
+		val blackSprite = BitmapData(640, 480, true, color.toInt())
 
-		return game.gameSprite.animateAsync(time) { step ->
+		return game.gameSprite.tweens.animateAsync(time) { step ->
 			game.front.copyPixels(game.back, game.back.rect, IPoint(0, 0))
-			game.front.draw(sprite, null, ColorTransform(1, 1, 1, step, 0, 0, 0, 0))
-			if (step == 1) {
+			game.front.draw(blackSprite, blackSprite.rect, 0, 0, step)
+			if (step == 1.0) {
 				game.back.copyPixels(game.front, game.back.rect, IPoint(0, 0))
 			}
 		}
-		*/
 	}
 
 	public fun paintAsync(pos: Int, type: Int): Promise<Unit> {

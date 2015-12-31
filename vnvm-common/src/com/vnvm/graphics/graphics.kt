@@ -20,13 +20,26 @@ interface GraphicsContext {
 	fun createTexture(data: BitmapData): TextureSlice
 }
 
-data class MouseEvent(var x: Double, var y: Double, var buttons: Int)
+interface Event
+interface MouseEvent : Event {
+	var x: Double
+	var y: Double
+}
+interface KeyEvent : Event {
+	var code: Int
+}
+data class MouseMovedEvent(override var x: Double, override var y: Double) : MouseEvent
+data class MouseClickEvent(override var x: Double, override var y: Double, var button: Int) : MouseEvent
+data class KeyPressEvent(override var code:Int) : KeyEvent
+data class KeyDownEvent(override var code:Int) : KeyEvent
+data class KeyUpEvent(override var code:Int) : KeyEvent
 
 interface InputContext {
-	val onMouseClick: Signal<MouseEvent>
-	val onMouseMove: Signal<MouseEvent>
-	val onMouseDown: Signal<MouseEvent>
-	val onMouseUp: Signal<MouseEvent>
+	val onEvent: Signal<Event>
+}
+
+interface WindowContext {
+	var title: String
 }
 
 interface Texture : Disposable {

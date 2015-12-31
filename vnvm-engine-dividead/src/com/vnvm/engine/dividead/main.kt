@@ -7,7 +7,7 @@ import com.vnvm.common.view.Views
 import com.vnvm.io.IsoFile
 
 object DivideadEngine {
-	fun start1(views: Views, assets: VfsFile) {
+	fun runTest(views: Views, assets: VfsFile) {
 		Game.newAsync(views, assets).then { game ->
 			/*
 			game.sg["I_87.BMP"].readAllAsync().then {
@@ -24,7 +24,7 @@ object DivideadEngine {
 		}
 	}
 
-	fun start2(views: Views, assets: VfsFile) {
+	fun runGame(views: Views, assets: VfsFile) {
 		val scriptName = "aastart"
 		val scriptPos = 0
 		Game.newAsync(views, assets).then { game ->
@@ -40,11 +40,11 @@ object DivideadEngine {
 
 	fun start(views: Views) {
 		var fs = LocalVirtualFileSystem("assets")
-		fs["dividead.iso"].openAsync().pipe {
-			IsoFile.openAsync(it).then {
-				//start1(views, it)
-				start2(views, it)
-			}
+		views.window.title = "DiviDead"
+
+		IsoFile.openAsync(fs["dividead.iso"]).then {
+			//runTest(views, it)
+			runGame(views, it)
 		}
 	}
 }

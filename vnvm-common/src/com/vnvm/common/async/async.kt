@@ -2,6 +2,7 @@ package com.vnvm.common.async
 
 import com.vnvm.common.DateTime
 import com.vnvm.common.Disposable
+import com.vnvm.common.DisposableGroup
 import com.vnvm.common.TimeSpan
 import com.vnvm.common.collection.Queue
 import com.vnvm.common.collection.isEmpty
@@ -334,10 +335,26 @@ fun <T : Any> Signal<T>.pipeTo(that: Signal<T>) {
 	this.add { that.dispatch(it) }
 }
 
-fun <T : Any> Signal<T>.waitOneAsync(): Promise<T> {
-	val deferred = Promise.Deferred<T>()
-	this.once { deferred.resolve(it) }
+fun Promise.Companion.waitOneAsync(vararg signals: Signal<*>):Promise<Unit> {
+	val deferred = Promise.Deferred<Unit>()
+	val disposableGroup = DisposableGroup()
+	for (signal in signals) {
+		disposableGroup.add(signal.once { disposableGroup.dispose(); deferred.resolve(Unit) })
+	}
 	return deferred.promise
+}
+
+fun <T : Any> List<Signal<T>>.waitOneAsync(): Promise<T> {
+	val deferred = Promise.Deferred<T>()
+	val disposableGroup = DisposableGroup()
+	for (signal in this) {
+		disposableGroup.add(signal.once { disposableGroup.dispose(); deferred.resolve(it) })
+	}
+	return deferred.promise
+}
+
+fun <T : Any> Signal<T>.waitOneAsync(): Promise<T> {
+	return listOf(this).waitOneAsync()
 }
 
 class PromiseQueue() {

@@ -4,8 +4,10 @@ import com.vnvm.common.IRectangle
 import com.vnvm.common.Sound
 import com.vnvm.common.async.Promise
 import com.vnvm.common.async.unit
+import com.vnvm.common.async.waitOneAsync
 import com.vnvm.common.error.noImpl
 import com.vnvm.common.image.BitmapDataUtils
+import com.vnvm.common.image.Colors
 import com.vnvm.common.log.Log
 import com.vnvm.common.milliseconds
 import com.vnvm.common.script.Opcode
@@ -23,7 +25,7 @@ class AB_OP(val ab: AB) {
 	//  FLOW RELATED
 	// ---------------
 
-	@Opcode(id = 0x02, format = "P", description = "Jumps unconditionally to a fixed adress")
+	@Opcode(id = 0x02, format = "P", description = "Jumps unconditionally to a fixed address")
 	public fun JUMP(offset: Int) {
 		ab.jump(offset)
 	};
@@ -96,8 +98,8 @@ class AB_OP(val ab: AB) {
 			var promise = if (game.isSkipping()) {
 				game.gameSprite.timers.waitAsync(50.milliseconds);
 			} else {
-				game.gameSprite.timers.waitAsync(5000.milliseconds);
-				//Promise.fromAnySignalOnce(GameInput.onClick, GameInput.onKeyPress);
+				//game.gameSprite.timers.waitAsync(5000.milliseconds);
+				Promise.waitOneAsync(animated.keys.onKeyDown, animated.keys.onKeyPress, animated.mice.onMouseClick)
 			}
 			animated.x = 520.0;
 			animated.y = 448.0;
@@ -400,8 +402,8 @@ class AB_OP(val ab: AB) {
 	public fun REPAINT_IN(type: Int) = ab.paintAsync(1, type);
 
 	@Opcode(id = 0x1E, format = "", description = "Performs a fade out to color black")
-	public fun FADE_OUT_BLACK() = ab.paintToColorAsync(listOf(0x00, 0x00, 0x00), 1.seconds);
+	public fun FADE_OUT_BLACK() = ab.paintToColorAsync(Colors.BLACK, 1.seconds);
 
 	@Opcode(id = 0x1F, format = "", description = "Performs a fade out to color white")
-	public fun FADE_OUT_WHITE() = ab.paintToColorAsync(listOf(0xFF, 0xFF, 0xFF), 1.seconds);
+	public fun FADE_OUT_WHITE() = ab.paintToColorAsync(Colors.WHITE, 1.seconds);
 }

@@ -13,8 +13,8 @@ class BitmapData8(val width: Int, val height: Int) {
 	companion object {
 		fun createWithBitmapData(bitmapData32: BitmapData): BitmapData8 {
 			var bitmapData8 = createNewWithSize(bitmapData32.width, bitmapData32.height)
-			bitmapData8.palette.colors[0].set(BmpColor(0xFF, 0xFF, 0xFF, 0x00))
-			bitmapData8.palette.colors[1].set(BmpColor(0xFF, 0xFF, 0xFF, 0xFF))
+			bitmapData8.palette.colors[0].set(Color(0xFF, 0xFF, 0xFF, 0x00))
+			bitmapData8.palette.colors[1].set(Color(0xFF, 0xFF, 0xFF, 0xFF))
 			for (y in 0 until bitmapData32.height) {
 				for (x in 0 until bitmapData32.width) {
 					if (bitmapData32.getPixel32(x, y) != 0) {
@@ -169,7 +169,7 @@ class BitmapData8(val width: Int, val height: Int) {
 		var rectW: Int = rect.width
 		var rectH: Int = rect.height
 		var temp = ByteArray(rectW * rectH * 4)
-		var colorsPalette = palette.colors.map { it.getPixel32() }.toIntArray()
+		var colorsPalette = palette.colors.map { it.toInt() }.toIntArray()
 
 		Memory.select(temp) {
 			var dstPos: Int

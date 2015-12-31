@@ -47,7 +47,7 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 	}
 
 	fun copyPixels(from: BitmapData, rect: IRectangle, pos: IPoint): Unit {
-		draw(from, rect, pos.x, pos.y)
+		_draw(from, rect, pos.x, pos.y, blending = false, alpha = 1.0)
 	}
 
 	fun getPixel32(x: Int, y: Int): Int {
@@ -66,23 +66,42 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 
 	//fun draw(bitmapData: BitmapData, matrix: Matrix): Unit = noImpl
 
-	fun draw(bitmapData: BitmapData, rect: IRectangle, px: Int, py: Int): Unit {
+	private fun _draw(bitmapData: BitmapData, rect: IRectangle, px: Int, py: Int, blending:Boolean, alpha:Double): Unit {
 		lock {
-			for (y in 0 until rect.height) {
-				for (x in 0 until rect.width) {
-					val tx = px + x
-					val ty = py + y
-					if (tx < 0 || tx >= this.width) break
-					if (ty < 0 || ty >= this.height) break
-					this.setPixel32(tx, ty, bitmapData.getPixel32(x + rect.x, y + rect.y))
+			if (blending) {
+				// @TODO: Faster mixing!
+				for (y in 0 until rect.height) {
+					for (x in 0 until rect.width) {
+						val tx = px + x
+						val ty = py + y
+						if (tx < 0 || tx >= this.width) break
+						if (ty < 0 || ty >= this.height) break
+						val new = bitmapData.getPixel32(x + rect.x, y + rect.y)
+						val old = this.getPixel32(tx, ty)
+						this.setPixel32(tx, ty, Color.mixRGBA(old, new, alpha))
+					}
+				}
+			} else {
+				// @TODO: Faster copying!
+				for (y in 0 until rect.height) {
+					for (x in 0 until rect.width) {
+						val tx = px + x
+						val ty = py + y
+						if (tx < 0 || tx >= this.width) break
+						if (ty < 0 || ty >= this.height) break
+						this.setPixel32(tx, ty, bitmapData.getPixel32(x + rect.x, y + rect.y))
+					}
 				}
 			}
-			//println("drawn!")
 		}
 	}
 
-	fun draw(bitmapData: BitmapData, px: Int, py: Int): Unit {
-		draw(bitmapData, bitmapData.rect, px, py)
+	fun draw(bitmapData: BitmapData, rect: IRectangle, px: Int, py: Int, alpha:Double = 1.0): Unit {
+		_draw(bitmapData, rect, px, py, blending = true, alpha = alpha)
+	}
+
+	fun draw(bitmapData: BitmapData, px: Int, py: Int, alpha:Double = 1.0): Unit {
+		_draw(bitmapData, bitmapData.rect, px, py, blending = true, alpha = alpha)
 	}
 
 	fun getPixels(rect: IRectangle = this.rect, flipY: Boolean = false): ByteArray {

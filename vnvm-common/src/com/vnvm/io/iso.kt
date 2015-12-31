@@ -12,13 +12,16 @@ import kotlin.properties.Delegates
 
 private val SECTOR_SIZE = 0x800
 
-class IsoFile(
+class IsoFile private constructor(
 	val s: AsyncStream,
 	val pvd: PrimaryVolumeDescriptor
 ) : VirtualFileSystem {
 	var root by Delegates.notNull<IsoNode>()
 
 	companion object {
+		fun openAsync(isoFile: VfsFile): Promise<VfsFile> {
+			return isoFile.openAsync().pipe { openAsync(it) }
+		}
 		fun openAsync(s: AsyncStream): Promise<VfsFile> {
 			s.position = SECTOR_SIZE.toLong() * 0x10
 			return s.readBytesAsync(Struct.size<PrimaryVolumeDescriptor>()).pipe {
@@ -31,13 +34,10 @@ class IsoFile(
 					iso.root()
 				}
 			}
-			//this.PrimaryVolumeDescriptor = this.Stream.ReadStruct<PrimaryVolumeDescriptor>();
-			//this.Root = new IsoNode(this, PrimaryVolumeDescriptor.DirectoryRecord);
-			//ProcessDirectoryRecord(this.Root);
 		}
 	}
 
-	fun processDirectoryRecordAsync(parentNode: IsoNode): Promise<Unit> {
+	private fun processDirectoryRecordAsync(parentNode: IsoNode): Promise<Unit> {
 		val directoryStart = parentNode.dr.extent.value.toLong() * SECTOR_SIZE
 		val directoryLength = parentNode.dr.size.value
 		val directoryStream = this.s.sliceLength(directoryStart, directoryLength.toLong())
@@ -93,17 +93,9 @@ class IsoFile(
 
 	fun locateNode(path:String):IsoNode = root[path]
 
-	override fun openAsync(path: String): Promise<AsyncStream> {
-		return Promise.resolved(locateNode(path).openAsync())
-	}
-
-	override fun statAsync(path: String): Promise<VfsStat> {
-		return Promise.resolved(locateNode(path).vfsStat)
-	}
-
-	override fun listAsync(path: String): Promise<List<VfsStat>> {
-		return Promise.resolved(locateNode(path).children.map { it.vfsStat })
-	}
+	override fun openAsync(path: String) = Promise.resolved(locateNode(path).openAsync())
+	override fun statAsync(path: String) = Promise.resolved(locateNode(path).vfsStat)
+	override fun listAsync(path: String) = Promise.resolved(locateNode(path).children.map { it.vfsStat })
 }
 
 public class IsoNode(

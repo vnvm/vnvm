@@ -7,7 +7,7 @@ import com.vnvm.common.error.InvalidArgumentException
 import com.vnvm.common.error.InvalidOperationException
 import com.vnvm.common.image.BitmapData
 import com.vnvm.common.image.BitmapData8
-import com.vnvm.common.image.BmpColor
+import com.vnvm.common.image.Color
 import com.vnvm.common.image.Palette
 import com.vnvm.common.io.BinBytes
 
@@ -44,7 +44,7 @@ object BMP {
 				val g = bytes.readUnsignedByte();
 				val b = bytes.readUnsignedByte();
 				val reserved = bytes.readUnsignedByte();
-				BmpColor(r, g, b, 0xFF)
+				Color(r, g, b, 0xFF)
 			}
 		} else {
 			listOf()
@@ -67,11 +67,11 @@ object BMP {
 		return bitmapData;
 	}
 
-	private fun decodeRows8(bytes: BinBytes, bitmapData: BitmapData, palette: List<BmpColor>): Unit {
+	private fun decodeRows8(bytes: BinBytes, bitmapData: BitmapData, palette: List<Color>): Unit {
 		val bmp8 = BitmapData8(bitmapData.width, bitmapData.height)
 		//println(bmp8[0, 0])
 		bmp8.setPixels(bmp8.rect, bytes.readBytes(bitmapData.width * bitmapData.height))
-		bmp8.drawToBitmapDataWithPalette(bitmapData, Palette(palette))
+		bmp8.drawToBitmapDataWithPalette(bitmapData, Palette(palette.map { it.toMutable() }))
 		bitmapData.flipY()
 	}
 

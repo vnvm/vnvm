@@ -80,6 +80,7 @@ object BitUtils {
 }
 
 fun Int.clamp(min: Int, max: Int) = if (this < min) min else if (this > max) max else this
+fun Int.clamp255() = clamp(0, 255)
 fun Long.clamp(min: Long, max: Long) = if (this < min) min else if (this > max) max else this
 fun Double.clamp(min: Double, max: Double) = if (this < min) min else if (this > max) max else this
 fun Double.clamp01() = this.clamp(0.0, 1.0)

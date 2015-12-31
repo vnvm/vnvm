@@ -8,15 +8,13 @@ import com.vnvm.common.clamp
 import com.vnvm.common.clamp01
 import com.vnvm.common.error.noImpl
 import com.vnvm.common.image.BitmapData
-import com.vnvm.graphics.GraphicsContext
-import com.vnvm.graphics.InputContext
-import com.vnvm.graphics.RenderContext
+import com.vnvm.graphics.*
 
 interface Updatable {
 	fun update(dt: Int): Unit
 }
 
-class Views(val graphics: GraphicsContext, val input: InputContext) : Updatable {
+class Views(val graphics: GraphicsContext, val input: InputContext, val window: WindowContext) : Updatable {
 	public val root = Sprite()
 	val usedBitmapDatas = hashSetOf<BitmapData>()
 	val lastFrameBitmapDatas = hashSetOf<BitmapData>()
@@ -43,9 +41,7 @@ class Views(val graphics: GraphicsContext, val input: InputContext) : Updatable 
 				lastFrameBitmapDatas.clear()
 			}
 		}
-		input.onMouseClick.add {
-			root.onMouseClick(it.x, it.y, it.buttons)
-		}
+		input.onEvent.add { root.onEvent(it) }
 	}
 
 	private var lastTime: Long = System.currentTimeMillis()
@@ -136,9 +132,27 @@ class Tweens : Updatable {
 	}
 }
 
-class Mouses : Updatable {
-	override fun update(dt: Int) {
-		throw UnsupportedOperationException()
+class Mice {
+	val onMouseClick = Signal<MouseClickEvent>()
+
+	fun onEvent(event: MouseEvent) {
+		when (event) {
+			is MouseClickEvent -> onMouseClick.dispatch(event)
+		}
+	}
+}
+
+class KeyHandler {
+	val onKeyDown = Signal<KeyDownEvent>()
+	val onKeyPress = Signal<KeyPressEvent>()
+	val onKeyUp = Signal<KeyUpEvent>()
+
+	fun onEvent(event: KeyEvent) {
+		when (event) {
+			is KeyDownEvent -> onKeyDown.dispatch(event)
+			is KeyPressEvent -> onKeyPress.dispatch(event)
+			is KeyUpEvent -> onKeyUp.dispatch(event)
+		}
 	}
 }
 
@@ -153,7 +167,8 @@ open class DisplayObject {
 	private var updatables = arrayListOf<Updatable>()
 	val timers: Timers by lazy { addUpdatable(Timers()) }
 	val tweens: Tweens by lazy { addUpdatable(Tweens()) }
-	val mouses: Mouses by lazy { addUpdatable(Mouses()) }
+	val mice: Mice by lazy { Mice() }
+	val keys: KeyHandler by lazy { KeyHandler() }
 
 	fun <T : Updatable> addUpdatable(updatable: T): T {
 		updatables.add(updatable)
@@ -185,7 +200,9 @@ open class DisplayObject {
 	open protected fun updateInternal(dt: Int) {
 	}
 
-	open fun onMouseClick(x: Double, y: Double, buttons: Int) {
+	open fun onEvent(event: Event) {
+		if (event is MouseEvent) mice.onEvent(event)
+		if (event is KeyEvent) keys.onEvent(event)
 	}
 }
 
@@ -208,7 +225,9 @@ open class Sprite : DisplayObject() {
 		for (n in 0 until children.size) children[n].update(dt)
 	}
 
-	override fun onMouseClick(x: Double, y: Double, buttons: Int) {
+	override fun onEvent(event: Event) {
+		super.onEvent(event)
+		for (n in 0 until children.size) children[n].onEvent(event)
 	}
 }
 
