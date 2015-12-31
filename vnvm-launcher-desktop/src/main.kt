@@ -1,9 +1,9 @@
 import com.badlogic.gdx.ApplicationListener
+import com.badlogic.gdx.Files
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
-import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.BitmapFont
@@ -15,6 +15,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.jglfw.gl.GL
 import com.vnvm.common.async.Signal
 import com.vnvm.common.collection.Stack
+import com.vnvm.common.error.ignoreerror
 import com.vnvm.common.image.BitmapData
 import com.vnvm.common.view.Views
 import com.vnvm.engine.dividead.DivideadEngine
@@ -31,6 +32,7 @@ fun main(args: Array<String>) {
 		width = 640
 		height = 480
 		title = "VNVM"
+		ignoreerror { addIcon("logo128.png", Files.FileType.Internal) }
 	})
 }
 
@@ -134,7 +136,7 @@ class LibgdxContext : RenderContext, GraphicsContext, InputContext, WindowContex
 		affine.scale(sx.toFloat(), sy.toFloat())
 	}
 
-	override fun text(text:String) {
+	override fun text(text: String) {
 		if (DEBUG) println("text: '$text'")
 		if (text.length <= 0) return
 		//font.color = Color.RED
