@@ -1,16 +1,14 @@
 package com.vnvm.engine.dividead
 
 import com.vnvm.common.io.LocalVirtualFileSystem
+import com.vnvm.common.io.VfsFile
 import com.vnvm.common.view.Bitmap
 import com.vnvm.common.view.Views
+import com.vnvm.io.IsoFile
 
 object DivideadEngine {
-	fun start1(views: Views) {
-		///*
-		var fs = LocalVirtualFileSystem("assets")
-		val scriptName = "aastart"
-		val scriptPos = 0
-		Game.newAsync(views, fs["dividead"]).then { game ->
+	fun start1(views: Views, assets: VfsFile) {
+		Game.newAsync(views, assets).then { game ->
 			/*
 			game.sg["I_87.BMP"].readAllAsync().then {
 				File("I_87.BMP").writeBytes(LZ.decode(it))
@@ -24,14 +22,12 @@ object DivideadEngine {
 
 			}
 		}
-
 	}
 
-	fun start2(views: Views) {
-		var fs = LocalVirtualFileSystem("assets")
+	fun start2(views: Views, assets: VfsFile) {
 		val scriptName = "aastart"
 		val scriptPos = 0
-		Game.newAsync(views, fs["dividead"]).then { game ->
+		Game.newAsync(views, assets).then { game ->
 			views.root.addChild(game.gameSprite)
 
 			var ab = AB(game)
@@ -43,7 +39,12 @@ object DivideadEngine {
 	}
 
 	fun start(views: Views) {
-		//start1(views)
-		start2(views)
+		var fs = LocalVirtualFileSystem("assets")
+		fs["dividead.iso"].openAsync().pipe {
+			IsoFile.openAsync(it).then {
+				//start1(views, it)
+				start2(views, it)
+			}
+		}
 	}
 }

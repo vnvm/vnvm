@@ -44,6 +44,7 @@ class IsoFile(
 
 		val DirectoryRecordStructSize = Struct.size<DirectoryRecord>()
 
+		println("Read stream: $directoryStart, $directoryLength")
 		return directoryStream.readBytesAsync(directoryStream.length.toInt()).pipe { bytes ->
 			val ds = BinBytes(bytes)
 
@@ -69,10 +70,10 @@ class IsoFile(
 				val DirectoryRecordBytes = ds.readBytes(DirectoryRecordSize)
 				var DirectoryRecord = BinBytes(DirectoryRecordBytes).readStruct<DirectoryRecord>()
 
+				val name2 = String(DirectoryRecordBytes.copyOfRange(DirectoryRecordStructSize, DirectoryRecordStructSize + DirectoryRecord.nameLength), "UTF-8");
 
-				val name = String(DirectoryRecordBytes.copyOfRange(DirectoryRecordStructSize, DirectoryRecordStructSize + DirectoryRecord.nameLength), "UTF-8");
-
-				//Console.WriteLine("{0}", name); Console.ReadKey();
+				// @TODO: Get long name
+				val name = name2.split(';').first()
 
 				//println(name)
 
@@ -84,7 +85,7 @@ class IsoFile(
 				parentNode.children.add(childIsoNode);
 			}
 
-			Promise.all(parentNode.children.map {
+			Promise.all(parentNode.children.filter { it.isDirectory }.map {
 				processDirectoryRecordAsync(it)
 			}).unit
 		}
@@ -112,6 +113,7 @@ public class IsoNode(
 	val parent: IsoNode? = null
 ) {
 	val path: String = if (parent != null) "${parent.path}/$name" else "$name"
+	val isDirectory = dr.flags.isDirectory
 	val children = arrayListOf<IsoNode>()
 	val tree: List<IsoNode> by lazy {
 		listOf(this) + this.children.flatMap { it.tree }
@@ -168,7 +170,7 @@ public data class DirectoryRecord(
 	val date: DateStruct,
 	val flags: FlagsEnum,
 	val fileUnitSize: Byte,
-	val interleavee: Byte,
+	val interleave: Byte,
 	val volumeSequenceNumber: u16b,
 	val nameLength: Byte
 ) {
@@ -185,12 +187,12 @@ public data class DirectoryRecord(
 	}
 
 	public data class FlagsEnum(val v: Byte) {
-		val Unknown1 = v.hasBit(0)
-		val Directory = v.hasBit(1)
-		val Unknown2 = v.hasBit(2)
-		val Unknown3 = v.hasBit(3)
-		val Unknown4 = v.hasBit(4)
-		val Unknown5 = v.hasBit(5)
+		//val Unknown1 = v.hasBit(0)
+		val isDirectory = v.hasBit(1)
+		//val Unknown2 = v.hasBit(2)
+		//val Unknown3 = v.hasBit(3)
+		//val Unknown4 = v.hasBit(4)
+		//val Unknown5 = v.hasBit(5)
 	}
 
 	val offset: Long = extent.l.toLong() * SECTOR_SIZE
