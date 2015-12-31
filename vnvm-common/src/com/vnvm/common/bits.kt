@@ -17,7 +17,14 @@ object BitUtils {
 		return pack32(data[offset + 0], data[offset + 1], data[offset + 2], data[offset + 3])
 	}
 
-	@JvmStatic public fun writeIntLE(data: ByteArray, offset: Int, value:Int): Unit {
+	@JvmStatic public fun readLongLE(data: ByteArray, offset: Int): Long {
+		return pack64(
+			data[offset + 0].toInt(), data[offset + 1].toInt(), data[offset + 2].toInt(), data[offset + 3].toInt(),
+			data[offset + 4].toInt(), data[offset + 5].toInt(), data[offset + 6].toInt(), data[offset + 7].toInt()
+		)
+	}
+
+	@JvmStatic public fun writeIntLE(data: ByteArray, offset: Int, value: Int): Unit {
 		data[offset + 0] = (value ushr 0).toByte()
 		data[offset + 1] = (value ushr 8).toByte()
 		data[offset + 2] = (value ushr 16).toByte()
@@ -34,6 +41,13 @@ object BitUtils {
 
 	@JvmStatic public fun pack32(b1: Int, b2: Int, b3: Int, b4: Int): Int {
 		return ((b1 and 0xFF) shl 0) or ((b2 and 0xFF) shl 8) or ((b3 and 0xFF) shl 16) or ((b4 and 0xFF) shl 24)
+	}
+
+	@JvmStatic public fun pack64(b1: Int, b2: Int, b3: Int, b4: Int, b5: Int, b6: Int, b7: Int, b8: Int): Long {
+		return (
+			((b1 and 0xFF) shl 0).toLong() or ((b2 and 0xFF) shl 8).toLong() or ((b3 and 0xFF) shl 16).toLong() or ((b4 and 0xFF) shl 24).toLong() or
+				((b5 and 0xFF) shl 32).toLong() or ((b6 and 0xFF) shl 40).toLong() or ((b7 and 0xFF) shl 48).toLong() or ((b8 and 0xFF) shl 56).toLong()
+			)
 	}
 
 	@JvmStatic public fun pack32(b1: Byte, b2: Byte, b3: Byte, b4: Byte): Int {
@@ -83,8 +97,8 @@ object MathEx {
 	@Deprecated("", ReplaceWith("v.clamp(a, b)", "com.vnvm.common.clamp"))
 	@JvmStatic fun clampInt(v: Int, a: Int, b: Int): Int = clamp(v, a, b)
 
-	@JvmStatic fun min(a:Int, b:Int, c:Int, d:Int) = Math.min(Math.min(Math.min(a, b), c), d)
-	@JvmStatic fun max(a:Int, b:Int, c:Int, d:Int) = Math.max(Math.max(Math.max(a, b), c), d)
+	@JvmStatic fun min(a: Int, b: Int, c: Int, d: Int) = Math.min(Math.min(Math.min(a, b), c), d)
+	@JvmStatic fun max(a: Int, b: Int, c: Int, d: Int) = Math.max(Math.max(Math.max(a, b), c), d)
 }
 
 object Std {

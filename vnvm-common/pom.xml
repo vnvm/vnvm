@@ -18,5 +18,8 @@
         <resources>
             <resource><directory>assets</directory></resource>
         </resources>
+        <testResources>
+            <testResource><directory>testassets</directory></testResource>
+        </testResources>
     </build>
 </project>

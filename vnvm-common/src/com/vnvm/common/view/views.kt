@@ -9,14 +9,14 @@ import com.vnvm.common.clamp01
 import com.vnvm.common.error.noImpl
 import com.vnvm.common.image.BitmapData
 import com.vnvm.graphics.GraphicsContext
+import com.vnvm.graphics.InputContext
 import com.vnvm.graphics.RenderContext
-import com.vnvm.graphics.TextureSlice
 
 interface Updatable {
 	fun update(dt: Int): Unit
 }
 
-class Views(val graphics: GraphicsContext) : Updatable {
+class Views(val graphics: GraphicsContext, val input: InputContext) : Updatable {
 	public val root = Sprite()
 	val usedBitmapDatas = hashSetOf<BitmapData>()
 	val lastFrameBitmapDatas = hashSetOf<BitmapData>()
@@ -42,6 +42,9 @@ class Views(val graphics: GraphicsContext) : Updatable {
 				}
 				lastFrameBitmapDatas.clear()
 			}
+		}
+		input.onMouseClick.add {
+			root.onMouseClick(it.x, it.y, it.buttons)
 		}
 	}
 
@@ -133,6 +136,12 @@ class Tweens : Updatable {
 	}
 }
 
+class Mouses : Updatable {
+	override fun update(dt: Int) {
+		throw UnsupportedOperationException()
+	}
+}
+
 open class DisplayObject {
 	var x: Double = 0.0
 	var y: Double = 0.0
@@ -144,6 +153,7 @@ open class DisplayObject {
 	private var updatables = arrayListOf<Updatable>()
 	val timers: Timers by lazy { addUpdatable(Timers()) }
 	val tweens: Tweens by lazy { addUpdatable(Tweens()) }
+	val mouses: Mouses by lazy { addUpdatable(Mouses()) }
 
 	fun <T : Updatable> addUpdatable(updatable: T): T {
 		updatables.add(updatable)
@@ -174,6 +184,9 @@ open class DisplayObject {
 
 	open protected fun updateInternal(dt: Int) {
 	}
+
+	open fun onMouseClick(x: Double, y: Double, buttons: Int) {
+	}
 }
 
 open class Sprite : DisplayObject() {
@@ -193,6 +206,9 @@ open class Sprite : DisplayObject() {
 
 	override protected fun updateInternal(dt: Int) {
 		for (n in 0 until children.size) children[n].update(dt)
+	}
+
+	override fun onMouseClick(x: Double, y: Double, buttons: Int) {
 	}
 }
 
@@ -230,111 +246,26 @@ open class TextField : DisplayObject() {
 }
 
 enum class Keys(val value: Int) {
-	Backspace(8),
-	Tab(9),
-	Enter(13),
-	Shift(16),
-	Control(17),
-	CapsLock(20),
-	Esc(27),
-	Spacebar(32),
-	PageUp(33),
-	PageDown(34),
-	End(35),
-	Home(36),
-	Left(37),
-	Up(38),
-	Right(39),
-	Down(40),
-	Insert(45),
-	Delete(46),
-	NumLock(144),
-	ScrLk(145),
-	Pause_Break(19),
+	Backspace(8), Tab(9), Enter(13), Shift(16), Control(17), CapsLock(20), Esc(27),
+	Spacebar(32), PageUp(33), PageDown(34), End(35), Home(36),
+	Left(37), Up(38), Right(39), Down(40),
+	Insert(45), Delete(46), NumLock(144), ScrLk(145), Pause_Break(19),
 
-	A(65),
-	B(66),
-	C(67),
-	D(68),
-	E(69),
-	F(70),
-	G(71),
-	H(72),
-	I(73),
-	J(74),
-	K(75),
-	L(76),
-	M(77),
-	N(78),
-	O(79),
-	P(80),
-	Q(81),
-	R(82),
-	S(83),
-	T(84),
-	U(85),
-	V(86),
-	W(87),
-	X(88),
-	Y(89),
-	Z(90),
+	A(65), B(66), C(67), D(68), E(69), F(70), G(71), H(72), I(73), J(74),
+	K(75), L(76), M(77), N(78), O(79), P(80), Q(81), R(82), S(83), T(84),
+	U(85), V(86), W(87), X(88), Y(89), Z(90),
 
-	_0(48),
-	_1(49),
-	_2(50),
-	_3(51),
-	_4(52),
-	_5(53),
-	_6(54),
-	_7(55),
-	_8(56),
-	_9(57)
+	_0(48), _1(49), _2(50), _3(51), _4(52), _5(53), _6(54), _7(55), _8(56), _9(57),
 
-	/*
-	;: = 186
-	=+ = 187
-	-_ = 189
-	/? = 191
-	`~ = 192
-	[{ = 219
-	\| = 220
-	]} = 221
-	"' = 222
-	, = 188
-	. = 190
-	/ = 191
-	Numpad 0 = 96
-	Numpad 1 = 97
-	Numpad 2 = 98
-	Numpad 3 = 99
-	Numpad 4 = 100
-	Numpad 5 = 101
-	Numpad 6 = 102
-	Numpad 7 = 103
-	Numpad 8 = 104
-	Numpad 9 = 105
-	Numpad Multiply = 106
-	Numpad Add = 107
-	Numpad Enter = 13
-	Numpad Subtract = 109
-	Numpad Decimal = 110
-	Numpad Divide = 111
-	F1 = 112
-	F2 = 113
-	F3 = 114
-	F4 = 115
-	F5 = 116
-	F6 = 117
-	F7 = 118
-	F8 = 119
-	F9 = 120
-	F10 = nokey
-	F11 = 122
-	F12 = 123
-	F13 = 124
-	F14 = 125
-	F15 = 126
-	*/
+	F1(112), F2(113), F3(114), F4(115), F5(116), F6(117), F7(118),
+	F8(119), F9(120), F10(121), F11(122), F12(123), F13(124), F14(125), F15(126),
+
+	Numpad0(96), Numpad1(97), Numpad2(98), Numpad3(99), Numpad4(100),
+	Numpad5(101), Numpad6(102), Numpad7(103), Numpad8(104), Numpad9(105),
+	NumpadMultiply(106), NumpadAdd(107), NumpadEnter(13), NumpadSubtract(109), NumpadDecimal(110), NumpadDivide(111),
+
+	SemicolonDoubleColon(186), EqualPlus(187), MinusUnderscore(189), SlashQuestionMark(191), Comma(188),
+	Dot(190), Slash(191), OpenBrackets(219), VerticalBar(220), CloseBrackets(221), DquoteQuote(222), Capo(192)
 }
 
 object GameInput {

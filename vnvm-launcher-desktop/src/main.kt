@@ -12,14 +12,12 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Affine2
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.jglfw.gl.GL
+import com.vnvm.common.async.Signal
 import com.vnvm.common.collection.Stack
 import com.vnvm.common.image.BitmapData
 import com.vnvm.common.view.Views
 import com.vnvm.engine.dividead.DivideadEngine
-import com.vnvm.graphics.GraphicsContext
-import com.vnvm.graphics.RenderContext
-import com.vnvm.graphics.Texture
-import com.vnvm.graphics.TextureSlice
+import com.vnvm.graphics.*
 import java.nio.ByteBuffer
 import kotlin.properties.Delegates
 
@@ -75,7 +73,12 @@ class LibgdxTexture(
 	}
 }
 
-class LibgdxContext : RenderContext, GraphicsContext {
+class LibgdxContext : RenderContext, GraphicsContext, InputContext {
+	override val onMouseClick = Signal<MouseEvent>()
+	override val onMouseMove = Signal<MouseEvent>()
+	override val onMouseDown = Signal<MouseEvent>()
+	override val onMouseUp = Signal<MouseEvent>()
+
 	val batch = SpriteBatch()
 	val font = BitmapFont(Gdx.files.classpath("com/badlogic/gdx/utils/arial-15.fnt"), true)
 	//val font = BitmapFont(Gdx.files.internal("Anonymous.ttf"));
@@ -159,7 +162,7 @@ class GdxApp(private val init: (views: Views) -> Unit) : ApplicationListener {
 	override public fun create(): Unit {
 		val context = LibgdxContext()
 		this.context = context
-		this.views = Views(context)
+		this.views = Views(context, context)
 		init(this.views)
 	}
 

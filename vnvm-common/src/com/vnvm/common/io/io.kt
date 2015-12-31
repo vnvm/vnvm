@@ -19,6 +19,11 @@ class BinBytes(val data: ByteArray, val offset: Int = 0, val length: Int = data.
 		position += 4
 		return out.toInt()
 	}
+	fun readLong(): Long {
+		val out = BitUtils.readLongLE(data, offset + position)
+		position += 8
+		return out
+	}
 
 	fun readShort(): Int {
 		val out = BitUtils.readShortLE(data, offset + position)

@@ -10,6 +10,7 @@ class VfsFile(val vfs: VirtualFileSystem, val path: String) {
 	fun readAllAsync(): Promise<ByteArray> = vfs.readAllAsync(path)
 	fun jail(): VfsFile = JailVirtualFileSystem(this).root()
 	operator fun get(subpath: String) = VfsFile(vfs, "$path/$subpath".trimStart('/')) // @TODO: Security!
+	override public fun toString() = "VfsFile($path)"
 }
 
 data class VfsStat(
