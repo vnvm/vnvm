@@ -120,9 +120,7 @@ class AB_OP(val ab: AB) {
 
 	@Opcode(id = 0x06, format = "", description = "Empties the option list", savepoint = true)
 	public fun OPTION_RESET() {
-		//game.optionList.clear();
 		state.options = arrayListOf();
-		noImpl
 	}
 
 	@Opcode(id = 0x01, format = "PT", description = "Adds an option to the list of options")
@@ -130,21 +128,16 @@ class AB_OP(val ab: AB) {
 	public fun OPTION_ADD(pointer: Int, text: String) {
 		val option = GameState.Option(pointer, text)
 		state.options.add(option)
-		//game.optionList.addOption(text, option);
-		noImpl
 	}
 
 	@Opcode(id = 0x07, format = "", description = "Show the list of options")
 	//@Unimplemented
-	public fun OPTION_SHOW() {
-		/*
-		game.optionList.visible = true;
+	public fun OPTION_SHOW(): Promise<Unit> {
+		game.optionList.show(state.options.map { Pair(it.text, it) })
 		return game.optionList.onSelected.waitOneAsync().then { e ->
-			game.optionList.visible = false;
-			ab.jump(e.selectedOption.data.pointer);
+			game.optionList.hide()
+			ab.jump(e.pointer)
 		}
-		*/
-		noImpl
 	}
 
 	@Opcode(id = 0x0A, format = "", description = "Shows again a list of options")

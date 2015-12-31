@@ -2,17 +2,13 @@ package com.vnvm.engine.dividead
 
 import com.vnvm.common.*
 import com.vnvm.common.async.Promise
-import com.vnvm.common.async.unit
 import com.vnvm.common.collection.xrange
 import com.vnvm.common.error.InvalidOperationException
-import com.vnvm.common.error.noImpl
 import com.vnvm.common.image.BColor
 import com.vnvm.common.image.BitmapData
-import com.vnvm.common.image.Colors
 import com.vnvm.common.image.toInt
 import com.vnvm.common.io.BinBytes
 import com.vnvm.common.script.Instruction2
-import com.vnvm.common.view.Sprite
 
 class AB(public var game: Game) {
 	public var scriptName = ""

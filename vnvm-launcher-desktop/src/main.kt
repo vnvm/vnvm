@@ -85,17 +85,13 @@ class LibgdxContext : RenderContext, GraphicsContext, InputContext, WindowContex
 
 	val batch = SpriteBatch()
 	val font = BitmapFont(Gdx.files.classpath("com/badlogic/gdx/utils/arial-15.fnt"), true)
-	//val font = BitmapFont(Gdx.files.internal("Anonymous.ttf"));
-	//val font = BitmapFont(Gdx.files.local("Anonymous.ttf"));
-	//val font = BitmapFont(Gdx.files.local("font.fnt"));
-
-
 	override fun createTexture(data: BitmapData): TextureSlice = TextureSlice(LibgdxTexture(data))
 
 	private val stack = Stack<Affine2>()
 	var affine = Affine2()
 
 	override fun begin() {
+		if (DEBUG) println("--------------")
 		val width = Gdx.graphics.width.toFloat()
 		val height = Gdx.graphics.height.toFloat()
 		val camera = OrthographicCamera(width, height);
@@ -110,40 +106,49 @@ class LibgdxContext : RenderContext, GraphicsContext, InputContext, WindowContex
 		batch.begin()
 	}
 
+	//val DEBUG = true
+	val DEBUG = false
+
 	override fun save() {
+		if (DEBUG) println("save")
 		stack.push(Affine2(affine))
 	}
 
 	override fun restore() {
+		if (DEBUG) println("restore")
 		affine.set(stack.pop())
 	}
 
 	override fun rotate(radians: Double) {
+		if (DEBUG) println("rotate: $radians")
 		affine.rotateRad(radians.toFloat())
 	}
 
 	override fun translate(x: Double, y: Double) {
+		if (DEBUG) println("translate: $x, $y")
 		affine.translate(x.toFloat(), y.toFloat())
 	}
 
 	override fun scale(sx: Double, sy: Double) {
+		if (DEBUG) println("scale: $sx, $sy")
 		affine.scale(sx.toFloat(), sy.toFloat())
 	}
 
-	override fun text(text:String, x:Double, y:Double) {
-		if (text.length > 0) {
-			//font.color = Color.RED
+	override fun text(text:String) {
+		if (DEBUG) println("text: '$text'")
+		if (text.length <= 0) return
+		//font.color = Color.RED
 
-			//font.draw(batch, text, x.toFloat(), y.toFloat() + font.descent)
-			val translation = affine.getTranslation(Vector2())
+		//font.draw(batch, text, x.toFloat(), y.toFloat() + font.descent)
+		val translation = affine.getTranslation(Vector2())
 
-			font.draw(batch, text, translation.x, translation.y)
-		}
+		font.draw(batch, text, translation.x, translation.y)
 	}
 
 	private val texreg = TextureRegion()
 
 	override fun quad(tex: TextureSlice, width: Double, height: Double) {
+		if (DEBUG) println("quad: $width, $height")
 		val tt = tex.texture as LibgdxTexture
 		tt.checkVersion()
 		val t = tt.tex!!
@@ -154,6 +159,7 @@ class LibgdxContext : RenderContext, GraphicsContext, InputContext, WindowContex
 	}
 
 	override fun end() {
+		if (DEBUG) println("end")
 		//batch.flush()
 		batch.end()
 	}
@@ -170,9 +176,9 @@ class GdxApp(private val init: (views: Views) -> Unit) : ApplicationListener {
 		init(this.views)
 		val clickEvent = MouseClickEvent(0.0, 0.0, 0)
 		val moveEvent = MouseMovedEvent(0.0, 0.0)
-		val keyDown = KeyDownEvent(0)
-		val keyUp = KeyUpEvent(0)
-		val keyPress = KeyPressEvent(0)
+		val keyDown = KeyDownEvent(Keys.A)
+		val keyUp = KeyUpEvent(Keys.A)
+		val keyPress = KeyPressEvent(Keys.A)
 		val onEvent = context.onEvent
 		Gdx.input.inputProcessor = object : InputProcessor {
 			override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {

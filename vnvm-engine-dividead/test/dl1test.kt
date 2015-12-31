@@ -1,6 +1,5 @@
 import com.vnvm.common.async.EventLoop
 import com.vnvm.common.io.openAsync
-import com.vnvm.common.io.readAllAsync
 import com.vnvm.engine.dividead.DL1
 import com.vnvm.engine.dividead.LZ
 import java.io.File

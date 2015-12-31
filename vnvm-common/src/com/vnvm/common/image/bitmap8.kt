@@ -164,10 +164,10 @@ class BitmapData8(val width: Int, val height: Int) {
 	}
 
 	public fun drawToBitmapDataWithPalette(bmp: BitmapData, palette: Palette, rect: IRectangle = this.rect) {
-		var rectX: Int = rect.x
-		var rectY: Int = rect.y
-		var rectW: Int = rect.width
-		var rectH: Int = rect.height
+		var rectX = rect.x
+		var rectY = rect.y
+		var rectW = rect.width
+		var rectH = rect.height
 		var temp = ByteArray(rectW * rectH * 4)
 		var colorsPalette = palette.colors.map { it.toInt() }.toIntArray()
 

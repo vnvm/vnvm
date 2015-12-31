@@ -1,14 +1,19 @@
 package com.vnvm.engine.dividead
 
+import com.vnvm.common.IPoint
+import com.vnvm.common.IRectangle
 import com.vnvm.common.Sound
 import com.vnvm.common.SoundChannel
 import com.vnvm.common.async.Promise
+import com.vnvm.common.async.Signal
+import com.vnvm.common.collection.Array2
 import com.vnvm.common.image.BitmapData
 import com.vnvm.common.image.BitmapDataUtils
 import com.vnvm.common.io.VfsFile
 import com.vnvm.common.log.Log
 import com.vnvm.common.script.ScriptOpcodes
 import com.vnvm.common.view.*
+import com.vnvm.graphics.Keys
 
 class Game(
 	val views: Views,
@@ -38,23 +43,16 @@ class Game(
 	public var voiceChannel = SoundChannel()
 	public var effectChannel = SoundChannel()
 	public var musicChannel = SoundChannel()
-	//public var optionList = OptionList(428, 60, 3, 2, true).apply {
-	//	x = 108;
-	//	y = 402;
-	//	visible = false
-	//}
+	public var optionList = OptionList<GameState.Option>(IRectangle(108, 402, 428, 60), 3, 2, true)
 
 	public var gameSprite = Sprite().apply {
-		val texture = views.graphics.createTexture(front)
 		addChild(Bitmap(front, PixelSnapping.AUTO, true));
-		//addChild(Image(texture));
 		addChild(textField);
-		//addChild(optionList.sprite);
+		addChild(optionList.sprite);
 		addChild(overlaySprite);
 	}
 
-	//public fun isSkipping() = GameInput.isPressing(Keys.Control);
-	public fun isSkipping() = false
+	public fun isSkipping() = views.isPressing(Keys.Control);
 
 	companion object {
 		private fun addExtensionsWhenRequired(name: String, expectedExtension: String): String {
@@ -117,5 +115,42 @@ class Game(
 			}
 			sound
 		}
+	}
+}
+
+class OptionList<TOption : Any>(
+	val rect: IRectangle,
+	val rows: Int,
+	val columns: Int,
+	val something: Boolean
+) {
+	val onSelected = Signal<TOption>()
+	val sprite = Sprite().apply {
+		visible = false
+		x = rect.x.toDouble()
+		y = rect.y.toDouble()
+	}
+	val elementSize = IPoint(rect.width / columns, rect.height / rows)
+
+	fun show(items: List<Pair<String, TOption>>) {
+		sprite.removeChildren()
+		items.zip(Array2.range(columns, rows)).forEach {
+			val (item, pos) = it
+			val (posX, posY) = pos
+			val (itemText, itemOption) = item
+			val tx = posX.toDouble() * elementSize.x
+			val ty = posY.toDouble() * elementSize.y
+			println("$posX, $posY : $tx, $ty")
+			sprite.addChild(TextField().apply {
+				text = itemText
+				x = tx
+				y = ty
+			})
+		}
+		sprite.visible = true
+	}
+
+	fun hide() {
+		sprite.visible = false
 	}
 }

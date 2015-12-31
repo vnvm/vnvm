@@ -1,8 +1,6 @@
 package com.vnvm.common.image.format
 
 import com.vnvm.common.IRectangle
-import com.vnvm.common.Memory
-import com.vnvm.common.MemoryI
 import com.vnvm.common.error.InvalidArgumentException
 import com.vnvm.common.error.InvalidOperationException
 import com.vnvm.common.image.BitmapData

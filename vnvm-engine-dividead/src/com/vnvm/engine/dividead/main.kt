@@ -24,9 +24,7 @@ object DivideadEngine {
 		}
 	}
 
-	fun runGame(views: Views, assets: VfsFile) {
-		val scriptName = "aastart"
-		val scriptPos = 0
+	fun runGame(views: Views, assets: VfsFile, scriptName: String = "aastart", scriptPos: Int = 0) {
 		Game.newAsync(views, assets).then { game ->
 			views.root.addChild(game.gameSprite)
 
@@ -44,7 +42,8 @@ object DivideadEngine {
 
 		IsoFile.openAsync(fs["dividead.iso"]).then {
 			//runTest(views, it)
-			runGame(views, it)
+			runGame(views, it, "aastart", 0) // start
+			//runGame(views, it, "aastart", 0x089A) // options
 		}
 	}
 }
