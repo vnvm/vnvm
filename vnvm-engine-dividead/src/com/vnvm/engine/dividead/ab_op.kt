@@ -392,7 +392,9 @@ class AB_OP(val ab: AB) {
 	public fun REPAINT_IN(type: Int) = ab.paintAsync(1, type);
 
 	@Opcode(id = 0x1E, format = "", description = "Performs a fade out to color black")
-	public fun FADE_OUT_BLACK() = ab.paintToColorAsync(Colors.BLACK, 1.seconds);
+	public fun FADE_OUT_BLACK():Promise<Unit> {
+		return ab.paintToColorAsync(Colors.BLACK, 1.seconds)
+	}
 
 	@Opcode(id = 0x1F, format = "", description = "Performs a fade out to color white")
 	public fun FADE_OUT_WHITE() = ab.paintToColorAsync(Colors.WHITE, 1.seconds);

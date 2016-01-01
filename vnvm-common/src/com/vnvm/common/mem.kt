@@ -23,26 +23,26 @@ object Memory {
 		for (n in 0 until length) setI8(offset + n, value)
 	}
 
-	fun setI32(index: Int, value: Int): Unit {
+	@JvmStatic fun setI32(index: Int, value: Int): Unit {
 		mem[index + 0] = (value ushr 0).toByte()
 		mem[index + 1] = (value ushr 8).toByte()
 		mem[index + 2] = (value ushr 16).toByte()
 		mem[index + 3] = (value ushr 24).toByte()
 	}
 
-	fun setI8(index: Int, value: Int): Unit {
+	@JvmStatic fun setI8(index: Int, value: Int): Unit {
 		mem[index + 0] = (value ushr 0).toByte()
 	}
 
-	fun getI32(index: Int): Int {
+	@JvmStatic fun getI32(index: Int): Int {
 		return BitUtils.readIntLE(mem, index)
 	}
 
-	fun getI32(data: ByteArray, index: Int): Int {
+	@JvmStatic fun getI32(data: ByteArray, index: Int): Int {
 		return BitUtils.readIntLE(data, index)
 	}
 
-	fun setI32(data: ByteArray, index: Int, value: Int): Unit {
+	@JvmStatic fun setI32(data: ByteArray, index: Int, value: Int): Unit {
 		BitUtils.writeIntLE(data, index, value)
 	}
 }
@@ -56,10 +56,10 @@ object MemoryI {
 
 /*
 object Memory {
-	private var unsafe: Unsafe = Unit.let {
-		val f = Unsafe::class.java.getDeclaredField("theUnsafe")
+	private var unsafe: sun.misc.Unsafe = Unit.let {
+		val f = sun.misc.Unsafe::class.java.getDeclaredField("theUnsafe")
 		f.isAccessible = true
-		f.get(null) as Unsafe
+		f.get(null) as sun.misc.Unsafe
 	}
 
 	var defaultMem = ByteArray(0);
@@ -80,7 +80,7 @@ object Memory {
 	}
 
 	@JvmStatic fun memset8(offset: Int, length: Int, value: Int) {
-		//unsafe.setMemory(mem, offset.toLong(), length.toLong(), value.toByte())
+		unsafe.setMemory(mem, offset.toLong(), length.toLong(), value.toByte())
 		// @TODO: pack and set in blocks
 		//for (n in 0 until length) setI8(offset + n, value)
 	}

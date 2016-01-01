@@ -289,7 +289,7 @@ class Bitmap(val data: BitmapData, val rect: IRectangle = data.rect) : DisplayOb
 }
 
 open class TextField(val font: BitmapFont) : DisplayObject() {
-	var fontSize: Double = 16.0
+	var fontSize: Double = 15.0
 	var width: Double = 100.0
 	var height: Double = 100.0
 	var text: String = ""

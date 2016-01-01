@@ -72,6 +72,10 @@ class LibgdxTexture(
 		}
 		*/
 		tex = com.badlogic.gdx.graphics.Texture(pixmap2, Pixmap.Format.RGBA8888, false)
+		tex!!.setFilter(
+			com.badlogic.gdx.graphics.Texture.TextureFilter.Linear,
+			com.badlogic.gdx.graphics.Texture.TextureFilter.Linear
+		)
 	}
 
 	override fun dispose() {

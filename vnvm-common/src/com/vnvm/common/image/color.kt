@@ -116,6 +116,7 @@ class Color(r: Int, g: Int, b: Int, a: Int) : BColor {
 		fun getAf(value: Int): Double = getA(value).toDouble() / 255.0
 
 		fun packRGBA(r: Int, g: Int, b: Int, a: Int): Int = BitUtils.pack32(b, g, r, a)
+		fun packRGBA(r: Byte, g: Byte, b: Byte, a: Byte): Int = BitUtils.pack32(b, g, r, a)
 		fun mixComp(x: Int, y: Int, ratio: Double) = ((x * (1.0 - ratio)) + y * ratio).toInt().clamp255()
 		fun mixRGBA(x: Int, y: Int, ratio: Double): Int {
 			return packRGBA(
@@ -140,6 +141,7 @@ class Color(r: Int, g: Int, b: Int, a: Int) : BColor {
 }
 
 object Colors {
+	val TRANSPARENT = Color(0, 0, 0, 0)
 	val BLACK = Color(0, 0, 0, 255)
 	val WHITE = Color(255, 255, 255, 255)
 	val RED = Color(255, 0, 0, 255)

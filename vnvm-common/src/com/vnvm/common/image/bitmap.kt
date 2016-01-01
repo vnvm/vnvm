@@ -22,6 +22,14 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 	val rect = IRectangle(0, 0, width, height)
 	var version = 0
 
+	init {
+		for (y in 0 until height) {
+			for (x in 0 until width) {
+				setPixel32(x, y, color)
+			}
+		}
+	}
+
 	private fun getOffset(x: Int, y: Int) = (y * width + x) * 4
 
 	private fun _transfer(r: IRectangle, data: ByteArray, dir: Boolean, flipY: Boolean): Unit {
