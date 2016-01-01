@@ -11,6 +11,9 @@ class DL1 : VirtualFileSystem {
 	private var entries = LinkedHashMap<String, AsyncStream>();
 
 	companion object {
+		fun loadAsync(file: VfsFile): Promise<VfsFile> {
+			return file.openAsync().pipe { loadAsync(it) }
+		}
 		fun loadAsync(stream: AsyncStream): Promise<VfsFile> {
 			var header: ByteArray;
 			var entriesByteArray: ByteArray;

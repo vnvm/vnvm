@@ -19,6 +19,7 @@ import com.vnvm.common.collection.Stack
 import com.vnvm.common.error.ignoreerror
 import com.vnvm.common.image.BitmapData
 import com.vnvm.common.image.Color
+import com.vnvm.common.image.Colors
 import com.vnvm.common.view.Views
 import com.vnvm.engine.dividead.DivideadEngine
 import com.vnvm.graphics.*
@@ -53,8 +54,8 @@ class LibgdxTexture(
 	}
 
 	fun upload(data: BitmapData) {
-		//val pixelsData = data.getPixels(flipY = false)
-		val pixelsData = data.getPixels(flipY = true)
+		val pixelsData = data.getPixels(flipY = false)
+		//val pixelsData = data.getPixels(flipY = true)
 		val bb = ByteBuffer.allocateDirect(pixelsData.size)
 		bb.put(pixelsData)
 		bb.flip()
@@ -70,7 +71,7 @@ class LibgdxTexture(
 			pixmap2.drawPixel(x, y, Integer.reverseBytes(data.getPixel32(x, y)))
 		}
 		*/
-		tex = com.badlogic.gdx.graphics.Texture(pixmap2)
+		tex = com.badlogic.gdx.graphics.Texture(pixmap2, Pixmap.Format.RGBA8888, false)
 	}
 
 	override fun dispose() {
@@ -134,7 +135,6 @@ class LibgdxContext : RenderContext, GraphicsContext, InputContext, WindowContex
 	override val onEvent = Signal<Event>()
 
 	val batch = SpriteBatch()
-	val font = BitmapFont(Gdx.files.classpath("com/badlogic/gdx/utils/arial-15.fnt"), true)
 	override fun createTexture(data: BitmapData): TextureSlice = TextureSlice(LibgdxTexture(data))
 
 	private val stack = Stack<Affine2>()
@@ -148,7 +148,7 @@ class LibgdxContext : RenderContext, GraphicsContext, InputContext, WindowContex
 		camera.setToOrtho(true, width, height);
 		//camera.setToOrtho(false, width, height);
 
-		camera.update();
+		camera.update()
 		batch.projectionMatrix = camera.combined;
 
 		stack.clear()
@@ -184,28 +184,29 @@ class LibgdxContext : RenderContext, GraphicsContext, InputContext, WindowContex
 		affine.scale(sx.toFloat(), sy.toFloat())
 	}
 
-	override fun text(text: String, color: Color) {
-		if (DEBUG) println("text: '$text'")
-		if (text.length <= 0) return
-		//font.color = Color.RED
-
-		//font.draw(batch, text, x.toFloat(), y.toFloat() + font.descent)
-		val translation = affine.getTranslation(Vector2())
-
-		font.setColor(color.rf, color.gf, color.bf, color.af)
-		font.draw(batch, text, translation.x, translation.y)
-	}
-
 	private val texreg = TextureRegion()
 
-	override fun quad(tex: TextureSlice, width: Double, height: Double) {
+	var _color = Colors.WHITE
+	override var color: Color
+		get() = _color
+		set(value) {
+			_color = value
+			batch.setColor(color.rf, color.gf, color.bf, color.af)
+		}
+
+	val tempAffine = Affine2()
+	override fun quad(tex: TextureSlice, x:Double, y:Double, width: Double, height: Double) {
 		if (DEBUG) println("quad: $width, $height")
 		val tt = tex.texture as LibgdxTexture
 		tt.checkVersion()
 		val t = tt.tex!!
+		val rect = tex.rect
+		//val texreg = TextureRegion() // Should we do a copy?
 		texreg.setRegion(t)
-		texreg.setRegion(tex.u1, tex.v1, tex.u2, tex.v2)
-		batch.draw(texreg, width.toFloat(), height.toFloat(), affine)
+		texreg.setRegion(tex.u1, tex.v2, tex.u2, tex.v1)
+		tempAffine.set(affine)
+		tempAffine.translate(x.toFloat(), y.toFloat())
+		batch.draw(texreg, width.toFloat(), height.toFloat(), tempAffine)
 		//batch.draw(t, 0f, 0f)
 	}
 

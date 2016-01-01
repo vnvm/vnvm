@@ -7,8 +7,8 @@ import com.vnvm.common.view.Views
 import com.vnvm.io.IsoFile
 
 object DivideadEngine {
-	fun runGame(views: Views, assets: VfsFile, scriptName: String = "aastart", scriptPos: Int = 0) {
-		Game.newAsync(views, assets).then { game ->
+	fun runGame(views: Views, common: VfsFile, assets: VfsFile, scriptName: String = "aastart", scriptPos: Int = 0) {
+		Game.newAsync(views, common, assets).then { game ->
 			views.root.addChild(game.gameSprite)
 
 			var ab = AB(game)
@@ -23,17 +23,18 @@ object DivideadEngine {
 		var fs = LocalVirtualFileSystem("assets")
 		views.window.title = "DiviDead"
 
-		IsoFile.openAsync(fs["dividead.iso"]).then {
+		IsoFile.openAsync(fs["dividead.iso"]).then { iso ->
 			//runTest(views, it)
-			//runGame(views, it, "aastart", 0) // start
-			runGame(views, it, "aastart", 0x089A) // options
+			runGame(views, fs, iso, "aastart", 0) // start
+			//runGame(views, it, "aastart", 0x089A) // options
+			//runGame(views, it, "aastart", 0x1703) // ALARM: sound + wait
 			//runGame(views, it, "aastart", 0x1841) // characters
 			//runGame(views, it, "aastart", 0x295B) // JUMP_IF
 		}
 	}
 
-	fun runTest(views: Views, assets: VfsFile) {
-		Game.newAsync(views, assets).then { game ->
+	fun runTest(views: Views, common: VfsFile, assets: VfsFile) {
+		Game.newAsync(views, common, assets).then { game ->
 			/*
 			game.sg["I_87.BMP"].readAllAsync().then {
 				File("I_87.BMP").writeBytes(LZ.decode(it))

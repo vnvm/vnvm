@@ -18,6 +18,7 @@ data class VfsStat(
 ) {
 	val name:String = file.path
 
+	val extension:String = File(name).extension
 }
 
 interface VirtualFileSystem {

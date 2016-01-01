@@ -1,6 +1,7 @@
 package com.vnvm.graphics
 
 import com.vnvm.common.Disposable
+import com.vnvm.common.IRectangle
 import com.vnvm.common.async.Signal
 import com.vnvm.common.image.BitmapData
 import com.vnvm.common.image.Color
@@ -11,10 +12,10 @@ interface RenderContext : GraphicsContext {
 	fun restore(): Unit
 	fun rotate(radians: Double): Unit
 	fun translate(x: Double, y: Double): Unit
-	fun scale(sx: Double, sy: Double): Unit
-	fun quad(tex: TextureSlice, width: Double = tex.width, height: Double = tex.height)
+	fun scale(sx: Double, sy: Double = sx): Unit
+	var color: Color
+	fun quad(tex: TextureSlice, x:Double = 0.0, y:Double = 0.0, width: Double = tex.width.toDouble(), height: Double = tex.height.toDouble())
 	fun end(): Unit
-	fun text(text: String, color: Color)
 }
 
 interface GraphicsContext {
@@ -186,16 +187,15 @@ interface Texture : Disposable {
 	val height: Int
 }
 
-class TextureSlice(
-	val texture: Texture,
-	val u1: Float = 0f,
-	val v1: Float = 0f,
-	val u2: Float = 1f,
-	val v2: Float = 1f,
-	val x: Int = 0,
-	val y: Int = 0,
-	val width: Double = texture.width.toDouble(),
-	val height: Double = texture.height.toDouble()
-) {
+data class TextureSlice(val texture: Texture, val rect: IRectangle = IRectangle(0, 0, texture.width, texture.height)) {
+	val width = rect.width
+	val height = rect.height
+	val u1: Float = (rect.left).toFloat() / texture.width.toFloat()
+	val v1: Float = (rect.top).toFloat() / texture.height.toFloat()
+	val u2: Float = (rect.right).toFloat() / texture.width.toFloat()
+	val v2: Float = (rect.bottom).toFloat() / texture.height.toFloat()
 
+	fun slice(slice: IRectangle): TextureSlice {
+		return TextureSlice(texture, slice.translate(this.rect.x, this.rect.y))
+	}
 }

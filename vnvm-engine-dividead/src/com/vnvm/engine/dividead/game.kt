@@ -5,6 +5,7 @@ import com.vnvm.common.async.Promise
 import com.vnvm.common.error.InvalidOperationException
 import com.vnvm.common.image.BitmapData
 import com.vnvm.common.image.BitmapDataUtils
+import com.vnvm.common.image.BitmapFont
 import com.vnvm.common.image.Colors
 import com.vnvm.common.io.VfsFile
 import com.vnvm.common.script.ScriptOpcodes
@@ -14,65 +15,19 @@ import com.vnvm.graphics.Music
 import com.vnvm.graphics.Sound
 import com.vnvm.ui.SpatialMenu
 
-class Game(
+class GameResources(
 	val views: Views,
 	val fileSystem: VfsFile,
 	val sg: VfsFile,
-	val wv: VfsFile
+	val wv: VfsFile,
+    val fnt: BitmapFont
 ) {
+	public var mid = fileSystem["MID"]
+
 	private var imageCache = hashMapOf<String, BitmapData>();
 
-	public var mid = fileSystem["MID"]
-	public var scriptOpcodes = ScriptOpcodes.createWithClass(AB_OP::class.java)
-	public var state = GameState();
-	public var back = BitmapData(640, 480, false, 0xFF000000.toInt());
-	public var front = BitmapData(640, 480, false, 0xFF000000.toInt());
-	public var textField = TextField().apply {
-		defaultTextFormat = TextFormat("Arial", 12, 0xFFFFFF);
-		selectable = false;
-		x = 110.0;
-		y = 400.0;
-		width = 420.0;
-		height = 60.0;
-		text = "";
-		textColor = Colors.WHITE
-	}
-	public var overlaySprite = Sprite()
-
-	public var voiceChannel = SoundChannel(views)
-	public var effectChannel = SoundChannel(views)
-	public var musicChannel = MusicChannel(views)
-	public var optionList = OptionList<GameState.Option>(IRectangle(108, 402, 428, 60), 3, 2, true)
-
-	public var gameSprite = Sprite().apply {
-		addChild(Bitmap(front, PixelSnapping.AUTO, true));
-		addChild(textField);
-		addChild(optionList.sprite);
-		addChild(overlaySprite);
-	}
-
-	public fun isSkipping() = views.isPressing(Keys.CONTROL_LEFT);
-
-	companion object {
-		private fun addExtensionsWhenRequired(name: String, expectedExtension: String): String {
-			return if (name.indexOf(".") >= 0) name else name + "." + expectedExtension
-		}
-
-		fun newAsync(views: Views, fileSystem: VfsFile): Promise<Game> {
-			return getDl1Async(fileSystem["SG.DL1"]).pipe { sg ->
-				getDl1Async(fileSystem["WV.DL1"]).then { wv ->
-					Game(views, fileSystem, sg, wv);
-				}
-			}
-		}
-
-		private fun getDl1Async(file: VfsFile): Promise<VfsFile> {
-			return file.openAsync().pipe { DL1.loadAsync(it) }
-		}
-	}
-
 	public fun getImageCachedAsync(imageName: String): Promise<BitmapData> {
-		val imageName = addExtensionsWhenRequired(imageName, "bmp").toUpperCase();
+		val imageName = Game.addExtensionsWhenRequired(imageName, "bmp").toUpperCase();
 
 		return if (imageName in imageCache) {
 			Promise.resolved(imageCache[imageName]!!);
@@ -103,7 +58,7 @@ class Game(
 	public fun getMusicAsync(musicName: String): Promise<Music> = getSoundMusicAsync("mid", mid, musicName, music = true).then { it as Music }
 
 	private fun getSoundMusicAsync(extension: String, vfs: VfsFile, name: String, music:Boolean): Promise<Any> {
-		val name = addExtensionsWhenRequired(name, extension).toUpperCase();
+		val name = Game.addExtensionsWhenRequired(name, extension).toUpperCase();
 		return vfs[name].readAllAsync().then { byteArray ->
 			if (music) {
 				views.audio.getMusic(byteArray, 0, byteArray.size)
@@ -114,7 +69,76 @@ class Game(
 	}
 }
 
+class Game(
+	val views: Views,
+	val resources: GameResources,
+    val ifc: DivideadInterface
+) {
+	// @TODO: Migrate
+	val sg = resources.sg
+	val fnt = resources.fnt
+
+	public var scriptOpcodes = ScriptOpcodes.createWithClass(AB_OP::class.java)
+	public var state = GameState();
+	public var back = BitmapData(640, 480, false, 0xFF000000.toInt());
+	public var front = BitmapData(640, 480, false, 0xFF000000.toInt());
+	public var textField = TextField(fnt).apply {
+		selectable = false;
+		x = 110.0;
+		y = 400.0;
+		width = 420.0;
+		height = 60.0;
+		text = "";
+		textColor = Colors.WHITE
+	}
+	public var overlaySprite = Sprite()
+
+	public var voiceChannel = SoundChannel(views)
+	public var effectChannel = SoundChannel(views)
+	public var musicChannel = MusicChannel(views)
+	public var optionList = OptionList<GameState.Option>(fnt, IRectangle(108, 402, 428, 60), 3, 2, true)
+
+	public var gameSprite = Sprite().apply {
+		addChild(Bitmap(front));
+		addChild(textField);
+		addChild(optionList.sprite);
+		addChild(overlaySprite);
+	}
+
+	public fun isSkipping() = views.isPressing(Keys.CONTROL_LEFT);
+
+	companion object {
+		fun addExtensionsWhenRequired(name: String, expectedExtension: String): String {
+			return if (name.indexOf(".") >= 0) name else name + "." + expectedExtension
+		}
+
+		fun newAsync(views: Views, commonVfs:VfsFile, gameVfs: VfsFile): Promise<Game> {
+			return getDl1Async(gameVfs["SG.DL1"]).pipe { sg ->
+				getDl1Async(gameVfs["WV.DL1"]).pipe { wv ->
+					BitmapFont.openAsync(views, commonVfs["arial-15.fnt"], commonVfs["arial-15.png"]).pipe { fnt ->
+						val resources = GameResources(views, gameVfs, sg, wv, fnt)
+						DivideadInterface.initAsync(resources).then { ifc ->
+							Game(views, resources, ifc)
+						}
+					}
+				}
+			}
+		}
+
+		private fun getDl1Async(file: VfsFile): Promise<VfsFile> {
+			return file.openAsync().pipe { DL1.loadAsync(it) }
+		}
+	}
+
+	// @TODO: Migrate
+	fun getImageCachedAsync(imageName: String) = resources.getImageCachedAsync(imageName)
+	fun getImageMaskCachedAsync(imageNameColor: String, imageNameMask: String) = resources.getImageMaskCachedAsync(imageNameColor, imageNameMask)
+	fun getSoundAsync(soundName: String) = resources.getSoundAsync(soundName)
+	fun getMusicAsync(musicName: String) = resources.getMusicAsync(musicName)
+}
+
 class OptionList<TOption : OptionList.Item>(
+	val font: BitmapFont,
 	val rect: IRectangle,
 	val rows: Int,
 	val columns: Int,
@@ -143,7 +167,7 @@ class OptionList<TOption : OptionList.Item>(
 		}
 		var selectedOption = options.first()
 		val optionTextFields = options.map {
-			Pair(it, TextField())
+			Pair(it, TextField(font))
 		}.toMap()
 
 		fun updateTextFields() {
@@ -191,5 +215,6 @@ class OptionList<TOption : OptionList.Item>(
 	fun hide() {
 		sprite.visible = false
 	}
+
 }
 

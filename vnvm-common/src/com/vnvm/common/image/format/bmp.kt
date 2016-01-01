@@ -3,14 +3,23 @@ package com.vnvm.common.image.format
 import com.vnvm.common.IRectangle
 import com.vnvm.common.error.InvalidArgumentException
 import com.vnvm.common.error.InvalidOperationException
+import com.vnvm.common.error.noImpl
 import com.vnvm.common.image.BitmapData
 import com.vnvm.common.image.BitmapData8
 import com.vnvm.common.image.Color
 import com.vnvm.common.image.Palette
 import com.vnvm.common.io.BinBytes
 
-object BMP {
-	fun decode(bytesData: ByteArray): BitmapData {
+object BMP : Imaging.Provider {
+	override fun encode(data: BitmapData): ByteArray {
+		noImpl
+	}
+
+	override fun isValid(bytesData: ByteArray):Boolean {
+		return BinBytes(bytesData).readUTFBytes(2) == "BP"
+	}
+
+	override fun decode(bytesData: ByteArray): BitmapData {
 		val bytes = BinBytes(bytesData)
 		// BITMAPFILEHEADER
 		val magic = bytes.readUTFBytes(2);

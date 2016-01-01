@@ -84,31 +84,29 @@ class AB_OP(val ab: AB) {
 		//println("TEXT: $text")
 		game.textField.text = text.replace('@', '"')
 
-		return game.getImageCachedAsync("waku_p").pipe { wakuB ->
-			var slices = (0 until 9).map { Bitmap(BitmapDataUtils.slice(wakuB, IRectangle(18 * it, 144, 18, 18))) }
-			var animated = Sprite();
-			var totalTime = 0
-			animated.addUpdatable { dt ->
-				totalTime += dt
-				animated.removeChildren();
-				animated.addChild(slices[(totalTime / 100) % slices.size]);
-			}
-			game.overlaySprite.removeChildren();
-			game.overlaySprite.addChild(animated);
-			var promise = if (game.isSkipping()) {
-				game.gameSprite.timers.waitAsync(50.milliseconds);
-			} else {
-				//game.gameSprite.timers.waitAsync(5000.milliseconds);
-				Promise.waitOneAsync(animated.keys.onKeyDown, animated.keys.onKeyPress, animated.mice.onMouseClick)
-			}
-			animated.x = 520.0;
-			animated.y = 448.0;
+		var slices = game.ifc.PAGES.map { Bitmap(it) }
+		var animated = Sprite()
+		var totalTime = 0
+		animated.addUpdatable { dt ->
+			totalTime += dt
+			animated.removeChildren();
+			animated.addChild(slices[(totalTime / 100) % slices.size])
+		}
+		game.overlaySprite.removeChildren();
+		game.overlaySprite.addChild(animated);
+		var promise = if (game.isSkipping()) {
+			game.gameSprite.timers.waitAsync(50.milliseconds);
+		} else {
+			//game.gameSprite.timers.waitAsync(5000.milliseconds);
+			Promise.waitOneAsync(animated.keys.onKeyDown, animated.keys.onKeyPress, animated.mice.onMouseClick)
+		}
+		animated.x = 520.0;
+		animated.y = 448.0;
 
-			promise.then { e ->
-				game.textField.text = "";
-				game.overlaySprite.removeChildren();
-				game.voiceChannel.stop();
-			}
+		return promise.then { e ->
+			game.textField.text = "";
+			game.overlaySprite.removeChildren();
+			game.voiceChannel.stop();
 		}
 	}
 
@@ -210,7 +208,7 @@ class AB_OP(val ab: AB) {
 	public fun WAIT(time: Int): Promise<Unit> {
 		if (game.isSkipping()) return Promise.unit
 
-		return game.gameSprite.timers.waitAsync(time.milliseconds)
+		return game.gameSprite.timers.waitAsync((time * 10).milliseconds)
 	}
 
 	// ---------------

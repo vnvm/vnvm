@@ -1,14 +1,13 @@
 package com.vnvm.common.view
 
+import com.vnvm.common.IRectangle
 import com.vnvm.common.TimeSpan
 import com.vnvm.common.async.EventLoop
 import com.vnvm.common.async.Promise
 import com.vnvm.common.async.Signal
 import com.vnvm.common.clamp
 import com.vnvm.common.clamp01
-import com.vnvm.common.image.BitmapData
-import com.vnvm.common.image.Color
-import com.vnvm.common.image.Colors
+import com.vnvm.common.image.*
 import com.vnvm.graphics.*
 
 interface Updatable {
@@ -235,7 +234,7 @@ open class DisplayObject {
 	open fun onEventInternal(event: Event) {
 	}
 
-	override fun toString():String {
+	override fun toString(): String {
 		var out = this.javaClass.simpleName
 		if (x != 0.0 || y != 0.0) out += " XY($x, $y)"
 		if (scaleX != 1.0 || scaleY != 1.0) out += " SXY($scaleX, $scaleY)"
@@ -268,23 +267,29 @@ open class Sprite : DisplayObject() {
 	}
 }
 
-enum class PixelSnapping { AUTO }
+class Bitmap(val data: BitmapData, val rect: IRectangle = data.rect) : DisplayObject() {
+	constructor(slice: BitmapDataSlice) : this(slice.bitmapData, slice.slice)
 
-class Bitmap(val data: BitmapData, val snapping: PixelSnapping = PixelSnapping.AUTO, val smooth: Boolean = true) : DisplayObject() {
-	var width = data.width
-	var height = data.height
+	var width = rect.width
+	var height = rect.height
+	private var slice: TextureSlice? = null
 
 	override fun renderInternal(views: Views, context: RenderContext) {
 		views.usedBitmapDatas.add(data)
 		if (data.texture == null) {
 			data.texture = context.createTexture(data)
+			slice = null
 		}
-		context.quad(data.texture!!, width.toDouble(), height.toDouble())
+		if (slice == null) {
+			slice = data.texture!!.slice(rect)
+			println(slice)
+		}
+		context.quad(slice!!, 0.0, 0.0, width.toDouble(), height.toDouble())
 	}
 }
 
-open class TextField : DisplayObject() {
-	var defaultTextFormat: TextFormat = TextFormat("Arial", 10, -1)
+open class TextField(val font: BitmapFont) : DisplayObject() {
+	var fontSize: Double = 16.0
 	var width: Double = 100.0
 	var height: Double = 100.0
 	var text: String = ""
@@ -292,12 +297,8 @@ open class TextField : DisplayObject() {
 	var textColor: Color = Colors.RED
 
 	override fun renderInternal(views: Views, context: RenderContext) {
-		context.text(text, textColor)
+		font.render(context, textColor, text, fontSize, 0, 0)
 	}
-}
-
-data class TextFormat(val face: String, val size: Int, val color: Int) {
-
 }
 
 fun DisplayObject.dump(pre: String = "") {

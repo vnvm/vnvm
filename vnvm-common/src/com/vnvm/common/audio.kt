@@ -9,25 +9,31 @@ data class SoundTransform(val vol: Double, val panning: Double)
 class SoundChannel(val views: Views) {
 	private var last: Sound? = null
 
+	fun Sound.stop():Unit = views.audio.stop(this)
+
 	fun play(sound: Sound): Unit {
-		if (last != null) views.audio.stop(last!!)
+		last?.stop()
 		last = sound
 		views.audio.play(sound)
 	}
 
 	fun stop() {
+		last?.stop()
 	}
 }
 
 class MusicChannel(val views: Views) {
 	private var last: Music? = null
 
+	fun Music.stop():Unit = views.audio.stop(this)
+
 	fun play(music: Music): Unit {
-		if (last != null) views.audio.stop(last!!)
+		last?.stop()
 		last = music
 		views.audio.play(music)
 	}
 
 	fun stop() {
+		last?.stop()
 	}
 }

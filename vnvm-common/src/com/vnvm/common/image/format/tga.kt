@@ -1,9 +1,19 @@
 package com.vnvm.common.image.format
 
+import com.vnvm.common.error.noImpl
 import com.vnvm.common.image.BitmapData
 
-object TGA {
-	fun encode(data: BitmapData): ByteArray {
+object TGA : Imaging.Provider {
+	override fun isValid(data: ByteArray): Boolean {
+		//noImpl
+		return false
+	}
+
+	override fun decode(data: ByteArray): BitmapData {
+		noImpl
+	}
+
+	override fun encode(data: BitmapData): ByteArray {
 		/*
 		typedef struct {
 		char  idlength;

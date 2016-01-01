@@ -4,15 +4,17 @@ import com.vnvm.common.*
 import com.vnvm.common.collection.foreach
 import com.vnvm.graphics.TextureSlice
 
-enum class BitmapDataChannel(val shift:Int) {
+enum class BitmapDataChannel(val shift: Int) {
 	RED(Color.RShift), GREEN(Color.GShift), BLUE(Color.BShift), ALPHA(Color.AShift);
 
-	fun get(color:Int):Int = (color ushr shift) and 0xFF
-	fun set(color:Int, value:Int):Int {
+	fun get(color: Int): Int = (color ushr shift) and 0xFF
+	fun set(color: Int, value: Int): Int {
 		val mask = 0xFF shl shift
 		return (color and mask.inv()) or ((value and 0xFF) shl shift)
 	}
 }
+
+class BitmapDataSlice(val bitmapData: BitmapData, val slice: IRectangle = bitmapData.rect)
 
 class BitmapData(val width: Int, val height: Int, val transparent: Boolean = true, val color: Int = -1) {
 	var texture: TextureSlice? = null
@@ -72,7 +74,7 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 
 	//fun draw(bitmapData: BitmapData, matrix: Matrix): Unit = noImpl
 
-	private fun _draw(bitmapData: BitmapData, rect: IRectangle, px: Int, py: Int, blending:Boolean, alpha:Double): Unit {
+	private fun _draw(bitmapData: BitmapData, rect: IRectangle, px: Int, py: Int, blending: Boolean, alpha: Double): Unit {
 		lock {
 			if (blending) {
 				// @TODO: Faster mixing!
@@ -102,11 +104,11 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 		}
 	}
 
-	fun draw(bitmapData: BitmapData, rect: IRectangle, px: Int, py: Int, alpha:Double = 1.0): Unit {
+	fun draw(bitmapData: BitmapData, rect: IRectangle, px: Int, py: Int, alpha: Double = 1.0): Unit {
 		_draw(bitmapData, rect, px, py, blending = true, alpha = alpha)
 	}
 
-	fun draw(bitmapData: BitmapData, px: Int, py: Int, alpha:Double = 1.0): Unit {
+	fun draw(bitmapData: BitmapData, px: Int, py: Int, alpha: Double = 1.0): Unit {
 		_draw(bitmapData, bitmapData.rect, px, py, blending = true, alpha = alpha)
 	}
 
@@ -184,14 +186,13 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 	}
 }
 
+fun BitmapData.slice(rect: IRectangle): BitmapData {
+	var destination = BitmapData(rect.width, rect.height);
+	destination.copyPixels(this, rect, IPoint(0, 0))
+	return destination;
+}
 
 object BitmapDataUtils {
-	fun slice(source: BitmapData, rect: IRectangle): BitmapData {
-		var destination = BitmapData(rect.width, rect.height);
-		destination.copyPixels(source, rect, IPoint(0, 0))
-		return destination;
-	}
-
 	fun combineColorMask(color: BitmapData, mask: BitmapData): BitmapData {
 		var newBitmap = BitmapData(color.width, color.height, true, 0x00000000);
 		newBitmap.copyPixels(color, color.rect, IPoint(0, 0));
