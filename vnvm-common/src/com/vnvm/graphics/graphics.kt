@@ -3,6 +3,7 @@ package com.vnvm.graphics
 import com.vnvm.common.Disposable
 import com.vnvm.common.async.Signal
 import com.vnvm.common.image.BitmapData
+import com.vnvm.common.image.Color
 
 interface RenderContext : GraphicsContext {
 	fun begin(): Unit
@@ -13,7 +14,7 @@ interface RenderContext : GraphicsContext {
 	fun scale(sx: Double, sy: Double): Unit
 	fun quad(tex: TextureSlice, width: Double = tex.width, height: Double = tex.height)
 	fun end(): Unit
-	fun text(text: String)
+	fun text(text: String, color: Color)
 }
 
 interface GraphicsContext {
@@ -36,11 +37,20 @@ data class KeyUpEvent(override var code:Int) : KeyEvent
 
 
 object Keys {
+	val INVALID = -1
+	//val Control = 17
+	val CONTROL_LEFT = 113
+	val CONTROL_RIGHT = 114
+
+	val UP = 19
+	val DOWN = 20
+	val LEFT = 21
+	val RIGHT = 22
+	/*
 	val Backspace = 8
 	val Tab = 9
 	val Enter = 13
 	val Shift = 16
-	val Control = 17
 	val CapsLock = 20
 	val Esc = 27
 	val Spacebar = 32
@@ -138,6 +148,10 @@ object Keys {
 	val CloseBrackets = 221
 	val DquoteQuote = 222
 	val Capo = 192
+	*/
+
+	// http://developer.android.com/reference/android/view/KeyEvent.html
+	val Return = 66
 }
 
 interface InputContext {

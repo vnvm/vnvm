@@ -32,7 +32,7 @@ class AB(public var game: Game) {
 			'2' -> script.readShort()
 			'T', 'S', 's' -> script.readStringz()
 			'P' -> script.readUnsignedInt()
-			'c' -> script.readUnsignedByte()
+			'c' -> script.readUnsignedByte().toChar()
 			else -> throw InvalidOperationException("Invalid format type '$type'")
 		}
 	}

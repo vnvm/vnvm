@@ -17,6 +17,7 @@ import com.vnvm.common.async.Signal
 import com.vnvm.common.collection.Stack
 import com.vnvm.common.error.ignoreerror
 import com.vnvm.common.image.BitmapData
+import com.vnvm.common.image.Color
 import com.vnvm.common.view.Views
 import com.vnvm.engine.dividead.DivideadEngine
 import com.vnvm.graphics.*
@@ -136,7 +137,7 @@ class LibgdxContext : RenderContext, GraphicsContext, InputContext, WindowContex
 		affine.scale(sx.toFloat(), sy.toFloat())
 	}
 
-	override fun text(text: String) {
+	override fun text(text: String, color: Color) {
 		if (DEBUG) println("text: '$text'")
 		if (text.length <= 0) return
 		//font.color = Color.RED
@@ -144,6 +145,7 @@ class LibgdxContext : RenderContext, GraphicsContext, InputContext, WindowContex
 		//font.draw(batch, text, x.toFloat(), y.toFloat() + font.descent)
 		val translation = affine.getTranslation(Vector2())
 
+		font.setColor(color.rf, color.gf, color.bf, color.af)
 		font.draw(batch, text, translation.x, translation.y)
 	}
 
@@ -178,10 +180,11 @@ class GdxApp(private val init: (views: Views) -> Unit) : ApplicationListener {
 		init(this.views)
 		val clickEvent = MouseClickEvent(0.0, 0.0, 0)
 		val moveEvent = MouseMovedEvent(0.0, 0.0)
-		val keyDown = KeyDownEvent(Keys.A)
-		val keyUp = KeyUpEvent(Keys.A)
-		val keyPress = KeyPressEvent(Keys.A)
+		val keyDown = KeyDownEvent(Keys.INVALID)
+		val keyUp = KeyUpEvent(Keys.INVALID)
+		val keyPress = KeyPressEvent(Keys.INVALID)
 		val onEvent = context.onEvent
+		println("GdxApp.create()")
 		Gdx.input.inputProcessor = object : InputProcessor {
 			override fun touchUp(screenX: Int, screenY: Int, pointer: Int, button: Int): Boolean {
 				clickEvent.x = screenX.toDouble()

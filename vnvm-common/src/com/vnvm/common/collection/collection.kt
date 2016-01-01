@@ -78,3 +78,6 @@ class Array2 {
 	}
 }
 
+fun <T : Any> Iterable<T>.without(item:T):List<T> {
+	return this.filter { it != item }
+}

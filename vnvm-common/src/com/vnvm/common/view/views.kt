@@ -7,6 +7,8 @@ import com.vnvm.common.async.Signal
 import com.vnvm.common.clamp
 import com.vnvm.common.clamp01
 import com.vnvm.common.image.BitmapData
+import com.vnvm.common.image.Color
+import com.vnvm.common.image.Colors
 import com.vnvm.graphics.*
 
 interface Updatable {
@@ -19,6 +21,10 @@ class Views(val graphics: GraphicsContext, val input: InputContext, val window: 
 	val lastFrameBitmapDatas = hashSetOf<BitmapData>()
 
 	var frames = 0
+
+	init {
+		input.onEvent.add { root.onEvent(it) }
+	}
 
 	fun render(context: RenderContext) {
 		if (frames++ == 0) {
@@ -40,7 +46,6 @@ class Views(val graphics: GraphicsContext, val input: InputContext, val window: 
 				lastFrameBitmapDatas.clear()
 			}
 		}
-		input.onEvent.add { root.onEvent(it) }
 	}
 
 	private var lastTime: Long = System.currentTimeMillis()
@@ -179,8 +184,12 @@ open class DisplayObject {
 	private var updatables = arrayListOf<Updatable>()
 	val timers: Timers by lazy { addUpdatable(Timers()) }
 	val tweens: Tweens by lazy { addUpdatable(Tweens()) }
-	val mice: Mice by lazy { Mice() }
-	val keys: KeyHandler by lazy { KeyHandler() }
+
+	private var _mice: Mice? = null
+	private var _keys: KeyHandler? = null
+
+	val mice: Mice by lazy { _mice = Mice(); _mice!! }
+	val keys: KeyHandler by lazy { _keys = KeyHandler(); _keys!! }
 
 	fun <T : Updatable> addUpdatable(updatable: T): T {
 		updatables.add(updatable)
@@ -199,6 +208,7 @@ open class DisplayObject {
 	}
 
 	fun render(views: Views, context: RenderContext): Unit {
+		if (!visible) return
 		context.save()
 		if (x != 0.0 || y != 0.0) context.translate(x, y)
 		if (scaleX != 1.0 || scaleY != 1.0) context.scale(scaleX, scaleY)
@@ -215,8 +225,10 @@ open class DisplayObject {
 
 	fun onEvent(event: Event) {
 		if (visible == false) return
-		if (event is MouseEvent) mice.onEvent(event)
-		if (event is KeyEvent) keys.onEvent(event)
+		when (event) {
+			is MouseEvent -> _mice?.onEvent(event)
+			is KeyEvent -> _keys?.onEvent(event)
+		}
 		onEventInternal(event)
 	}
 
@@ -277,10 +289,10 @@ open class TextField : DisplayObject() {
 	var height: Double = 100.0
 	var text: String = ""
 	var selectable: Boolean = false
-	var textColor: Int = -1
+	var textColor: Color = Colors.RED
 
 	override fun renderInternal(views: Views, context: RenderContext) {
-		context.text(text)
+		context.text(text, textColor)
 	}
 }
 

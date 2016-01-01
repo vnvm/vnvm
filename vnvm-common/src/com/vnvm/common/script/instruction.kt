@@ -20,13 +20,13 @@ data class Instruction2(
 		} else if (!opcode.info.skipLog) {
 			Log.trace("Executing... $this");
 		}
-		//try {
+		try {
 			return method(obj, *parameters);
-		//} catch (e:Throwable) {
-		//	val paramcount = parameters.size
-		//	println("FAILED: this=$this : obj=$obj : method=${opcode.method} : paramcount=$paramcount, parameters=${parameters.toList()} : e=$e")
-		//	throw e
-		//}
+		} catch (e:Throwable) {
+			val paramcount = parameters.size
+			println("FAILED: this=$this : obj=$obj : method=${opcode.method} : paramcount=$paramcount, parameters=${parameters.toList()} : e=$e")
+			throw e
+		}
 	}
 
 	override public fun toString(): String {

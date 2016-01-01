@@ -3,7 +3,7 @@ package com.vnvm.engine.dividead
 import com.vnvm.common.IRectangle
 
 class GameState {
-	data class Option(val pointer:Int, val text: String)
+	data class Option(val pointer:Int, override val text: String) : OptionList.Item
 	data class MapOption(val pointer:Int, val rect: IRectangle)
 
 	public var options = arrayListOf<Option>()

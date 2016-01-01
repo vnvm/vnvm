@@ -133,8 +133,7 @@ class AB_OP(val ab: AB) {
 	@Opcode(id = 0x07, format = "", description = "Show the list of options")
 	//@Unimplemented
 	public fun OPTION_SHOW(): Promise<Unit> {
-		game.optionList.show(state.options.map { Pair(it.text, it) })
-		return game.optionList.onSelected.waitOneAsync().then { e ->
+		return game.optionList.showAsync(state.options).then { e ->
 			game.optionList.hide()
 			ab.jump(e.pointer)
 		}

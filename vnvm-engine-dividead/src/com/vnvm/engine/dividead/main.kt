@@ -42,8 +42,10 @@ object DivideadEngine {
 
 		IsoFile.openAsync(fs["dividead.iso"]).then {
 			//runTest(views, it)
-			runGame(views, it, "aastart", 0) // start
-			//runGame(views, it, "aastart", 0x089A) // options
+			//runGame(views, it, "aastart", 0) // start
+			runGame(views, it, "aastart", 0x089A) // options
+			//runGame(views, it, "aastart", 0x1841) // characters
+			//runGame(views, it, "aastart", 0x295B) // JUMP_IF
 		}
 	}
 }

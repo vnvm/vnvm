@@ -1,13 +1,23 @@
 package com.vnvm.common
 
-class Point(
+import com.vnvm.common.collection.Array2
+
+data class Point(
 	@JvmField var x: Double = 0.0,
 	@JvmField var y: Double = 0.0
 ) {
+	constructor(x: Int, y: Int) : this(x.toDouble(), y.toDouble())
+
 	fun setTo(x: Double, y: Double): Point {
 		this.x = x
 		this.y = y
 		return this
+	}
+
+	companion object {
+		fun range(x:Int, y:Int): List<Point> {
+			return Array2.range(x, y).map { Point(it.first, it.second) }
+		}
 	}
 }
 
@@ -68,9 +78,11 @@ data class IRectangle(val x: Int, val y: Int, val width: Int, val height: Int) {
 		}
 	}
 
-	fun translate(dx: Int, dy: Int):IRectangle {
+	fun translate(dx: Int, dy: Int): IRectangle {
 		return IRectangle(this.x + dx, this.y + dy, this.width, this.height)
 	}
+
+	fun contains(x: Int, y: Int): Boolean = (x >= left && y >= top && x < right && y < bottom)
 }
 
 fun IRectangle.intersection(that: IRectangle): IRectangle {

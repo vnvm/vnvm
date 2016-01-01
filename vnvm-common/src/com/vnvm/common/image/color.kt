@@ -88,26 +88,46 @@ class MutableColor(
 	fun toInt() = Color.packRGBA(r, g, b, a)
 }
 
-class Color(
-	override val r: Int,
-	override val g: Int,
-	override val b: Int,
-	override val a: Int
-) : BColor {
+class Color(r: Int, g: Int, b: Int, a: Int) : BColor {
+	override val r: Int = r and 0xff
+	override val g: Int = g and 0xff
+	override val b: Int = b and 0xff
+	override val a: Int = a and 0xff
+
+	val rf: Float get() = r.toFloat() / 255f
+	val gf: Float get() = g.toFloat() / 255f
+	val bf: Float get() = b.toFloat() / 255f
+	val af: Float get() = a.toFloat() / 255f
+
 	companion object {
-		fun getB(value: Int): Int = (value ushr 0) and 0xFF
-		fun getG(value: Int): Int = (value ushr 8) and 0xFF
-		fun getR(value: Int): Int = (value ushr 16) and 0xFF
-		fun getA(value: Int): Int = (value ushr 24) and 0xFF
+		const val BShift = 0
+		const val GShift = 8
+		const val RShift = 16
+		const val AShift = 24
+
+		fun getB(value: Int): Int = (value ushr BShift) and 0xFF
+		fun getG(value: Int): Int = (value ushr GShift) and 0xFF
+		fun getR(value: Int): Int = (value ushr RShift) and 0xFF
+		fun getA(value: Int): Int = (value ushr AShift) and 0xFF
+
+		fun getBf(value: Int): Double = getB(value).toDouble() / 255.0
+		fun getGf(value: Int): Double = getG(value).toDouble() / 255.0
+		fun getRf(value: Int): Double = getR(value).toDouble() / 255.0
+		fun getAf(value: Int): Double = getA(value).toDouble() / 255.0
+
 		fun packRGBA(r: Int, g: Int, b: Int, a: Int): Int = BitUtils.pack32(b, g, r, a)
-		fun mixComp(a: Int, b: Int, ratio: Double) = ((a * (1.0 - ratio)) + b * ratio).toInt().clamp255()
-		fun mixRGBA(a: Int, b: Int, ratio: Double): Int {
+		fun mixComp(x: Int, y: Int, ratio: Double) = ((x * (1.0 - ratio)) + y * ratio).toInt().clamp255()
+		fun mixRGBA(x: Int, y: Int, ratio: Double): Int {
 			return packRGBA(
-				mixComp(getR(a), getR(b), ratio),
-				mixComp(getG(a), getG(b), ratio),
-				mixComp(getB(a), getB(b), ratio),
-				mixComp(getA(a), getA(b), ratio)
+				mixComp(getR(x), getR(y), ratio),
+				mixComp(getG(x), getG(y), ratio),
+				mixComp(getB(x), getB(y), ratio),
+				mixComp(getA(x), getA(y), ratio)
 			)
+		}
+
+		fun mixRGBAv2(x: Int, y: Int, ratio: Double): Int {
+			return mixRGBA(x, y, getAf(y) * ratio)
 		}
 
 		fun add(left: Color, right: Color) = MutableColor().setAdd(left, right).toColor()
@@ -122,4 +142,7 @@ class Color(
 object Colors {
 	val BLACK = Color(0, 0, 0, 255)
 	val WHITE = Color(255, 255, 255, 255)
+	val RED = Color(255, 0, 0, 255)
+	val GREEN = Color(0, 255, 0, 255)
+	val BLUE = Color(0, 0, 255, 255)
 }

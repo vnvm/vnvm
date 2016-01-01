@@ -4,8 +4,14 @@ import com.vnvm.common.*
 import com.vnvm.common.collection.foreach
 import com.vnvm.graphics.TextureSlice
 
-enum class BitmapDataChannel {
-	RED, GREEN, BLUE, ALPHA
+enum class BitmapDataChannel(val shift:Int) {
+	RED(Color.RShift), GREEN(Color.GShift), BLUE(Color.BShift), ALPHA(Color.AShift);
+
+	fun get(color:Int):Int = (color ushr shift) and 0xFF
+	fun set(color:Int, value:Int):Int {
+		val mask = 0xFF shl shift
+		return (color and mask.inv()) or ((value and 0xFF) shl shift)
+	}
 }
 
 class BitmapData(val width: Int, val height: Int, val transparent: Boolean = true, val color: Int = -1) {
@@ -78,7 +84,7 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 						if (ty < 0 || ty >= this.height) break
 						val new = bitmapData.getPixel32(x + rect.x, y + rect.y)
 						val old = this.getPixel32(tx, ty)
-						this.setPixel32(tx, ty, Color.mixRGBA(old, new, alpha))
+						this.setPixel32(tx, ty, Color.mixRGBAv2(old, new, alpha))
 					}
 				}
 			} else {
@@ -111,8 +117,31 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 		return data
 	}
 
-	fun copyChannel(sourceBitmapData: BitmapData, sourceRect: IRectangle, destPoint: IPoint, sourceChannel: BitmapDataChannel, destChannel: BitmapDataChannel): Unit {
-		println("BitmapData.copyChannel")
+	fun copyChannel(
+		sourceBitmapData: BitmapData,
+		sourceRect: IRectangle,
+		destPoint: IPoint,
+		sourceChannel: BitmapDataChannel,
+		destChannel: BitmapDataChannel
+	): Unit {
+		val dest = this
+		for (y in 0 until sourceRect.height) {
+			for (x in 0 until sourceRect.width) {
+				val sx = sourceRect.x + x
+				val sy = sourceRect.y + y
+				val dx = destPoint.x + x
+				val dy = destPoint.y + y
+
+				if (!dest.rect.contains(dx, dy)) continue
+				if (!sourceBitmapData.rect.contains(sx, sy)) continue
+
+				val src = sourceBitmapData.getPixel32(sx, sy)
+				val dst = dest.getPixel32(dx, dy)
+				val srcV = sourceChannel.get(src)
+				val mix = destChannel.set(dst, srcV)
+				dest.setPixel32(destPoint.x + x, destPoint.y + y, mix)
+			}
+		}
 	}
 
 	companion object {
