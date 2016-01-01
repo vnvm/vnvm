@@ -2,18 +2,16 @@ package com.vnvm.engine.dividead
 
 import com.vnvm.common.*
 import com.vnvm.common.async.Promise
-import com.vnvm.common.async.Signal
-import com.vnvm.common.collection.Array2
-import com.vnvm.common.collection.without
 import com.vnvm.common.error.InvalidOperationException
 import com.vnvm.common.image.BitmapData
 import com.vnvm.common.image.BitmapDataUtils
 import com.vnvm.common.image.Colors
 import com.vnvm.common.io.VfsFile
-import com.vnvm.common.log.Log
 import com.vnvm.common.script.ScriptOpcodes
 import com.vnvm.common.view.*
 import com.vnvm.graphics.Keys
+import com.vnvm.graphics.Music
+import com.vnvm.graphics.Sound
 import com.vnvm.ui.SpatialMenu
 
 class Game(
@@ -41,9 +39,9 @@ class Game(
 	}
 	public var overlaySprite = Sprite()
 
-	public var voiceChannel = SoundChannel()
-	public var effectChannel = SoundChannel()
-	public var musicChannel = SoundChannel()
+	public var voiceChannel = SoundChannel(views)
+	public var effectChannel = SoundChannel(views)
+	public var musicChannel = MusicChannel(views)
 	public var optionList = OptionList<GameState.Option>(IRectangle(108, 402, 428, 60), 3, 2, true)
 
 	public var gameSprite = Sprite().apply {
@@ -101,20 +99,17 @@ class Game(
 		}
 	}
 
-	public fun getSoundAsync(soundName: String): Promise<Sound> = getSoundMusicAsync("wav", wv, soundName);
-	public fun getMusicAsync(musicName: String): Promise<Sound> = getSoundMusicAsync("mid", mid, musicName);
+	public fun getSoundAsync(soundName: String): Promise<Sound> = getSoundMusicAsync("wav", wv, soundName, music = false).then { it as Sound }
+	public fun getMusicAsync(musicName: String): Promise<Music> = getSoundMusicAsync("mid", mid, musicName, music = true).then { it as Music }
 
-	private fun getSoundMusicAsync(extension: String, vfs: VfsFile, name: String): Promise<Sound> {
+	private fun getSoundMusicAsync(extension: String, vfs: VfsFile, name: String, music:Boolean): Promise<Any> {
 		val name = addExtensionsWhenRequired(name, extension).toUpperCase();
-
 		return vfs[name].readAllAsync().then { byteArray ->
-			var sound = Sound()
-			try {
-				sound.loadCompressedDataFromByteArray(byteArray, byteArray.size);
-			} catch (e: Throwable) {
-				Log.trace("Error: $e");
+			if (music) {
+				views.audio.getMusic(byteArray, 0, byteArray.size)
+			} else {
+				views.audio.getSound(byteArray, 0, byteArray.size)
 			}
-			sound
 		}
 	}
 }
@@ -136,7 +131,7 @@ class OptionList<TOption : OptionList.Item>(
 	}
 	val elementSize = IPoint(rect.width / columns, rect.height / rows)
 
-	fun showAsync(items: List<TOption>):Promise<TOption> {
+	fun showAsync(items: List<TOption>): Promise<TOption> {
 		if (items.size == 0) return Promise.rejected(InvalidOperationException("No items to select!"))
 		val deferred = Promise.Deferred<TOption>()
 		sprite.removeChildren()

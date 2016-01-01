@@ -15,7 +15,7 @@ interface Updatable {
 	fun update(dt: Int): Unit
 }
 
-class Views(val graphics: GraphicsContext, val input: InputContext, val window: WindowContext) : Updatable {
+class Views(val graphics: GraphicsContext, val input: InputContext, val window: WindowContext, val audio: AudioContext) : Updatable {
 	public val root = Sprite()
 	val usedBitmapDatas = hashSetOf<BitmapData>()
 	val lastFrameBitmapDatas = hashSetOf<BitmapData>()

@@ -1,7 +1,6 @@
 package com.vnvm.engine.dividead
 
 import com.vnvm.common.IRectangle
-import com.vnvm.common.Sound
 import com.vnvm.common.async.Promise
 import com.vnvm.common.async.unit
 import com.vnvm.common.async.waitOneAsync
@@ -14,6 +13,7 @@ import com.vnvm.common.script.Opcode
 import com.vnvm.common.seconds
 import com.vnvm.common.view.Bitmap
 import com.vnvm.common.view.Sprite
+import com.vnvm.graphics.Sound
 
 class AB_OP(val ab: AB) {
 	//static var margin = { x = 108, y = 400, h = 12 };

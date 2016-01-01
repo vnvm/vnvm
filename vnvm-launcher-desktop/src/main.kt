@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.InputProcessor
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
+import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
 import com.badlogic.gdx.graphics.g2d.BitmapFont
@@ -78,7 +79,53 @@ class LibgdxTexture(
 	}
 }
 
-class LibgdxContext : RenderContext, GraphicsContext, InputContext, WindowContext {
+class SoundWrapper(val native:com.badlogic.gdx.audio.Sound) : Sound {
+}
+
+class MusicWrapper(val native:com.badlogic.gdx.audio.Music) : Music {
+}
+
+class LibgdxContext : RenderContext, GraphicsContext, InputContext, WindowContext, AudioContext {
+	override fun getSound(data: ByteArray, offset: Int, size: Int): Sound {
+		val file = FileHandle.tempDirectory("vnvm").child("1.wav")
+		file.writeBytes(data, offset, size, false)
+		return try {
+			SoundWrapper(Gdx.audio.newSound(file))
+		} catch (e:Throwable) {
+			e.printStackTrace()
+			DummySoundMusic
+		}
+	}
+
+	override fun getMusic(data: ByteArray, offset: Int, size: Int): Music {
+		val file = FileHandle.tempDirectory("vnvm").child("1.mid")
+		file.writeBytes(data, offset, size, false)
+		return try {
+			MusicWrapper(Gdx.audio.newMusic(file))
+		} catch (e:Throwable) {
+			e.printStackTrace()
+			DummySoundMusic
+		}
+	}
+
+	override fun play(sound: Sound) {
+		(sound as? SoundWrapper)?.native?.play()
+	}
+
+	override fun play(sound: Music) {
+		(sound as? MusicWrapper)?.native?.play()
+	}
+
+	override fun stop(sound:Sound) {
+		(sound as? SoundWrapper)?.native?.stop()
+		(sound as? SoundWrapper)?.native?.dispose()
+	}
+
+	override fun stop(sound:Music) {
+		(sound as? MusicWrapper)?.native?.stop()
+		(sound as? MusicWrapper)?.native?.dispose()
+	}
+
 	override var title: String
 		get() = throw UnsupportedOperationException()
 		set(value) {
@@ -176,7 +223,7 @@ class GdxApp(private val init: (views: Views) -> Unit) : ApplicationListener {
 	override public fun create(): Unit {
 		val context = LibgdxContext()
 		this.context = context
-		this.views = Views(context, context, context)
+		this.views = Views(context, context, context, context)
 		init(this.views)
 		val clickEvent = MouseClickEvent(0.0, 0.0, 0)
 		val moveEvent = MouseMovedEvent(0.0, 0.0)

@@ -26,14 +26,16 @@ interface MouseEvent : Event {
 	var x: Double
 	var y: Double
 }
+
 interface KeyEvent : Event {
 	var code: Int
 }
+
 data class MouseMovedEvent(override var x: Double, override var y: Double) : MouseEvent
 data class MouseClickEvent(override var x: Double, override var y: Double, var button: Int) : MouseEvent
-data class KeyPressEvent(override var code:Int) : KeyEvent
-data class KeyDownEvent(override var code:Int) : KeyEvent
-data class KeyUpEvent(override var code:Int) : KeyEvent
+data class KeyPressEvent(override var code: Int) : KeyEvent
+data class KeyDownEvent(override var code: Int) : KeyEvent
+data class KeyUpEvent(override var code: Int) : KeyEvent
 
 
 object Keys {
@@ -156,6 +158,23 @@ object Keys {
 
 interface InputContext {
 	val onEvent: Signal<Event>
+}
+
+interface Sound {
+}
+
+interface Music {
+}
+
+object DummySoundMusic : Sound, Music
+
+interface AudioContext {
+	fun getMusic(data: ByteArray, offset:Int = 0, size:Int = data.size): Music
+	fun getSound(data: ByteArray, offset:Int = 0, size:Int = data.size): Sound
+	fun play(sound: Sound): Unit
+	fun play(sound: Music): Unit
+	fun stop(sound: Sound): Unit
+	fun stop(sound: Music): Unit
 }
 
 interface WindowContext {
