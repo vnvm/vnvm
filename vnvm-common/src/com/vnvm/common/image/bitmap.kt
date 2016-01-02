@@ -16,28 +16,25 @@ enum class BitmapDataChannel(val shift: Int) {
 
 class BitmapDataSlice(val bitmapData: BitmapData, val slice: IRectangle = bitmapData.rect)
 
-class BitmapData(val width: Int, val height: Int, val transparent: Boolean = true, val color: Int = -1) {
+class BitmapData(val width: Int, val height: Int, val color: BColor = Colors.TRANSPARENT) {
 	var texture: TextureSlice? = null
-	val data: ByteArray = ByteArray(width * height * 4)
+	val data = IntArray(width * height)
 	val rect = IRectangle(0, 0, width, height)
 	var version = 0
 
 	init {
-		for (y in 0 until height) {
-			for (x in 0 until width) {
-				setPixel32(x, y, color)
-			}
-		}
+		val color = color.toInt()
+		for (n in 0 until width * height) data[n] = color
 	}
 
-	private fun getOffset(x: Int, y: Int) = (y * width + x) * 4
+	private fun getOffset(x: Int, y: Int) = (y * width + x)
 
-	private fun _transfer(r: IRectangle, data: ByteArray, dir: Boolean, flipY: Boolean): Unit {
+	private fun _transfer(r: IRectangle, data: IntArray, dir: Boolean, flipY: Boolean): Unit {
 		for (y in 0 until r.height) {
 			val y2 = if (flipY) r.height - y - 1 else y
 			val outOffset = getOffset(r.left, r.top + y)
-			val inOffset = (r.width * y2) * 4
-			val size = r.width * 4
+			val inOffset = (r.width * y2)
+			val size = r.width
 			if (dir) {
 				System.arraycopy(data, inOffset, this.data, outOffset, size)
 			} else {
@@ -46,7 +43,7 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 		}
 	}
 
-	fun setPixels(rect: IRectangle, data: ByteArray, flipY: Boolean = false): Unit {
+	fun setPixels(rect: IRectangle, data: IntArray, flipY: Boolean = false): Unit {
 		lock {
 			val r = rect.intersection(this.rect)
 			//val r = rect
@@ -67,11 +64,19 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 	}
 
 	fun getPixel32(x: Int, y: Int): Int {
-		return Memory.getI32(data, getOffset(x, y))
+		return data[getOffset(x, y)]
+	}
+
+	fun getPixel32(offset: Int): Int {
+		return data[offset]
 	}
 
 	fun setPixel32(x: Int, y: Int, value: Int): Unit {
-		Memory.setI32(data, getOffset(x, y), value)
+		data[getOffset(x, y)] = value
+	}
+
+	fun setPixel32(offset: Int, value: Int): Unit {
+		data[offset] = value
 	}
 
 	inline fun lock(callback: () -> Unit) {
@@ -120,9 +125,9 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 		_draw(bitmapData, bitmapData.rect, px, py, blending = true, alpha = alpha)
 	}
 
-	fun getPixels(rect: IRectangle = this.rect, flipY: Boolean = false): ByteArray {
+	fun getPixels(rect: IRectangle = this.rect, flipY: Boolean = false): IntArray {
 		val r = rect.intersection(this.rect)
-		val data = ByteArray(r.area * 4)
+		val data = IntArray(r.area)
 		_transfer(r, data, false, flipY)
 		return data
 	}
@@ -166,7 +171,7 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 		lock {
 			foreach(width, height) { x, y, n ->
 				//println("$width, $height, $x, $y, $n")
-				Memory.setI32(data, n * 4, callback(x, y, n))
+				data[n] = callback(x, y, n)
 			}
 		}
 	}
@@ -174,14 +179,13 @@ class BitmapData(val width: Int, val height: Int, val transparent: Boolean = tru
 	fun foreach(callback: (x: Int, y: Int, n: Int, color: Int) -> Unit) {
 		foreach(width, height) { x, y, n ->
 			//println("$width, $height, $x, $y, $n")
-			val color = Memory.getI32(data, n * 4)
-			callback(x, y, n, color)
+			callback(x, y, n, data[n])
 		}
 	}
 
 	fun flipY() {
 		lock {
-			val temp = ByteArray(width * 4)
+			val temp = IntArray(width)
 			val size = temp.size
 			for (y in 0 until height / 2) {
 				val row1 = getOffset(0, y)
@@ -200,26 +204,30 @@ fun BitmapData.slice(rect: IRectangle): BitmapData {
 	return destination;
 }
 
+fun BitmapData.applyMask(mask: BitmapData): BitmapData {
+	val color = this
+	var newBitmap = BitmapData(color.width, color.height, Colors.TRANSPARENT);
+	newBitmap.copyPixels(color, color.rect, IPoint(0, 0));
+	newBitmap.copyChannel(mask, mask.rect, IPoint(0, 0), BitmapDataChannel.RED, BitmapDataChannel.ALPHA);
+	return newBitmap;
+}
+
+
 object BitmapDataUtils {
 	fun combineColorMask(color: BitmapData, mask: BitmapData): BitmapData {
-		var newBitmap = BitmapData(color.width, color.height, true, 0x00000000);
-		newBitmap.copyPixels(color, color.rect, IPoint(0, 0));
-		newBitmap.copyChannel(mask, mask.rect, IPoint(0, 0), BitmapDataChannel.RED, BitmapDataChannel.ALPHA);
-		return newBitmap;
+		return color.applyMask(mask)
 	}
 
 	fun chromaKey(image: BitmapData, chromaKey: Int): BitmapData {
 		var colors = image.getPixels(image.rect);
-		var output = BitmapData(image.width, image.height, true, 0);
-		Memory.select(colors) {
-			var m = 0;
-			val chromaKey2 = chromaKey and 0xFFFFFF;
-			for (n in 0 until colors.size / 4) {
-				var c = Memory.getI32(m);
-				if (((c ushr 8) and 0xFFFFFF) == chromaKey2) c = 0;
-				Memory.setI32(m, c);
-				m += 4;
-			}
+		var output = BitmapData(image.width, image.height, Colors.TRANSPARENT)
+		var m = 0;
+		val chromaKey2 = chromaKey and 0xFFFFFF;
+		for (n in 0 until colors.size / 4) {
+			var c = colors[m]
+			if (((c ushr 8) and 0xFFFFFF) == chromaKey2) c = 0;
+			colors[m] = c
+			m++
 		}
 		output.setPixels(image.rect, colors);
 		return output;

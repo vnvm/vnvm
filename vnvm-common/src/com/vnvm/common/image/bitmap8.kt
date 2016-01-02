@@ -168,29 +168,25 @@ class BitmapData8(val width: Int, val height: Int) {
 		var rectY = rect.y
 		var rectW = rect.width
 		var rectH = rect.height
-		var temp = ByteArray(rectW * rectH * 4)
+		var temp = IntArray(rectW * rectH)
 		var colorsPalette = palette.colors.map { it.toInt() }.toIntArray()
 
-		Memory.select(temp) {
-			var dstPos: Int
-			var srcPos: Int
-			var _data = data
-			for (y in 0 until rectH) {
-				dstPos = y * rectW * 4
-				srcPos = getIndex(rectX + 0, rectY + y)
+		var dstPos: Int
+		var srcPos: Int
+		var _data = data
+		for (y in 0 until rectH) {
+			dstPos = y * rectW
+			srcPos = getIndex(rectX + 0, rectY + y)
 
-				//Log.trace(Std.format("($srcPos, $dstPos) :: ($rectX, $rectY, $rectW, $rectH)"))
+			//Log.trace(Std.format("($srcPos, $dstPos) :: ($rectX, $rectY, $rectW, $rectH)"))
 
-				for (x in 0 until rectW) {
-					Memory.setI32(dstPos, colorsPalette[_data.getu(srcPos)])
-					dstPos += 4
-					srcPos += 1
-				}
+			for (x in 0 until rectW) {
+				temp[dstPos] = colorsPalette[_data.getu(srcPos)]
+				dstPos += 1
+				srcPos += 1
 			}
-			bmp.setPixels(rect, temp)
 		}
-
-		Memory.free(temp)
+		bmp.setPixels(rect, temp)
 	}
 
 	public fun getIndex(x: Int, y: Int): Int = y * width + x
@@ -218,10 +214,11 @@ class BitmapData8(val width: Int, val height: Int) {
 		rectW = rectW.clamp(0, this.width - 1 - rectX)
 		rectH = rectH.clamp(0, this.height - 1 - rectY)
 
-		Memory.select(data) {
-			for (y in 0 until rectH) {
-				var n: Int = getIndex(rectX + 0, rectY + y)
-				Memory.memset8(n, rectW, color)
+		val col0 = color.toByte()
+		for (y in 0 until rectH) {
+			var n: Int = getIndex(rectX + 0, rectY + y)
+			for (x in 0 until rectW) {
+				data[n + x] = col0
 			}
 		}
 	}

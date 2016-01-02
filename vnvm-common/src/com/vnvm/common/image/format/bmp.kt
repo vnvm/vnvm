@@ -86,7 +86,7 @@ object BMP : Imaging.Provider {
 		var width = bitmapData.width
 		var height = bitmapData.height
 
-		var row = ByteArray(width * 4)
+		var row = IntArray(width)
 		for (y in 0 until height) {
 			var opos = 0
 			for (x in 0 until width) {
@@ -94,10 +94,7 @@ object BMP : Imaging.Provider {
 				val g = bytes.readUnsignedByte().toByte()
 				val b = bytes.readUnsignedByte().toByte()
 				val a = 0xFF.toByte()
-				row[opos++] = b
-				row[opos++] = g
-				row[opos++] = r
-				row[opos++] = a
+				row[opos++] = Color.packRGBA(r, g, b, a)
 			}
 			bitmapData.setPixels(IRectangle(0, height - y - 1, width, 1), row);
 			//bitmapData.setPixels(IRectangle(0, y, width, 1), row);

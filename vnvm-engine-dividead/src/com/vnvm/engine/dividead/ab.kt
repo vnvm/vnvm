@@ -89,7 +89,7 @@ class AB(public var game: Game) {
 	}
 
 	public fun paintToColorAsync(color: BColor, time: TimeSpan): Promise<Unit> {
-		val blackSprite = BitmapData(640, 480, true, color.toInt())
+		val blackSprite = BitmapData(640, 480, color)
 
 		return game.gameSprite.tweens.animateAsync(time) { step ->
 			game.front.copyPixels(game.back, game.back.rect, IPoint(0, 0))

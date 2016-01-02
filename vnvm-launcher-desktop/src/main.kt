@@ -7,12 +7,10 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration
 import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.Pixmap
-import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.Gdx2DPixmap
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.math.Affine2
-import com.badlogic.gdx.math.Vector2
 import com.badlogic.jglfw.gl.GL
 import com.vnvm.common.async.Signal
 import com.vnvm.common.collection.Stack
@@ -24,6 +22,7 @@ import com.vnvm.common.view.Views
 import com.vnvm.engine.dividead.DivideadEngine
 import com.vnvm.graphics.*
 import java.nio.ByteBuffer
+import java.nio.ByteOrder
 import kotlin.properties.Delegates
 
 fun main(args: Array<String>) {
@@ -56,9 +55,13 @@ class LibgdxTexture(
 	fun upload(data: BitmapData) {
 		val pixelsData = data.getPixels(flipY = false)
 		//val pixelsData = data.getPixels(flipY = true)
-		val bb = ByteBuffer.allocateDirect(pixelsData.size)
-		bb.put(pixelsData)
-		bb.flip()
+		val bb = ByteBuffer.allocateDirect(pixelsData.size * 4)
+		bb.order(ByteOrder.LITTLE_ENDIAN)
+		for (n in 0 until pixelsData.size) {
+			bb.putInt(n shl 2, pixelsData[n])
+
+		}
+		//bb.flip()
 		val pixmap = Gdx2DPixmap(bb, longArrayOf(0L, data.width.toLong(), data.height.toLong(), Gdx2DPixmap.GDX2D_FORMAT_RGBA8888.toLong()))
 		val pixmap2 = Pixmap(pixmap)
 		tex?.dispose()
@@ -84,10 +87,10 @@ class LibgdxTexture(
 	}
 }
 
-class SoundWrapper(val native:com.badlogic.gdx.audio.Sound) : Sound {
+class SoundWrapper(val native: com.badlogic.gdx.audio.Sound) : Sound {
 }
 
-class MusicWrapper(val native:com.badlogic.gdx.audio.Music) : Music {
+class MusicWrapper(val native: com.badlogic.gdx.audio.Music) : Music {
 }
 
 class LibgdxContext : RenderContext, GraphicsContext, InputContext, WindowContext, AudioContext {
@@ -96,7 +99,7 @@ class LibgdxContext : RenderContext, GraphicsContext, InputContext, WindowContex
 		file.writeBytes(data, offset, size, false)
 		return try {
 			SoundWrapper(Gdx.audio.newSound(file))
-		} catch (e:Throwable) {
+		} catch (e: Throwable) {
 			e.printStackTrace()
 			DummySoundMusic
 		}
@@ -107,7 +110,7 @@ class LibgdxContext : RenderContext, GraphicsContext, InputContext, WindowContex
 		file.writeBytes(data, offset, size, false)
 		return try {
 			MusicWrapper(Gdx.audio.newMusic(file))
-		} catch (e:Throwable) {
+		} catch (e: Throwable) {
 			e.printStackTrace()
 			DummySoundMusic
 		}
@@ -121,12 +124,12 @@ class LibgdxContext : RenderContext, GraphicsContext, InputContext, WindowContex
 		(sound as? MusicWrapper)?.native?.play()
 	}
 
-	override fun stop(sound:Sound) {
+	override fun stop(sound: Sound) {
 		(sound as? SoundWrapper)?.native?.stop()
 		(sound as? SoundWrapper)?.native?.dispose()
 	}
 
-	override fun stop(sound:Music) {
+	override fun stop(sound: Music) {
 		(sound as? MusicWrapper)?.native?.stop()
 		(sound as? MusicWrapper)?.native?.dispose()
 	}
@@ -199,7 +202,7 @@ class LibgdxContext : RenderContext, GraphicsContext, InputContext, WindowContex
 		}
 
 	val tempAffine = Affine2()
-	override fun quad(tex: TextureSlice, x:Double, y:Double, width: Double, height: Double) {
+	override fun quad(tex: TextureSlice, x: Double, y: Double, width: Double, height: Double) {
 		if (DEBUG) println("quad: $width, $height")
 		val tt = tex.texture as LibgdxTexture
 		tt.checkVersion()

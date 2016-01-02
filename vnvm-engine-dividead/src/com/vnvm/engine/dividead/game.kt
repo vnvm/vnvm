@@ -80,8 +80,8 @@ class Game(
 
 	public var scriptOpcodes = ScriptOpcodes.createWithClass(AB_OP::class.java)
 	public var state = GameState();
-	public var back = BitmapData(640, 480, false, 0xFF000000.toInt());
-	public var front = BitmapData(640, 480, false, 0xFF000000.toInt());
+	public var back = BitmapData(640, 480, Colors.BLACK);
+	public var front = BitmapData(640, 480, Colors.BLACK);
 	public var textField = TextField(fnt).apply {
 		selectable = false;
 		x = 110.0;

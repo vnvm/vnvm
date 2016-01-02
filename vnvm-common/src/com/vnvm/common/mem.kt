@@ -1,5 +1,6 @@
 package com.vnvm.common
 
+/*
 object Memory {
 	var defaultMem = ByteArray(0);
 	var mem = defaultMem;
@@ -53,6 +54,7 @@ object MemoryI {
 		Memory.setI32(index shl 2, value)
 	}
 }
+*/
 
 /*
 object Memory {
