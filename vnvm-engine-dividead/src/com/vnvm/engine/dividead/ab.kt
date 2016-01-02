@@ -28,8 +28,8 @@ class AB(public var game: Game) {
 
 	fun parseParam(type: Char): Any {
 		return when (type) {
-			'F' -> script.readShort().clamp(0, 999)
-			'2' -> script.readShort()
+			'F' -> script.readUnsignedShort().clamp(0, 999)
+			'2' -> script.readUnsignedShort()
 			'T', 'S', 's' -> script.readStringz()
 			'P' -> script.readUnsignedInt()
 			'c' -> script.readUnsignedByte().toChar()

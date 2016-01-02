@@ -94,7 +94,11 @@ class IsoFile private constructor(
 	fun locateNode(path:String):IsoNode = root[path]
 
 	override fun openAsync(path: String) = Promise.resolved(locateNode(path).openAsync())
-	override fun statAsync(path: String) = Promise.resolved(locateNode(path).vfsStat)
+	override fun statAsync(path: String) = Promise.resolved(try {
+		locateNode(path).vfsStat
+	} catch (t:Throwable) {
+		VfsStat(VfsFile(this, path), 0L, false)
+	})
 	override fun listAsync(path: String) = Promise.resolved(locateNode(path).children.map { it.vfsStat })
 }
 
@@ -114,7 +118,7 @@ public class IsoNode(
 		return iso.s.sliceLength(dr.offset, dr.size.value.toLong())
 	}
 
-	val vfsStat: VfsStat get() = VfsStat(VfsFile(iso, path), dr.size.value.toLong())
+	val vfsStat: VfsStat get() = VfsStat(VfsFile(iso, path), dr.size.value.toLong(), true)
 
 	override fun toString() = "IsoNode($path)"
 

@@ -7,6 +7,7 @@ class VfsFile(val vfs: VirtualFileSystem, val path: String) {
 	fun openAsync(): Promise<AsyncStream> = vfs.openAsync(path)
 	fun listAsync(): Promise<List<VfsStat>> = vfs.listAsync(path)
 	fun statAsync(): Promise<VfsStat> = vfs.statAsync(path)
+	fun existsAsync(): Promise<Boolean> = this.statAsync().then { it.exists }
 	fun readAllAsync(): Promise<ByteArray> = vfs.readAllAsync(path)
 	fun jail(): VfsFile = JailVirtualFileSystem(this).root()
 	operator fun get(subpath: String) = VfsFile(vfs, "$path/$subpath".trimStart('/')) // @TODO: Security!
@@ -14,7 +15,9 @@ class VfsFile(val vfs: VirtualFileSystem, val path: String) {
 }
 
 data class VfsStat(
-	val file: VfsFile, val size: Long
+	val file: VfsFile,
+	val size: Long,
+    val exists:Boolean
 ) {
 	val name:String = file.path
 
@@ -76,7 +79,11 @@ private class _LocalVirtualFileSystem(val basepath:String) : VirtualFileSystem {
 	}
 
 	private fun getStat(file:File):VfsStat {
-		return VfsStat(VfsFile(this, file.name), file.length())
+		try {
+			return VfsStat(VfsFile(this, file.name), file.length(), true)
+		} catch (e:Throwable) {
+			return VfsStat(VfsFile(this, file.name), 0L, false)
+		}
 	}
 
 	private fun resolveFile(path:String):File {

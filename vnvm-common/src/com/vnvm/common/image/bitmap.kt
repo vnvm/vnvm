@@ -217,13 +217,18 @@ fun BitmapData.applyChroma(color: BColor): BitmapData {
 	var colors = image.getPixels(image.rect);
 	var output = BitmapData(image.width, image.height, Colors.TRANSPARENT)
 	var m = 0;
-	val chromaKey2 = color.toInt() and 0xFFFFFF;
-	for (n in 0 until colors.size / 4) {
+	val chromaKey2 = Color.getRGB(color.toInt())
+	var transparentCount = 0
+	for (n in 0 until colors.size) {
 		var c = colors[m]
-		if (((c ushr 8) and 0xFFFFFF) == chromaKey2) c = 0;
+		if (Color.getRGB(c) == chromaKey2) {
+			c = 0
+			transparentCount++
+		}
 		colors[m] = c
 		m++
 	}
+	//println("applyChroma: transparentCount=$transparentCount")
 	output.setPixels(image.rect, colors);
 	return output;
 

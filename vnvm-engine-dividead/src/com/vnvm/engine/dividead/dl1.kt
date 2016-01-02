@@ -53,12 +53,16 @@ class DL1 : VirtualFileSystem {
 	override public fun listAsync(path: String): Promise<List<VfsStat>> {
 		return Promise.resolved(this.entries.map {
 			val (name, info) = it
-			VfsStat(VfsFile(this, name), info.length)
+			VfsStat(VfsFile(this, name), info.length, true)
 		}.filter { it.name.startsWith(path) })
 	}
 
 	override public fun statAsync(path: String): Promise<VfsStat> {
-		return Promise.resolved(VfsStat(VfsFile(this, path), getEntry(path).length))
+		return Promise.resolved(try {
+			VfsStat(VfsFile(this, path), getEntry(path).length, true)
+		} catch (t:Throwable) {
+			VfsStat(VfsFile(this, path), 0L, false)
+		})
 	}
 
 	public fun listFiles(): Iterable<String> {

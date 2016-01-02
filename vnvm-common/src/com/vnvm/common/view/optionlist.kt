@@ -27,7 +27,7 @@ class OptionList<TOption : OptionList.Item>(
 	}
 	val elementSize = IPoint(rect.width / columns, rect.height / rows)
 
-	fun showAsync(items: List<TOption>): Promise<TOption> {
+	fun showAsync(items: List<TOption>, initialOption: TOption? = items.firstOrNull()): Promise<TOption> {
 		if (items.size == 0) return Promise.rejected(InvalidOperationException("No items to select!"))
 		val deferred = Promise.Deferred<TOption>()
 		sprite.removeChildren()
@@ -41,7 +41,7 @@ class OptionList<TOption : OptionList.Item>(
 			val pos = it.second
 			SpatialMenu.Item(pos, option)
 		}
-		var selectedOption = options.first()
+		var selectedOption = options.first { it.option == initialOption!! }
 		val optionTextFields = options.map {
 			Pair(it, TextField(font))
 		}.toMap()

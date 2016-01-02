@@ -12,6 +12,7 @@ interface BColor {
 }
 
 fun BColor.toInt() = Color.packRGBA(r, g, b, a)
+fun BColor.toRGB() = this.toInt() and 0xFFFFFF
 
 class MutableColor(
 	override var r: Int,
@@ -110,6 +111,8 @@ class Color(r: Int, g: Int, b: Int, a: Int) : BColor {
 		fun getG(value: Int): Int = (value ushr GShift) and 0xFF
 		fun getR(value: Int): Int = (value ushr RShift) and 0xFF
 		fun getA(value: Int): Int = (value ushr AShift) and 0xFF
+
+		fun getRGB(value: Int): Int = value and 0xFFFFFF
 
 		fun getBf(value: Int): Double = getB(value).toDouble() / 255.0
 		fun getGf(value: Int): Double = getG(value).toDouble() / 255.0
