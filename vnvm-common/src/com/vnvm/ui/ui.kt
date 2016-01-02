@@ -30,7 +30,7 @@ object SpatialMenu {
 			sel,
 			{ it, sel -> it.pos.s().compareTo(sel.pos.s()) * mult > 0 },
 			{ dx, dy -> if (isx) (dx * dx) / dy else (dy * dy) / dx },
-			{ it, sel -> Math.abs(it.pos.s() - sel.pos.s()).toDouble() }
+			{ it, sel -> it.pos.distanceTo(sel.pos) }
 		) ?: sel
 	}
 
@@ -51,7 +51,7 @@ object SpatialMenu {
 		val bestOption = availableOptions.zip(scores)
 			.filter { it.second == maxScore }
 			.map { it.first }
-			.sortedByDescending { scoring2(it, sel) }
+			.sortedBy { scoring2(it, sel) }
 			.firstOrNull()
 		return bestOption
 	}

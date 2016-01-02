@@ -89,6 +89,7 @@ class MutableColor(
 }
 
 class Color(r: Int, g: Int, b: Int, a: Int) : BColor {
+	val int = Color.packRGBA(r, g, b, a)
 	override val r: Int = r and 0xff
 	override val g: Int = g and 0xff
 	override val b: Int = b and 0xff
@@ -137,7 +138,7 @@ class Color(r: Int, g: Int, b: Int, a: Int) : BColor {
 	}
 
 	fun toMutable() = MutableColor(r, g, b, a)
-	fun toInt() = Color.packRGBA(r, g, b, a)
+	fun toInt() = int
 }
 
 object Colors {

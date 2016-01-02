@@ -19,6 +19,10 @@ data class Point(
 			return Array2.range(x, y).map { Point(it.first, it.second) }
 		}
 	}
+
+	fun distanceTo(that: Point): Double {
+		return Math.hypot(that.x - this.x, that.y - this.y)
+	}
 }
 
 data class Rectangle(

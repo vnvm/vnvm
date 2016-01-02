@@ -327,6 +327,10 @@ class Signal<T : Any> {
 	operator fun invoke(value: T) = dispatch(value)
 }
 
+//fun <T : Any> Signal<T>.filter(filter: (T) -> Boolean): Signal<T> {
+
+//}
+
 fun Signal<Unit>.dispatch() {
 	return this.dispatch(Unit)
 }
@@ -335,7 +339,7 @@ fun <T : Any> Signal<T>.pipeTo(that: Signal<T>) {
 	this.add { that.dispatch(it) }
 }
 
-fun Promise.Companion.waitOneAsync(vararg signals: Signal<*>):Promise<Unit> {
+fun Promise.Companion.waitOneAsync(vararg signals: Signal<*>): Promise<Unit> {
 	val deferred = Promise.Deferred<Unit>()
 	val disposableGroup = DisposableGroup()
 	for (signal in signals) {
@@ -457,4 +461,44 @@ object EventLoop {
 		callback()
 		waitAllEvents()
 	}
+}
+
+class Stream2<T : Any> {
+	class Emisor<T : Any> {
+		val stream = Stream2<T>()
+
+		fun emit(value: T): Unit {
+			stream.onEmit.dispatch(value)
+		}
+
+		fun close(): Unit {
+			stream.onClose.dispatch(Unit)
+		}
+	}
+
+	private val onEmit = Signal<T>()
+	private val onClose = Signal<Unit>()
+
+	fun listenAsync(callback: (value: T) -> Unit): Promise<Unit> {
+		val deferred = Promise.Deferred<Unit>()
+		onEmit.add { callback(it) }
+		onClose.once { deferred.resolve(Unit) }
+		return deferred.promise
+	}
+}
+
+fun <T1 : Any, T2 : Any> Stream2<T1>.map(map: (T1) -> T2): Stream2<T2> {
+	val emisor = Stream2.Emisor<T2>()
+	this.listenAsync { emisor.emit(map(it)) }.then {
+		emisor.close()
+	}
+	return emisor.stream
+}
+
+fun <T : Any> Stream2<T>.filter(filter: (T) -> Boolean): Stream2<T> {
+	val emisor = Stream2.Emisor<T>()
+	this.listenAsync { if (filter(it)) emisor.emit(it) }.then {
+		emisor.close()
+	}
+	return emisor.stream
 }

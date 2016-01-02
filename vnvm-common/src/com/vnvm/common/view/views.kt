@@ -86,7 +86,8 @@ class UpdatableGroup : Updatable {
 	}
 
 	override fun update(dt: Int) {
-		for (n in 0 until items.size) items[n].update(dt)
+		var n = 0
+		while (n < items.size) items[n++].update(dt)
 	}
 }
 

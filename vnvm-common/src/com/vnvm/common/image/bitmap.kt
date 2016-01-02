@@ -212,27 +212,24 @@ fun BitmapData.applyMask(mask: BitmapData): BitmapData {
 	return newBitmap;
 }
 
+fun BitmapData.applyChroma(color: BColor): BitmapData {
+	val image = this
+	var colors = image.getPixels(image.rect);
+	var output = BitmapData(image.width, image.height, Colors.TRANSPARENT)
+	var m = 0;
+	val chromaKey2 = color.toInt() and 0xFFFFFF;
+	for (n in 0 until colors.size / 4) {
+		var c = colors[m]
+		if (((c ushr 8) and 0xFFFFFF) == chromaKey2) c = 0;
+		colors[m] = c
+		m++
+	}
+	output.setPixels(image.rect, colors);
+	return output;
+
+}
 
 object BitmapDataUtils {
-	fun combineColorMask(color: BitmapData, mask: BitmapData): BitmapData {
-		return color.applyMask(mask)
-	}
-
-	fun chromaKey(image: BitmapData, chromaKey: Int): BitmapData {
-		var colors = image.getPixels(image.rect);
-		var output = BitmapData(image.width, image.height, Colors.TRANSPARENT)
-		var m = 0;
-		val chromaKey2 = chromaKey and 0xFFFFFF;
-		for (n in 0 until colors.size / 4) {
-			var c = colors[m]
-			if (((c ushr 8) and 0xFFFFFF) == chromaKey2) c = 0;
-			colors[m] = c
-			m++
-		}
-		output.setPixels(image.rect, colors);
-		return output;
-	}
-
 	/*
 	private fun _blend(colorDataData: BytesData, maskDataData: BytesData, totalPixels: Int, readOffset: Int, writeOffset: Int, ratio: Float, reverse: Bool) {
 		var colorDataData2 = new Bytes3(Bytes.ofData(colorDataData));

@@ -1,5 +1,6 @@
 package com.vnvm.engine.dividead
 
+import com.vnvm.common.DisposableGroup
 import com.vnvm.common.IRectangle
 import com.vnvm.common.async.Promise
 import com.vnvm.common.async.unit
@@ -7,12 +8,14 @@ import com.vnvm.common.async.waitOneAsync
 import com.vnvm.common.error.noImpl
 import com.vnvm.common.image.BitmapDataUtils
 import com.vnvm.common.image.Colors
+import com.vnvm.common.image.applyChroma
 import com.vnvm.common.log.Log
 import com.vnvm.common.milliseconds
 import com.vnvm.common.script.Opcode
 import com.vnvm.common.seconds
 import com.vnvm.common.view.Bitmap
 import com.vnvm.common.view.Sprite
+import com.vnvm.graphics.Keys
 import com.vnvm.graphics.Sound
 
 class AB_OP(val ab: AB) {
@@ -84,7 +87,7 @@ class AB_OP(val ab: AB) {
 		//println("TEXT: $text")
 		game.textField.text = text.replace('@', '"')
 
-		var slices = game.ifc.PAGES.map { Bitmap(it) }
+		var slices = game.ui.PAGES.map { Bitmap(it) }
 		var animated = Sprite()
 		var totalTime = 0
 		animated.addUpdatable { dt ->
@@ -98,7 +101,20 @@ class AB_OP(val ab: AB) {
 			game.gameSprite.timers.waitAsync(50.milliseconds);
 		} else {
 			//game.gameSprite.timers.waitAsync(5000.milliseconds);
-			Promise.waitOneAsync(animated.keys.onKeyDown, animated.keys.onKeyPress, animated.mice.onMouseClick)
+			val deferred = Promise.Deferred<Unit>()
+			val group = DisposableGroup()
+			fun done() {
+				group.dispose()
+				deferred.resolve(Unit)
+			}
+			animated.keys.onKeyDown.add {
+				if (it.code != Keys.ESC) done()
+			}
+			animated.mice.onMouseClick.add {
+				done()
+			}
+
+			deferred.promise
 		}
 		animated.x = 520.0;
 		animated.y = 448.0;
@@ -256,23 +272,18 @@ class AB_OP(val ab: AB) {
 
 	@Opcode(id = 0x46, format = "S", description = "Sets an image as the foreground")
 	public fun FOREGROUND(name: String): Promise<Unit> {
-		return game.getImageCachedAsync(name).then { bitmapData ->
-			game.back.draw(bitmapData, 0, 0);
-		}
+		return game.setFrameAsync(name)
 	}
 
 	@Opcode(id = 0x47, format = "s", description = "Sets an image as the background")
 	public fun BACKGROUND(name: String): Promise<Unit> {
-		state.background = name;
-		return game.getImageCachedAsync(name).then { bitmapData ->
-			game.back.draw(bitmapData, 32, 8);
-		}
+		return game.setBackgroundAsync(name)
 	}
 
 	@Opcode(id = 0x16, format = "S", description = "Puts an image overlay on the screen")
 	public fun IMAGE_OVERLAY(name: String): Promise<Unit> {
 		return game.getImageCachedAsync(name).then { bitmapData ->
-			var outBitmapData = BitmapDataUtils.chromaKey(bitmapData, 0x00FF00)
+			var outBitmapData = bitmapData.applyChroma(Colors.GREEN)
 			game.back.draw(outBitmapData, 32, 8);
 		}
 	}

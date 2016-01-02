@@ -154,7 +154,8 @@ object Keys {
 	*/
 
 	// http://developer.android.com/reference/android/view/KeyEvent.html
-	val Return = 66
+	val RETURN = 66
+	val ESC = 131
 }
 
 interface InputContext {

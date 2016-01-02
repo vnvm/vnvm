@@ -1,26 +1,27 @@
 package com.vnvm.engine.dividead
 
-import com.vnvm.common.*
+import com.vnvm.common.IRectangle
+import com.vnvm.common.MusicChannel
+import com.vnvm.common.SoundChannel
 import com.vnvm.common.async.Promise
-import com.vnvm.common.error.InvalidOperationException
 import com.vnvm.common.image.BitmapData
-import com.vnvm.common.image.BitmapDataUtils
 import com.vnvm.common.image.BitmapFont
 import com.vnvm.common.image.Colors
+import com.vnvm.common.image.applyMask
 import com.vnvm.common.io.VfsFile
 import com.vnvm.common.script.ScriptOpcodes
+import com.vnvm.common.seconds
 import com.vnvm.common.view.*
 import com.vnvm.graphics.Keys
 import com.vnvm.graphics.Music
 import com.vnvm.graphics.Sound
-import com.vnvm.ui.SpatialMenu
 
 class GameResources(
 	val views: Views,
 	val fileSystem: VfsFile,
 	val sg: VfsFile,
 	val wv: VfsFile,
-    val fnt: BitmapFont
+	val fnt: BitmapFont
 ) {
 	public var mid = fileSystem["MID"]
 
@@ -47,7 +48,7 @@ class GameResources(
 		} else {
 			getImageCachedAsync(imageNameColor).pipe { color ->
 				getImageCachedAsync(imageNameMask).then { mask ->
-					imageCache[imageName] = BitmapDataUtils.combineColorMask(color, mask)
+					imageCache[imageName] = color.applyMask(mask)
 					imageCache[imageName]!!
 				}
 			}
@@ -57,7 +58,7 @@ class GameResources(
 	public fun getSoundAsync(soundName: String): Promise<Sound> = getSoundMusicAsync("wav", wv, soundName, music = false).then { it as Sound }
 	public fun getMusicAsync(musicName: String): Promise<Music> = getSoundMusicAsync("mid", mid, musicName, music = true).then { it as Music }
 
-	private fun getSoundMusicAsync(extension: String, vfs: VfsFile, name: String, music:Boolean): Promise<Any> {
+	private fun getSoundMusicAsync(extension: String, vfs: VfsFile, name: String, music: Boolean): Promise<Any> {
 		val name = Game.addExtensionsWhenRequired(name, extension).toUpperCase();
 		return vfs[name].readAllAsync().then { byteArray ->
 			if (music) {
@@ -72,7 +73,7 @@ class GameResources(
 class Game(
 	val views: Views,
 	val resources: GameResources,
-    val ifc: DivideadInterface
+	val ui: DivideadUi
 ) {
 	// @TODO: Migrate
 	val sg = resources.sg
@@ -96,13 +97,25 @@ class Game(
 	public var voiceChannel = SoundChannel(views)
 	public var effectChannel = SoundChannel(views)
 	public var musicChannel = MusicChannel(views)
-	public var optionList = OptionList<GameState.Option>(fnt, IRectangle(108, 402, 428, 60), 3, 2, true)
+	public var optionList = OptionList<GameState.Option>(fnt, IRectangle(108, 402, 428, 60), 3, 2)
+	public val mainMenu = GameMenu(this)
+	val extraScene = ExtraScene(this)
+	var ab = AB(this)
 
 	public var gameSprite = Sprite().apply {
 		addChild(Bitmap(front));
 		addChild(textField);
 		addChild(optionList.sprite);
 		addChild(overlaySprite);
+		addChild(mainMenu.sprite)
+	}
+
+	init {
+		gameSprite.keys.onKeyDown.add {
+			if (it.code == Keys.ESC) {
+				showMainMenuAsync()
+			}
+		}
 	}
 
 	public fun isSkipping() = views.isPressing(Keys.CONTROL_LEFT);
@@ -112,12 +125,12 @@ class Game(
 			return if (name.indexOf(".") >= 0) name else name + "." + expectedExtension
 		}
 
-		fun newAsync(views: Views, commonVfs:VfsFile, gameVfs: VfsFile): Promise<Game> {
+		fun newAsync(views: Views, commonVfs: VfsFile, gameVfs: VfsFile): Promise<Game> {
 			return getDl1Async(gameVfs["SG.DL1"]).pipe { sg ->
 				getDl1Async(gameVfs["WV.DL1"]).pipe { wv ->
 					BitmapFont.openAsync(views, commonVfs["arial-15.fnt"], commonVfs["arial-15.png"]).pipe { fnt ->
 						val resources = GameResources(views, gameVfs, sg, wv, fnt)
-						DivideadInterface.initAsync(resources).then { ifc ->
+						DivideadUi.initAsync(resources).then { ifc ->
 							Game(views, resources, ifc)
 						}
 					}
@@ -132,89 +145,110 @@ class Game(
 
 	// @TODO: Migrate
 	fun getImageCachedAsync(imageName: String) = resources.getImageCachedAsync(imageName)
+
 	fun getImageMaskCachedAsync(imageNameColor: String, imageNameMask: String) = resources.getImageMaskCachedAsync(imageNameColor, imageNameMask)
 	fun getSoundAsync(soundName: String) = resources.getSoundAsync(soundName)
 	fun getMusicAsync(musicName: String) = resources.getMusicAsync(musicName)
-}
 
-class OptionList<TOption : OptionList.Item>(
-	val font: BitmapFont,
-	val rect: IRectangle,
-	val rows: Int,
-	val columns: Int,
-	val something: Boolean
-) {
-	interface Item {
-		val text: String
+	fun startGame(name: String, offset: Int = 0) {
+		ab.loadScriptAsync(name, offset).then { success ->
+			ab.executeAsync()
+		}
 	}
 
-	val sprite = Sprite().apply {
-		visible = false
-		x = rect.x.toDouble()
-		y = rect.y.toDouble()
-	}
-	val elementSize = IPoint(rect.width / columns, rect.height / rows)
-
-	fun showAsync(items: List<TOption>): Promise<TOption> {
-		if (items.size == 0) return Promise.rejected(InvalidOperationException("No items to select!"))
-		val deferred = Promise.Deferred<TOption>()
-		sprite.removeChildren()
-
-		val options = items.zip(Point.range(columns, rows)).map {
-			val option = it.first
-			val pos = it.second
-			SpatialMenu.Item(pos, option)
-		}
-		var selectedOption = options.first()
-		val optionTextFields = options.map {
-			Pair(it, TextField(font))
-		}.toMap()
-
-		fun updateTextFields() {
-			for (tf in optionTextFields.values) tf.textColor = Colors.WHITE
-			optionTextFields[selectedOption]!!.textColor = Colors.RED
-		}
-
-		options.forEach {
-			val item = it.option
-			val pos = it.pos
-			val (posX, posY) = pos
-			val tx = posX.toDouble() * elementSize.x
-			val ty = posY.toDouble() * elementSize.y
-			println("$posX, $posY : $tx, $ty")
-			sprite.addChild(optionTextFields[it]!!.apply {
-				text = item.text
-				x = tx
-				y = ty
-			})
-		}
-
-		sprite.addChild(Sprite().apply {
-			keys.onKeyDown.add {
-				println("keyDown: ${it.code}")
-				val prevSel = selectedOption
-				when (it.code) {
-					Keys.LEFT -> selectedOption = SpatialMenu.moveLeft(options, selectedOption)
-					Keys.RIGHT -> selectedOption = SpatialMenu.moveRight(options, selectedOption)
-					Keys.UP -> selectedOption = SpatialMenu.moveUp(options, selectedOption)
-					Keys.DOWN -> selectedOption = SpatialMenu.moveDown(options, selectedOption)
-					Keys.Return -> deferred.resolve(selectedOption.option)
-					else -> Unit
-				}
-				updateTextFields()
-				//println("$prevSel -> $selectedOption")
+	fun initAsync(): Promise<Unit> {
+		return setFrameAsync("WAKU_A1").pipe {
+			setBackgroundAsync("TITLE").pipe {
+				ab.paintAsync(pos = 0, type = 2)
 			}
-		})
-
-		updateTextFields()
-
-		sprite.visible = true
-		return deferred.promise
+		}
 	}
 
-	fun hide() {
-		sprite.visible = false
+	fun showMainMenuAsync(): Promise<Unit> {
+		return mainMenu.showAsync(listOf(
+			GameMenu.Option("START") {
+				//addChild(new GameScalerSprite(640, 480, game.gameSprite));
+				startGame("aastart", 0)
+			},
+			GameMenu.Option("LOAD") {
+
+			},
+			GameMenu.Option("OPTION") {
+				showExtraAsync()
+			},
+			GameMenu.Option("EXIT") {
+				ab.paintToColorAsync(Colors.BLACK, 1.seconds).then {
+					System.exit(0)
+				}
+			}
+		))
 	}
 
+	fun showExtraAsync():Promise<Unit> {
+		return extraScene.showAsync()
+	}
+
+	fun setBackgroundAsync(name: String): Promise<Unit> {
+		state.background = name;
+		return getImageCachedAsync(name).then { bitmapData ->
+			back.draw(bitmapData, 32, 8);
+		}
+	}
+
+	fun setFrameAsync(name: String): Promise<Unit> {
+		return getImageCachedAsync(name).then { bitmapData ->
+			back.draw(bitmapData, 0, 0);
+		}
+	}
 }
 
+class GameMenu(val game: Game) {
+	val sprite = Sprite().apply {
+		x = 48.0
+		y = 16.0
+		visible = false
+	}
+
+	class Option(
+		override val text: String,
+		val callback: () -> Unit
+	) : OptionList.Item
+
+	fun showAsync(options: List<Option>): Promise<Unit> {
+		var py = 0
+		sprite.visible = true
+
+		sprite.removeChildren()
+		sprite.addChild(Bitmap(game.ui.MENU_HEAD).apply { y = py.toDouble() })
+		py += 40
+		for (option in options) {
+			sprite.addChild(Bitmap(game.ui.MENU_ROW).apply { y = py.toDouble() })
+			py += 16
+		}
+		sprite.addChild(Bitmap(game.ui.MENU_FOOT).apply { y = py.toDouble() })
+		val test = OptionList<Option>(game.fnt, IRectangle(16, 40, 240, 16 * options.size), options.size, 1)
+		sprite.addChild(test.sprite)
+		return test.showAsync(options).then {
+			sprite.visible = false
+			it.callback()
+			Unit
+		}
+	}
+}
+
+class ExtraScene(val game: Game) {
+	val bgpages = (0 until 6).map { "CGMODE_${('A' + it).toChar()}" }
+	val FLIST = game.ui.FLIST
+
+	fun setPageAsync(page: Int):Promise<Unit> {
+		return game.setFrameAsync("WAKU_A1").pipe {
+			game.setBackgroundAsync(bgpages[page]).pipe {
+				game.ab.paintAsync(0, 3)
+			}
+		}
+	}
+	//val CGMODE_1.BMP
+	fun showAsync():Promise<Unit> {
+		return setPageAsync(0)
+	}
+}

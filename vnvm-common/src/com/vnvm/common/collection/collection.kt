@@ -71,7 +71,7 @@ inline fun ByteArray.getu(offset: Int): Int {
 class Array2 {
 	companion object {
 		fun range(width: Int, height: Int): List<Pair<Int, Int>> {
-			val rows = (0 until width).toList()
+			val rows = (0 until height).toList()
 			val columns = (0 until width).toList()
 			return rows.flatMap { y -> columns.map { x -> Pair(x, y) } }
 		}
