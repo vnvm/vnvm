@@ -1,4 +1,4 @@
-package com.vnvm.engine.dividead
+package com.vnvm.engine.dividead.scene
 
 import com.vnvm.common.*
 import com.vnvm.common.async.Promise
@@ -9,8 +9,10 @@ import com.vnvm.common.image.BitmapData
 import com.vnvm.common.image.toInt
 import com.vnvm.common.io.BinBytes
 import com.vnvm.common.script.Instruction2
+import com.vnvm.engine.dividead.AB_OP
+import com.vnvm.engine.dividead.Game
 
-class AB(public var game: Game) {
+class IngameScene(public var game: Game) {
 	public var scriptName = ""
 	public var abOp = AB_OP(this)
 	private var script = BinBytes(ByteArray(0))

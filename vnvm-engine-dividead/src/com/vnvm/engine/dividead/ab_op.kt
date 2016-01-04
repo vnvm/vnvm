@@ -15,10 +15,11 @@ import com.vnvm.common.script.Opcode
 import com.vnvm.common.seconds
 import com.vnvm.common.view.Bitmap
 import com.vnvm.common.view.Sprite
+import com.vnvm.engine.dividead.scene.IngameScene
 import com.vnvm.graphics.Keys
 import com.vnvm.graphics.Sound
 
-class AB_OP(val ab: AB) {
+class AB_OP(val ab: IngameScene) {
 	//static var margin = { x = 108, y = 400, h = 12 };
 
 	val game = ab.game
